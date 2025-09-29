@@ -1,0 +1,172 @@
+body {
+  background-color: #f8f9fa; 
+  font-family: 'Trebuchet MS', sans-serif;
+  color: #212529;
+}
+
+/* navbar */
+header {
+  background-color: white;
+  color: #050733ff;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  margin: 0;
+  margin-left: 60px;
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas {
+  background-color: #050733ff;
+  color: #fff;
+}
+
+.btn-usuario {
+  background-color: #050733ff;
+  color: #fff;
+  margin-left: 10px;
+}
+
+/* menú lateral */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+.offcanvas {
+  font-size: 25px;
+}
+
+.offcanvas-title {
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+
+.nav-item {
+  font-weight: bold;
+  font-size: 22px;
+}
+#sidebar .nav-link {
+  font-size: 18px;   /* tamaño menú hamburguesa */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+
+.nav-pills .nav-link {
+  font-size: 25px;   /* tamaño botones nav */
+  color: #050733ff !important; 
+  font-weight: bold;
+
+}
+
+
+/* tarjeta de curso */
+.card {
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card-title {
+  font-weight: bold;
+  font-size: 28px;
+  color: #050733ff;
+}
+
+.form-label {
+  font-weight: bold;
+}
+
+
+.tabla-container {
+  max-width: 95%;   
+  margin: 30px auto;
+  overflow-x: auto;
+  border: none;    
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.tabla th,
+.tabla td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+.fijo {
+  min-width: 100px;
+  background: #f9f9f9;
+  font-weight: bold;
+}
+.tabla {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 800px;
+}
+
+.tabla th, .tabla td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+  min-width: 100px;
+}
+
+.tabla th {
+  background-color: #050733ff;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Columnas fijas a la izquierda */
+.fijo {
+  position: sticky;
+  left: 0;
+  background-color: #e4e6eb;
+  z-index: 1;
+}
+
+.fijo:nth-child(1) { left: 0; }
+.fijo:nth-child(2) { left: 120px; }
+.fijo:nth-child(3) { left: 240px; }
+
+.tabla input {
+  width: 90%;
+  padding: 4px;
+  border: 1px solid #999;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.error {
+  border: 2px solid red;
+  background-color: #ffe0e0;
+}
+

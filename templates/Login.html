@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="Viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/Login.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <title>Login</title>
+</head>
+<body class="body_style">
+
+  <header class="container">
+    <div class="container5">
+      <img src="/static/img/IMG 2.png" alt="..." class="img1">
+    </div>
+
+    <form action="{{ url_for('login') }}" method="POST">
+      <div class="mb-3">
+        <label for="email" class="form-label">Correo</label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="Edunotas@ejemplo.com" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Contraseña</label>
+        <div class="input-group">
+        <input type="password" id="password" name="password" class="form-control" required>
+        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
+      <i class="fa-solid fa-eye"></i>
+    </button>
+  </div>
+</div>
+
+      <button type="submit" class="btn btn-danger">CONFIRMAR</button>
+    </form>
+
+  
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="alert alert-{{ category }} mt-3">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <p class="text1">_________ o _________</p>
+    <p>
+      ¿No tienes cuenta? <a href="{{ url_for('registro') }}" class="registro-link">Regístrate aquí</a>
+    </p>
+    
+
+  </header>
+
+  <div class="container5">
+    <img src="/static/img/IMG 1.png" alt="..." class="img2">
+  </div>    
+
+  <script src="/static/js/Login.js"></script>
+
+  <script>
+    function togglePassword() {
+      const input = document.getElementById("password");
+      const icon = document.querySelector(".toggle-btn i");
+
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash"); // cambia a "ojo tachado"
+      } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye"); // vuelve al ojo normal
+      }
+    }
+  </script>
+</body>
+</html>

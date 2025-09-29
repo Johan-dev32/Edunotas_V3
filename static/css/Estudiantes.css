@@ -1,0 +1,206 @@
+body {
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+header {
+  background-color: rgb(255, 255, 255); /* azul */
+  color: rgb(255, 0, 0); /* texto en blanco */
+}
+
+/* Cambiar color del título */
+.titulo-header {
+ 
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;  /* lo acercas/separas de la izquierda */
+}
+
+/* Botón hamburguesa con color claro */
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+
+/* Botón de iniciar sesión */
+header .btn-outline-primary {
+  color: #050733ff;
+  border-color: #050733ff;
+  margin-left: 900px;
+
+}
+
+.btn-edunotas {
+    background-color: #050733ff; 
+    color: rgb(255, 255, 255);        
+    margin-left: 800px;
+
+}
+.btn-usuario {
+  background-color: #050733ff; 
+    color: rgb(255, 255, 255);        
+    margin-left: 10px;
+}
+
+
+header .btn-outline-primary:hover {
+  background-color: white;
+  color: #ffffff;
+}
+/* Menú lateral */
+.sidebar {
+  position: fixed;
+  left: -250px;
+  top: 0;
+  width: 250px;
+  height: 100%;
+  background: linear-gradient(to bottom, #3a7bd5, #3a6073, #e96443);
+  color: white;
+  padding: 20px;
+  transition: 0.3s;
+  z-index: 1000;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+.sidebar a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  margin: 15px 0;
+  font-size: 18px;
+  transition: 0.2s;
+}
+
+.sidebar a:hover {
+  font-weight: bold;
+}
+
+/* Capa oscura */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 900;
+}
+
+/* Contenido principal */
+.container {
+  padding: 20px;
+  margin-top: 10px;
+}
+
+.container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Botones */
+.actions {
+  margin-bottom: 0;
+  margin-top: 20px;
+  display: flex;
+  gap: 5px;
+  justify-content: flex-start;
+}
+
+.actions button {
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+}
+
+.actions .add { background: #28a745; }
+.actions .update { background: #007bff; }
+.actions .delete { background: #dc3545; }
+
+.search-bar {
+  text-align: right;
+  margin-bottom: 15px;
+}
+
+.search-bar input {
+  padding: 6px;
+  width: 220px;
+}
+
+/* Tabla */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background: #007bff;
+  color: white;
+}
+
+tr:hover {
+  background: #f1f1f1;
+}
+
+.offcanvas {
+  font-size: 25px;
+}
+
+
+.offcanvas-title{
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px ;
+}
+
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+.nav-item{
+  font-weight: bold;
+  font-size: 22px;
+}
+#sidebar .nav-link {
+  font-size: 18px;   /* tamaño menú hamburguesa */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
+.nav-pills .nav-link {
+  font-size: 25px;   /* tamaño botones nav */
+  color: #050733ff !important; 
+  font-weight: bold;
+
+}

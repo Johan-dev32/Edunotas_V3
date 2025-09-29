@@ -1,0 +1,270 @@
+body {
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Canvas de la animación al fondo */
+
+#finisher-canvas {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: -1 !important;
+  pointer-events: none;
+}
+
+
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+header {
+  background-color: rgb(255, 255, 255); /* azul */
+  color: rgb(255, 0, 0); /* texto en blanco */
+}
+
+/* Cambiar color del título */
+.titulo-header {
+ 
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;  /* lo acercas/separas de la izquierda */
+}
+
+/* Botón hamburguesa con color claro */
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+
+/* Botón de iniciar sesión */
+header .btn-outline-primary {
+  color: #050733ff;
+  border-color: #050733ff;
+  margin-left: 900px;
+
+}
+.btn-edunotas {
+    background-color: #050733ff; 
+    color: rgb(255, 255, 255);        
+    margin-left: 800px;
+
+}
+.btn-usuario {
+  background-color: #050733ff; 
+    color: rgb(255, 255, 255);        
+    margin-left: 10px;
+}
+
+
+header .btn-outline-primary:hover {
+  background-color: white;
+  color: #ffffff;
+}
+.h4{
+  margin-left: 250px;
+  font-weight: bolder;
+  margin-bottom: 10px; 
+  color:#050733ff;
+  margin-top: -20px;
+  font-size: 35px;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+.h5{
+  margin-left: 1000px;
+  font-weight: bolder;
+  margin-bottom: 10px; 
+  color:#050733ff;
+  margin-top: -400px;
+  font-size: 35px;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+.h6{
+  margin-left: 980px;
+  font-weight: bolder;
+  margin-bottom: 40px; 
+  color:#050733ff;
+  margin-top: -20px;
+  font-size: 35px;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+.offcanvas{
+  font-size: 25px;
+}
+
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+
+.btn-close-red-light {
+filter: invert(60%) sepia(100%) saturate(2000%) hue-rotate(316deg) brightness(103%) ;
+
+}
+section.bg-light {
+  margin-top: 500px; /* ajusta el valor */
+}
+.txtimg{
+margin-left: 460px;
+font-size: 40px;
+margin-top: 50px;
+font-weight: bolder;
+color: white;
+}
+.txtimg2{
+  margin-left: 550px;
+  font-size: 30px;
+  margin-top:   10px;
+  font-weight: bold;
+  color: white;
+}
+.txtimg3{
+  margin-left: 50px;
+  font-size: 15px;
+  margin-top: 30px;
+  color: white;
+  text-align: center; 
+  font-weight: bold;
+}
+.containerimg{
+   margin-bottom: 0;
+  padding-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 500px;
+  
+}
+.nav-pills{
+  margin-top: 40px;
+}
+.bg-light{
+  margin-top: -80px;
+}
+.section{
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+.offcanvas-title{
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px ;
+}
+.nav-item{
+  margin-bottom: 10px;
+}
+#sidebar .nav-link {
+  font-size: 18px;   /* tamaño menú hamburguesa */
+  font-weight: bold;
+}
+
+/* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
+.nav-pills .nav-link {
+  font-size: 25px;   /* tamaño botones nav */
+  color: #050733ff !important; 
+  font-weight: bold;
+
+}
+
+.nav-pills .nav-link {
+  color: #050733ff !important; 
+}
+
+/* Al pasar el mouse */
+.nav-pills .nav-link:hover {
+  color: rgb(18, 24, 139) !important; 
+}
+
+/* Cuando está activo */
+.nav-pills .nav-link.active {
+  background-color: #050733ff !important; 
+  color: #fff !important; 
+  font-weight: bold;
+}
+.nav-pills{
+  max-width: 1000px;  
+  margin: 0 auto;    
+}
+.tiulo4{
+  margin-left: 100px;
+  font-weight: bolder;
+  margin-bottom: 20px; 
+  color:#050733ff;
+  margin-top: -20px;
+  font-size: 30px;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+.tiulo5{
+  margin-left: 80px;
+  font-weight: bolder;
+  margin-bottom: 30px; 
+  color:#050733ff;
+  font-size: 30px;
+  top: 30px;
+}
+.editar{
+  margin-top: -60px;
+  margin-left: 930px;
+  font-size: 40px;
+  color: #050733ff;
+}
+#noticia1.bg-secondary {
+  width: 750px;
+  height: 300px;
+  background-color: #050733ff !important; /* tu color personalizado */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#noticia1.bg-secondary:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+.accordion-item{
+margin-left: 900px;
+}
+.accordion-header, .accordion-body{
+  width: 400px;
+}
+.editar1{
+  margin-top: -250px;
+  margin-left: 30px;
+  font-size: 40px;
+  color: #050733ff;
+}
+.scale-up-center {
+  animation: scale-up-center 0.6s ease-in-out both;
+}
+
+@keyframes scale-up-center {
+  0% {
+    transform: scale(.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

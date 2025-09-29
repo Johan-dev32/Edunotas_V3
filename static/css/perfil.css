@@ -1,0 +1,265 @@
+body {
+  font-family: 'Trebuchet MS', sans-serif;
+  /* Hace que la imagen cubra toda la pantalla */
+  background-repeat: no-repeat; /* Evita que se repita */
+   /* Hace que se quede fija al hacer scroll */
+  background-position: center;  /* Centra la imagen */
+  background-attachment: scroll;
+  height: 600px;
+}
+
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+  
+}
+header {
+  background-color: rgb(255, 255, 255); /* azul */
+  color: rgb(207, 0, 0); 
+}
+
+/* Cambiar color del título */
+.titulo-header {
+ 
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;  /* lo acercas/separas de la izquierda */
+}
+
+/* Botón hamburguesa con color claro */
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+
+/* Botón de iniciar sesión */
+header .btn-outline-primary {
+  color: #050733ff;
+  border-color: #050733ff;
+  margin-left: 900px;
+
+}
+.btn-edunotas {
+    background-color: #050733ff; 
+    color: rgb(255, 255, 255);        
+    margin-left: 800px;
+
+}
+.btn-usuario {
+  background-color: #050733ff; 
+    color: rgb(255, 255, 255);        
+    margin-left: 10px;
+}
+
+
+header .btn-outline-primary:hover {
+  background-color: white;
+  color: #ffffff;
+}
+
+.offcanvas {
+  font-size: 25px;
+}
+#sidebar .nav-link {
+  font-size: 18px;   /* tamaño menú hamburguesa */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
+.nav-pills .nav-link {
+  font-size: 25px;   /* tamaño botones nav */
+  color: #050733ff !important; 
+  font-weight: bold;
+
+}
+
+.offcanvas-title{
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px ;
+}
+.offcanvas{
+  font-weight: bold;
+  font-size: 22px;
+}
+
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+.titulo{
+  margin-left:600px;
+  font-size: 40px;
+  margin-top: 30px;
+  font-weight: bold;
+}
+.texto1{
+  margin-left: 550px;
+  font-size: 25px;
+  font-weight: bold;
+  margin-bottom: 80px;
+}
+.card {
+  max-width: 800px;   /* ancho máximo */
+  max-height: 4000px;
+  /* centrar horizontalmente */
+  font-size: 11 px;  /* letras un poco más pequeñas */
+}
+.custom-card {
+  margin-left: 450px;  /* lo mueve a la derecha */
+}
+.card-header{
+  background-color: #050733ff;
+}
+.btn-menu{
+  margin-left: 100px;
+  background-color: #050733ff; 
+  color: #ffffff;
+  margin-bottom: 20px;
+  
+}
+.btn-subir{
+  background-color: rgb(34, 208, 14);
+  color: #ffffff;
+}
+.btn-outline-secondary{
+  background-color: #ffffff;
+}
+.form-select {
+  width: 300px;    
+  min-height: 70px;         
+  margin-top: -250px;   
+  margin-left: 50px;     
+  font-size: 1.1rem;   
+  text-align: center;    /* texto más grande */
+  font-weight: bold;          /* un poco más grueso */
+  border: 2px solid #050733ff; /* azul Bootstrap */
+  border-radius: 8px;        
+  box-shadow: 0 4px 8px #050733ff; /* sombra sutil */
+  transition: all 0.3s ease;
+}
+
+/* Efecto al pasar el mouse */
+.form-select:hover {
+  border-color: #ff4e4e;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+/* Efecto al hacer clic o enfocar */
+.form-select:focus {
+  outline: none;
+  border-color: #ff4e4e;       /* morado */
+  box-shadow: 0 0 8px #ff4e4e;
+}
+.form-label{
+  font-weight: bold;
+}
+
+/* --- NAVBAR --- */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #343a40; /* gris oscuro */
+  color: white;
+  padding: 12px 25px;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.menu a {
+  color: white;
+  margin: 0 12px;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.menu a:hover {
+  text-decoration: underline;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
+/* --- CONTENEDOR PERFIL --- */
+.perfil-container {
+  max-width: 800px;          /* más ancho */
+  margin: 40px auto;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: #fff;
+}
+
+/* --- ENCABEZADO CON ICONO --- */
+.perfil-header {
+  background-color: #6c757d; /* gris */
+  text-align: center;
+  padding: 40px;
+}
+
+.perfil-icon {
+  font-size: 70px;
+  color: white;
+}
+
+/* --- INFO PERFIL --- */
+.perfil-info {
+  padding: 30px;
+  line-height: 1.8;  /* espacio entre líneas */
+}
+
+.perfil-info h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+  font-size: 22px;
+}
+
+.perfil-info p {
+  margin: 12px 0;
+  font-size: 17px;
+  color: #444;
+}
+
+.perfil-info strong {
+  color: #000;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .perfil-container {
+    max-width: 95%;
+    margin: 20px auto;
+  }
+
+  .menu {
+    display: none; /* ocultar menú en móvil */
+  }
+
+  .user-info {
+    font-size: 14px;
+  }
+}

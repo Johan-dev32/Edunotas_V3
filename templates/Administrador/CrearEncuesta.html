@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear Encuesta - EduNotas</title>
+  <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Administrador/CrearEncuesta.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="d-flex align-items-center p-3 border-bottom w-100">
+    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+
+
+    <div class="dropdown ms-auto">
+      <button 
+        class="btn btn-edunotas position-relative dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton1" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
+        <span class="bi bi-envelope-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li><a class="dropdown-item" href="#">Ajustes</a></li>
+        <li><a class="dropdown-item" href="#">Opción 2</a></li>
+        <li><a class="dropdown-item" href="#">Opción 3</a></li>
+      </ul>
+    </div>
+
+
+    <div class="dropdown">
+      <button 
+        class="btn btn-usuario dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton2" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
+        <span class="bi bi-person-lines-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+      </ul>
+    </div>
+  </header>
+
+<!--  MENU  -->
+  <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
+ <div class="offcanvas-header">
+  <h5 class="offcanvas-title">MENÚ</h5>
+</div>
+<div class="offcanvas1-body">
+  <ul class="nav flex-column">
+  <li class="nav-item"><a href="{{ url_for('paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+  <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas">
+   <i class="bi bi-caret-down-fill"></i> Notas 
+  </a>
+
+  <div class="collapse" id="submenuNotas">
+    <ul class="nav flex-column ms-3">
+     <li class=""><a href="{{ url_for('notas') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+    </ul>
+    <ul class="nav flex-column ms-3">
+     <li class=""><a href="{{ url_for('notasr') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
+    </ul>
+    <ul class="nav flex-column ms-3">
+     <li class=""><a href="{{ url_for('verpromedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+    </ul>
+  </div>
+  <li class="nav-item"><a href="{{ url_for('observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+  <li class="nav-item">
+  <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios" role="button" aria-expanded="false" aria-controls="submenuUsuarios">
+    <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
+  </a>
+
+  <div class="collapse" id="submenuUsuarios">
+    <ul class="nav flex-column ms-3">
+      <li class="nav-item">
+        <a href="{{ url_for('profesores') }}" class="nav-link text-white">
+          <i class="bi bi-person-fill-gear"></i> Profesores
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('acudientes') }}" class="nav-link text-white">
+          <i class="bi bi-person-fill"></i> Acudientes
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('estudiantes') }}" class="nav-link text-white">
+          <i class="bi bi-mortarboard-fill"></i> Estudiantes
+        </a>
+      </li>
+    </ul>
+  </div>
+</li>
+
+
+<li class="nav-item">
+  <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuEncuestas" role="button" aria-expanded="false" aria-controls="submenuEncuestas">
+    <i class="bi bi-caret-down-fill"></i> Encuestas
+  </a>
+
+  <div class="collapse" id="submenuEncuestas">
+    <ul class="nav flex-column ms-3">
+      <li class="nav-item">
+        <a href="{{ url_for('crear_encuesta') }}" class="nav-link text-white">
+          <i class="bi bi-file-earmark-plus-fill"></i> Crear Encuesta
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('editar_eliminar_encuesta') }}" class="nav-link text-white">
+          <i class="bi bi-pencil-square"></i> Editar / Eliminar Encuesta
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('resultados_encuesta') }}" class="nav-link text-white">
+          <i class="bi bi-bar-chart-fill"></i> Ver Resultados
+        </a>
+      </li>
+    </ul>
+  </div>
+</li>
+
+  <li class="nav-item"><a href="{{ url_for('asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+  <li class="nav-item"><a href="{{ url_for('horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+ </ul>
+ </div>
+</div>
+
+<div class="container mt-4">
+  <div class="row">
+
+  <!-- CONTENIDO ENCUESTA -->
+  <section class="container mt-5">
+    <h1 class="text-center titulo-principal" id="formTitle">Crear Encuesta</h1>
+    <p class="text-center descripcion" id="formDescription">Es hora de crear una encuesta</p>
+    <form id="encuestaForm" class="p-4 bg-light border rounded">
+  <div class="row mb-3">
+    <!-- Fecha -->
+    <div class="col-md-3">
+      <label class="form-label">Fecha de cierre</label>
+      <input type="date" class="form-control" id="fechaCierre">
+    </div>
+
+    <!-- Título + Imagen -->
+    <div class="col-md-6">
+      <label class="form-label">Título</label>
+      <input type="text" class="form-control mb-2" id="tituloEncuesta" placeholder="Ingrese un título">
+
+      <label class="form-label">Imagen (opcional)</label>
+      <input type="file" class="form-control" id="imgInput" accept="image/*">
+      <div id="imgPreview" class="border rounded mt-2 text-center p-2" style="height:120px; color:#777;">
+        Sin imagen
+      </div>
+    </div>
+
+    <!-- Dirigido a -->
+<div class="col-md-3">
+  <label class="form-label">Dirigido a:</label><br>
+
+  <!-- Administradores -->
+  <div class="form-check mb-2">
+    <input class="form-check-input targetChk" type="checkbox" value="Administradores" id="chkAdmins">
+    <label class="form-check-label" for="chkAdmins">Administradores</label>
+  </div>
+
+  <!-- Docentes -->
+  <div class="form-check mb-2">
+    <input class="form-check-input targetChk" type="checkbox" value="Docentes" id="chkDoc">
+    <label class="form-check-label" for="chkDoc">Docentes</label>
+    <select class="form-select mt-1 d-none" id="materiaSelect">
+      <option value="">Seleccione materia</option>
+    </select>
+  </div>
+
+  <!-- Estudiantes -->
+  <div class="form-check mb-2">
+    <input class="form-check-input targetChk" type="checkbox" value="Estudiantes" id="chkEst">
+    <label class="form-check-label" for="chkEst">Estudiantes</label>
+    <select class="form-select mt-1 d-none" id="gradoSelectEst">
+      <option value="">Seleccione grado</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+      <option value="10">10</option>
+      <option value="11">11</option>
+    </select>
+    <select class="form-select mt-1 d-none" id="cursoSelectEst">
+      <option value="">Seleccione curso</option>
+    </select>
+  </div>
+
+  <!-- Acudientes -->
+  <div class="form-check mb-2">
+    <input class="form-check-input targetChk" type="checkbox" value="Acudientes" id="chkAcu">
+    <label class="form-check-label" for="chkAcu">Acudientes</label>
+    <select class="form-select mt-1 d-none" id="gradoSelectAcu">
+      <option value="">Seleccione grado</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+      <option value="10">10</option>
+      <option value="11">11</option>
+    </select>
+    <select class="form-select mt-1 d-none" id="cursoSelectAcu">
+      <option value="">Seleccione curso</option>
+    </select>
+  </div>
+</div>
+  <!-- Contenedor preguntas dinámicas -->
+  <div id="preguntasContainer"></div>
+
+  <button type="button" class="btn btn-primary mb-3" id="agregarPregunta">+ Agregar Pregunta</button>
+  <br>
+  <button type="submit" class="btn btn-success">Enviar Encuesta</button>
+</form>
+  </section>
+
+
+      <script>
+        
+        const LISTA_ENCUESTAS_URL = "{{ url_for('editar_eliminar_encuesta') }}";
+        console.log("DEBUG: LISTA_ENCUESTAS_URL seteada en HTML:", LISTA_ENCUESTAS_URL);
+    </script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/Administrador/encuesta.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Docente{% endblock %}
+
+{% block header %}
+<header class="finisher-header d-flex align-items-center p-3 border-bottom w-100">
+  <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar"> 
+    <i class="bi bi-list"></i> 
+  </button> 
+  <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2> 
+
+  <!-- Dropdown mensajes -->
+  <div class="dropdown">
+    <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-envelope-fill"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <li><a class="dropdown-item" href="#">Ajustes</a></li>
+      <li><a class="dropdown-item" href="#">Opción 2</a></li>
+      <li><a class="dropdown-item" href="#">Opción 3</a></li>
+    </ul>
+  </div>
+
+  <!-- Dropdown usuario -->
+  <div class="dropdown">
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-lines-fill"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <li><a class="dropdown-item" href="{{url_for('Docente.perfil')}}">Perfil</a></li>
+      <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="containerimg">
+  <p class="txtimg">EduNotas en el Colegio Fe y Alegría</p>
+  <p class="txtimg2">Alcanzar la excelencia educativa</p>
+  <p class="txtimg3">
+    En el Colegio Fe y Alegría, creemos que la tecnología<br> debe estar al servicio del aprendizaje.<br>
+    Con EduNotas, potenciamos la organización académica, <br>fortalecemos la comunicación y hacemos más eficiente la vida escolar.
+  </p>
+</div>
+
+<!-- Menú superior -->
+<div class="container my-5 mt-5">
+  <ul class="nav nav-pills justify-content-center bg-white p-4 rounded-pill ">
+    <li class="nav-item">
+      <a href="{{ url_for('Docente.resumensemanal') }}" class="nav-link active rounded-pill px-4">Resumen Semanal</a>
+    </li>
+    <li class="nav-item">
+<!-- Offcanvas menú lateral -->
+<section class="bg-light py-5 mt-5">
+  <div class="container">
+    <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">MENÚ</h5>
+      </div>
+      <div class="offcanvas1-body">
+        <ul class="nav flex-column">
+          <li class="nav-item"><a href="{{ url_for('Docente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+          
+          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
+          <div class="collapse" id="submenuNotas">
+            <ul class="nav flex-column ms-3">
+              <!-- Ajustado: estas rutas NO piden parámetros -->
+              <li><a href="{{ url_for('Docente.notasr') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+              <li><a href="{{ url_for('Docente.notasr') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
+            </ul>
+          </div>
+
+          <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+          <li class="nav-item"><a href="{{ url_for('Docente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
+
+          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
+            <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
+          </a>
+          <div class="collapse" id="submenuUsuarios">
+            <ul class="nav flex-column ms-3">
+              <li><a href="{{ url_for('Docente.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
+              <li><a href="{{ url_for('Docente.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
+              <li><a href="{{ url_for('Docente.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
+            </ul>
+          </div>
+
+          <li class="nav-item"><a href="{{ url_for('Docente.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+          <li class="nav-item"><a href="{{ url_for('Docente.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+
+
+<!-- Noticias y Circulares -->
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-6">
+      <h4 class="h4">NOTICIAS</h4>
+      <a href="{{ url_for('Docente.noticias_vistas') }}" class="text-decoration-none mt-3">
+        <div id="noticia1" class="bg-secondary text-white rounded shadow-sm">Noticia 1</div>
+      </a>
+    </div>
+
+    <div class="col-md-6">
+      <p class="h5">CIRCULARES</p>
+      <p class="h6">ESTUDIANTILES</p>
+      <div class="accordion accordion-flush" id="accordionFlushExample">
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne">
+              Circular #1
+            </button>
+          </h2>
+          <div id="flush-collapseOne" class="accordion-collapse collapse">
+            <div class="accordion-body text-center"><div id="circular1-contenido"></div></div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo">
+              Circular #2
+            </button>
+          </h2>
+          <div id="flush-collapseTwo" class="accordion-collapse collapse">
+            <div class="accordion-body text-center"><div id="circular2-contenido"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<a href="{{ url_for('Docente.noticias') }}" class="text-decoration-none"><div class="editar1"><i class="bi bi-pencil-square"></i></div></a>
+<a href="{{ url_for('Docente.circulares') }}" class="text-decoration-none"><div class="editar"><i class="bi bi-pencil-square"></i></div></a>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/Administrador/finisher-header.es5.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/Administrador/Inicio.js') }}"></script>
+{% endblock %}

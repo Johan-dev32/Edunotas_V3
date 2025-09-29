@@ -1,0 +1,163 @@
+.body {
+  font-family: 'Trebuchet MS', sans-serif;
+  background-repeat: no-repeat;
+  background-position: center;  
+  background-attachment: scroll;
+  height: 600px;
+}
+
+/* sidebar */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+/* header */
+header {
+  background-color: #fff; 
+  color: #cf0000; 
+}
+
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;  
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas {
+  background-color: #050733ff; 
+  color: #fff;        
+  margin-left: 770px;
+}
+
+.btn-usuario {
+  background-color: #050733ff; 
+  color: #fff;        
+  margin-left: 10px;
+}
+
+/* sidebar texto */
+.offcanvas {
+  font-size: 25px;
+  font-family:'Trebuchet MS', sans-serif;
+  
+}
+
+.offcanvas-title {
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+
+.nav-item {
+  font-weight: bold;
+  font-size: 22px;
+}
+#sidebar .nav-link {
+  font-size: 18px;   /* tamaño menú hamburguesa */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
+.nav-pills .nav-link {
+  font-size: 25px;   /* tamaño botones nav */
+  color: #050733ff !important; 
+  font-weight: bold;
+
+}
+
+
+/* tabla */
+.registro-tutorias h2 {
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.btn-tutoria {
+  display: inline-block;
+  margin-bottom: 15px;
+  padding: 8px 15px;
+  background-color: #050733ff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-tutoria:hover {
+  background-color: #333;
+}
+
+.tabla-tutorias {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+  font-family: 'Trebuchet MS', sans-serif;
+  font-weight: bolder;
+  color: #ffffff;
+}
+
+.tabla-tutorias th, 
+.tabla-tutorias td {
+  border: 1px solid #514e4e;
+  padding: 8px;
+  text-align: left;
+}
+
+.tabla-tutorias th {
+  background-color: #050733ff;
+  text-align: center;
+}
+.tabla-tutorias td {
+  background-color: #fff;
+  color: #000;                /* negro */
+  padding: 8px;
+  border: 1px solid #514e4e;
+  text-align: left;
+}
+
+.tabla-tutorias tr:nth-child(even) {
+  background-color: #ffffff;
+
+}
+#accionesTutorias .d-flex {
+  border: 1px solid #333;
+  border-top: none;
+}
+
+.contenedor-tutorias {
+  display: grid;
+  grid-template-columns: auto 50px; /* tabla y columna botones */
+  gap: 10px;
+  align-items: start;
+}
+
+#accionesTutorias {
+  display: flex;
+  margin-top: 60px;
+  margin-bottom: 22px;
+  flex-direction: column;
+  align-items: center;
+}

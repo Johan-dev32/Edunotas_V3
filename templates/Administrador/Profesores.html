@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión Docentes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Profesores.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+  <header class="d-flex align-items-center p-3 border-bottom w-100">
+<button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+  <i class="bi bi-list"></i>
+</button>
+<h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+<div class="dropdown">
+    
+  <button 
+    class="btn btn-edunotas position-relative dropdown-toggle" 
+    type="button" 
+    id="dropdownMenuButton" 
+    data-bs-toggle="dropdown" 
+    aria-expanded="false">
+    <span class="bi bi-envelope-fill"></span>
+  </button>
+  
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <li><a class="dropdown-item" href="#">Ajustes</a></li>
+    <li><a class="dropdown-item" href="#">Opción 2</a></li>
+    <li><a class="dropdown-item" href="#">Opción 3</a></li>
+  </ul>
+</div>
+
+<!--Botón menu de usuario-->
+
+<div class="dropdown">
+  <button 
+    class="btn btn-usuario dropdown-toggle" 
+    type="button" 
+    id="dropdownMenuButton" 
+    data-bs-toggle="dropdown" 
+    aria-expanded="false">
+    <span class="bi bi-person-lines-fill"></span>
+  </button>
+
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <li><a class="dropdown-item" href="{{url_for('Administrador.perfil')}}">Perfil</a></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+  </ul>
+</div>
+
+</a>
+  </header>
+
+<!--  MENU  -->
+  <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
+ <div class="offcanvas-header">
+  <h5 class="offcanvas-title">MENÚ</h5>
+</div>
+<div class="offcanvas1-body">
+  <ul class="nav flex-column">
+  <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+  <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas">
+   <i class="bi bi-caret-down-fill"></i> Notas 
+  </a>
+
+  <div class="collapse" id="submenuNotas">
+    <ul class="nav flex-column ms-3">
+     <li class=""><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+    </ul>
+    <ul class="nav flex-column ms-3">
+     <li class=""><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
+    </ul>
+    <ul class="nav flex-column ms-3">
+     <li class=""><a href="{{ url_for('verpromedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+    </ul>
+  </div>
+<<<<<<< HEAD:templates/Administrador/Profesores.html
+  <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+  <li class="nav-item"><a href="{{ url_for('Administrador.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
+=======
+  <li class="nav-item"><a href="{{ url_for('observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+>>>>>>> f968ce65124a6f032d20c4e2957637b2da2aae63:templates/Administrador/templates/Profesores.html
+  <li class="nav-item">
+  <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios" role="button" aria-expanded="false" aria-controls="submenuUsuarios">
+    <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
+  </a>
+
+  <div class="collapse" id="submenuUsuarios">
+    <ul class="nav flex-column ms-3">
+      <li class="nav-item">
+<<<<<<< HEAD:templates/Administrador/Profesores.html
+        <a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white">
+          <i class="bi bi-person-fill-gear"></i>Profesores
+=======
+        <a href="{{ url_for('profesores') }}" class="nav-link text-white">
+          <i class="bi bi-person-fill-gear"></i> Profesores
+>>>>>>> f968ce65124a6f032d20c4e2957637b2da2aae63:templates/Administrador/templates/Profesores.html
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white">
+          <i class="bi bi-person-fill"></i> Acudientes
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white">
+          <i class="bi bi-mortarboard-fill"></i> Estudiantes
+        </a>
+      </li>
+    </ul>
+  </div>
+</li>
+
+<<<<<<< HEAD:templates/Administrador/Profesores.html
+  <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+  <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+=======
+
+<li class="nav-item">
+  <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuEncuestas" role="button" aria-expanded="false" aria-controls="submenuEncuestas">
+    <i class="bi bi-caret-down-fill"></i> Encuestas
+  </a>
+
+  <div class="collapse" id="submenuEncuestas">
+    <ul class="nav flex-column ms-3">
+      <li class="nav-item">
+        <a href="{{ url_for('crear_encuesta') }}" class="nav-link text-white">
+          <i class="bi bi-file-earmark-plus-fill"></i> Crear Encuesta
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('editar_eliminar_encuesta') }}" class="nav-link text-white">
+          <i class="bi bi-pencil-square"></i> Editar / Eliminar Encuesta
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('resultados_encuesta') }}" class="nav-link text-white">
+          <i class="bi bi-bar-chart-fill"></i> Ver Resultados
+        </a>
+      </li>
+    </ul>
+  </div>
+</li>
+
+  <li class="nav-item"><a href="{{ url_for('asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+  <li class="nav-item"><a href="{{ url_for('horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+>>>>>>> f968ce65124a6f032d20c4e2957637b2da2aae63:templates/Administrador/templates/Profesores.html
+ </ul>
+ </div>
+</div>
+  <!-- Capa oscura cuando el menú está abierto -->
+  <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+
+  <!-- Contenido principal -->
+  <main class="container">
+    </a>
+    <h2 class="fw-bold fs-1">GESTIÓN DE DOCENTES</h2>
+
+    <div class="actions">
+      <button class="add"> Agregar Docente</button>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="search" placeholder="Buscar docente..." onkeyup="buscarDocente()">
+    </div>
+
+    <table id="tabla-docentes">
+      <thead>
+        <tr>
+          <th>Nombre Completo</th>
+          <th>Tipo Documento</th>
+          <th>N° Documento</th>
+          <th>Correo Institucional</th>
+          <th>Número de Celular</th>
+          <th>Profesión</th>
+          <th>Ciclo</th>
+        </tr>
+      </thead>
+    <tbody>
+  {% for docente in docentes %}
+  <tr>
+    <td>{{ docente.Nombre }} {{ docente.Apellido }}</td>
+    <td>{{ docente.TipoDocumento }}</td>
+    <td>{{ docente.NumeroDocumento }}</td>
+    <td>{{ docente.Correo }}</td>
+    <td>{{ docente.Telefono }}</td>
+    <td>{{ docente.Direccion or 'Sin registrar' }}</td> <!-- profesión -->
+    <td>{{ docente.Calle or 'N/A' }}</td> <!-- ciclo -->
+    <td>
+      <!-- Botón Editar -->
+      <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editarModal{{ docente.ID_Usuario }}">Editar</button>
+
+      <!-- Botón Eliminar -->
+      <form action="{{ url_for('Administrador.eliminar_docente', id=docente.ID_Usuario) }}" method="POST" style="display:inline;">
+        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+      </form>
+    </td>
+  </tr>
+
+  <!-- Modal Editar -->
+  
+  <div class="modal fade" id="editarModal{{ docente.ID_Usuario }}" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content"> <!-- Aquí va modal-content, no en el form -->
+      <form action="{{ url_for('Administrador.actualizar_docente', id=docente.ID_Usuario) }}" method="POST">
+        <div class="modal-header">
+          <h5>Editar Docente</h5>
+        </div>
+        <div class="modal-body">
+          <input type="text" name="Nombre" value="{{ docente.Nombre }}" class="form-control mb-2">
+          <input type="text" name="Apellido" value="{{ docente.Apellido }}" class="form-control mb-2">
+          <input type="text" name="TipoDocumento" value="{{ docente.TipoDocumento }}" class="form-control mb-2">
+          <input type="text" name="NumeroDocumento" value="{{ docente.NumeroDocumento }}" class="form-control mb-2">
+          <input type="email" name="Correo" value="{{ docente.Correo }}" class="form-control mb-2">
+          <input type="text" name="Telefono" value="{{ docente.Telefono }}" class="form-control mb-2">
+          <input type="text" name="Profesion" value="{{ docente.Direccion }}" class="form-control mb-2">
+          <input type="text" name="Ciclo" value="{{ docente.Calle }}" class="form-control mb-2">
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+    {% endfor %}
+  </tbody>
+    </table>
+
+    <div class="modal fade" id="agregarModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form action="{{ url_for('Administrador.agregar_docente') }}" method="POST" class="modal-content">
+      <div class="modal-header"><h5>Agregar Docente</h5></div>
+      <div class="modal-body">
+        <input type="text" name="Nombre" placeholder="Nombre" class="form-control mb-2">
+        <input type="text" name="Apellido" placeholder="Apellido" class="form-control mb-2">
+        <input type="text" name="TipoDocumento" placeholder="Tipo Documento" class="form-control mb-2">
+        <input type="text" name="NumeroDocumento" placeholder="Número Documento" class="form-control mb-2">
+        <input type="email" name="Correo" placeholder="Correo Institucional" class="form-control mb-2">
+        <input type="text" name="Telefono" placeholder="Teléfono" class="form-control mb-2">
+        <input type="text" name="Profesion" placeholder="Profesión" class="form-control mb-2">
+        <input type="text" name="Ciclo" placeholder="Ciclo" class="form-control mb-2">
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.querySelector(".add").addEventListener("click", () => {
+    new bootstrap.Modal(document.getElementById("agregarModal")).show();
+  });
+</script>
+  </main>
+
+  <script src="/static/js/Administrador/profesores.js"></script>
+</body>
+</html>

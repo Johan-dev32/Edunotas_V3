@@ -1,0 +1,66 @@
+body {
+    background-image: url(https://static.vecteezy.com/system/resources/previews/006/891/095/non_2x/abstract-gradient-background-light-blue-red-suitable-for-background-presentation-website-card-promotion-and-social-media-concept-vector.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: #ffffff;
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+
+.body_style{
+background-color: rgb(255, 255, 255);
+
+}
+.container {
+background-color: #ffffff;
+box-shadow: 0px 0px 1px 1px rgb(0, 0, 0);
+padding: 50px;
+border-radius: 10px;
+text-align: center;
+width: 400px;
+height: 500px;                                                      
+margin-top: 100px;
+} 
+.btn-prymari{
+background-color: rgb(14, 122, 41);
+margin-top: 150px;
+margin-left: 800px;
+}
+.img1{
+margin-top: -50px;
+height: 100px;
+}
+.img2{
+height: 200px;
+margin-left: 100px;
+margin: 20px;
+margin-top: -40px;
+}
+.text1{
+font-weight: bolder;
+margin-top: 5px;
+}
+.container4{
+margin-right: 900px;
+}
+.img3{
+height:30px;
+margin-left: 180px;
+margin-top: -60px;
+}
+.text2{
+font-size: small;
+}
+.text3{
+font-size: small;
+margin-top: -15px;
+}

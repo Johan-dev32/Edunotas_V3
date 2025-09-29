@@ -1,0 +1,120 @@
+body {
+  background-color: #f8f9fa; 
+  font-family: 'Trebuchet MS', sans-serif;
+  color: #212529;
+}
+
+/* navbar */
+header {
+  background-color: white;
+  color: #050733ff;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas {
+  background-color: #050733ff;
+  color: #fff;
+}
+
+.btn-usuario {
+  background-color: #050733ff;
+  color: #fff;
+  margin-left: 10px;
+}
+
+/*  menu_des  */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+.offcanvas {
+  font-size: 25px;
+}
+
+.offcanvas-title {
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+
+.nav-item {
+  font-weight: bold;
+  font-size: 22px;
+}
+#sidebar .nav-link {
+  font-size: 18px;   /* tamaño menú hamburguesa */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.titulo-principal {
+  font-size: 3rem;   
+  margin-top: 20px;   
+  font-weight: 900;      
+  color: #050733ff;      
+}
+.descripcion {
+  font-size: 1.3rem;     
+  color: #555;  
+ }
+ /* Caja de subida personalizada */
+.upload-box {
+  border: 2px dashed #d3d3d3;
+  border-radius: 8px;
+  background-color: #fafafa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-box:hover {
+  border-color: #0d6efd;
+  background-color: #f1f8ff;
+}
+
+.upload-label {
+  display: block;
+  cursor: pointer;
+}
+
+.upload-label p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+.texto-documento{
+  font-family: 'Trebuchet MS', sans-serif;
+  font-weight: bolder;
+  margin-left: 170px;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+.btn-primary{
+  background-color:#050733ff;
+}

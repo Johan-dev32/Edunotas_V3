@@ -1,0 +1,98 @@
+body {
+  background-color: #f8f9fa; 
+  font-family: 'Trebuchet MS', sans-serif;
+  color: #212529;
+}
+
+header {
+  background-color: white;
+  color: #050733ff;
+}
+
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  margin-left: 60px;
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas, .btn-usuario {
+  background-color: #050733ff;
+  color: #fff;
+}
+
+.btn-usuario {
+  margin-left: 10px;
+}
+
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+.offcanvas-title { margin-left: 40px; font-weight: bold; font-size: 30px; }
+
+.nav-item { font-weight: bold; font-size: 22px; }
+
+#sidebar .nav-link { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+
+.titulo-principal {
+  font-size: 50px;
+  font-weight: bolder;
+  color: #050733ff;
+  text-transform: uppercase;
+}
+
+.curso-id {
+  font-size: 60px;
+  color: #050733ff;
+}
+
+.tabla-container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.tabla th {
+  background: #050733ff;
+  color: #fff;
+  padding: 10px;
+  text-align: left;
+}
+
+.tabla td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.tabla tr:nth-child(even) { background: #f2f2f2; }
+
+.tabla tr:hover { background: #e6f0ff; }
+
+.bolita { display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 6px; }
+.bolita.alto { background: green; }
+.bolita.medio { background: orange; }
+.bolita.bajo { background: red; }
+
+#contenedorObservacion { max-width: 400px; }
+
+.fila-seleccionada { background-color: #d1e7ff !important; }

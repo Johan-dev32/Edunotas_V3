@@ -1,0 +1,310 @@
+body {
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+header {
+  background-color: rgb(255, 255, 255); /* azul */
+  color: rgb(255, 0, 0); /* texto en blanco */
+}
+
+/* Cambiar color del título */
+.titulo-header {
+ 
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;  /* lo acercas/separas de la izquierda */
+}
+
+/* Botón hamburguesa con color claro */
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+
+/* Botón de iniciar sesión */
+header .btn-outline-primary {
+  color: #050733ff;
+  border-color: #050733ff;
+  margin-left: 900px;
+
+}
+
+.btn-edunotas {
+    background-color: #050733ff; 
+    color: rgb(255, 255, 255);        
+    margin-left: 800px;
+
+}
+.btn-usuario {
+  background-color: #050733ff; 
+    color: rgb(255, 255, 255);        
+    margin-left: 10px;
+}
+
+
+header .btn-outline-primary:hover {
+  background-color: white;
+  color: #ffffff;
+}
+/* Menú lateral */
+.sidebar {
+  position: fixed;
+  left: -250px;
+  top: 0;
+  width: 250px;
+  height: 100%;
+  background: linear-gradient(to bottom, #3a7bd5, #3a6073, #e96443);
+  color: white;
+  padding: 20px;
+  transition: 0.3s;
+  z-index: 1000;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+.sidebar a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  margin: 15px 0;
+  font-size: 18px;
+  transition: 0.2s;
+}
+
+.sidebar a:hover {
+  font-weight: bold;
+}
+
+/* Capa oscura */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 900;
+}
+
+h2 {
+  margin-bottom: 10px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+button {
+  padding: 8px 15px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+body {
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #3b61ea, #fc8e75);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #3b61ea, #fc8e75);
+  border-radius: 8px;
+}
+header {
+  background-color: rgb(255, 255, 255); /* azul */
+  color: rgb(255, 0, 0); /* texto en blanco */
+}
+
+/* Cambiar color del título */
+.titulo-header {
+ 
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;  /* lo acercas/separas de la izquierda */
+}
+
+/* Botón hamburguesa con color claro */
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+
+/* Botón de iniciar sesión */
+header .btn-outline-primary {
+  color: #050733ff;
+  border-color: #050733ff;
+  margin-left: 900px;
+
+}
+
+.btn-edunotas {
+    background-color: #050733ff; 
+    color: rgb(255, 255, 255);        
+    margin-left: 800px;
+
+}
+.btn-usuario {
+  background-color: #050733ff; 
+    color: rgb(255, 255, 255);        
+    margin-left: 10px;
+}
+
+
+header .btn-outline-primary:hover {
+  background-color: white;
+  color: #ffffff;
+}
+/* Menú lateral */
+.sidebar {
+  position: fixed;
+  left: -250px;
+  top: 0;
+  width: 250px;
+  height: 100%;
+  background: linear-gradient(to bottom, #3a7bd5, #3a6073, #e96443);
+  color: white;
+  padding: 20px;
+  transition: 0.3s;
+  z-index: 1000;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+.sidebar a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  margin: 15px 0;
+  font-size: 18px;
+  transition: 0.2s;
+}
+
+.sidebar a:hover {
+  font-weight: bold;
+}
+
+/* Capa oscura */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 900;
+}
+.container1 {
+    margin: 3%;
+}
+
+.container2 {
+    margin: 3%;
+}
+
+.oculto {
+  display: none;
+}
+ 
+
+/* Fondo oscuro semitransparente */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo negro translúcido */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Encima de todo */
+}
+
+/* Contenedor del formulario (el cuadro blanco) */
+.modal-contenido {
+  background-color: #fff;
+  padding: 30px 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Oculta el modal con esta clase */
+.oculto {
+  display: none;
+}
+
+/* Estilos generales del formulario */
+.modal-contenido h2 {
+  margin-top: 0;
+  font-size: 22px;
+}
+
+.modal-contenido label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.modal-contenido input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  box-sizing: border-box;
+}
+
+.acciones {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.acciones button {
+  padding: 8px 16px;
+  border: 1px solid #999;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.acciones button:hover {
+  background-color: #e0e0e0;
+}

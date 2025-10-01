@@ -2,22 +2,21 @@ body {
   font-family: 'Trebuchet MS', sans-serif;
   margin: 0;
   padding: 0;
-  height: 100vh;
+  padding-bottom: 250px;
   overflow-x: hidden;
 }
 
 /* Canvas de la animación al fondo */
 
 #finisher-canvas {
-  position: fixed !important;
+  position: absolute;   /* antes fixed */
   top: 0;
   left: 0;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: -1 !important;
+  width: 100%;
+  height: 600px;  /* antes 100% */
+  z-index: -1;
   pointer-events: none;
 }
-
 
 #sidebar {
   width: 220px;
@@ -202,6 +201,7 @@ color: white;
 .nav-pills{
   max-width: 1000px;  
   margin: 0 auto;    
+  margin-top: 300px;
 }
 .tiulo4{
   margin-left: 100px;
@@ -267,4 +267,7 @@ margin-left: 900px;
   100% {
     transform: scale(1);
   }
+}
+.Circulares{
+  margin-top: 50px;
 }

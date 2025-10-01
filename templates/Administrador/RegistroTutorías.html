@@ -58,15 +58,13 @@
      <li class=""><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
     </ul>
     <ul class="nav flex-column ms-3">
-     <li class=""><a href="{{ url_for('verpromedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+     <li class=""><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
     </ul>
   </div>
-<<<<<<< HEAD:templates/Administrador/RegistroTutorías.html
+
   <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
-=======
-  <li class="nav-item"><a href="{{ url_for('observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
->>>>>>> f968ce65124a6f032d20c4e2957637b2da2aae63:templates/Administrador/templates/RegistroTutorías.html
+
   <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios" role="button" aria-expanded="false" aria-controls="submenuUsuarios">
     <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
@@ -75,13 +73,9 @@
   <div class="collapse" id="submenuUsuarios">
     <ul class="nav flex-column ms-3">
       <li class="nav-item">
-<<<<<<< HEAD:templates/Administrador/RegistroTutorías.html
+
         <a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white">
           <i class="bi bi-person-fill-gear"></i>Profesores
-=======
-        <a href="{{ url_for('profesores') }}" class="nav-link text-white">
-          <i class="bi bi-person-fill-gear"></i> Profesores
->>>>>>> f968ce65124a6f032d20c4e2957637b2da2aae63:templates/Administrador/templates/RegistroTutorías.html
         </a>
       </li>
       <li class="nav-item">
@@ -98,10 +92,9 @@
   </div>
 </li>
 
-<<<<<<< HEAD:templates/Administrador/RegistroTutorías.html
+
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-=======
 
 <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuEncuestas" role="button" aria-expanded="false" aria-controls="submenuEncuestas">
@@ -111,17 +104,17 @@
   <div class="collapse" id="submenuEncuestas">
     <ul class="nav flex-column ms-3">
       <li class="nav-item">
-        <a href="{{ url_for('crear_encuesta') }}" class="nav-link text-white">
+        <a href="{{ url_for('Administrador.crear_encuesta') }}" class="nav-link text-white">
           <i class="bi bi-file-earmark-plus-fill"></i> Crear Encuesta
         </a>
       </li>
       <li class="nav-item">
-        <a href="{{ url_for('editar_eliminar_encuesta') }}" class="nav-link text-white">
+        <a href="{{ url_for('Administrador.editar_eliminar_encuesta') }}" class="nav-link text-white">
           <i class="bi bi-pencil-square"></i> Editar / Eliminar Encuesta
         </a>
       </li>
       <li class="nav-item">
-        <a href="{{ url_for('resultados_encuesta') }}" class="nav-link text-white">
+        <a href="{{ url_for('Administrador.resultados_encuesta') }}" class="nav-link text-white">
           <i class="bi bi-bar-chart-fill"></i> Ver Resultados
         </a>
       </li>
@@ -129,9 +122,9 @@
   </div>
 </li>
 
-  <li class="nav-item"><a href="{{ url_for('asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
-  <li class="nav-item"><a href="{{ url_for('horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
->>>>>>> f968ce65124a6f032d20c4e2957637b2da2aae63:templates/Administrador/templates/RegistroTutorías.html
+  <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+  <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+
  </ul>
  </div>
 </div>

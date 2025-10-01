@@ -359,6 +359,26 @@ def notas_consultar():
 def observador():
     return render_template('Administrador/Observador.html')
 
+@Administrador_bp.route('/calculo_promedio')
+def calculo_promedio():
+    return render_template('Administrador/CalculoPromedio.html')
+
+@Administrador_bp.route('/crear_encuesta')
+def crear_encuesta():
+    return render_template('Administrador/CrearEncuesta.html')
+
+@Administrador_bp.route('/editar_eliminar_encuesta')
+def editar_eliminar_encuesta():
+    return render_template('Administrador/EditarEliminarEncuesta.html')
+
+@Administrador_bp.route('/resultados_encuesta')
+def resultados_encuesta():
+    return render_template('Administrador/ResultadosEncuesta.html')
+
+@Administrador_bp.route('/ver_promedio')
+def ver_promedio():
+    return render_template('Administrador/VerPromedio.html')
+
 
 # ----------------- SUB-PÁGINAS -----------------
 @Administrador_bp.route('/materialapoyo2')

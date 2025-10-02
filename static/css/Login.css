@@ -100,6 +100,48 @@ canvas {
   cursor: pointer;
 }
 
+.input-field {
+  width: 100%;
+  padding: 12px 15px;
+  margin-top: 5px;
+  border: 2px solid #4e54c8;
+  border-radius: 12px;
+  background: #f9f9ff;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  appearance: none; /* quita la flecha por defecto */
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+}
+
+.input-field:hover {
+  border-color: #8f94fb;
+  box-shadow: 0px 0px 10px rgba(142, 148, 251, 0.4);
+}
+
+.input-field:focus {
+  border-color: #4e54c8;
+  box-shadow: 0px 0px 12px rgba(78, 84, 200, 0.5);
+  background: #fff;
+}
+
+.label-rol {
+  display: block;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+
 .form-line:focus {
   border-bottom-color: #050733ff;
 }

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Inicio - Docente{% endblock %}
+{% block title %}Inicio - Acudiente{% endblock %}
 
 {% block header %}
 <header class="finisher-header d-flex align-items-center p-3 border-bottom w-100">
@@ -8,6 +8,31 @@
     <i class="bi bi-list"></i> 
   </button> 
   <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2> 
+
+  <script src="{{ url_for('static', filename='js/Administrador/finisher-header.es5.min.js') }}"></script>
+    <!-- Luego la inicialización de la animación -->
+    <script type="text/javascript">
+        new FinisherHeader({
+            "count": 12,
+            "size": {
+                "min": 1300,
+                "max": 1500,
+                "pulse": 0
+            },
+            "speed": {
+                "x": { "min": 2, "max": 5 },
+                "y": { "min": 0.6, "max": 3 }
+            },
+            "colors": {
+                "background": "#0c0994",
+                "particles": ["#000000", "#000000", "#0c09a5", "#080000"]
+            },
+            "blending": "lighten",
+            "opacity": { "center": 0.6, "edge": 0 },
+            "skew": 0,
+            "shapes": ["c"]
+        });
+    </script>
 
   <!-- Dropdown mensajes -->
   <div class="dropdown">
@@ -26,7 +51,7 @@
     <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
       <span class="bi bi-person-lines-fill"></span>
     </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
       <li><a class="dropdown-item" href="{{url_for('Docente.perfil')}}">Perfil</a></li>
       <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
     </ul>
@@ -35,29 +60,37 @@
 {% endblock %}
 
 {% block content %}
-<div class="containerimg">
-  <p class="txtimg">EduNotas en el Colegio Fe y Alegría</p>
-  <p class="txtimg2">Alcanzar la excelencia educativa</p>
-  <p class="txtimg3">
-    En el Colegio Fe y Alegría, creemos que la tecnología<br> debe estar al servicio del aprendizaje.<br>
-    Con EduNotas, potenciamos la organización académica, <br>fortalecemos la comunicación y hacemos más eficiente la vida escolar.
-  </p>
-</div>
+
+
 
 <!-- Menú superior -->
-<div class="container my-5 mt-5">
+<div class="container ">
   <ul class="nav nav-pills justify-content-center bg-white p-4 rounded-pill ">
     <li class="nav-item">
       <a href="{{ url_for('Docente.resumensemanal') }}" class="nav-link active rounded-pill px-4">Resumen Semanal</a>
     </li>
     <li class="nav-item">
+      <a href="{{ url_for('Docente.registrotutorias') }}" class="nav-link rounded-pill px-4">Registro de Tutorías</a>
+    </li>
+    <li class="nav-item">
+      <a href="{{ url_for('Docente.comunicacion') }}" class="nav-link rounded-pill px-4">Comunicación</a>
+    </li>
+    <li class="nav-item">
+      <a href="{{ url_for('Docente.materialapoyo') }}" class="nav-link rounded-pill px-4">Material de Apoyo</a>
+    </li>
+    <li class="nav-item">
+      <a href="{{ url_for('Docente.reunion') }}" class="nav-link rounded-pill px-4">Crear Reunión</a>
+    </li>
+  </ul>
+</div>
+
 <!-- Offcanvas menú lateral -->
-<section class="bg-light py-5 mt-5">
-  <div class="container">
-    <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title">MENÚ</h5>
-      </div>
+<section class="bg-light py-3 mt-3">
+  <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">MENÚ</h5>
+  </div>
+  <div class="offcanvas1-body">
       <div class="offcanvas1-body">
         <ul class="nav flex-column">
           <li class="nav-item"><a href="{{ url_for('Docente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
@@ -66,8 +99,8 @@
           <div class="collapse" id="submenuNotas">
             <ul class="nav flex-column ms-3">
               <!-- Ajustado: estas rutas NO piden parámetros -->
-              <li><a href="{{ url_for('Docente.notasr') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Docente.notasr') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
+              <li><a href="{{ url_for('Docente.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+              <li><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
             </ul>
           </div>
 
@@ -82,6 +115,7 @@
               <li><a href="{{ url_for('Docente.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
               <li><a href="{{ url_for('Docente.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
               <li><a href="{{ url_for('Docente.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
+              <li><a href="{{ url_for('Docente.registro') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Registro Usuarios</a></li>
             </ul>
           </div>
 
@@ -91,12 +125,10 @@
       </div>
     </div>
   </div>
-
-
-
+</section>
 
 <!-- Noticias y Circulares -->
-<div class="container mt-4">
+<div class="contenedor-bajo container mt-4">
   <div class="row">
     <div class="col-md-6">
       <h4 class="h4">NOTICIAS</h4>
@@ -105,7 +137,7 @@
       </a>
     </div>
 
-    <div class="col-md-6">
+    <div class="Circulares">
       <p class="h5">CIRCULARES</p>
       <p class="h6">ESTUDIANTILES</p>
       <div class="accordion accordion-flush" id="accordionFlushExample">
@@ -136,7 +168,11 @@
 
 <a href="{{ url_for('Docente.noticias') }}" class="text-decoration-none"><div class="editar1"><i class="bi bi-pencil-square"></i></div></a>
 <a href="{{ url_for('Docente.circulares') }}" class="text-decoration-none"><div class="editar"><i class="bi bi-pencil-square"></i></div></a>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 {% endblock %}
+
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/Administrador/finisher-header.es5.min.js') }}"></script>

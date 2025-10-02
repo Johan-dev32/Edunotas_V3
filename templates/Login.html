@@ -9,25 +9,30 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
 </head>
 <body>
   
- <div class="pantalla">
-
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <script>
+      {% for message in messages %}
+        alert("{{ message }}");
+      {% endfor %}
+    </script>
+  {% endif %}
+{% endwith %}
   
+ <div class="pantalla">
   <!-- Mitad izquierda con animación -->
   <div class="mitad animacion finisher-header">
-  
-     <!-- Fondo de olas animadas -->
-   <div class="waves">
+    <!-- Fondo de olas animadas -->
+    <div class="waves">
       <div class="wave circulo a"></div>
       <div class="wave circulo b"></div>
       <div class="wave circulo c"></div>
     </div>
 
     <!-- Texto sobre la animación -->
-    
     <div class="containerimg">
       <p class="txtimg">EduNotas en el Colegio Fe y Alegría</p>
       <p class="txtimg2">Alcanzar la excelencia Educativa</p>
@@ -38,35 +43,59 @@
         fortalecemos la comunicación y hacemos más eficiente la vida escolar.
       </p>
     </div>
-
   </div>
-    <!-- Mitad derecha blanca -->
-    
+
+  <!-- Mitad derecha blanca -->
   <div class="container d-flex align-items-center justify-content-center login-container">
     <div class="col-md-6 col-lg-4">
       <img src="{{ url_for('static', filename='img/IMG 1.png') }}" alt="Logo" class="Logo">
       <div class="login-form">
-
+        <h2 class="text-center mb-4 titulo">INICIAR SESIÓN</h2>
         
-        
-        <h2 class="text-center mb-4 titulo">INICIAR SESISÓN</h2>
-       <form>
- <div class="input-container mb-4">
-          <i class="bi bi-person-fill"></i>
-          <input type="email" id="email" class="form-line" placeholder="Correo electrónico" required>
-        </div>
-        
-        <div class="input-container mb-4">
-          <i class="bi bi-lock-fill"></i>
-
+        <!-- FORMULARIO CORREGIDO -->
+        <form method="POST" action="{{ url_for('login') }}">
+          <div class="input-container mb-4">
+            <i class="bi bi-person-fill"></i>
+            <input type="email" id="email" name="email" class="form-line" placeholder="Correo electrónico" required>
+          </div>
+          
+          <div class="input-container mb-4">
+            <i class="bi bi-lock-fill"></i>
             <!-- Input -->
-          <input type="password" id="password" class="form-line" placeholder="Contraseña" required>
-
+            <input type="password" id="password" name="password" class="form-line" placeholder="Contraseña" required>
             <!-- Ojo -->
-          <i class="bi bi-eye-slash toggle-eye" id="togglePassword"></i>
-        </div>
+            <i class="bi bi-eye-slash toggle-eye" id="togglePassword"></i>
+          </div>
+
+          <div>
+              <label class="label-rol" for="rol">Rol</label>
+                <select class="input-field" id="rol" name="rol" required>
+                    <option value="" disabled selected>Selecciona un rol</option>
+                    <option value="Administrador">Administrador</option>
+                    <option value="Docente">Docente</option>
+                    <option value="Estudiante">Estudiante</option>
+                    <option value="Acudiente">Acudiente</option>
+                </select>
+            </div>
+            <br><br>
+            
+
+          <!-- Botón -->
+          <div class="d-grid">
+            <button type="submit" class="btn btn-ingresar">Ingresar</button>
+          </div>
+        </form>
         
- <script>
+        <p class="text-center mt-3">
+          <a href="#">¿Olvidaste tu contraseña?</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Script para mostrar/ocultar contraseña -->
+<script>
   const passwordInput = document.getElementById("password");
   const togglePassword = document.getElementById("togglePassword");
 
@@ -82,60 +111,24 @@
     }
   });
 </script>
-        <!-- Botón -->
-        <div class="d-grid">
-          <a href="{{ url_for('Administrador.paginainicio') }}" class="btn btn-ingresar">Ingresar</a>
-        </div>
-      </form>
-      
-      <p class="text-center mt-3">
-        <a href="#">¿Olvidaste tu contraseña?</a>
-      </p>
-      
-    </div>
-  </div>
-</div>
 
-  <!-- Script de la librería -->
-  <script src="{{ url_for('static', filename='js/Administrador/finisher-header.es5.min.js') }}"></script>
+<!-- Script de la librería -->
+<script src="{{ url_for('static', filename='js/Administrador/finisher-header.es5.min.js') }}"></script>
 
-  <!-- Configuración de la animación -->
-  <script type="text/javascript">
+<!-- Configuración de la animación -->
+<script type="text/javascript">
 new FinisherHeader({
   "count": 12,
-  "size": {
-    "min": 1300,
-    "max": 1500,
-    "pulse": 0
-  },
-  "speed": {
-    "x": {
-      "min": 2,
-      "max": 5
-    },
-    "y": {
-      "min": 0.6,
-      "max": 3
-    }
-  },
+  "size": { "min": 1300, "max": 1500, "pulse": 0 },
+  "speed": { "x": { "min": 2, "max": 5 }, "y": { "min": 0.6, "max": 3 } },
   "colors": {
     "background": "#0c0994",
-    "particles": [
-      "#000000",
-      "#000000",
-      "#0c09a5",
-      "#080000"
-    ]
+    "particles": ["#000000","#000000","#0c09a5","#080000"]
   },
   "blending": "lighten",
-  "opacity": {
-    "center": 0.6,
-    "edge": 0
-  },
+  "opacity": { "center": 0.6, "edge": 0 },
   "skew": 0,
-  "shapes": [
-    "c"
-  ]
+  "shapes": ["c"]
 });
 </script>
 </body>

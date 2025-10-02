@@ -64,28 +64,57 @@
 
 
 <!-- Menú superior -->
-<div class="container ">
-  <ul class="nav nav-pills justify-content-center bg-white p-4 rounded-pill ">
-    <li class="nav-item">
-      <a href="{{ url_for('Administrador.resumensemanal') }}" class="nav-link active rounded-pill px-4">Resumen Semanal</a>
-    </li>
-    <li class="nav-item">
-      <a href="{{ url_for('Administrador.registrotutorias') }}" class="nav-link rounded-pill px-4">Registro de Tutorías</a>
-    </li>
-    <li class="nav-item">
-      <a href="{{ url_for('Administrador.comunicacion') }}" class="nav-link rounded-pill px-4">Comunicación</a>
-    </li>
-    <li class="nav-item">
-      <a href="{{ url_for('Administrador.materialapoyo') }}" class="nav-link rounded-pill px-4">Material de Apoyo</a>
-    </li>
-    <li class="nav-item">
-      <a href="{{ url_for('Administrador.reunion') }}" class="nav-link rounded-pill px-4">Crear Reunión</a>
-    </li>
-  </ul>
+<div class="container my-5">
+  <div class="row g-4 justify-content-center text-center">
+
+    <div class="col-md-4 col-lg-3">
+      <div class="menu-item">
+       <a href="{{ url_for('Administrador.resumensemanal') }}"><i class="bi bi-graph-up"></i>
+        <a href="{{ url_for('Administrador.resumensemanal') }}">Resumen Semanal</a>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+      <div class="menu-item">
+        <a href="{{ url_for('Administrador.registrotutorias') }}"><i class="bi bi-journal-text"></i>
+        <a href="{{ url_for('Administrador.registrotutorias') }}">Registro de Tutorías</a>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+      <div class="menu-item">
+        <a href="{{ url_for('Administrador.comunicacion') }}"><i class="bi bi-chat-dots"></i>
+        <a href="{{ url_for('Administrador.comunicacion') }}">Comunicación</a>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+      <div class="menu-item">
+        <a href="{{ url_for('Administrador.manual') }}"><i class="bi bi-journal-medical"></i>
+        <a href="{{ url_for('Administrador.manual') }}">Manual del Usuario</a>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+      <div class="menu-item">
+        <a href="{{ url_for('Administrador.materialapoyo') }}"><i class="bi bi-folder2"></i>
+        <a href="{{ url_for('Administrador.materialapoyo') }}">Material de Apoyo</a>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+      <div class="menu-item">
+        <a href="{{ url_for('Administrador.reunion') }}"><i class="bi bi-calendar-event"></i>
+        <a href="{{ url_for('Administrador.reunion') }}">Crear Reunión</a>
+      </div>
+    </div>
+
+  </div>
 </div>
 
+
 <!-- Offcanvas menú lateral -->
-<section class="bg-light py-3 mt-3">
+<section class="bg-light py-5 mt-2">
   <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
@@ -105,7 +134,7 @@
           </div>
 
           <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
+          
 
           <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
             <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios

@@ -5,3 +5,7 @@ import os
 from decimal import Decimal
 #Definir el Blueprint para el administardor
 Acudiente_bp = Blueprint('Acudiente', __name__, url_prefix='/acudiente')
+
+@Acudiente_bp.route('/paginainicio')
+def paginainicio():
+    return render_template('Acudiente/Paginainicio.html')

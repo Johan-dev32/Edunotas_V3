@@ -13,7 +13,7 @@ Administrador_bp = Blueprint('Administrador', __name__, url_prefix='/administrad
 # ----------------- RUTAS DE INICIO -----------------
 @Administrador_bp.route('/paginainicio')
 def paginainicio():
-    return render_template('Administrador/Paginainicio.html')
+    return render_template('Administrador/Paginainicio_Administrador.html')
 
 
 @Administrador_bp.route('/perfil')
@@ -277,6 +277,61 @@ def eliminar_acudiente(id):
 
 
 # ----------------- OTRAS VISTAS -----------------
+
+@Administrador_bp.route ('/registro', methods=['GET', 'POST'])
+def registro():
+    if request.method == 'POST':
+        nombre = request.form.get('Nombre')
+        apellido = request.form.get('Apellido')
+        correo = request.form.get('Correo')
+        contrasena = request.form.get('Contrasena')
+        numero_documento = request.form.get('NumeroDocumento')
+        telefono = request.form.get('Telefono')
+        direccion = request.form.get('Direccion')
+        rol = request.form.get('Rol')
+
+        tipo_documento = request.form.get('TipoDocumento', 'CC')
+        estado = request.form.get('Estado', 'Activo')
+        genero = request.form.get('Genero', '')
+
+        if not all([nombre, apellido, correo, contrasena, numero_documento, telefono, direccion, rol]):
+            flash('Por favor, completa todos los campos requeridos.')
+            return render_template('Administrador/Registro.html')
+
+        try:
+            existing_user = Usuario.query.filter_by(Correo=correo).first()
+            if existing_user:
+                flash('El correo ya está registrado.')
+                return render_template('Administrador/Registro.html')
+
+            hashed_password = generate_password_hash(contrasena)
+            
+            new_user = Usuario(
+                Nombre=nombre,
+                Apellido=apellido,
+                Correo=correo,
+                Contrasena=hashed_password,
+                TipoDocumento=tipo_documento,
+                NumeroDocumento=numero_documento,
+                Telefono=telefono,
+                Direccion=direccion,
+                Rol=rol,
+                Estado=estado,
+                Genero=genero
+            )
+            
+            
+            db.session.add(new_user)
+            db.session.commit()
+        
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            flash(f'Error al registrar: {str(e)}')
+            return render_template('Administrador/Registro.html')
+
+    return render_template('Administrador/Registro.html')
+
+
 @Administrador_bp.route('/manual')
 def manual():
     return render_template('Administrador/ManualUsuario.html')
@@ -379,9 +434,11 @@ def resultados_encuesta():
 def ver_promedio():
     return render_template('Administrador/VerPromedio.html')
 
-@Administrador_bp.route('/citacion')
-def citacion():
-    return render_template('Administrador/Citacion.html')
+
+
+@Administrador_bp.route('/cursos')
+def cursos():
+    return render_template('Administrador/Cursos.html', cursos=cursos)
 
 # ----------------- SUB-PÁGINAS -----------------
 @Administrador_bp.route('/materialapoyo2')
@@ -392,3 +449,12 @@ def materialapoyo2():
 @Administrador_bp.route('/registrotutorias2')
 def registrotutorias2():
     return render_template('Administrador/RegistroTutorías2.html')
+
+@Administrador_bp.route('/cursos2')
+def cursos2():
+    return render_template('Administrador/Cursos2.html')
+
+
+@Administrador_bp.route('/citacion')
+def citacion():
+    return render_template('Administrador/Citacion.html')

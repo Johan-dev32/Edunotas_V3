@@ -114,7 +114,6 @@
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
 
-
 <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuEncuestas" role="button" aria-expanded="false" aria-controls="submenuEncuestas">
     <i class="bi bi-caret-down-fill"></i> Encuestas
@@ -143,10 +142,10 @@
 
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-
  </ul>
  </div>
 </div>
+
 
 <div class="logo-container">
   <img src="{{ url_for('static', filename='IMGS/IMG 9.png') }}" alt="Logo del colegio">
@@ -154,11 +153,9 @@
   <!-- titulos -->
   <section class="bg-light py-5 mt-5">
     <div class="container">
-
-      <h1 class="text-center mb-4 titulo-principal">CONSULTA DE NOTAS</h1>
-
-      <p class="text-center descripcion">Aquí podrás consultar los cursos de los estudiantes </p>
-      <h2 class="text-center mb-4 subtitulo">LISTA DE NOTAS</h2><br><br>
+      <h1 class="text-center titulo-principal">CURSOS</h1>
+      <p class="text-center descripcion">Aquí podrás consultar los cursos de los estudiantes...</p>
+      <h2 class="text-center mb-4 subtitulo">LISTA DE CURSOS</h2><br><br>
       <!-- ciclo1 -->
       <h3 class="mb-3 text-center">Ciclo 1</h3>
       <div class="row g-3 mb-4">
@@ -166,7 +163,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">601</h4>
-                <a href="{{ url_for('Administrador.notas_registro', curso_id=601) }}" class="btn btn-success">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=601) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -174,7 +171,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">602</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=602) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=602) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -182,7 +179,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">603</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=603) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=603) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -192,7 +189,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">701</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=701) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=701) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -200,7 +197,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">702</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=702) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=702) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -208,7 +205,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">703</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=703) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=703) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -222,7 +219,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">801</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=801) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=801) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -230,7 +227,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">802</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=802) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=802) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -238,7 +235,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">803</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=803) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=803) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -248,7 +245,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">901</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=901) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=901) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -256,7 +253,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">902</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=902) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=902) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -264,7 +261,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">903</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=903) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=903) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -278,7 +275,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">1001</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=1001) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=1001) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -286,7 +283,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">1002</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=1002) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=1002) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -294,7 +291,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">1003</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=1003) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=1003) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -305,7 +302,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">1101</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=1101) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=1101) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -313,7 +310,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">1102</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=1102) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=1102) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>
@@ -321,7 +318,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">1103</h4>
-              <a href="{{ url_for('Administrador.notas_registro', curso_id=1103) }}" class="btn btn-primary">Registrar Notas</a>
+              <a href="{{ url_for('Administrador.cursos2', curso_id=1103) }}" class="btn btn-primary">Ver Cursos</a>
             </div>
           </div>
         </div>

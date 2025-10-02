@@ -24,7 +24,7 @@ def perfil():
 
 # ----------------- DOCENTES -----------------
 @Administrador_bp.route('/profesores')
-@login_required
+
 def profesores():
     docentes = Usuario.query.filter_by(Rol='Docente').all()
     return render_template('Administrador/Profesores.html', docentes=docentes)
@@ -379,6 +379,9 @@ def resultados_encuesta():
 def ver_promedio():
     return render_template('Administrador/VerPromedio.html')
 
+@Administrador_bp.route('/citacion')
+def citacion():
+    return render_template('Administrador/Citacion.html')
 
 # ----------------- SUB-PÁGINAS -----------------
 @Administrador_bp.route('/materialapoyo2')

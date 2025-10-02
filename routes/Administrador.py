@@ -352,11 +352,6 @@ def comunicacion():
     return render_template('Administrador/Comunicación.html')
 
 
-@Administrador_bp.route('/materialapoyo')
-def materialapoyo():
-    return render_template('Administrador/MaterialApoyo.html')
-
-
 @Administrador_bp.route('/reunion')
 def reunion():
     return render_template('Administrador/Reunion.html')
@@ -436,11 +431,6 @@ def ver_promedio():
 
 
 # ----------------- SUB-PÁGINAS -----------------
-@Administrador_bp.route('/materialapoyo2')
-def materialapoyo2():
-    return render_template('Administrador/MaterialApoyo2.html')
-
-
 @Administrador_bp.route('/registrotutorias2')
 def registrotutorias2():
     return render_template('Administrador/RegistroTutorías2.html')

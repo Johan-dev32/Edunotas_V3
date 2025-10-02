@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colegio Fe y Alegría</title>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Iconos -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- CSS propio -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cursos_notas.css') }}">
+</head>
+<body>
+
+
+  <header class="d-flex align-items-center p-3 border-bottom w-100">
+    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+
+
+    <div class="dropdown ms-auto">
+      <button 
+        class="btn btn-edunotas position-relative dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton1" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
+        <span class="bi bi-envelope-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li><a class="dropdown-item" href="#">Ajustes</a></li>
+        <li><a class="dropdown-item" href="#">Opción 2</a></li>
+        <li><a class="dropdown-item" href="#">Opción 3</a></li>
+      </ul>
+    </div>
+
+
+    <div class="dropdown">
+      <button 
+        class="btn btn-usuario dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton2" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
+        <span class="bi bi-person-lines-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+        <li><a class="dropdown-item" href="{{url_for('Docente.perfil')}}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+      </ul>
+    </div>
+  </header>
+
+
+
+<!--  MENU  -->
+  <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
+ <div class="offcanvas-header">
+  <h5 class="offcanvas-title">MENÚ</h5>
+</div>
+<div class="offcanvas1-body">
+  <ul class="nav flex-column">
+  <li class="nav-item"><a href="{{ url_for('Docente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+  <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas">
+   <i class="bi bi-caret-down-fill"></i> Notas 
+  </a>
+
+  <div class="collapse" id="submenuNotas">
+    <ul class="nav flex-column ms-3">
+     <li class=""><a href="{{ url_for('Docente.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+    </ul>
+    <ul class="nav flex-column ms-3">
+     <li class=""><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
+    </ul>
+    <ul class="nav flex-column ms-3">
+     <li class=""><a href="{{ url_for('Docente.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+    </ul>
+  </div>
+
+  <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+  <li class="nav-item"><a href="{{ url_for('Docente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
+  <li class="nav-item"><a href="{{ url_for('Docente.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+
+ </ul>
+ </div>
+</div>
+
+<!-- tabla principal  -->
+<div class="tabla-container mt-4">
+  <table class="tabla">
+    <thead>
+      <tr>
+        <th class="fijo">Nombre</th>
+        <th class="fijo">Curso</th>
+        <th class="fijo">Materia</th>
+        <th>Nota 1</th>
+        <th>Nota 2</th>
+        <th>Nota 3</th>
+        <th>Asistencia 1</th>
+        <th>Asistencia 2</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="fijo">Ana Gómez</td>
+        <td class="fijo">{{ curso_id }}</td>
+        <td class="fijo">ESPAÑOL</td>
+        <td><input type="number" step="0.1" min="1" max="5" value="4.5" readonly></td>
+        <td><input type="number" step="0.1" min="1" max="5" value="4.0" readonly></td>
+        <td><input type="number" step="0.1" min="1" max="5" value="3.8" readonly></td>
+        <td>
+          <select disabled>
+            <option>Asistió</option>
+          </select>
+        </td>
+        <td>
+          <select disabled>
+            <option>No asistió</option>
+          </select>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+    <script src="{{ url_for('static', filename='js/Administrador//validacion_planilla_notas.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/Administrador//materias.js') }}"></script>
+    <script>
+   
+    cargarMaterias("{{ curso_id }}");
+    </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+</html>

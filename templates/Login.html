@@ -1,79 +1,142 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="Viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/Login.css') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
-</head>
-<body class="body_style">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Login.css') }}">
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-  <header class="container">
-    <div class="container5">
-      <img src="/static/img/IMG 2.png" alt="..." class="img1">
+</head>
+<body>
+  
+ <div class="pantalla">
+
+  
+  <!-- Mitad izquierda con animación -->
+  <div class="mitad animacion finisher-header">
+  
+     <!-- Fondo de olas animadas -->
+   <div class="waves">
+      <div class="wave circulo a"></div>
+      <div class="wave circulo b"></div>
+      <div class="wave circulo c"></div>
     </div>
 
-    <form action="{{ url_for('login') }}" method="POST">
-      <div class="mb-3">
-        <label for="email" class="form-label">Correo</label>
-        <input type="email" class="form-control" id="email" name="email" placeholder="Edunotas@ejemplo.com" required>
-      </div>
+    <!-- Texto sobre la animación -->
+    
+    <div class="containerimg">
+      <p class="txtimg">EduNotas en el Colegio Fe y Alegría</p>
+      <p class="txtimg2">Alcanzar la excelencia Educativa</p>
+      <p class="txtimg3">
+        En el Colegio Fe y Alegría, creemos que la tecnología<br>
+        debe estar al servicio del aprendizaje.<br>
+        Con EduNotas, potenciamos la organización académica,<br>
+        fortalecemos la comunicación y hacemos más eficiente la vida escolar.
+      </p>
+    </div>
 
-      <div class="mb-3">
-        <label for="password" class="form-label">Contraseña</label>
-        <div class="input-group">
-        <input type="password" id="password" name="password" class="form-control" required>
-        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
-      <i class="fa-solid fa-eye"></i>
-    </button>
+  </div>
+    <!-- Mitad derecha blanca -->
+    
+  <div class="container d-flex align-items-center justify-content-center login-container">
+    <div class="col-md-6 col-lg-4">
+      <img src="{{ url_for('static', filename='img/IMG 1.png') }}" alt="Logo" class="Logo">
+      <div class="login-form">
+
+        
+        
+        <h2 class="text-center mb-4 titulo">INICIAR SESISÓN</h2>
+       <form>
+ <div class="input-container mb-4">
+          <i class="bi bi-person-fill"></i>
+          <input type="email" id="email" class="form-line" placeholder="Correo electrónico" required>
+        </div>
+        
+        <div class="input-container mb-4">
+          <i class="bi bi-lock-fill"></i>
+
+            <!-- Input -->
+          <input type="password" id="password" class="form-line" placeholder="Contraseña" required>
+
+            <!-- Ojo -->
+          <i class="bi bi-eye-slash toggle-eye" id="togglePassword"></i>
+        </div>
+        
+ <script>
+  const passwordInput = document.getElementById("password");
+  const togglePassword = document.getElementById("togglePassword");
+
+  togglePassword.addEventListener("click", function () {
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+      this.classList.remove("bi-eye-slash");
+      this.classList.add("bi-eye");
+    } else {
+      passwordInput.type = "password";
+      this.classList.remove("bi-eye");
+      this.classList.add("bi-eye-slash");
+    }
+  });
+</script>
+        <!-- Botón -->
+        <div class="d-grid">
+          <a href="{{ url_for('Administrador.paginainicio') }}" class="btn btn-ingresar">Ingresar</a>
+        </div>
+      </form>
+      
+      <p class="text-center mt-3">
+        <a href="#">¿Olvidaste tu contraseña?</a>
+      </p>
+      
+    </div>
   </div>
 </div>
 
-      <button type="submit" class="btn btn-danger">CONFIRMAR</button>
-    </form>
+  <!-- Script de la librería -->
+  <script src="{{ url_for('static', filename='js/Administrador/finisher-header.es5.min.js') }}"></script>
 
-  
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, msg in messages %}
-          <div class="alert alert-{{ category }} mt-3">{{ msg }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-    <p class="text1">_________ o _________</p>
-    <p>
-      ¿No tienes cuenta? <a href="{{ url_for('registro') }}" class="registro-link">Regístrate aquí</a>
-    </p>
-    
-
-  </header>
-
-  <div class="container5">
-    <img src="/static/img/IMG 1.png" alt="..." class="img2">
-  </div>    
-
-  <script src="/static/js/Login.js"></script>
-
-  <script>
-    function togglePassword() {
-      const input = document.getElementById("password");
-      const icon = document.querySelector(".toggle-btn i");
-
-      if (input.type === "password") {
-        input.type = "text";
-        icon.classList.remove("fa-eye");
-        icon.classList.add("fa-eye-slash"); // cambia a "ojo tachado"
-      } else {
-        input.type = "password";
-        icon.classList.remove("fa-eye-slash");
-        icon.classList.add("fa-eye"); // vuelve al ojo normal
-      }
+  <!-- Configuración de la animación -->
+  <script type="text/javascript">
+new FinisherHeader({
+  "count": 12,
+  "size": {
+    "min": 1300,
+    "max": 1500,
+    "pulse": 0
+  },
+  "speed": {
+    "x": {
+      "min": 2,
+      "max": 5
+    },
+    "y": {
+      "min": 0.6,
+      "max": 3
     }
-  </script>
+  },
+  "colors": {
+    "background": "#0c0994",
+    "particles": [
+      "#000000",
+      "#000000",
+      "#0c09a5",
+      "#080000"
+    ]
+  },
+  "blending": "lighten",
+  "opacity": {
+    "center": 0.6,
+    "edge": 0
+  },
+  "skew": 0,
+  "shapes": [
+    "c"
+  ]
+});
+</script>
 </body>
 </html>

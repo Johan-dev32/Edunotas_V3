@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colegio Fe y Alegría</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Iconos -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- CSS propio -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Administrador/Cursos2.css') }}">
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="d-flex align-items-center p-3 border-bottom w-100">
+    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+
+    <div class="dropdown ms-auto">
+      <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="bi bi-envelope-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li><a class="dropdown-item" href="#">Ajustes</a></li>
+        <li><a class="dropdown-item" href="#">Opción 2</a></li>
+        <li><a class="dropdown-item" href="#">Opción 3</a></li>
+      </ul>
+    </div>
+
+    <div class="dropdown">
+      <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="bi bi-person-lines-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+        <li><a class="dropdown-item" href="{{ url_for('Administrador.perfil') }}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- MENU -->
+  <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">MENÚ</h5>
+    </div>
+    <div class="offcanvas1-body">
+      <ul class="nav flex-column">
+        <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+
+        <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas">
+          <i class="bi bi-caret-down-fill"></i> Notas
+        </a>
+        <div class="collapse" id="submenuNotas">
+          <ul class="nav flex-column ms-3">
+            <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+            <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
+            <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+          </ul>
+        </div>
+
+        <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+        <li class="nav-item"><a href="{{ url_for('Administrador.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
+        <li class="nav-item"><a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
+        <li class="nav-item"><a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
+        <li class="nav-item"><a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
+        <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+        <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CONTENIDO -->
+  <section class="bg-light py-5 mt-5">
+    <div class="container">
+      <h1 class="text-center titulo-principal">LISTA DE CURSOS</h1>
+
+      <!-- Formulario para agregar estudiante -->
+      <form id="formEstudiante" class="mb-4">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <input type="text" id="nombre" class="form-control" placeholder="Nombre" required>
+          </div>
+          <div class="col-md-3">
+            <input type="text" id="ciclo" class="form-control" placeholder="Ciclo" required>
+          </div>
+          <div class="col-md-2">
+            <input type="text" id="curso" class="form-control" placeholder="Curso" required>
+          </div>
+          <div class="col-md-2">
+            <input type="number" id="promedio" class="form-control" placeholder="Promedio" step="0.1" min="1" max="5" required>
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-success">
+              <i class="bi bi-person-plus-fill"></i> Agregar
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Span oculto con la URL de citaciones -->
+      <span id="citaciones-url" data-url="{{ url_for('Administrador.citacion') }}"></span>
+
+      <!-- Tabla de estudiantes -->
+      <table class="table table-bordered table-striped" id="tablaPromedios">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Ciclo</th>
+            <th>Curso</th>
+            <th>Promedio</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filas dinámicas aquí -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- JS -->
+  <script src="{{ url_for('static', filename='js/Administrador/Cursos2.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

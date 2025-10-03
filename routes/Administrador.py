@@ -15,20 +15,12 @@ Administrador_bp = Blueprint('Administrador', __name__, url_prefix='/administrad
 def paginainicio():
     return render_template('Administrador/Paginainicio_Administrador.html')
 
-
-@Administrador_bp.route('/perfil')
-@login_required
-def perfil():
-    return render_template('Administrador/perfil.html', usuario=current_user)
-
-
 # ----------------- DOCENTES -----------------
 @Administrador_bp.route('/profesores')
 
 def profesores():
     docentes = Usuario.query.filter_by(Rol='Docente').all()
     return render_template('Administrador/Profesores.html', docentes=docentes)
-
 
 @Administrador_bp.route('/agregar_docente', methods=['POST'])
 @login_required

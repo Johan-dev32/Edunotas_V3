@@ -96,3 +96,22 @@ header .btn-dark {
 #contenedorObservacion { max-width: 400px; }
 
 .fila-seleccionada { background-color: #d1e7ff !important; }
+
+/* Botón de flecha */
+.back-btn {
+  position: fixed;      
+  top: 20%;             
+  left: 40px;           
+  transform: translateY(-50%);
+  background:#b4b1c7;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px oklch(0% 0 0 / 0.1);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}

@@ -11,11 +11,6 @@ Docente_bp = Blueprint('Docente', __name__, url_prefix='/docente')
 def paginainicio():
     return render_template('Docentes/Paginainicio_Docentes.html')
 
-@Docente_bp.route('/perfil')
-@login_required
-def perfil():
-    return render_template('Docentes/perfil.html', usuario=current_user)
-
 @Docente_bp.route('/manual')
 def manual():
     return render_template('Docentes/ManualUsuario.html')
@@ -35,6 +30,10 @@ def registrotutorias():
 @Docente_bp.route('/tareas_actividades')
 def tareas_actividades():
     return render_template('Docentes/Registrar_Tareas_Actividades.html')
+
+@Docente_bp.route('/tareas_actividades2')
+def tareas_actividades2():
+    return render_template('Docentes/Registrar_Tareas_Actividades2.html')
 
 @Docente_bp.route('/aprobacion_academica')
 def aprobacion_academica():

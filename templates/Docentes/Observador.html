@@ -46,7 +46,7 @@
   </button>
 
   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <li><a class="dropdown-item" href="{{url_for('Docente.perfil')}}">Perfil</a></li>
+    <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
     <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
   </ul>
 </div>
@@ -56,35 +56,39 @@
 
 <!--  MENU  -->
   <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
- <div class="offcanvas-header">
-  <h5 class="offcanvas-title">MENÚ</h5>
-</div>
-<div class="offcanvas1-body">
-  <ul class="nav flex-column">
-  <li class="nav-item"><a href="{{ url_for('Docente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
-  <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas">
-   <i class="bi bi-caret-down-fill"></i> Notas 
-  </a>
+   <div class="offcanvas-header">
+    <h5 class="offcanvas-title">MENÚ</h5>
+   </div>
+   <div class="offcanvas1-body">
+      <div class="offcanvas1-body">
+        <ul class="nav flex-column">
+          <li class="nav-item"><a href="{{ url_for('Docente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio </a></li>
 
-  <div class="collapse" id="submenuNotas">
-    <ul class="nav flex-column ms-3">
-     <li class=""><a href="{{ url_for('Docente.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-    </ul>
-    <ul class="nav flex-column ms-3">
-     <li class=""><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
-    </ul>
-    <ul class="nav flex-column ms-3">
-     <li class=""><a href="{{ url_for('Docente.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
-    </ul>
+          <!-- Submenú Notas -->
+          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas </a>
+            <div class="collapse" id="submenuNotas">
+              <ul class="nav flex-column ms-3">
+                <li><a href="{{ url_for('Docente.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-search"></i> Consultar Notas </a></li>
+                <li><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Registrar Notas </a></li>
+                <li><a href="{{ url_for('Docente.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-calculator"></i> Cálculo de Promedios </a></li>
+              </ul>
+            </div>
+            
+            <li class="nav-item"><a href="{{ url_for('Docente.tareas_actividades') }}" class="nav-link text-white"><i class="bi bi-book-half"></i> Registro de Tareas y Actividades</a></li>
+
+            <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador </a></li>
+
+            <li class="nav-item"><a href="{{ url_for('Docente.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Aprobación Académica </a></li>
+
+            <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones </a></li>
+
+            <li class="nav-item"><a href="{{ url_for('Docente.historial_academico') }}" class="nav-link text-white"><i class="bi bi-clock"></i> Historial Académico </a></li>
+
+            <li class="nav-item"><a href="{{ url_for('Docente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
+        </ul>
+      </div>
+    </div>
   </div>
-
-  <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-  <li class="nav-item"><a href="{{ url_for('Docente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
-  <li class="nav-item"><a href="{{ url_for('Docente.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-
- </ul>
- </div>
-</div>
 </head>
 <body>
 

@@ -52,20 +52,24 @@ def index():
     return render_template("Login.html")
 
 @app.route('/indexadministrador')
+@login_required
 def indexadministrador():
-    return render_template("Administrador/Paginainicio_Administrador.html")
+    return render_template("Administrador/Paginainicio_Administrador.html", usuario=current_user)
 
 @app.route('/indexestudiante')
+@login_required
 def indexestudiante():
-    return render_template("Estudiante/Paginainicio_Estudiante.html")
+    return render_template("Estudiante/Paginainicio_Estudiante.html", usuario=current_user)
 
 @app.route('/indexdocente')
+@login_required
 def indexdocente():
-    return render_template("Docentes/Paginainicio_Docentes.html")
+    return render_template("Docentes/Paginainicio_Docentes.html", usuario=current_user)
 
 @app.route('/indexacudiente')
+@login_required
 def indexacudiente():
-    return render_template("Acudiente/Paginainicio_Acudiente.html")
+    return render_template("Acudiente/Paginainicio_Acudiente.html", usuario=current_user)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -112,6 +116,28 @@ def login():
             return redirect(url_for('login'))
 
     return render_template('login.html')
+
+@app.route("/perfil")
+@login_required
+def perfil():
+    return render_template("perfil.html", usuario=current_user)
+
+@app.route('/perfil/<rol>')
+def perfil_rol(rol):
+        if rol == "Administrador":
+            return render_template("inicio_admin.html")
+        elif rol == "Docente":
+            return render_template("inicio_docente.html")
+        elif rol == "Estudiante":
+            return render_template("inicio_estudiante.html")
+        elif rol == "Acudiente":
+            return render_template("inicio_acudiente.html")
+        else:
+            return "Rol no válido", 404
+        
+@app.route('/manual')
+def manual():
+    return render_template('manual.html')
 
 
 @app.route('/logout')

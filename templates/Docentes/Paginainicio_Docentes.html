@@ -52,7 +52,7 @@
       <span class="bi bi-person-lines-fill"></span>
     </button>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
-      <li><a class="dropdown-item" href="{{url_for('Administrador.perfil')}}">Perfil</a></li>
+      <li><a class="dropdown-item" href="{{url_for('Docente.perfil')}}">Perfil</a></li>
       <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
     </ul>
   </div>
@@ -64,24 +64,45 @@
 
 
 <!-- Menú superior -->
-<div class="container ">
-  <ul class="nav nav-pills justify-content-center bg-white p-4 rounded-pill ">
-    <li class="nav-item">
-      <a href="{{ url_for('Administrador.resumensemanal') }}" class="nav-link active rounded-pill px-4">Resumen Semanal</a>
-    </li>
-    <li class="nav-item">
-      <a href="{{ url_for('Administrador.registrotutorias') }}" class="nav-link rounded-pill px-4">Registro de Tutorías</a>
-    </li>
-    <li class="nav-item">
-      <a href="{{ url_for('Administrador.comunicacion') }}" class="nav-link rounded-pill px-4">Comunicación</a>
-    </li>
-    <li class="nav-item">
-      <a href="{{ url_for('Administrador.materialapoyo') }}" class="nav-link rounded-pill px-4">Material de Apoyo</a>
-    </li>
-    <li class="nav-item">
-      <a href="{{ url_for('Administrador.reunion') }}" class="nav-link rounded-pill px-4">Crear Reunión</a>
-    </li>
-  </ul>
+<div class="container my-5">
+  <div class="row g-4 justify-content-center text-center">
+
+    <div class="col-md-4 col-lg-3">
+      <div class="menu-item">
+       <a href="{{ url_for('Docente.resumensemanal') }}"><i class="bi bi-graph-up"></i>
+        <a href="{{ url_for('Docente.resumensemanal') }}">Resumen Semanal</a>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+      <div class="menu-item">
+        <a href="{{ url_for('Docente.registrotutorias') }}"><i class="bi bi-journal-text"></i>
+        <a href="{{ url_for('Docente.registrotutorias') }}">Registro de Tutorías</a>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+      <div class="menu-item">
+        <a href="{{ url_for('Docente.medioscomunicacion') }}"><i class="bi bi-chat-dots"></i>
+        <a href="{{ url_for('Docente.medioscomunicacion') }}">Comunicación</a>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+      <div class="menu-item">
+        <a href="{{ url_for('Docente.materialapoyo') }}"><i class="bi bi-folder2"></i>
+        <a href="{{ url_for('Docente.materialapoyo') }}">Material de Apoyo</a>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+      <div class="menu-item">
+        <a href="{{ url_for('Docente.reunion') }}"><i class="bi bi-calendar-event"></i>
+        <a href="{{ url_for('Docente.reunion') }}">Crear Reunión</a>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <!-- Offcanvas menú lateral -->
@@ -93,34 +114,29 @@
   <div class="offcanvas1-body">
       <div class="offcanvas1-body">
         <ul class="nav flex-column">
-          <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
-          
-          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
-          <div class="collapse" id="submenuNotas">
-            <ul class="nav flex-column ms-3">
-              <!-- Ajustado: estas rutas NO piden parámetros -->
-              <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
-            </ul>
-          </div>
+          <li class="nav-item"><a href="{{ url_for('Docente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio </a></li>
 
-          <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
+          <!-- Submenú Notas -->
+          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas </a>
+            <div class="collapse" id="submenuNotas">
+              <ul class="nav flex-column ms-3">
+                <li><a href="{{ url_for('Docente.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-search"></i> Consultar Notas </a></li>
+                <li><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Registrar Notas </a></li>
+                <li><a href="{{ url_for('Docente.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-calculator"></i> Cálculo de Promedios </a></li>
+              </ul>
+            </div>
+            
+            <li class="nav-item"><a href="{{ url_for('Docente.tareas_actividades') }}" class="nav-link text-white"><i class="bi bi-book-half"></i> Registro de Tareas y Actividades</a></li>
 
-          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
-            <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
-          </a>
-          <div class="collapse" id="submenuUsuarios">
-            <ul class="nav flex-column ms-3">
-              <li><a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
-              <li><a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
-              <li><a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
-              <li><a href="{{ url_for('Administrador.registro') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Registro Usuarios</a></li>
-            </ul>
-          </div>
+            <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador </a></li>
 
-          <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+            <li class="nav-item"><a href="{{ url_for('Docente.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Aprobación Académica </a></li>
+
+            <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones </a></li>
+
+            <li class="nav-item"><a href="{{ url_for('Docente.historial_academico') }}" class="nav-link text-white"><i class="bi bi-clock"></i> Historial Académico </a></li>
+
+            <li class="nav-item"><a href="{{ url_for('Docente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
         </ul>
       </div>
     </div>
@@ -132,42 +148,14 @@
   <div class="row">
     <div class="col-md-6">
       <h4 class="h4">NOTICIAS</h4>
-      <a href="{{ url_for('Administrador.noticias_vistas') }}" class="text-decoration-none mt-3">
+      <a href="{{ url_for('Docente.noticias_vistas') }}" class="text-decoration-none mt-3">
         <div id="noticia1" class="bg-secondary text-white rounded shadow-sm">Noticia 1</div>
       </a>
-    </div>
-
-    <div class="Circulares">
-      <p class="h5">CIRCULARES</p>
-      <p class="h6">ESTUDIANTILES</p>
-      <div class="accordion accordion-flush" id="accordionFlushExample">
-        <div class="accordion-item">
-          <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne">
-              Circular #1
-            </button>
-          </h2>
-          <div id="flush-collapseOne" class="accordion-collapse collapse">
-            <div class="accordion-body text-center"><div id="circular1-contenido"></div></div>
-          </div>
-        </div>
-        <div class="accordion-item">
-          <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo">
-              Circular #2
-            </button>
-          </h2>
-          <div id="flush-collapseTwo" class="accordion-collapse collapse">
-            <div class="accordion-body text-center"><div id="circular2-contenido"></div></div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
 
-<a href="{{ url_for('Administrador.noticias') }}" class="text-decoration-none"><div class="editar1"><i class="bi bi-pencil-square"></i></div></a>
-<a href="{{ url_for('Administrador.circulares') }}" class="text-decoration-none"><div class="editar"><i class="bi bi-pencil-square"></i></div></a>
+<a href="{{ url_for('Docente.noticias') }}" class="text-decoration-none"><div class="editar1"><i class="bi bi-pencil-square"></i></div></a>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 

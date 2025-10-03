@@ -3,57 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Colegio Fe y Alegría</title>
+  <title>Gestión Docentes</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/MaterialApoyo2.css') }}">
-  <script src="{{ url_for('static', filename='js/MaterialApoyo2.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ResumenSemanal.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </head>
 <body>
+
+
   <header class="d-flex align-items-center p-3 border-bottom w-100">
-<button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
-  <i class="bi bi-list"></i>
-</button>
-<h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
 
-<div class="dropdown">
-  <button 
-    class="btn btn-edunotas position-relative dropdown-toggle" 
-    type="button" 
-    id="dropdownMenuButton" 
-    data-bs-toggle="dropdown" 
-    aria-expanded="false">
-    <span class="bi bi-envelope-fill"></span>
-  </button>
+    <div class="dropdown ms-auto">
+      <button 
+        class="btn btn-edunotas position-relative dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton1" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
+        <span class="bi bi-envelope-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li><a class="dropdown-item" href="#">Ajustes</a></li>
+        <li><a class="dropdown-item" href="#">Opción 2</a></li>
+        <li><a class="dropdown-item" href="#">Opción 3</a></li>
+      </ul>
+    </div>
 
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <li><a class="dropdown-item" href="#">Ajustes</a></li>
-    <li><a class="dropdown-item" href="#">Opción 2</a></li>
-    <li><a class="dropdown-item" href="#">Opción 3</a></li>
-  </ul>
-</div>
 
-
-<div class="dropdown">
-  <button 
-    class="btn btn-usuario dropdown-toggle" 
-    type="button" 
-    id="dropdownMenuButton" 
-    data-bs-toggle="dropdown" 
-    aria-expanded="false">
-    <span class="bi bi-person-lines-fill"></span>
-  </button>
-
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <li><a class="dropdown-item" href="{{url_for('Administrador.perfil')}}">Perfil</a></li>
-
-    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-  </ul>
-</div>
-
+    <div class="dropdown">
+      <button 
+        class="btn btn-usuario dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton2" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
+        <span class="bi bi-person-lines-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+        <li><a class="dropdown-item" href="{{url_for('Administrador.perfil')}}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+      </ul>
+    </div>
+  </header>
 
 
 
@@ -84,7 +81,6 @@
   <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
 
-
   <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios" role="button" aria-expanded="false" aria-controls="submenuUsuarios">
     <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
@@ -112,10 +108,8 @@
   </div>
 </li>
 
-
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-
 
 <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuEncuestas" role="button" aria-expanded="false" aria-controls="submenuEncuestas">
@@ -150,69 +144,42 @@
  </div>
 </div>
 
-  </header>
-<div class="containerimg">
-  <p class="titulo">MATERIAL DE APOYO</p>
-  <p class="texto1">Visualiza todo el material que has subido </p>
-  
-<class="bg-light">
 
-<div class="container py-2">
-  <div class="card shadow-lg rounded-3 custom-card">
-    <div class="card-header  text-white">
-      <h5 class="mb-0 text-center fw-bold">Subir Material de Apoyo</h5>
+<h1 class="titulo">RESUMEN SEMANAL</h1>
+  <p class="descripcion">CREA EL DOCUMENTO PDF PARA INFORMAR AL COLEGIO</p>
+  <div class="container">
+
+  <form id="resumenForm">
+
+    <div class="row">
+      <div class="col">
+        <label for="fecha">FECHA</label>
+        <input type="date" id="fecha" name="fecha" required>
+      </div>
+      <div class="col">
+        <label for="autor">CREADO POR</label>
+        <input type="text" id="autor" name="autor" placeholder="Nombre del autor" required>
+      </div>
     </div>
-    <div class="card-body">
-      <form>
-        <div class="dropdown">
 
 
-
-</div>
-        <div class="mb-3">
-          <label for="nombre" class="form-label">MATERIA ELEGIDA</label>
-          <input type="text" class="form-control" id="nombre" name="nombre" required>
-        </div>
-
-        <!-- Subir documento -->
-        <div class="mb-3">
-          <label for="archivo" class="form-label">SELECCIONA UN DOCUMENTO</label>
-          <input class="form-control" type="file" id="archivo" name="archivo" multiple>
-        </div>
-
-        <!-- Subir link -->
-        <div class="mb-3">
-          <label for="link" class="form-label">AGREGUE EL ENLACE</label>
-          <input type="url" class="form-control" id="link" name="link" placeholder="https://ejemplo.com">
-        </div>
-
-        <!-- Botones -->
-        <div class="d-flex justify-content-end gap-2">
-          <button type="reset" class="btn btn-outline-secondary">Cancelar</button>
-          <button type="submit" class="btn btn-subir"><i class="bi bi-send-fill"></i> Subir</button>
-        </div>
-      </form>
+    <div class="form-group">
+      <label for="titulo">TITULO</label>
+      <input type="text" id="titulo" name="titulo" placeholder="Escribe el título del documento" required>
     </div>
-  </div>
+
+    <div class="form-group">
+      <label for="redaccion">ACTIVIDADES REALIZADAS</label>
+      <textarea id="redaccion" name="redaccion" rows="6" placeholder="Escriba las actividades aquí..." required></textarea>
+    </div>
+
+   <button type="button" class="btn" id="btnPDF">Generar PDF</button>
+
+  </form>
 </div>
 
-<select class="form-select" aria-label="Materias">
-  <option selected>MATERIAS</option>
-  <option value="1">ESPAÑOL</option>
-  <option value="2">MATEMÁTICAS</option>
-  <option value="3">INGLÉS</option>
-  <option value="4">SOCIALES</option> 
-  <option value="5">ÉTICA</option>
-  <option value="6">FILOSOFÍA</option>
-  <option value="7">EDUCACIÓN FÍSICA</option>
-  <option value="8">ARTÍSTICA</option>
-  <option value="9">BIOLÓGICA - FÍSICA - QUÍMICA</option>
-  <option value="10">RELIGIÓN</option>
-  <option value="11">TECNOLOGÍA - INFORMÁTICA</option>
-  <option value="12">P.T.I</option>
-  <option value="13">RUTA</option>
-</select>
-
-<p class="palo">|</p>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+  <script src="{{ url_for('static', filename='js/Administrador/resumen.js') }}"></script>
 </body>
 </html>

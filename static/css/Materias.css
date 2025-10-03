@@ -99,18 +99,15 @@ header .btn-dark {
 .titulo-principal {
   font-size: 3rem;      
   font-weight: 900;      
-  color: #050733ff;      
+  color: #050733ff;    
+  margin-left: 50px;  
 }
 
-.subtitulo {
-  font-size: 2rem;       
-  font-weight: 700;
-  color: #050733ff;        
-}
 
 .descripcion {
   font-size: 1.3rem;     
-  color: #555;           
+  color: #555;  
+  margin-left: 50px;         
 }
 
 section.bg-light {
@@ -201,19 +198,6 @@ section.bg-light {
 #guardarPeriodos:hover {
   background-color: #3b61ea;
 }
-.registro-fechas {
-  margin-top: 5px;
-  display: flex;
-  justify-content: flex-start;
-}
-
-.mini-barra {
-  background: rgb(255, 255, 255);
-  color: #000000;
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 5px;
-  margin-right: 5px;
-  font-family: 'Trebuchet MS', sans-serif;
-  white-space: nowrap;
+.btn-crearmateria{
+  margin-left: -120px;
 }

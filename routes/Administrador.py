@@ -451,3 +451,9 @@ def cursos2():
 @Administrador_bp.route('/citacion')
 def citacion():
     return render_template('Administrador/Citacion.html')
+
+@Administrador_bp.route('/materias')
+def materias():
+    return render_template('Administrador/Materias.html')
+
+

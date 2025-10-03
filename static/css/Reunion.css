@@ -141,3 +141,7 @@ input.form-control:focus {
   font-weight: 500;
   color: #495057;
 }
+.Historial {
+  font-family: 'Trebuchet MS', sans-serif;
+  font-weight: bolder;
+}

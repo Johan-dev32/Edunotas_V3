@@ -49,6 +49,7 @@
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
         <li><a class="dropdown-item" href="{{url_for('Administrador.perfil')}}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
         <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
       </ul>
     </div>
@@ -81,7 +82,6 @@
   </div>
 
   <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-  <li class="nav-item"><a href="{{ url_for('Administrador.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
 
   <li class="nav-item"><a href="{{ url_for('observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
 

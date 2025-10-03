@@ -456,4 +456,28 @@ def citacion():
 def materias():
     return render_template('Administrador/Materias.html')
 
+@Administrador_bp.route('/detallesmateria/<int:curso_id>')
+def detallesmateria(curso_id):
+    materias = {
+        601: "Español",
+        602: "Matemáticas",
+        603: "Inglés",
+        701: "Sociales",
+        702: "Ética",
+        703: "Filosofía",
+        801: "Artística",
+        802: "Biología",
+        803: "Física",
+        901: "Química",
+        902: "Religión",
+        903: "Tecnología",
+        1001: "Informática",
+        1002: "P.T.I",
+        1003: "Ruta",
+        1101: "Educación Física"
+    }
+
+    materia_nombre = materias.get(curso_id, "Materia desconocida")
+    return render_template("Administrador/DetallesMateria.html", materia=materia_nombre)
+
 

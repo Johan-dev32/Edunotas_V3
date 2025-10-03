@@ -9,7 +9,8 @@
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <!-- CSS propio -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/Asignaturas.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/DetallesMateria.css') }}">
+
 </head>
 <body>
 
@@ -110,6 +111,7 @@
   </div>
 </li>
 
+
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
 
@@ -141,71 +143,63 @@
 
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-
  </ul>
  </div>
 </div>
-</div>
 
-<h1 class="text-center titulo-principal">GESTION DE ASIGNATURAS </h1>
-<p class="text-center descripcion">GESTIONA LAS ASIGNATURAS PARA EL COLEGIO</p>
-  <div id="acciones">
-    <button class="btn btn-primary" onclick="mostrarFormulario()">Agregar Asignatura</button>
-    <button class="btn btn-warning" onclick="editarAsignatura()">Editar Asignatura</button>
-    <button class="btn btn-danger" onclick="desactivarAsignatura()">Desactivar Asignatura</button>
-  </div>
+  <!-- titulos -->
+  <section class="bg-light py-5 mt-5">
+    <div class="container">
+      <h1 class="text-center titulo-principal">DETALLES DE LA MATERIA</h1>
+      <p class="text-center descripcion">Mira como la Materia funciona</p>
 
-  <table id="tablaAsignaturas">
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Ciclo</th>
-        <th>Cursos</th>
-        <th>Profesor</th>
-        <th>Estado</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<div class="container mt-4">
+  <div class="container-box">
+    <!-- Encabezado del curso -->
+    <div class="titulo">1101</div>
 
-  <!-- Modal -->
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <h2 id="tituloForm">Agregar Asignatura</h2>
-      
-      <label>Nombre de la Asignatura:
-        <input type="text" id="nombreAsignatura">
-      </label>
+    <div class="row align-items-center">
+      <!-- Texto a la izquierda -->
+      <div class="col-md-7">
+        <p><strong>Se calcula mediante niveles como:</strong><br>
+          Bajo: 1.0 a 2.9, Medio: 3.0 a 4.4, Alto: 4.5 a 5.0
+        </p>
 
-      <label>Descripción / Temas:
-        <textarea id="descripcionAsignatura"></textarea>
-      </label>
+        <p>
+          <strong>Talleres y trabajos:</strong> 20%, <br>
+          <strong>Evaluaciones:</strong> 30%, <br>
+          <strong>Proyectos:</strong> 30%, <br>
+          <strong>Comportamiento:</strong> 10%, <br>
+          <strong>Participación:</strong> 10%
+        </p>
 
-      <label>Ciclo:
-        <select id="cicloAsignatura">
-          <option value="">-- Seleccione --</option>
-          <option value="1">Ciclo 1 (601-603, 701-703)</option>
-          <option value="2">Ciclo 2 (801-803, 901-903)</option>
-          <option value="3">Ciclo 3 (1001-1003, 1101-1103)</option>
-        </select>
-      </label>
+        <p>
+          <strong>Promedio =</strong> (Nota1 + Nota2 + ... + NotaN) / Número de asignaturas
+        </p>
+      </div>
 
-      <label>Profesor Encargado:
-        <input type="text" id="profesorAsignatura">
-      </label>
-
-      <div class="modal-buttons">
-        <button class="btn btn-primary" onclick="guardarAsignatura()">Guardar</button>
-        <button class="btn" onclick="cerrarModal()">Cancelar</button>
+      <!-- Tarjeta a la derecha -->
+      <div class="col-md-5">
+        <div class="card card-custom shadow-sm">
+          <div class="card-header">
+            {{ materia }}
+          </div>
+          <div class="card-body">
+            <div class="linea"></div>
+            <div class="linea"></div>
+            <div class="linea"></div>
+            <div class="linea"></div>
+            <div class="linea"></div>
+            <div class="linea"></div>
+            <button class="btn btn-detalle">Ver Detalladamente</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ url_for('static', filename='js/Administrador/asignaturas.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   <script src="{{ url_for('static', filename='js/Administrador/DetallesMateria.js') }}"></script>
 </body>
 </html>
-
-

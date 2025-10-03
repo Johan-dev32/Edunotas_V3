@@ -1,0 +1,219 @@
+body {
+  background-color: #f8f9fa; 
+  font-family: 'Trebuchet MS', sans-serif;
+  color: #212529;
+}
+
+/* navbar */
+header {
+  background-color: white;
+  color: #050733ff;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas {
+  background-color: #050733ff;
+  color: #fff;
+}
+
+.btn-usuario {
+  background-color: #050733ff;
+  color: #fff;
+  margin-left: 10px;
+}
+
+/*  menu_des  */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+.offcanvas {
+  font-size: 25px;
+}
+
+.offcanvas-title {
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+.nav-item {
+  font-weight: bold;
+  font-size: 22px;
+}
+#sidebar .nav-link {
+  font-size: 18px;   /* tamaño menú hamburguesa */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
+.nav-pills .nav-link {
+  font-size: 25px;   /* tamaño botones nav */
+  color: #050733ff !important; 
+  font-weight: bold;
+
+}
+
+
+.logo-container {
+  width: auto;
+  height: auto;
+}
+
+.logo-container img {
+  max-width: 250px; 
+  height: auto;
+}
+
+
+/* titulos */
+
+.titulo-principal {
+  font-size: 3rem;      
+  font-weight: 900;      
+  color: #050733ff;      
+}
+
+.subtitulo {
+  font-size: 2rem;       
+  font-weight: 700;
+  color: #050733ff;        
+}
+
+.descripcion {
+  font-size: 1.3rem;     
+  color: #555;           
+}
+
+section.bg-light {
+  margin-top: 10px !important;
+  padding-top: 30px !important;
+}
+/* los cuadros de curso */
+.curso-card {
+  border: 2px solid #050733ff;
+  border-radius: 10px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.curso-card:hover {
+  transform: scale(1.05);
+  background-color: #eef5ff;
+}
+
+.curso-card .card-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #050733ff;
+}
+
+.curso-card .btn {
+  margin-top: 10px;
+  background-color: #050733ff;
+  border: none;
+}
+
+.curso-card .btn:hover {
+  background-color: #3b61ea;
+}
+
+.periodos-card {
+  width: 100%;
+  background: #ffffff;
+  border: 2px solid #050733ff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(12,18,40,0.08);
+  font-family: 'Trebuchet MS', sans-serif;
+  margin-bottom: 30px;
+}
+
+.periodos-card h5 {
+  color: #050733ff;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Contenedor en grid */
+.periodos-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 periodos en fila */
+  gap: 15px;
+}
+
+.periodo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #f9f9fc;
+  border: 1px solid #dce1ef;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.periodo label {
+  color: #050733ff;
+  font-size: 14px;
+  text-align: center;
+}
+
+.periodo input[type="date"] {
+  font-size: 13px;
+  padding: 5px;
+}
+
+#guardarPeriodos {
+  background-color: #050733ff;
+  border: none;
+  font-weight: bold;
+  width: 150px;   /* tamaño fijo más pequeño */
+  height: 40px;
+}
+
+#guardarPeriodos:hover {
+  background-color: #3b61ea;
+}
+.registro-fechas {
+  margin-top: 5px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.mini-barra {
+  background: rgb(255, 255, 255);
+  color: #000000;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  margin-right: 5px;
+  font-family: 'Trebuchet MS', sans-serif;
+  white-space: nowrap;
+}

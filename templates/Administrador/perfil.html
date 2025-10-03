@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Observador</title>
+  <title>Perfil Usuario</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/Observador.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/perfil.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
   <header class="d-flex align-items-center p-3 border-bottom w-100">
@@ -46,14 +47,9 @@
   </button>
 
   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-<<<<<<< HEAD
-    <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-=======
     <li><a class="dropdown-item" href="{{url_for('Administrador.perfil')}}">Perfil</a></li>
     <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
->>>>>>> a831f876e497b8bee5205b2addb3fa1d7c23bf9f
     <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-    
   </ul>
 </div>
 
@@ -79,15 +75,8 @@
     <ul class="nav flex-column ms-3">
      <li class=""><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
     </ul>
-    <ul class="nav flex-column ms-3">
-     <li class=""><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
-    </ul>
   </div>
-
   <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-  <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
-  <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-
   <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios" role="button" aria-expanded="false" aria-controls="submenuUsuarios">
     <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
@@ -97,7 +86,7 @@
     <ul class="nav flex-column ms-3">
       <li class="nav-item">
         <a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white">
-          <i class="bi bi-person-fill-gear"></i> Profesores
+          <i class="bi bi-person-fill-gear"></i>Profesores
         </a>
       </li>
       <li class="nav-item">
@@ -114,134 +103,28 @@
   </div>
 </li>
 
-
-<li class="nav-item">
-  <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuEncuestas" role="button" aria-expanded="false" aria-controls="submenuEncuestas">
-    <i class="bi bi-caret-down-fill"></i> Encuestas
-  </a>
-
-  <div class="collapse" id="submenuEncuestas">
-    <ul class="nav flex-column ms-3">
-      <li class="nav-item">
-        <a href="{{ url_for('Administrador.crear_encuesta') }}" class="nav-link text-white">
-          <i class="bi bi-file-earmark-plus-fill"></i> Crear Encuesta
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="{{ url_for('Administrador.editar_eliminar_encuesta') }}" class="nav-link text-white">
-          <i class="bi bi-pencil-square"></i> Editar / Eliminar Encuesta
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="{{ url_for('Administrador.resultados_encuesta') }}" class="nav-link text-white">
-          <i class="bi bi-bar-chart-fill"></i> Ver Resultados
-        </a>
-      </li>
-    </ul>
-  </div>
-</li>
-
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-
  </ul>
  </div>
 </div>
-</head>
-<body>
 
-  <!-- 1. CONTROL DE CUPOS -->
-<div class="container1 ">
-  <section id="cupos">
-    <h2 class="titulo-principal">Control de Cupos</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Registrados</th>
-          <th>Grupo</th>
-          <th>Cupos Disponibles</th>
-          <th>Máximo</th>
-        </tr>
-      </thead>
-      <tbody id="tablaCupos">
-        <tr>
-          <td>28</td>
-          <td>1001</td>
-          <td>2</td>
-          <td>30</td>
-        </tr>
-        <tr>
-          <td>25</td>
-          <td>1002</td>
-          <td>5</td>
-          <td>30</td>
-        </tr>
-        <tr>
-          <td>30</td>
-          <td>1003</td>
-          <td>0</td>
-          <td>30</td>
-        </tr>
-      </tbody>
-    </table>
-    <button id="btnAbrirFormulario">Agregar Observación</button>
-  </section>
-</div>
-
-<div class="container2">
-  <!-- 2. FORMULARIO MODAL -->
-  <div id="modalFormulario" class="modal oculto">
-  <div class="modal-contenido">
-      <h2>Agregar Observación</h2>
-      <form id="formObservacion">
-        <label>Nombre del estudiante:</label>
-        <input type="text" id="nombre" required>
-
-        <label>Comportamiento:</label>
-        <input type="text" id="comportamiento" required>
-
-        <label>Actitud:</label>
-        <input type="text" id="actitud" required>
-
-        <label>Avances:</label>
-        <input type="text" id="avances" required>
-
-        <label>Dificultades:</label>
-        <input type="text" id="dificultades" required>
-
-        <label>Seguimiento:</label>
-        <input type="text" id="seguimiento" required>
-
-        <div class="acciones">
-          <button type="submit">Agregar</button>
-          <button type="button" id="btnCancelar">Cancelar</button>
-        </div>
-      </form>
+<!-- Contenedor del perfil -->
+  <section class="perfil-container">
+    <div class="perfil-header">
+      <i class="fa-solid fa-user perfil-icon"></i>
     </div>
-  </div>
-
-  <!-- 4. TABLA DE OBSERVADOR -->
-  <section id="observador" class="oculto">
-    <h2>Observador de Estudiantes</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Comportamiento</th>
-          <th>Actitud</th>
-          <th>Avances</th>
-          <th>Dificultades</th>
-          <th>Seguimiento</th>
-        </tr>
-      </thead>
-      <tbody id="tablaObservador">
-        <!-- Aquí se agregan las filas -->
-      </tbody>
-    </table>
+    <div class="perfil-info">
+      <h2>Perfil de Usuario ({{ usuario.Rol }})</h2>
+      <p><strong>Nombre completo:</strong> {{ usuario.Nombre }} {{ usuario.Apellido }}</p>
+      <p><strong>Tipo de documento:</strong> {{ usuario.TipoDocumento }}</p>
+      <p><strong>Número de documento:</strong> {{ usuario.NumeroDocumento }}</p>
+      <p><strong>Número de contacto / Teléfono:</strong> {{ usuario.Telefono }}</p>
+      <p><strong>Correo electrónico:</strong> {{ usuario.Correo }}</p>
+      <p><strong>Dirección de residencia:</strong> {{ usuario.Direccion }}</p>
+      <p><strong>Género:</strong> {{ usuario.Genero }}</p>
+      <p><strong>Estado:</strong> {{ usuario.Estado }}</p>
+    </div>
   </section>
-</div>
-
-
-<script src="{{ url_for('static', filename='js/Administrador/observador.js') }}"></script>
 </body>
 </html>

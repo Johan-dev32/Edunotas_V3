@@ -3,7 +3,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const invitadosInput = document.getElementById("invitados");
   const linkGeneradoInput = document.getElementById("linkGenerado");
-  const btnAgendar = document.getElementById("btnAgendar");
+  const form = document.getElementById("formReunion");
+  const historial = document.getElementById("historial");
+
+  // 🔹 Cargar historial guardado
+  let reuniones = JSON.parse(localStorage.getItem("reuniones")) || [];
+  renderHistorial();
 
   // Generar link cuando terminas de escribir invitados
   if (invitadosInput && linkGeneradoInput) {
@@ -14,18 +19,55 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Redirigir al link al hacer clic en Agendar Reunión
-  if (btnAgendar && linkGeneradoInput) {
-    btnAgendar.addEventListener("click", function (event) {
-      event.preventDefault(); // evita que el form recargue la página
+  // Guardar reunión
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
 
-      const link = linkGeneradoInput.value;
-      if (link) {
-        window.open(link, "_blank"); // abre en nueva pestaña
-        // window.location.href = link; // si lo quieres en la misma pestaña
-      } else {
-        alert("Primero debes generar el link de la reunión.");
-      }
+    const datos = {
+      fecha: document.getElementById("fecha").value,
+      tema: document.getElementById("tema").value,
+      organizador: document.getElementById("organizador").value,
+      cargo: document.getElementById("cargo").value,
+      invitados: invitadosInput.value,
+      link: linkGeneradoInput.value
+    };
+
+    if (!datos.link) {
+      alert("⚠️ Primero genera el link antes de agendar.");
+      return;
+    }
+
+    // 🚀 Insertar arriba y limitar a 3
+    reuniones.unshift(datos); 
+    reuniones = reuniones.slice(0, 3); 
+
+    // Guardar en localStorage
+    localStorage.setItem("reuniones", JSON.stringify(reuniones));
+
+    // Mostrar en historial
+    renderHistorial();
+
+    // Abrir el link en otra pestaña
+    window.open(datos.link, "_blank");
+
+    // Limpiar formulario
+    form.reset();
+    linkGeneradoInput.value = "";
+  });
+
+  // Renderizar historial en la vista
+  function renderHistorial() {
+    historial.innerHTML = "";
+    reuniones.forEach((r) => {
+      const li = document.createElement("li");
+      li.className = "list-group-item";
+      li.innerHTML = `
+        <strong>${r.fecha}</strong> - ${r.tema} <br>
+        <small>${r.organizador} (${r.cargo})</small><br>
+        Invitados: ${r.invitados}<br>
+        <a href="${r.link}" target="_blank">🔗 Enlace</a>
+      `;
+      historial.appendChild(li);
     });
   }
 });

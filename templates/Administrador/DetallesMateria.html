@@ -4,10 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Colegio Fe y Alegría</title>
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/RegistroTutorias2.css') }}">
+  <!-- CSS propio -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/DetallesMateria.css') }}">
+
 </head>
 <body>
 
@@ -46,12 +49,8 @@
         <span class="bi bi-person-lines-fill"></span>
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-<<<<<<< HEAD
-        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-=======
         <li><a class="dropdown-item" href="{{url_for('Administrador.perfil')}}">Perfil</a></li>
         <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
->>>>>>> a831f876e497b8bee5205b2addb3fa1d7c23bf9f
         <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
       </ul>
     </div>
@@ -112,9 +111,9 @@
   </div>
 </li>
 
+
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-
 
 <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuEncuestas" role="button" aria-expanded="false" aria-controls="submenuEncuestas">
@@ -144,113 +143,63 @@
 
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-
  </ul>
  </div>
 </div>
 
+  <!-- titulos -->
+  <section class="bg-light py-5 mt-5">
+    <div class="container">
+      <h1 class="text-center titulo-principal">DETALLES DE LA MATERIA</h1>
+      <p class="text-center descripcion">Mira como la Materia funciona</p>
 
-<section class="registro-tutorias container mt-5">
-    <h2 class="titulo mt-5">REGISTRO DE TUTORIAS</h2></div>
-<div>    
-<style>
-        .form-container {
-            max-width: 500px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
-        }
-        .input-field {
-            width: 100%;
-            padding: 0.75rem;
-            margin-top: 0.5rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s
-        
-        }
-        .input-field:focus {
-            outline: none;
-            border-color: #2563eb;
-        }
-    </style>
-</head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="form-container">
-        <h2 class="text-3xl font-bold text-center text-gray-800 mb-6 fw-bolder">REGISTRO DE TUTORIAS</h2>
-        <form action="{{ url_for('Administrador.registro') }}" method="post" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-gray-700 font-medium mb-1 mt-2" for="nombre">Nombre Completo</label>
-                    <input class="input-field" type="text" id="nombre" name="Nombre" required>
-                </div>
-            <div>
-                <label class="block text-gray-700 font-medium mb-1 mt-3" for="rol">Rol</label>
-                <select class="input-field" id="rol" name="Rol" required>
-                    <option value="" disabled selected>Selecciona un rol</option>
-                    <option value="Administrador">Administrador</option>
-                    <option value="Docente">Docente</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-gray-700 font-medium mb-1 mt-3" for="Tema">Tema</label>
-                <input class="input-field" id="Tema" name="Temas" placeholder="Asignatura y Tema" required >
-            </div>
-           <div>
-          <label class="block text-gray-700 font-medium mb-1 mt-3" for="fecha">Fecha de Realización</label>
-                <input class="input-field" type="date" id="fecha"  name="fecha"  required>
-            </div>
-                <label class="block text-gray-700 font-medium mb-1 mt-3" for="numero-documento">Curso</label>
-                <select class="form-select" aria-label="Cursos">
-  <option selected></option>
-  <option value="1">601</option>
-  <option value="2">602</option>
-  <option value="3">603</option>
-  <option value="4">701</option> 
-  <option value="5">702</option>
-  <option value="6">703</option>
-  <option value="7">801</option>
-  <option value="8">802</option>
-  <option value="9">803</option>
-  <option value="10">901</option>
-  <option value="11">902</option>
-  <option value="12">903</option>
-  <option value="13">1001</option>
-  <option value="14">1002</option>
-  <option value="15">1003</option>
-  <option value="16">1101</option>
-  <option value="17">1102</option>
-  <option value="18">1103</option>
-</select>
-            <div>
-  <label class="block text-gray-700 font-medium mb-1 mt-3" for="nombre_estudiante">Nombre del Estudiante</label>
-  <input class="input-field" type="text" id="nombre_estudiante" name="Nombreestudiante" required>
+<div class="container mt-4">
+  <div class="container-box">
+    <!-- Encabezado del curso -->
+    <div class="titulo">1101</div>
+
+    <div class="row align-items-center">
+      <!-- Texto a la izquierda -->
+      <div class="col-md-7">
+        <p><strong>Se calcula mediante niveles como:</strong><br>
+          Bajo: 1.0 a 2.9, Medio: 3.0 a 4.4, Alto: 4.5 a 5.0
+        </p>
+
+        <p>
+          <strong>Talleres y trabajos:</strong> 20%, <br>
+          <strong>Evaluaciones:</strong> 30%, <br>
+          <strong>Proyectos:</strong> 30%, <br>
+          <strong>Comportamiento:</strong> 10%, <br>
+          <strong>Participación:</strong> 10%
+        </p>
+
+        <p>
+          <strong>Promedio =</strong> (Nota1 + Nota2 + ... + NotaN) / Número de asignaturas
+        </p>
+      </div>
+
+      <!-- Tarjeta a la derecha -->
+      <div class="col-md-5">
+        <div class="card card-custom shadow-sm">
+          <div class="card-header">
+            {{ materia }}
+          </div>
+          <div class="card-body">
+            <div class="linea"></div>
+            <div class="linea"></div>
+            <div class="linea"></div>
+            <div class="linea"></div>
+            <div class="linea"></div>
+            <div class="linea"></div>
+            <button class="btn btn-detalle">Ver Detalladamente</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div>
-  <label class="block text-gray-700 font-medium mb-1 mt-3" for="correo">Correo Electrónico del Estudiante</label>
-  <input class="input-field" type="email" id="correo" name="Correo" required>
-</div>
-
-<div>
-  <label class="block text-gray-700 font-medium mb-1 mt-3" for="motivo">Motivo</label>
-  <input class="input-field" type="text" id="motivo" name="motivo" required>
-</div>
-
-<div>
-  <label class="block text-gray-700 font-medium mb-1 mt-3" for="observaciones">Observaciones</label>
-  <input class="input-field" type="text" id="observaciones" name="observaciones" required>
-</div>
-            
-          <div class="d-flex justify-content-center">
-  <button type="button" class="btn btn-primary fw-bold px-5 mt-3" onclick="guardarTutoria()">
-    Registrar
-  </button>
-</div>
-
-<script src="{{ url_for('static', filename='js/Administrador//registroTutorias.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   <script src="{{ url_for('static', filename='js/Administrador/DetallesMateria.js') }}"></script>
 </body>
-</div>
+</html>

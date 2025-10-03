@@ -308,3 +308,8 @@ header .btn-outline-primary:hover {
 .acciones button:hover {
   background-color: #e0e0e0;
 }
+.titulo-principal {
+  font-size: 3rem;      
+  font-weight: 900;      
+  color: #050733ff;      
+}

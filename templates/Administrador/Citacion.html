@@ -15,12 +15,12 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/Citacion.css') }}">
 
   <!-- EmailJS -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script>
-    (function() {
-      emailjs.init('B9uCP5mC5hOLbLZtJ'); // 🔑 tu Public Key
-    })();
-  </script>
+  <script type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<script type="text/javascript">
+  emailjs.init('B9uCP5mC5hOLbLZtJ')
+</script>
 </head>
 <body>
   <header class="d-flex align-items-center p-3 border-bottom w-100">

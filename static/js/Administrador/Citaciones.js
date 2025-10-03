@@ -1,20 +1,21 @@
 const btn = document.getElementById('btnGuardar');
+const form = document.getElementById('form'); // 👈 guardamos referencia al form
 
-document.getElementById('form')
-  .addEventListener('submit', function(event) {
-    event.preventDefault();
+form.addEventListener('submit', function(event) {
+  event.preventDefault();
 
-    btn.innerText = 'Enviando...'; // 👈 en vez de .value usamos .innerText
+  btn.innerText = 'Enviando...'; // 👈 en vez de .value usamos .innerText
 
-    const serviceID = 'default_service';   // cámbialo por el tuyo si no es este
-    const templateID = 'template_mnpwosp'; // cámbialo por el tuyo en EmailJS
+  const serviceID = 'default_service';   // cámbialo por el tuyo si no es este
+  const templateID = 'template_mnpwosp'; // cámbialo por el tuyo en EmailJS
 
-    emailjs.sendForm(serviceID, templateID, this)
-      .then(() => {
-        btn.innerText = 'Enviar Citación';
-        alert('✅ Citación enviada correctamente');
-      }, (err) => {
-        btn.innerText = 'Enviar Citación';
-        alert('❌ Error: ' + JSON.stringify(err));
-      });
-  });
+  emailjs.sendForm(serviceID, templateID, this)
+    .then(() => {
+      btn.innerText = 'Enviar Citación';
+      alert('✅ Citación enviada correctamente');
+      form.reset(); // 👈 reinicia el formulario
+    }, (err) => {
+      btn.innerText = 'Enviar Citación';
+      alert('❌ Error: ' + JSON.stringify(err));
+    });
+});

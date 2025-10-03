@@ -434,6 +434,9 @@ def resultados_encuesta():
 def ver_promedio():
     return render_template('Administrador/VerPromedio.html')
 
+@Administrador_bp.route('/configuracion_academica')
+def configuracion_academica():
+    return render_template('Administrador/ConfiguracionAcademica.html')
 
 
 @Administrador_bp.route('/cursos')

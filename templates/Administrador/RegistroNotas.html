@@ -131,7 +131,8 @@
  </ul>
  </div>
 </div>
-</div>  <!-- CONTENIDO -->
+</div> 
+ <!-- CONTENIDO -->
   <div class="container mt-4">
     <div class="card">
       <div class="card-body">
@@ -201,9 +202,9 @@
   </div>
 
   <!-- JS -->
-  <script src="{{ url_for('static', filename='js/validacion_planilla_notas.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/materias.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/acciones_notas.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/Administrador/validacion_planilla_notas.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/Administrador/materias.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/Administrador/acciones_notas.js') }}"></script>
   <script>
     // cargar materias según curso
     cargarMaterias("{{ curso_id }}");

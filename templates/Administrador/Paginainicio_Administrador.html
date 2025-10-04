@@ -121,9 +121,12 @@
           <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
           <div class="collapse" id="submenuNotas">
             <ul class="nav flex-column ms-3">
-              <!-- Ajustado: estas rutas NO piden parámetros -->
               <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
+              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
+             <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+
+
+
             </ul>
           </div>
 
@@ -143,8 +146,36 @@
             </ul>
           </div>
 
+
+          <li class="nav-item">
+  <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuEncuestas" role="button" aria-expanded="false" aria-controls="submenuEncuestas">
+    <i class="bi bi-caret-down-fill"></i> Encuestas
+  </a>
+
+  <div class="collapse" id="submenuEncuestas">
+    <ul class="nav flex-column ms-3">
+      <li class="nav-item">
+        <a href="{{ url_for('Administrador.crear_encuesta') }}" class="nav-link text-white">
+          <i class="bi bi-file-earmark-plus-fill"></i> Crear Encuesta
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('Administrador.editar_eliminar_encuesta') }}" class="nav-link text-white">
+          <i class="bi bi-pencil-square"></i> Editar / Eliminar Encuesta
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('Administrador.resultados_encuesta') }}" class="nav-link text-white">
+          <i class="bi bi-bar-chart-fill"></i> Ver Resultados
+        </a>
+      </li>
+    </ul>
+  </div>
+</li>
+
+
           <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+          <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
         </ul>
       </div>
     </div>

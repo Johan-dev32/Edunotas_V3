@@ -397,6 +397,10 @@ def notas_curso(curso_id):
     return render_template("Administrador/notas_curso.html", curso_id=curso_id)
 
 
+@Administrador_bp.route('/ver_horarios')
+def ver_horarios():
+    return render_template("Administrador/VerHorarios.html")
+
 @Administrador_bp.route('/notas_registro')
 def notas_registro():
     return render_template('Administrador/Notas_Registro.html')

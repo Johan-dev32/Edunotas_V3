@@ -473,3 +473,6 @@ def detallesmateria(curso_id):
     return render_template("Administrador/DetallesMateria.html", materia=materia_nombre)
 
 
+@Administrador_bp.route('/asistencia')
+def asistencia():
+    return render_template('Administrador/Asistencia.html')

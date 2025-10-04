@@ -203,6 +203,13 @@ header .btn-dark {
   transition: background 0.2s, transform 0.2s;
 }
 
+#asignaturaSelectBar {
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #000;
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 992px) {
   .actividades {

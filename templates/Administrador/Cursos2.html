@@ -12,7 +12,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
   <!-- CSS propio -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/Administrador/Cursos2.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Cursos2.css') }}">
 </head>
 <body>
   <!-- HEADER -->
@@ -38,12 +38,8 @@
         <span class="bi bi-person-lines-fill"></span>
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-<<<<<<< HEAD
         <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
-=======
-        <li><a class="dropdown-item" href="{{ url_for('Administrador.perfil') }}">Perfil</a></li>
         <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
->>>>>>> a831f876e497b8bee5205b2addb3fa1d7c23bf9f
         <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
       </ul>
     </div>
@@ -82,7 +78,7 @@
   <!-- CONTENIDO -->
   <section class="bg-light py-5 mt-5">
     <div class="container">
-      <h1 class="text-center titulo-principal">LISTA DE CURSOS</h1>
+      <h1 class="text-center titulo-principal">CURSO</h1>
 
       <!-- Formulario para agregar estudiante -->
       <form id="formEstudiante" class="mb-4">
@@ -108,7 +104,11 @@
       </form>
 
       <!-- Span oculto con la URL de citaciones -->
-      <span id="citaciones-url" data-url="{{ url_for('Administrador.citacion') }}"></span>
+<span id="citaciones-url" data-url="{{ url_for('Administrador.citacion') }}"></span>
+
+<!-- Span oculto con la URL de asistencia -->
+<span id="asistencia-url" data-url="{{ url_for('Administrador.asistencia') }}"></span>
+
 
       <!-- Tabla de estudiantes -->
       <table class="table table-bordered table-striped" id="tablaPromedios">
@@ -118,7 +118,8 @@
             <th>Ciclo</th>
             <th>Curso</th>
             <th>Promedio</th>
-            <th>Acción</th>
+            <th>Citaciones</th>
+            <th>Asistencia</th>
           </tr>
         </thead>
         <tbody>

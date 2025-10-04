@@ -2,10 +2,11 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
+from flask_mail import Message
 from Controladores.models import db, Usuario, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades
 import os
-
 from decimal import Decimal
+
 #Definir el Blueprint para el administardor
 Administrador_bp = Blueprint('Administrador', __name__, url_prefix='/administrador')
 
@@ -448,6 +449,11 @@ def citacion():
 def materias():
     return render_template('Administrador/Materias.html')
 
+@Administrador_bp.route('/inasistencias')
+def inasistencias():
+    return render_template('Administrador/inasistencias.html')
+
+
 @Administrador_bp.route('/detallesmateria/<int:curso_id>')
 def detallesmateria(curso_id):
     materias = {
@@ -471,5 +477,54 @@ def detallesmateria(curso_id):
 
     materia_nombre = materias.get(curso_id, "Materia desconocida")
     return render_template("Administrador/DetallesMateria.html", materia=materia_nombre)
+
+@Administrador_bp.route('/enviar_correo', methods=['GET', 'POST'])
+@login_required
+def enviar_correo():
+    if request.method == 'POST':
+        from app import mail  # ✅ Importación local, evita circular import
+
+        curso = request.form.get('curso')
+        tipo = request.form.get('tipo')
+        destinatario = request.form.get('destinatario')
+        archivo = request.files.get('archivo')
+
+        if not destinatario or not archivo:
+            flash("Faltan datos ❌", "danger")
+            return redirect(url_for('Administrador.paginainicio'))
+
+        try:
+            msg = Message(
+                subject=f"{tipo} - Curso {curso}",
+                recipients=[destinatario]
+            )
+
+            # 📌 Plantilla HTML bonita
+            msg.html = render_template(
+                "Administrador/CorreoAdjunto.html",
+                curso=curso,
+                tipo=tipo,
+                destinatario=destinatario
+            )
+
+            # 📎 Adjuntar archivo
+            msg.attach(
+                archivo.filename,
+                archivo.content_type,
+                archivo.read()
+            )
+
+            mail.send(msg)
+            flash("Correo enviado correctamente ✅", "success")
+        except Exception as e:
+            flash(f"Error al enviar el correo: {e}", "danger")
+
+        return redirect(url_for('Administrador.paginainicio'))
+
+    # Si es GET, muestra el formulario
+    return render_template("Administrador/Comunicaciòn.html")
+
+
+
 
 

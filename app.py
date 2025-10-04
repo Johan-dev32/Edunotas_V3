@@ -261,6 +261,7 @@ def reset_password(token):
     return render_template('reset_password.html', token=token)
 
 
+
 app.register_blueprint(Administrador_bp)
 app.register_blueprint(Docente_bp)
 app.register_blueprint(Estudiante_bp)

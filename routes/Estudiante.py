@@ -10,3 +10,7 @@ Estudiante_bp = Blueprint('Estudiante', __name__, url_prefix='/estudiante')
 @Estudiante_bp.route('/paginainicio')
 def paginainicio():
     return render_template('Estudiante/Paginainicio_Estudiante.html')
+
+@Estudiante_bp.route('/subidaeviencias')
+def subidaeviencias():
+    return render_template('Estudiante/SubidaEvidencias.html')

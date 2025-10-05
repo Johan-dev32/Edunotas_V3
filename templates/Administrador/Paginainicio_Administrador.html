@@ -102,6 +102,13 @@
       </div>
     </div>
 
+    <div class="col-md-4 col-lg-3">
+      <div class="menu-item">
+        <a href="{{ url_for('Administrador.inasistencias') }}"><i class="bi bi-calendar-event"></i>
+        <a href="{{ url_for('Administrador.inasistencias') }}">Gestion Inasistencias</a>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -143,6 +150,7 @@
           </div>
 
           <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+          <li class="nav-item"><a href="{{ url_for('Administrador.historialacademico') }}" class="nav-link text-white"><i class="bi bi-journal-text"></i> Historial Academico</a></li>
           <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
         </ul>
       </div>

@@ -2,8 +2,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("formEstudiante");
   const tabla = document.querySelector("#tablaPromedios tbody");
 
-  // obtener la url de citaciones desde el span oculto
+  // obtener las url desde los spans ocultos
   const citacionesUrl = document.getElementById("citaciones-url").dataset.url;
+  const asistenciaUrl = document.getElementById("asistencia-url").dataset.url;
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -21,8 +22,13 @@ document.addEventListener("DOMContentLoaded", () => {
       <td>${curso}</td>
       <td>${promedio}</td>
       <td>
-        <a href="${citacionesUrl}" class="btn btn-light btn-sm">
+        <a href="${citacionesUrl}" class="btn btn-light btn-sm" title="Citaciones">
           <i class="bi bi-card-heading"></i>
+        </a>
+      </td>
+      <td>
+        <a href="${asistenciaUrl}" class="btn btn-light btn-sm" title="Asistencia">
+          <i class="bi bi-check2-circle"></i>
         </a>
       </td>
     `;

@@ -3,7 +3,9 @@ body {
   font-family: 'Trebuchet MS', sans-serif;
   color: #212529;
 }
-
+html, body {
+  overflow-x: hidden !important;
+}
 /* navbar */
 header {
   background-color: white;

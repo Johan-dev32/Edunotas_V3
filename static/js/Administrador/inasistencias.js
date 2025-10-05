@@ -1,7 +1,7 @@
 const datosInasistencias = [
   {
     estudiante: "Juan Pérez",
-    curso: "10A",
+    curso: "1002",
     fecha: "2025-09-28",
     razon: "Cita médica",
     archivo: "https://upload.wikimedia.org/wikipedia/en/0/05/Hello_kitty_character_portrait.png",
@@ -9,7 +9,7 @@ const datosInasistencias = [
   },
   {
     estudiante: "María López",
-    curso: "9B",
+    curso: "901",
     fecha: "2025-09-29",
     razon: "Calamidad familiar",
     archivo: "https://www.inspireuplift.com/resizer/?image=https://cdn.inspireuplift.com/uploads/images/seller_products/59330/1709049161_KITTY.png&width=800&height=800&quality=90&format=auto&fit=pad",
@@ -17,7 +17,7 @@ const datosInasistencias = [
   },
   {
     estudiante: "Carlos Gómez",
-    curso: "11C",
+    curso: "1102",
     fecha: "2025-09-30",
     razon: "Gripa fuerte",
     archivo: "https://i.pinimg.com/originals/4c/9c/51/4c9c518f8a52bfcbb5e3eac2de8f26dd.png",
@@ -25,7 +25,7 @@ const datosInasistencias = [
   },
   {
     estudiante: "Ana Torres",
-    curso: "8A",
+    curso: "803",
     fecha: "2025-10-01",
     razon: "Viaje familiar",
     archivo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Hello_Kitty_1974.png",
@@ -33,7 +33,7 @@ const datosInasistencias = [
   },
   {
     estudiante: "David Rodríguez",
-    curso: "7B",
+    curso: "701",
     fecha: "2025-10-02",
     razon: "Consulta odontológica",
     archivo: "https://i.etsystatic.com/18930834/r/il/77e8d3/2456442681/il_794xN.2456442681_3w2v.jpg",
@@ -41,7 +41,7 @@ const datosInasistencias = [
   },
   {
     estudiante: "Laura Sánchez",
-    curso: "6C",
+    curso: "603",
     fecha: "2025-10-03",
     razon: "Accidente leve",
     archivo: "https://m.media-amazon.com/images/I/51syjM4S9DL._AC_UF894,1000_QL80_.jpg",
@@ -49,7 +49,7 @@ const datosInasistencias = [
   },
   {
     estudiante: "Pedro Martínez",
-    curso: "9A",
+    curso: "902",
     fecha: "2025-10-04",
     razon: "Problemas personales",
     archivo: "https://ih1.redbubble.net/image.2546065091.6234/flat,750x,075,f-pad,750x1000,f8f8f8.jpg",
@@ -57,7 +57,7 @@ const datosInasistencias = [
   },
   {
     estudiante: "Sofía Ramírez",
-    curso: "10B",
+    curso: "1001",
     fecha: "2025-10-05",
     razon: "Cita psicológica",
     archivo: "https://cdn.shopify.com/s/files/1/0553/2495/5721/files/hello-kitty-face_480x480.png?v=1631712435",
@@ -65,7 +65,7 @@ const datosInasistencias = [
   },
   {
     estudiante: "Andrés Castillo",
-    curso: "11A",
+    curso: "1102",
     fecha: "2025-10-06",
     razon: "Problemas de transporte",
     archivo: "https://www.pngmart.com/files/22/Hello-Kitty-PNG-Pic.png",
@@ -73,7 +73,7 @@ const datosInasistencias = [
   },
   {
     estudiante: "Valentina Hernández",
-    curso: "8C",
+    curso: "801",
     fecha: "2025-10-07",
     razon: "Dolor de cabeza",
     archivo: "https://png.pngtree.com/png-clipart/20230916/original/pngtree-hello-kitty-png-image_12228227.png",

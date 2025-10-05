@@ -4,26 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Colegio Fe y Alegría</title>
-
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
   <!-- CSS propio -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/Cursos2.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/HistorialAcademico.css') }}">
+
 </head>
 <body>
-  <!-- HEADER -->
+
+
   <header class="d-flex align-items-center p-3 border-bottom w-100">
     <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
       <i class="bi bi-list"></i>
     </button>
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
+
     <div class="dropdown ms-auto">
-      <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+      <button 
+        class="btn btn-edunotas position-relative dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton1" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
         <span class="bi bi-envelope-fill"></span>
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
@@ -33,17 +38,25 @@
       </ul>
     </div>
 
+
     <div class="dropdown">
-      <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+      <button 
+        class="btn btn-usuario dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton2" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
         <span class="bi bi-person-lines-fill"></span>
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-        <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
         <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
+        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
       </ul>
     </div>
   </header>
+
+
 
 <!--  MENU  -->
   <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
@@ -70,9 +83,6 @@
   </div>
 
   <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-  <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
-  <li class="nav-item"><a href="{{ url_for('Administrador.reporte') }}" class="nav-link text-white"><i class="bi bi-calendar2"></i></i> Generar reporte</a></li>
-  <li class="nav-item"><a href="{{ url_for('Administrador.inasistencias') }}" class="nav-link text-white"><i class="bi bi-card-checklist"></i></i></i> Inasistencias</a></li>
 
   <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios" role="button" aria-expanded="false" aria-controls="submenuUsuarios">
@@ -100,6 +110,10 @@
     </ul>
   </div>
 </li>
+
+
+  <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+  <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
 
 <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuEncuestas" role="button" aria-expanded="false" aria-controls="submenuEncuestas">
@@ -129,67 +143,28 @@
 
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-
  </ul>
  </div>
 </div>
 
-  <!-- CONTENIDO -->
+  <!-- titulos -->
   <section class="bg-light py-5 mt-5">
     <div class="container">
-      <h1 class="text-center titulo-principal">CURSO</h1>
-
-      <!-- Formulario para agregar estudiante -->
-      <form id="formEstudiante" class="mb-4">
-        <div class="row g-3">
-          <div class="col-md-3">
-            <input type="text" id="nombre" class="form-control" placeholder="Nombre" required>
-          </div>
-          <div class="col-md-3">
-            <input type="text" id="ciclo" class="form-control" placeholder="Ciclo" required>
-          </div>
-          <div class="col-md-2">
-            <input type="text" id="curso" class="form-control" placeholder="Curso" required>
-          </div>
-          <div class="col-md-2">
-            <input type="number" id="promedio" class="form-control" placeholder="Promedio" step="0.1" min="1" max="5" required>
-          </div>
-          <div class="col-md-2 d-grid">
-            <button type="submit" class="btn btn-success">
-              <i class="bi bi-person-plus-fill"></i> Agregar
-            </button>
-          </div>
-        </div>
-      </form>
-
-      <!-- Span oculto con la URL de citaciones -->
-<span id="citaciones-url" data-url="{{ url_for('Administrador.citacion') }}"></span>
-
-<!-- Span oculto con la URL de asistencia -->
-<span id="asistencia-url" data-url="{{ url_for('Administrador.asistencia') }}"></span>
+      <h1 class="text-center titulo-principal">HISTORIAL ACADÉMICO</h1>
+      <p class="text-center descripcion">Observa el Historial Academico del Estudiante</p>
+      <p class="text-center subtitulo">Por favor digite el numero de documento del Estudiante</p>
 
 
-      <!-- Tabla de estudiantes -->
-      <table class="table table-bordered table-striped" id="tablaPromedios">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Ciclo</th>
-            <th>Curso</th>
-            <th>Promedio</th>
-            <th>Citaciones</th>
-            <th>Asistencia</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Filas dinámicas aquí -->
-        </tbody>
-      </table>
-    </div>
-  </section>
+<div class="search-container">
+  <div class="position-relative">
+    <span class="input-group-text"><i class="bi bi-search"></i></span>
+    <input type="text" class="form-control custom-input" placeholder="search">
+  </div>
+  <br>
+  <a href="{{ url_for('Administrador.historialacademico2') }}" class="btn btn-custom">Buscar</a>
+</div>
 
-  <!-- JS -->
-  <script src="{{ url_for('static', filename='js/Administrador/Cursos2.js') }}"></script>
+ <script src="{{ url_for('static', filename='js/Administrador/HistorialAcademico.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

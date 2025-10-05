@@ -431,6 +431,10 @@ def configuracion_academica():
 def cursos():
     return render_template('Administrador/Cursos.html', cursos=cursos)
 
+@Administrador_bp.route('/historialacademico')
+def historialacademico():
+    return render_template('Administrador/HistorialAcademico.html')
+
 # ----------------- SUB-PÁGINAS -----------------
 @Administrador_bp.route('/registrotutorias2')
 def registrotutorias2():
@@ -532,3 +536,10 @@ def enviar_correo():
 
 
 
+@Administrador_bp.route('/asistencia')
+def asistencia():
+    return render_template('Administrador/Asistencia.html')
+
+@Administrador_bp.route('/historialacademico2')
+def historialacademico2():
+    return render_template('Administrador/HistorialAcademico2.html')

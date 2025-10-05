@@ -2,7 +2,10 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
-from Controladores.models import db, Usuario, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades
+from sqlalchemy import func
+from flask import jsonify
+from datetime import datetime
+from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad
 import os
 
 from decimal import Decimal
@@ -324,6 +327,41 @@ def registro():
     return render_template('Administrador/Registro.html')
 
 
+@Administrador_bp.route('/api/repitentes', methods=['POST'])
+@login_required
+def api_agregar_repitente():
+    try:
+        data = request.get_json()
+
+        # buscar estudiante por documento
+        estudiante = Usuario.query.filter_by(NumeroDocumento=data.get('doc')).first()
+        if not estudiante:
+            return jsonify({"success": False, "error": "Estudiante no encontrado"}), 404
+
+        # crear nueva matrícula (año actual, estado repitente)
+        nueva_matricula = Matricula(
+            ID_Estudiante=estudiante.ID_Usuario,
+            AnioLectivo=datetime.now().year,
+            Estado="Repitente"
+        )
+        db.session.add(nueva_matricula)
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "id": estudiante.ID_Usuario,
+            "nombre": f"{estudiante.Nombre} {estudiante.Apellido}",
+            "tipo": estudiante.TipoDocumento,
+            "doc": estudiante.NumeroDocumento,
+            "curso": data.get('curso'),
+            "veces": Matricula.query.filter_by(ID_Estudiante=estudiante.ID_Usuario).count()
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 @Administrador_bp.route('/manual')
 def manual():
     return render_template('Administrador/ManualUsuario.html')
@@ -426,6 +464,68 @@ def configuracion_academica():
     return render_template('Administrador/ConfiguracionAcademica.html')
 
 
+@Administrador_bp.route('/repitentes')
+@login_required
+def repitentes():
+    """
+    Lista estudiantes repitentes (más de una matrícula en distintos años lectivos).
+    """
+    repitentes = (
+        db.session.query(
+            Usuario.ID_Usuario,
+            Usuario.Nombre,
+            Usuario.Apellido,
+            Usuario.TipoDocumento,
+            Usuario.NumeroDocumento,
+            func.count(Matricula.AnioLectivo).label("VecesMatriculado")
+        )
+        .join(Matricula, Usuario.ID_Usuario == Matricula.ID_Estudiante)
+        .filter(Usuario.Rol == 'Estudiante')
+        .group_by(
+            Usuario.ID_Usuario,
+            Usuario.Nombre,
+            Usuario.Apellido,
+            Usuario.TipoDocumento,
+            Usuario.NumeroDocumento
+        )
+        .having(func.count(Matricula.AnioLectivo) > 1)
+        .order_by(func.count(Matricula.AnioLectivo).desc())
+        .all()
+    )
+
+    return render_template('Administrador/Repitentes.html', repitentes=repitentes)
+
+@Administrador_bp.route('/repitentes2/<int:id_estudiante>')
+@login_required
+def historial_repitente(id_estudiante):
+    estudiante = Usuario.query.get_or_404(id_estudiante)
+
+    # buscamos todas sus matrículas
+    historial = db.session.query(
+        Matricula.AnioLectivo,
+        Curso.Grado.label("Curso"),
+        db.func.avg(Actividad.Calificacion).label("Promedio")
+    ).join(Curso, Curso.ID_Matricula == Matricula.ID_Matricula) \
+     .join(Actividad, Actividad.ID_Matricula == Matricula.ID_Matricula) \
+     .filter(Matricula.ID_Estudiante == id_estudiante) \
+     .group_by(Matricula.AnioLectivo, Curso.Grado) \
+     .order_by(Matricula.AnioLectivo.asc()) \
+     .all()
+
+    # contar cuántas veces se matriculó
+    veces = Matricula.query.filter_by(ID_Estudiante=id_estudiante).count()
+
+    # último curso (curso actual)
+    curso_actual = historial[-1].Curso if historial else "N/A"
+
+    return render_template(
+        'Administrador/historial_repitente.html',
+        estudiante=estudiante,
+        historial=historial,
+        curso_actual=curso_actual,
+        veces=veces
+    )
+
 @Administrador_bp.route('/cursos')
 def cursos():
     return render_template('Administrador/Cursos.html', cursos=cursos)
@@ -435,9 +535,52 @@ def cursos():
 def registrotutorias2():
     return render_template('Administrador/RegistroTutorías2.html')
 
-@Administrador_bp.route('/cursos2')
+@Administrador_bp.route('/cursos2', methods=['GET', 'POST'])
 def cursos2():
-    return render_template('Administrador/Cursos2.html')
+    if request.method == 'POST':
+        grado = request.form['Grado']
+        grupo = request.form['Grupo']
+        anio = request.form['Anio']
+        director = request.form['DirectorGrupo']
+
+        nuevo_curso = Curso(
+            Grado=grado,
+            Grupo=grupo,
+            Anio=anio,
+            Estado="Activo",
+            DirectorGrupo=director if director else None
+        )
+        db.session.add(nuevo_curso)
+        db.session.commit()
+        flash("✅ Curso agregado correctamente", "success")
+
+        return redirect(url_for('Administrador.cursos2'))
+
+    # 👇 para GET (mostrar cursos)
+    cursos = Curso.query.all()
+    usuarios = Usuario.query.all()
+    return render_template('Administrador/Cursos2.html', cursos=cursos, usuarios=usuarios)
+
+@Administrador_bp.route('/agregar_curso', methods=['POST'])
+@login_required
+def agregar_curso():
+    grado = request.form['grado']
+    grupo = request.form['grupo']
+    anio = request.form['anio']
+    director_id = request.form['director']
+
+    # Aquí guardas en la BD
+    nuevo_curso = Curso(
+        grado=grado,
+        grupo=grupo,
+        anio=anio,
+        director_id=director_id
+    )
+    db.session.add(nuevo_curso)
+    db.session.commit()
+
+    flash("Curso agregado exitosamente", "success")
+    return redirect(url_for('Administrador.cursos2'))
 
 
 @Administrador_bp.route('/citacion')

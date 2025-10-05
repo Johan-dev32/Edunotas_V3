@@ -9,7 +9,7 @@
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <!-- CSS propio -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/HistorialAcademico.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/HistorialAcademico3.css') }}">
 
 </head>
 <body>
@@ -148,31 +148,113 @@
 </div>
 
   <!-- titulos -->
-<section class="bg-light py-5 mt-5">
-  <div class="container">
-    <h1 class="text-center titulo-principal">HISTORIAL ACADÉMICO</h1>
-    <p class="text-center descripcion">Observa el Historial Academico del Estudiante</p>
-    <p class="text-center subtitulo">Por favor digite el numero de documento del Estudiante</p>
+  <section class="bg-light py-5 mt-5">
+    <div class="container">
+      <h1 class="text-center titulo-principal">HISTORIAL ACADÉMICO</h1>
 
-    <div class="search-container">
-      <div class="position-relative">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input type="text" class="form-control custom-input" placeholder="search">
-      </div>
-      <br>
-      <!-- 🔽 aquí ponemos la URL de Flask como atributo data-url -->
-      <a href="#" 
-         class="btn btn-custom" 
-         id="btnBuscar" 
-         data-url="{{ url_for('Administrador.historialacademico2') }}">
-         Buscar
-      </a>
+<h2 class="descripcion text-center">Historial Académico - Periodo {{ periodo }}</h2>
+
+
+  
+  <div class="container mt-5">
+    <!-- Barra de búsqueda -->
+    <div class="input-group mb-4 justify-content-center">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="text" class="form-control w-50" placeholder="Buscar estudiante...">
     </div>
+
+    <!-- Datos del estudiante -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold text-dark">Luis Gómez</h5>
+      <span class="fw-semibold">803</span>
+    </div>
+
+    <!-- Datos académicos -->
+    <div class="mb-3">
+      <label for="periodo" class="form-label fw-semibold">Datos Académicos</label>
+      <select id="periodo" class="form-select w-auto d-inline-block">
+        <option selected>Periodo 1</option>
+        <option>Periodo 2</option>
+        <option>Periodo 3</option>
+        <option>Periodo 4</option>
+      </select>
+    </div>
+
+    <!-- Tabla de materias -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header text-white">Materias</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped mb-0 text-center align-middle">
+            <thead class="table-primary">
+              <tr>
+                <th>Materia</th>
+                <th>Nota 1</th>
+                <th>Nota 2</th>
+                <th>Nota 3</th>
+                <th>Nota Final</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Español</td><td>3.6</td><td>3.8</td><td>4.0</td><td>4.0</td></tr>
+              <tr><td>Matemáticas</td><td>3.4</td><td>3.9</td><td>4.0</td><td>4.0</td></tr>
+              <tr><td>Inglés</td><td>3.8</td><td>3.7</td><td>4.0</td><td>4.0</td></tr>
+              <tr><td>Sociales</td><td>3.5</td><td>3.9</td><td>3.8</td><td>3.9</td></tr>
+              <tr><td>Ética</td><td>3.6</td><td>3.5</td><td>3.9</td><td>3.8</td></tr>
+              <tr><td>Filosofía</td><td>3.7</td><td>3.8</td><td>3.9</td><td>3.9</td></tr>
+              <tr><td>Educación Física</td><td>4.0</td><td>4.0</td><td>4.0</td><td>4.0</td></tr>
+              <tr><td>Artística</td><td>3.9</td><td>4.0</td><td>4.0</td><td>4.0</td></tr>
+              <tr><td>Biología</td><td>3.6</td><td>3.8</td><td>3.9</td><td>3.8</td></tr>
+              <tr><td>Física - Química</td><td>3.5</td><td>3.6</td><td>3.8</td><td>3.7</td></tr>
+              <tr><td>Religión</td><td>3.8</td><td>3.9</td><td>4.0</td><td>4.0</td></tr>
+              <tr><td>Tecnología - Informática</td><td>3.7</td><td>3.9</td><td>3.8</td><td>3.8</td></tr>
+              <tr><td>P.T.I</td><td>3.5</td><td>3.6</td><td>3.7</td><td>3.7</td></tr>
+              <tr><td>RUTA</td><td>3.9</td><td>3.8</td><td>3.9</td><td>3.9</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de recuperaciones -->
+    <div class="card shadow-sm">
+      <div class="card-header text-white">Recuperaciones</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped mb-0 align-middle">
+            <thead class="table-primary text-center">
+              <tr>
+                <th>Materia</th>
+                <th>Observación</th>
+                <th>Nota</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Español</td><td>No entregó recuperación</td><td></td></tr>
+              <tr><td>Matemáticas</td><td>Entregó correctamente</td><td></td></tr>
+              <tr><td>Inglés</td><td>Entregó a tiempo</td><td></td></tr>
+              <tr><td>Sociales</td><td>No hubo recuperación</td><td></td></tr>
+              <tr><td>Ética</td><td>Mejorar redacción en próxima entrega</td><td></td></tr>
+              <tr><td>Filosofía</td><td>No presentó</td><td></td></tr>
+              <tr><td>Educación Física</td><td>No aplica</td><td></td></tr>
+              <tr><td>Artística</td><td>Entregó correctamente</td><td></td></tr>
+              <tr><td>Biología</td><td>Entrega tardía</td><td></td></tr>
+              <tr><td>Física - Química</td><td>No entregó</td><td></td></tr>
+              <tr><td>Religión</td><td>No hubo recuperación</td><td></td></tr>
+              <tr><td>Tecnología - Informática</td><td>Entregó correctamente</td><td></td></tr>
+              <tr><td>P.T.I</td><td>No entregó</td><td></td></tr>
+              <tr><td>RUTA</td><td>Sin observaciones</td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
-</section>
 
 
- <script src="{{ url_for('static', filename='js/Administrador/HistorialAcademico.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/Administrador/HistorialAcademico2.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

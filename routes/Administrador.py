@@ -539,3 +539,8 @@ def asistencia():
 @Administrador_bp.route('/historialacademico2')
 def historialacademico2():
     return render_template('Administrador/HistorialAcademico2.html')
+
+@Administrador_bp.route('/historialacademico3')
+def historialacademico3():
+    periodo = request.args.get('periodo')
+    return render_template('Administrador/HistorialAcademico3.html', periodo=periodo)

@@ -457,6 +457,10 @@ def materias():
 def inasistencias():
     return render_template('Administrador/inasistencias.html')
 
+@Administrador_bp.route('/reporte')
+def reporte():
+    return render_template('Administrador/Reporte.html')
+
 
 @Administrador_bp.route('/detallesmateria/<int:curso_id>')
 def detallesmateria(curso_id):

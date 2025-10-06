@@ -72,6 +72,10 @@
   <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.reporte') }}" class="nav-link text-white"><i class="bi bi-calendar2"></i></i> Generar reporte</a></li>
+<<<<<<< HEAD
+=======
+  <li class="nav-item"><a href="{{ url_for('Administrador.inasistencias') }}" class="nav-link text-white"><i class="bi bi-card-checklist"></i></i></i> Inasistencias</a></li>
+>>>>>>> 53aa66df512f702e518a8eabc196b80667038fdb
 
   <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios" role="button" aria-expanded="false" aria-controls="submenuUsuarios">
@@ -139,27 +143,41 @@
       <h1 class="text-center titulo-principal">CURSO</h1>
 
       <!-- Formulario para agregar estudiante -->
-      <form id="formEstudiante" class="mb-4">
-        <div class="row g-3">
-          <div class="col-md-3">
-            <input type="text" id="nombre" class="form-control" placeholder="Nombre" required>
-          </div>
-          <div class="col-md-3">
-            <input type="text" id="ciclo" class="form-control" placeholder="Ciclo" required>
-          </div>
-          <div class="col-md-2">
-            <input type="text" id="curso" class="form-control" placeholder="Curso" required>
-          </div>
-          <div class="col-md-2">
-            <input type="number" id="promedio" class="form-control" placeholder="Promedio" step="0.1" min="1" max="5" required>
-          </div>
-          <div class="col-md-2 d-grid">
-            <button type="submit" class="btn btn-success">
-              <i class="bi bi-person-plus-fill"></i> Agregar
-            </button>
-          </div>
+    <form class="row g-3 justify-content-center" method="POST" action="{{ url_for('Administrador.cursos2') }}">
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="grado" placeholder="Grado" required>
         </div>
-      </form>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="grupo" placeholder="Grupo" required>
+        </div>
+        <div class="col-md-2">
+            <input type="number" class="form-control" name="anio" placeholder="Año" required>
+        </div>
+        <div class="col-md-3">
+            <select class="form-control" name="director" required>
+                <option value="">-- Selecciona Director --</option>
+                <option value="1">Carlos Pérez</option>
+                <option value="2">María Gómez</option>
+                <option value="3">Luis Rodríguez</option>
+                {% for director in directores %}
+                <option value="{{ Directorgrupo.id }}">{{ Directorgrupo.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-1 d-grid">
+            <button type="submit" class="btn btn-success">Agregar</button>
+        </div>
+    </form>
+
+      <!-- Span oculto con la URL de citacion -->
+      <span id="url_citacion" style="display: none;">{{ url_for('Administrador.cursos2') }}</span>
+    </div>
+  </section>
+  <script>
+  </select>
+
+  <button type="submit" class="btn btn-success">Agregar</button>
+</form>
 
       <!-- Span oculto con la URL de citaciones -->
 <span id="citaciones-url" data-url="{{ url_for('Administrador.citacion') }}"></span>
@@ -169,6 +187,38 @@
 
 
       <!-- Tabla de estudiantes -->
+<<<<<<< HEAD
+      <table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Grado</th>
+      <th>Grupo</th>
+      <th>Año</th>
+      <th>Director</th>
+      <th>Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for curso in cursos %}
+    <tr>
+      <td>{{ curso.ID_Curso }}</td>
+      <td>{{ curso.Grado }}</td>
+      <td>{{ curso.Grupo }}</td>
+      <td>{{ curso.Anio }}</td>
+      <td>
+        {% if curso.director %}
+          {{ curso.director.Nombre }} {{ curso.director.Apellido }}
+        {% else %}
+          Sin asignar
+        {% endif %}
+      </td>
+      <td>{{ curso.Estado }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+=======
       <table class="table table-bordered table-striped" id="tablaPromedios">
         <thead>
           <tr>
@@ -184,6 +234,7 @@
           <!-- Filas dinámicas aquí -->
         </tbody>
       </table>
+>>>>>>> 41c7cad7d6a9734831b592a42acb789b9dce7319
     </div>
   </section>
 

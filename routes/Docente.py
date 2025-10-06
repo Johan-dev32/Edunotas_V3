@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
+from flask_mail import Message
 from Controladores.models import db, Docente_Asignatura, Programacion, Asistencia, Detalle_Asistencia, Actividad, Actividad_Estudiante, Observacion
 import os
 from Controladores.models import (
@@ -111,6 +112,9 @@ def materialapoyo2():
 def registrotutorias2():
     return render_template('Docentes/RegistroTutorías2.html')
 
+
+
+#--------------------------------LO DE NOTAS-----------------------
 
 @Docente_bp.route('/api/materias/<int:curso_id>')
 @login_required
@@ -309,3 +313,40 @@ def api_guardar_notas():
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+# ----------------- ENVIAR CORREO CON ARCHIVO -----------------
+@Docente_bp.route('/enviar_correo', methods=['GET', 'POST'])
+@login_required
+def enviar_correo():
+    if request.method == 'POST':
+        from app import mail 
+
+        curso = request.form.get('curso')
+        tipo = request.form.get('tipo')
+        destinatario = request.form.get('correo')
+        archivo = request.files.get('archivo')
+
+        try:
+            msg = Message(
+                subject=f"{tipo} - Curso {curso}",
+                recipients=[destinatario],
+                body=f"Se envía el archivo correspondiente al curso {curso}."
+            )
+
+            if archivo:
+                msg.attach(
+                    archivo.filename,
+                    archivo.content_type,
+                    archivo.read()
+                )
+
+            mail.send(msg)
+            flash("Correo enviado correctamente ✅", "success")
+        except Exception as e:
+            flash(f"Error al enviar: {e}", "danger")
+
+        return redirect(url_for('Administrador.enviar_correo'))
+
+    return render_template("Administrador/EnviarCorreo.html")
+
+

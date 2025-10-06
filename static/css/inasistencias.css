@@ -1,0 +1,180 @@
+body {
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0px;
+  background: #fff;
+  color: #212529;
+}
+
+/* navbar */
+header {
+  background-color: white;
+  color: #050733ff;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas {
+  background-color: #050733ff;
+  color: #fff;
+}
+
+.btn-usuario {
+  background-color: #050733ff;
+  color: #fff;
+  margin-left: 10px;
+}
+
+/*  menu_des  */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+.offcanvas {
+  font-size: 25px;
+}
+
+.offcanvas-title {
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+.nav-item {
+  font-weight: bold;
+  font-size: 22px;
+}
+#sidebar .nav-link {
+  font-size: 18px;   /* tamaño menú hamburguesa */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
+.nav-pills .nav-link {
+  font-size: 25px;   /* tamaño botones nav */
+  color: #050733ff !important; 
+  font-weight: bold;
+
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 40px;
+  font-weight: bold;
+  color: #050733ff;
+}
+
+.filters {
+  margin-bottom: 20px;
+  background: #fff;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.filters label {
+  margin-right: 20px;
+  font-weight: bold;
+  color: #0a0a2a;
+}
+
+.filters input,
+.filters select {
+  margin-left: 5px;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.filters button {
+  padding: 8px 16px;
+  border: 1px solid #0a0a2a;
+  background: #fff;
+  color: #0a0a2a;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.filters button:hover {
+  background: #0a0a2a;
+  color: #fff;
+}
+
+/* Tabla estilo Control de Cupos */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  margin-top: 10px;
+}
+
+th, td {
+  text-align: center;
+  padding: 12px;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #f8f8f8;
+  font-weight: bold;
+  color: #0a0a2a;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Botones de acciones */
+button.aprobar {
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+button.rechazar {
+  background: #f44336;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+button.aprobar:hover,
+button.rechazar:hover {
+  opacity: 0.85;
+}
+
+.container {
+  margin-top: 20px; 
+  padding: 0 20px;   
+}

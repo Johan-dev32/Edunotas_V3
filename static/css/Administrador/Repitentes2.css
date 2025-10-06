@@ -1,0 +1,51 @@
+.body {
+  font-family: 'Trebuchet MS', sans-serif;
+  background-repeat: no-repeat;
+  background-position: center;  
+  background-attachment: scroll;
+  height: 600px;
+}
+
+/* sidebar */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+/* header */
+header {
+  background-color: #fff; 
+  color: #cf0000; 
+}
+
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;  
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas {
+  background-color: #050733ff; 
+  color: #fff;        
+  margin-left: 770px;
+}
+
+.btn-usuario {
+  background-color: #050733ff; 
+  color: #fff;        
+  margin-left: 10px;
+}

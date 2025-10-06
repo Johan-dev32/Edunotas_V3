@@ -2,32 +2,25 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Colegio Fe y Alegría</title>
-  <!-- Bootstrap -->
+    <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
   <!-- CSS propio -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/cursos_notas.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/evaluaciones.css') }}">
 </head>
 <body>
-
-
-  <header class="d-flex align-items-center p-3 border-bottom w-100">
+      <header class="d-flex align-items-center p-3 border-bottom w-100">
     <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
       <i class="bi bi-list"></i>
     </button>
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
-
     <div class="dropdown ms-auto">
-      <button 
-        class="btn btn-edunotas position-relative dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton1" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
+      <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
         <span class="bi bi-envelope-fill"></span>
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
@@ -37,27 +30,19 @@
       </ul>
     </div>
 
-
     <div class="dropdown">
-      <button 
-        class="btn btn-usuario dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton2" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
+      <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
         <span class="bi bi-person-lines-fill"></span>
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
         <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
         <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
+
         <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
       </ul>
     </div>
   </header>
-
-
-
-<!--  MENU  -->
+    <!--  MENU  -->
   <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
  <div class="offcanvas-header">
   <h5 class="offcanvas-title">MENÚ</h5>
@@ -80,8 +65,8 @@
      <li class=""><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
     </ul>
   </div>
-  <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
 
+  <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.reporte') }}" class="nav-link text-white"><i class="bi bi-calendar2"></i></i> Generar reporte</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.inasistencias') }}" class="nav-link text-white"><i class="bi bi-card-checklist"></i></i></i> Inasistencias</a></li>
@@ -95,8 +80,9 @@
   <div class="collapse" id="submenuUsuarios">
     <ul class="nav flex-column ms-3">
       <li class="nav-item">
+
         <a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white">
-          <i class="bi bi-person-fill-gear"></i> Profesores
+          <i class="bi bi-person-fill-gear"></i>Profesores
         </a>
       </li>
       <li class="nav-item">
@@ -141,71 +127,69 @@
 
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+
  </ul>
  </div>
 </div>
 
 
-  <div class="container mt-4">
-    <div class="card">
-      <div class="card-body">
-        <h3 class="card-title">Curso {{ curso_id }}</h3>
 
-        <!-- selector de materia -->
-        <div class="mb-3">
-          <label for="materia" class="form-label">Selecciona una materia:</label>
-          <select id="materia" class="form-select"></select>
-        </div>
+<h1 class="titulo-principal">Historial de Evaluaciones del Estudiante</h1>
+  <main>
+    <!-- Buscador -->
+    <section class="buscador">
+      <div class="campo">
+        <label for="curso">Curso:</label>
+        <select id="curso">
+  <option value="">Seleccionar curso</option>
+  <option value="901">901</option>
+  <option value="902">902</option>
+  <option value="1001">1001</option>
+  <option value="1002">1002</option>
+  <option value="1003">1003</option>
+  <option value="1101">1101</option>
+  <option value="1102">1102</option>
+  <option value="1103">1103</option>
+</select>
+
       </div>
-    </div>
-  </div>
 
+      <div class="campo">
+        <label for="materia">Materia:</label>
+        <select id="materia">
+          <option value="">Seleccione una materia</option>
+          <option value="Matemáticas">Matemáticas</option>
+          <option value="Lengua Castellana">Lengua Castellana</option>
+          <option value="Ciencias">Ciencias</option>
+          <option value="Historia">Historia</option>
+        </select>
+      </div>
 
-<!-- tabla principal  -->
-<div class="tabla-container mt-4">
-  <table class="tabla">
-    <thead>
-      <tr>
-        <th class="fijo">Nombre</th>
-        <th class="fijo">Curso</th>
-        <th class="fijo">Materia</th>
-        <th>Nota 1</th>
-        <th>Nota 2</th>
-        <th>Nota 3</th>
-        <th>Asistencia 1</th>
-        <th>Asistencia 2</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="fijo">Ana Gómez</td>
-        <td class="fijo">{{ curso_id }}</td>
-        <td class="fijo">ESPAÑOL</td>
-        <td><input type="number" step="0.1" min="1" max="5" value="4.5" readonly></td>
-        <td><input type="number" step="0.1" min="1" max="5" value="4.0" readonly></td>
-        <td><input type="number" step="0.1" min="1" max="5" value="3.8" readonly></td>
-        <td>
-          <select disabled>
-            <option>Asistió</option>
-          </select>
-        </td>
-        <td>
-          <select disabled>
-            <option>No asistió</option>
-          </select>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-    <script src="{{ url_for('static', filename='js/Administrador//validacion_planilla_notas.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/Administrador//materias.js') }}"></script>
-    <script>
-   
-    cargarMaterias("{{ curso_id }}");
-    </script>
+      <button id="btnBuscar">Buscar</button>
+    </section>
+
+    <!-- Tabla de resultados -->
+    <section class="tabla-container" id="tablaContainer" style="display: none;">
+      <h2 id="tituloTabla"></h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo de Evaluación</th>
+            <th>Nota</th>
+            <th>Comentario</th>
+            <th>Corrección</th>
+          </tr>
+        </thead>
+        <tbody id="tablaBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+    <!-- Bootstrap Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
 
+  <!-- Tu JS -->
+  <script src="{{ url_for('static', filename='js/Administrador/evaluaciones.js') }}"></script>
+</body>
 </html>

@@ -677,10 +677,6 @@ def enviar_correo():
     # Si es GET, muestra el formulario
     return render_template("Administrador/Comunicaciòn.html")
 
-
-
-
-
 @Administrador_bp.route('/asistencia')
 def asistencia():
     return render_template('Administrador/Asistencia.html')

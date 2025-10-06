@@ -17,10 +17,8 @@ mail = Mail()
 
 s = URLSafeTimedSerializer("clave_super_secreta")
 
-import pymysql
-
 # Importa el objeto 'db' y los modelos desde tu archivo de modelos
-from Controladores.models import db, Usuario, Acudiente, Curso, Matricula, Periodo, Asignatura, Docente_Asignatura, Programacion, Asistencia, Detalle_Asistencia, Cronograma_Actividades, Actividad, Actividad_Estudiante, Observacion
+from Controladores.models import db, Usuario
 
 # Configuración de la aplicación
 app = Flask(__name__)
@@ -66,8 +64,8 @@ with app.app_context():
     if not database_exists(engine.url):
         create_database(engine.url)
         print("Base de datos 'edunotas' creada exitosamente.")
-    db.create_all()
-    print("Tablas de la base de datos creadas exitosamente.")
+        db.create_all()
+        print("Tablas de la base de datos creadas exitosamente.")
     
 ###nuevo    
 def send_reset_email(user_email, user_name, token):
@@ -268,5 +266,5 @@ app.register_blueprint(Estudiante_bp)
 app.register_blueprint(Acudiente_bp)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)

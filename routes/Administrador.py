@@ -2,15 +2,11 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
-<<<<<<< HEAD
 from sqlalchemy import func
 from flask import jsonify
 from datetime import datetime
 from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad
-=======
 from flask_mail import Message
-from Controladores.models import db, Usuario, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades
->>>>>>> 41c7cad7d6a9734831b592a42acb789b9dce7319
 import os
 from decimal import Decimal
 

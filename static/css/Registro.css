@@ -162,7 +162,7 @@ small {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  background: #004d99;
+  background: #050733ff;
   color: #fff;
   font-weight: bold;
   transition: background 0.3s;
@@ -177,7 +177,7 @@ select {
 }
 
 .btn:hover {
-  background: #003366;
+  background: #050733ff;
 }
 
 .nota {

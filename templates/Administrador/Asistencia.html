@@ -18,159 +18,45 @@
     </button>
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
+
     <div class="dropdown ms-auto">
-      <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" data-bs-toggle="dropdown">
+      <button 
+        class="btn btn-edunotas position-relative dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton1" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
         <span class="bi bi-envelope-fill"></span>
       </button>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
         <li><a class="dropdown-item" href="#">Ajustes</a></li>
         <li><a class="dropdown-item" href="#">Opción 2</a></li>
         <li><a class="dropdown-item" href="#">Opción 3</a></li>
       </ul>
     </div>
 
+
     <div class="dropdown">
-      <button class="btn btn-usuario dropdown-toggle" type="button" data-bs-toggle="dropdown">
+      <button 
+        class="btn btn-usuario dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton2" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
         <span class="bi bi-person-lines-fill"></span>
       </button>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
 
-        <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
         <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
         <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
       </ul>
     </div>
   </header>
-
 <!--  MENU  -->
   <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
-<<<<<<< HEAD
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title">MENÚ</h5>
-    </div>
-    <div class="offcanvas1-body">
-      <ul class="nav flex-column">
-        <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
-        
-        <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas">
-          <i class="bi bi-caret-down-fill"></i> Notas 
-        </a>
-        <div class="collapse" id="submenuNotas">
-          <ul class="nav flex-column ms-3">
-            <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-            <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
-            <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Cálculo de Promedio</a></li>
-          </ul>
-        </div>
-
-        <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-
-        <li class="nav-item">
-          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios" role="button" aria-expanded="false" aria-controls="submenuUsuarios">
-            <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
-          </a>
-          <div class="collapse" id="submenuUsuarios">
-            <ul class="nav flex-column ms-3">
-              <li><a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
-              <li><a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
-              <li><a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
-            </ul>
-          </div>
-        </li>
-
-        <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
-        <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- FORMULARIO -->
-  <section class="bg-light py-5 mt-5">
-    <div class="container">
-      <h1 class="text-center titulo-principal">JUSTIFICACION DE INASISTENCIA DEL ESTUDIANTE</h1>
-      <p class="text-center descripcion">Aquí podrás gestionar las citaciones para los padres de familia</p>
-
- <div class="container my-5">
-    <!-- Tarjeta de Justificación -->
-
-   
-
-    <div class="card shadow">
-    
-         
-     
-      <div class="card-body" id="contenido-justificacion">
-        <p><strong>Estudiante:</strong> Laura Martínez</p>
-        <p><strong>Curso:</strong> 902</p>
-        <p><strong>Fecha de la Inasistencia:</strong> 17/04/2025</p>
-        <p><strong>Motivo:</strong></p>
-        <p>
-          Se justifica la inasistencia de la estudiante <strong>Laura Martínez</strong> el día 
-          <strong>17 de abril de 2025</strong> debido a una cita médica previamente agendada por control general de salud. 
-          La estudiante presentó síntomas de fiebre y malestar general desde el día anterior y fue atendida por un profesional en el centro médico San José.
-        </p>
-        <p><strong>Documento Soporte:</strong> Certificado médico expedido por la doctora Paula Gómez – Registro No. 548921.</p>
-        <p><strong>Firma del acudiente:</strong> Marta Rodríguez (Madre)</p>
-      </div>
-
-      <!-- Área de subida de comprobante -->
-      <div class="card-body">
-        <div class="mb-3">
-          <label for="comprobante" class="form-label">Ingresar aquí el comprobante:</label>
-          <input class="form-control" type="file" id="comprobante" accept=".pdf,.jpg,.png">
-        </div>
- 
-         <button id="btnVerPDF" class="btn btn-light btn-sm">
-          <i class="bi bi-file-earmark-pdf-fill text-danger"></i> Ver PDF
-        </button>
-      </div>
-       
-
-        <!-- Botones -->
-        <div class="text-center mt-4">
-          <button id="btnEditar" class="btn btn-warning px-4 me-2">
-            <i class="bi bi-pencil-square"></i> Editar
-          </button>
-          <button id="btnGuardar" class="btn btn-custom px-4" disabled>
-            <i class="bi bi-save"></i> Guardar
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
- 
-      <div class="text-center mt-4">
-      <button id="btnSubir" class="btn btn-custom px-5">
-        <i class="bi bi-upload"></i> Subir Justificación
-      </button>
-    </div>
-  </div>
-
-  <!-- Modal de confirmación -->
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="confirmModalLabel">
-          <i class="bi bi-exclamation-triangle-fill text-warning"></i>
-          Confirmar envío
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        <p id="detalleJustificacion"></p>
-        <p>¿Deseas continuar?</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" id="btnConfirmarSubida" class="btn btn-danger">Subir</button>
-      </div>
-    </div>
-  </div>
-=======
  <div class="offcanvas-header">
   <h5 class="offcanvas-title">MENÚ</h5>
->>>>>>> 877813e60b62d45aa7631c034b2695bee14edadc
 </div>
 <div class="offcanvas1-body">
   <ul class="nav flex-column">
@@ -194,6 +80,7 @@
   <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.reporte') }}" class="nav-link text-white"><i class="bi bi-calendar2"></i></i> Generar reporte</a></li>
+  <li class="nav-item"><a href="{{ url_for('Administrador.inasistencias') }}" class="nav-link text-white"><i class="bi bi-card-checklist"></i></i></i> Inasistencias</a></li>
 
   <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios" role="button" aria-expanded="false" aria-controls="submenuUsuarios">
@@ -249,13 +136,12 @@
 </li>
 
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
-  <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+  <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
 
  </ul>
  </div>
 </div>
 <h1 class="titulo-principal">Registro de Asistencia Tardía</h1>
-
   <main>
     <section class="controls">
       <label>Fecha: <input type="date" id="fecha" /></label>

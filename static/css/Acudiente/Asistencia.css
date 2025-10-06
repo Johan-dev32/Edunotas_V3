@@ -15,6 +15,7 @@ header {
   color: #050733ff;
   font-size: 40px;
   font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
   margin: 0;
   margin-left: 60px;
 }
@@ -35,7 +36,7 @@ header .btn-dark {
   margin-left: 10px;
 }
 
-/* menú lateral */
+/*  menu_des  */
 #sidebar {
   width: 220px;
   min-height: 100vh;
@@ -63,7 +64,6 @@ header .btn-dark {
   max-height: 100vh;  
 }
 
-
 .nav-item {
   font-weight: bold;
   font-size: 22px;
@@ -74,7 +74,7 @@ header .btn-dark {
   margin-bottom: 10px;
 }
 
-
+/* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
 .nav-pills .nav-link {
   font-size: 25px;   /* tamaño botones nav */
   color: #050733ff !important; 
@@ -83,91 +83,79 @@ header .btn-dark {
 }
 
 
-/* tarjeta de curso */
-.card {
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+.logo-container {
+  width: auto;
+  height: auto;
 }
 
-.card-title {
+.logo-container img {
+  max-width: 250px; 
+  height: auto;
+}
+
+
+/* titulos */
+
+.titulo-principal {
+  font-size: 3rem;      
+  font-weight: 900;      
+  color: #050733ff;      
+}
+
+.subtitulo {
+  font-size: 2rem;       
+  font-weight: 700;
+  color: #050733ff;        
+}
+
+.descripcion {
+  font-size: 1.3rem;     
+  color: #555;           
+}
+
+.card {
+  border: 2px solid #050733ff;
+}
+
+.btn-custom {
+  background-color: #050733ff;
+  color: white;
   font-weight: bold;
-  font-size: 28px;
+}
+
+.btn-custom:hover {
+  background-color: #23265cff;
+  color: #fff;
+}
+
+.icono-pdf {
+  font-size: 2rem;
   color: #050733ff;
 }
 
-.form-label {
-  font-weight: bold;
+.editando {
+  border: 2px dashed #050733ff;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #f0f2ff;
 }
-
-
-
-.tabla-container {
-  max-width: 95%;   
-  margin: 30px auto;
-  overflow-x: auto;
-  border: none;    
-}
-
-.tabla {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: center;
-}
-
-.tabla th,
-.tabla td {
-  border: 1px solid #ccc;
-  padding: 8px;
-}
-
-.fijo {
-  min-width: 100px;
-  background: #f9f9f9;
-  font-weight: bold;
-}
-.tabla {
-  border-collapse: collapse;
-  width: 100%;
-  min-width: 800px;
-}
-
-.tabla th, .tabla td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: center;
-  min-width: 100px;
-}
-
-.tabla th {
+.btn-warning, .btn-custom{
+  margin-bottom: 10px;
   background-color: #050733ff;
-  color: white;
-  position: sticky;
-  top: 0;
-  z-index: 2;
+  color: #ffffff;
+}
+/* Cambiar botón warning al color institucional */
+.btn-warning {
+  background-color: #050733ff !important;
+  border-color: #050733ff !important;
+  color: #fff !important; /* texto blanco */
 }
 
-/* Columnas fijas a la izquierda */
-.fijo {
-  position: sticky;
-  left: 0;
-  background-color: #e4e6eb;
-  z-index: 1;
+/* Evitar que se ponga amarillo al pasar el mouse */
+.btn-warning:hover,
+.btn-warning:focus,
+.btn-warning:active {
+  background-color: #23265c !important;  /* un tono más claro/oscuro */
+  border-color: #23265c !important;
+  color: #fff !important;
 }
-
-.fijo:nth-child(1) { left: 0; }
-.fijo:nth-child(2) { left: 120px; }
-.fijo:nth-child(3) { left: 240px; }
-
-.tabla input {
-  width: 90%;
-  padding: 4px;
-  border: 1px solid #999;
-  border-radius: 4px;
-  text-align: center;
-}
-
-.error {
-  border: 2px solid red;
-  background-color: #ffe0e0;
-}
-

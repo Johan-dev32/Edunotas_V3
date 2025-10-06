@@ -1,4 +1,7 @@
+* { box-sizing: border-box; }
 body {
+  margin: 0;
+  padding: 0;
   background-color: #f8f9fa; 
   font-family: 'Trebuchet MS', sans-serif;
   color: #212529;
@@ -15,7 +18,6 @@ header {
   color: #050733ff;
   font-size: 40px;
   font-weight: bolder;
-  font-family: 'Trebuchet MS', sans-serif;
   margin: 0;
   margin-left: 60px;
 }
@@ -36,7 +38,7 @@ header .btn-dark {
   margin-left: 10px;
 }
 
-/*  menu_des  */
+/* menú lateral */
 #sidebar {
   width: 220px;
   min-height: 100vh;
@@ -64,6 +66,7 @@ header .btn-dark {
   max-height: 100vh;  
 }
 
+
 .nav-item {
   font-weight: bold;
   font-size: 22px;
@@ -74,7 +77,7 @@ header .btn-dark {
   margin-bottom: 10px;
 }
 
-/* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
+
 .nav-pills .nav-link {
   font-size: 25px;   /* tamaño botones nav */
   color: #050733ff !important; 
@@ -82,80 +85,79 @@ header .btn-dark {
 
 }
 
-
-.logo-container {
-  width: auto;
-  height: auto;
+main {
+  padding: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
-.logo-container img {
-  max-width: 250px; 
-  height: auto;
+.controls {
+  margin-bottom: 12px;
+  display:flex;
+  gap:10px;
+  align-items: center;
 }
+.controls input[type="date"]{ padding:6px; }
 
-
-/* titulos */
-
-.titulo-principal {
-  font-size: 3rem;      
-  font-weight: 900;      
-  color: #050733ff;      
+button {
+  padding:8px 12px;
+  border-radius:6px;
+  border: none;
+  cursor: pointer;
 }
+button:hover { opacity: 0.95; }
 
-.subtitulo {
-  font-size: 2rem;       
-  font-weight: 700;
-  color: #050733ff;        
+#exportCsv{ background:#10b981; color:white; }
+#verReporte{ background:#ef4444; color:white; }
+#cargarLista{ background:#3b82f6; color:white; }
+
+table {
+  width:100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
-
-.descripcion {
-  font-size: 1.3rem;     
-  color: #555;           
-}
-
-.card {
-  border: 2px solid #050733ff;
-}
-
-.btn-custom {
-  background-color: #050733ff;
-  color: white;
-  font-weight: bold;
-}
-
-.btn-custom:hover {
-  background-color: #23265cff;
-  color: #fff;
-}
-
-.icono-pdf {
-  font-size: 2rem;
-  color: #050733ff;
-}
-
-.editando {
-  border: 2px dashed #050733ff;
+th, td {
   padding: 10px;
-  border-radius: 8px;
-  background-color: #f0f2ff;
+  text-align: left;
+  border-bottom: 1px solid #eee;
 }
-.btn-warning, .btn-custom{
-  margin-bottom: 10px;
-  background-color: #050733ff;
-  color: #ffffff;
+td.actions { display:flex; gap:8px; }
+
+.status-btn { padding:6px 8px; border-radius:6px; background:#e5e7eb; }
+.status-presente{ background:#10b981; color:white; }
+.status-ausente{ background:#ef4444; color:white; }
+.status-tarde{ background:#f59e0b; color:white; }
+
+.modal{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(0,0,0,0.4);
 }
-/* Cambiar botón warning al color institucional */
-.btn-warning {
-  background-color: #050733ff !important;
-  border-color: #050733ff !important;
-  color: #fff !important; /* texto blanco */
+.modal.hidden{ display:none; }
+
+.modal-content{
+  background:white;
+  padding:20px;
+  border-radius:8px;
+  width:90%;
+  max-width:600px;
+}
+.modal-actions{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
 }
 
-/* Evitar que se ponga amarillo al pasar el mouse */
-.btn-warning:hover,
-.btn-warning:focus,
-.btn-warning:active {
-  background-color: #23265c !important;  /* un tono más claro/oscuro */
-  border-color: #23265c !important;
-  color: #fff !important;
+h1.titulo-principal {
+  text-align: center;
+  margin-bottom: 15px;
+  margin-top: 40px;
+  font-size: 40px;
+  font-weight: bold;
+  color: #050733ff;
 }

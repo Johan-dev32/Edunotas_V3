@@ -49,7 +49,6 @@
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
         <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
         <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
       </ul>
     </div>
@@ -81,13 +80,6 @@
     </ul>
   </div>
   <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-<<<<<<< HEAD
-=======
-  <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
-  <li class="nav-item"><a href="{{ url_for('Administrador.reporte') }}" class="nav-link text-white"><i class="bi bi-calendar2"></i></i> Generar reporte</a></li>
-  <li class="nav-item"><a href="{{ url_for('Administrador.inasistencias') }}" class="nav-link text-white"><i class="bi bi-card-checklist"></i></i></i> Inasistencias</a></li>
-
->>>>>>> 53aa66df512f702e518a8eabc196b80667038fdb
   <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios" role="button" aria-expanded="false" aria-controls="submenuUsuarios">
     <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
@@ -114,10 +106,7 @@
   </div>
 </li>
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 53aa66df512f702e518a8eabc196b80667038fdb
 <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuEncuestas" role="button" aria-expanded="false" aria-controls="submenuEncuestas">
     <i class="bi bi-caret-down-fill"></i> Encuestas
@@ -146,7 +135,6 @@
 
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-
  </ul>
  </div>
 </div>
@@ -158,9 +146,11 @@
   <!-- titulos -->
   <section class="bg-light py-5 mt-5">
     <div class="container">
-      <h1 class="text-center titulo-principal">CONSULTA DE NOTAS</h1>
-      <p class="text-center descripcion">Aquí podrás consultar los cursos de los estudiantes...</p>
-      <h2 class="text-center mb-4 subtitulo">LISTA DE NOTAS</h2><br><br>
+
+      <h1 class="text-center mb-4 titulo-principal">HORARIOS DE LOS CURSOS</h1>
+
+      <p class="text-center descripcion">Aquí podrás consultar y editar los horarios de cada curso</p>
+      <h2 class="text-center mb-4 subtitulo">LISTA DE CURSOS</h2><br><br>
       <!-- ciclo1 -->
       <h3 class="mb-3 text-center">Ciclo 1</h3>
       <div class="row g-3 mb-4">
@@ -168,7 +158,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">601</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=601) }}" class="btn btn-primary">Ver Notas</a>
+                <a href="{{ url_for('Administrador.horarios', curso_id=601) }}" class="btn btn-success">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -176,7 +166,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">602</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=602) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=602) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -184,7 +174,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">603</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=603) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=603) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -194,7 +184,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">701</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=701) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=701) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -202,7 +192,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">702</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=702) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=702) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -210,7 +200,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">703</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=703) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=703) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -224,7 +214,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">801</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=801) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=801) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -232,7 +222,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">802</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=802) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=802) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -240,7 +230,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">803</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=803) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=803) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -250,7 +240,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">901</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=901) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=901) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -258,7 +248,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">902</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=902) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=902) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -266,7 +256,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">903</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=903) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=903) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -280,7 +270,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">1001</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=1001) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=1001) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -288,7 +278,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">1002</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=1002) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=1002) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -296,7 +286,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">1003</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=1003) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=1003) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -307,7 +297,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">1101</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=1101) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=1101) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -315,7 +305,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">1102</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=1102) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=1102) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>
@@ -323,7 +313,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">1103</h4>
-              <a href="{{ url_for('Administrador.notas_curso', curso_id=1103) }}" class="btn btn-primary">Ver Notas</a>
+              <a href="{{ url_for('Administrador.horarios', curso_id=1103) }}" class="btn btn-primary">Consultar o Editar Horario</a>
             </div>
           </div>
         </div>

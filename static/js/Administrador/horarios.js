@@ -76,11 +76,9 @@ function crearBloque(celda, data = null) {
         const aulaInput = bloque.querySelector('.bloque-aula');
         const closeBtn = bloque.querySelector('.bloque-close');
 
-        // Validación letras
         materiaInput.addEventListener('input', e => e.target.value = e.target.value.replace(/[^a-zA-Z\s]/g, ''));
         docenteInput.addEventListener('input', e => e.target.value = e.target.value.replace(/[^a-zA-Z\s]/g, ''));
 
-        // Enter para confirmar
         [materiaInput, docenteInput, aulaInput].forEach(input => {
             input.addEventListener('keypress', e => {
                 if (e.key === 'Enter') {
@@ -102,7 +100,6 @@ function crearBloque(celda, data = null) {
             });
         });
 
-        // Cerrar mini formulario
         closeBtn.addEventListener('click', () => {
             bloque.remove();
             guardarBloques();
@@ -112,7 +109,7 @@ function crearBloque(celda, data = null) {
     celda.appendChild(bloque);
 }
 
-// Activar drag & drop
+// Activar drag & drop y botón cerrar
 function activarBloque(bloque) {
     const bloqueTexto = bloque.querySelector('.bloque-texto');
     if (!bloqueTexto) return;
@@ -125,27 +122,32 @@ function activarBloque(bloque) {
         guardarBloques();
     });
 
-    bloqueTexto.querySelector('.bloque-close').addEventListener('click', () => {
-        bloque.remove();
-        guardarBloques();
-    });
+    // Cada vez que se crea o mueve, reactivamos botón de cierre
+    const closeBtn = bloqueTexto.querySelector('.bloque-close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            bloque.remove();
+            guardarBloques();
+        });
+    }
 }
 
 // Drag & Drop de celdas
 document.querySelectorAll('#horario-table td, #fuera-tabla').forEach(td => {
     td.addEventListener('dblclick', () => {
-        if (!td.classList.contains('recreo-cell')) crearBloque(td);
+        // Solo permitir celdas que tengan data-dia
+        if (!td.dataset.dia || td.classList.contains('recreo-cell')) return;
+        crearBloque(td);
     });
 
     td.addEventListener('dragover', e => e.preventDefault());
     td.addEventListener('drop', e => {
         e.preventDefault();
         if (!editMode || !dragged) return;
-
-        // Bloque único por celda
         if (td.querySelector('.bloque') && td.id !== 'fuera-tabla') return;
-
         td.appendChild(dragged);
+        // Reasignar evento de cierre por si se movió
+        activarBloque(dragged);
         guardarBloques();
     });
 });

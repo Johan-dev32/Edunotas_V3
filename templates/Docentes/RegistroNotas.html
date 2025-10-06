@@ -36,44 +36,42 @@
         <span class="bi bi-person-lines-fill"></span>
       </button>
       <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="{{url_for('Docente.perfil')}}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
         <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
       </ul>
     </div>
   </header>
 
-<!--  MENU  -->
+  <!-- MENU -->
   <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
- <div class="offcanvas-header">
-  <h5 class="offcanvas-title">MENÚ</h5>
-</div>
-<div class="offcanvas1-body">
-  <ul class="nav flex-column">
-  <li class="nav-item"><a href="{{ url_for('Docente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
-  <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas">
-   <i class="bi bi-caret-down-fill"></i> Notas 
-  </a>
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">MENÚ</h5>
+    </div>
+    <div class="offcanvas1-body">
+      <ul class="nav flex-column">
+        <li class="nav-item"><a href="{{ url_for('Docente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
 
-  <div class="collapse" id="submenuNotas">
-    <ul class="nav flex-column ms-3">
-     <li class=""><a href="{{ url_for('Docente.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-    </ul>
-    <ul class="nav flex-column ms-3">
-     <li class=""><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
-    </ul>
-    <ul class="nav flex-column ms-3">
-     <li class=""><a href="{{ url_for('Docente.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
-    </ul>
-  </div>
+        <!-- Submenú Notas -->
+        <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
+        <div class="collapse" id="submenuNotas">
+          <ul class="nav flex-column ms-3">
+            <li><a href="{{ url_for('Docente.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-search"></i> Consultar Notas</a></li>
+            <li><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Registrar Notas</a></li>
+            <li><a href="{{ url_for('Docente.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-calculator"></i> Cálculo de Promedios</a></li>
+          </ul>
+        </div>
+        
+        <li class="nav-item"><a href="{{ url_for('Docente.tareas_actividades') }}" class="nav-link text-white"><i class="bi bi-book-half"></i> Registro de Tareas y Actividades</a></li>
+        <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+        <li class="nav-item"><a href="{{ url_for('Docente.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Aprobación Académica</a></li>
+        <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones</a></li>
+        <li class="nav-item"><a href="{{ url_for('Docente.historial_academico') }}" class="nav-link text-white"><i class="bi bi-clock"></i> Historial Académico</a></li>
+        <li class="nav-item"><a href="{{ url_for('Docente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
+      </ul>
+    </div>
+  </div>  
 
-  <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-  <li class="nav-item"><a href="{{ url_for('Docente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
-  <li class="nav-item"><a href="{{ url_for('Docente.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-
- </ul>
- </div>
-</div>
-</div>  <!-- CONTENIDO -->
+  <!-- CONTENIDO -->
   <div class="container mt-4">
     <div class="card">
       <div class="card-body">
@@ -93,24 +91,25 @@
     <button class="btn btn-success me-2" onclick="guardarNotas()">
       <i class="bi bi-save"></i> Guardar
     </button>
-    <button class="btn btn-warning" onclick="restablecerNotas()">
+    <button class="btn btn-warning me-2" onclick="restablecerNotas()">
       <i class="bi bi-arrow-counterclockwise"></i> Restablecer
+    </button>
+    <button class="btn btn-primary" id="agregarColumnaBtn">
+      <i class="bi bi-plus-square"></i> Agregar columna de nota
     </button>
   </div>
 
   <!-- TABLA -->
   <div class="tabla-container mt-4">
-    <table class="tabla">
+    <table class="tabla table table-bordered text-center align-middle">
       <thead>
-        <tr>
+        <tr id="tablaHeader">
           <th class="fijo">Nombre</th>
           <th class="fijo">Curso</th>
           <th class="fijo">Materia</th>
-          <th>Nota 1</th>
-          <th>Nota 2</th>
-          <th>Nota 3</th>
-          <th>Asistencia 1</th>
-          <th>Asistencia 2</th>
+          <th class="nota" draggable="true">Nota 1</th>
+          <th class="nota" draggable="true">Nota 2</th>
+          <th class="nota" draggable="true">Nota 3</th>
         </tr>
       </thead>
       <tbody>
@@ -121,33 +120,16 @@
           <td><input type="number" step="0.1" min="1" max="5"></td>
           <td><input type="number" step="0.1" min="1" max="5"></td>
           <td><input type="number" step="0.1" min="1" max="5"></td>
-          <td>
-            <select>
-              <option value="">--Seleccionar--</option>
-              <option value="asistió">Asistió</option>
-              <option value="no asistió">No asistió</option>
-              <option value="excusa">Excusa</option>
-            </select>
-          </td>
-          <td>
-            <select>
-              <option value="">--Seleccionar--</option>
-              <option value="asistió">Asistió</option>
-              <option value="no asistió">No asistió</option>
-              <option value="excusa">Excusa</option>
-            </select>
-          </td>
         </tr>
       </tbody>
     </table>
   </div>
 
   <!-- JS -->
-  <script src="{{ url_for('static', filename='js/validacion_planilla_notas.js') }}"></script>
   <script src="{{ url_for('static', filename='js/materias.js') }}"></script>
   <script src="{{ url_for('static', filename='js/acciones_notas.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/columnas_notas.js') }}"></script>
   <script>
-    // cargar materias según curso
     cargarMaterias("{{ curso_id }}");
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

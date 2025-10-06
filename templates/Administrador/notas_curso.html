@@ -48,7 +48,8 @@
         <span class="bi bi-person-lines-fill"></span>
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-        <li><a class="dropdown-item" href="{{url_for('Administrador.perfil')}}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
         <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
       </ul>
     </div>
@@ -80,6 +81,7 @@
     </ul>
   </div>
   <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+
   <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios" role="button" aria-expanded="false" aria-controls="submenuUsuarios">
     <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios

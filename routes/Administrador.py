@@ -15,20 +15,12 @@ Administrador_bp = Blueprint('Administrador', __name__, url_prefix='/administrad
 def paginainicio():
     return render_template('Administrador/Paginainicio_Administrador.html')
 
-
-@Administrador_bp.route('/perfil')
-@login_required
-def perfil():
-    return render_template('Administrador/perfil.html', usuario=current_user)
-
-
 # ----------------- DOCENTES -----------------
 @Administrador_bp.route('/profesores')
 
 def profesores():
     docentes = Usuario.query.filter_by(Rol='Docente').all()
     return render_template('Administrador/Profesores.html', docentes=docentes)
-
 
 @Administrador_bp.route('/agregar_docente', methods=['POST'])
 @login_required
@@ -382,9 +374,9 @@ def asignaturas():
     return render_template('Administrador/Asignaturas.html')
 
 
-@Administrador_bp.route('/horarios')
-def horarios():
-    return render_template('Administrador/Horarios.html')
+@Administrador_bp.route('/horarios/<int:curso_id>')
+def horarios(curso_id=None):
+    return render_template('Administrador/Horarios.html', curso_id=curso_id)
 
 
 @Administrador_bp.route('/registro_notas/<int:curso_id>')
@@ -455,3 +447,33 @@ def cursos2():
 @Administrador_bp.route('/citacion')
 def citacion():
     return render_template('Administrador/Citacion.html')
+
+@Administrador_bp.route('/materias')
+def materias():
+    return render_template('Administrador/Materias.html')
+
+@Administrador_bp.route('/detallesmateria/<int:curso_id>')
+def detallesmateria(curso_id):
+    materias = {
+        601: "Español",
+        602: "Matemáticas",
+        603: "Inglés",
+        701: "Sociales",
+        702: "Ética",
+        703: "Filosofía",
+        801: "Artística",
+        802: "Biología",
+        803: "Física",
+        901: "Química",
+        902: "Religión",
+        903: "Tecnología",
+        1001: "Informática",
+        1002: "P.T.I",
+        1003: "Ruta",
+        1101: "Educación Física"
+    }
+
+    materia_nombre = materias.get(curso_id, "Materia desconocida")
+    return render_template("Administrador/DetallesMateria.html", materia=materia_nombre)
+
+

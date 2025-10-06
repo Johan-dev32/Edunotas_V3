@@ -15,6 +15,7 @@ header {
   color: #050733ff;
   font-size: 40px;
   font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
   margin: 0;
   margin-left: 60px;
 }
@@ -35,7 +36,7 @@ header .btn-dark {
   margin-left: 10px;
 }
 
-/* menú lateral */
+/*  menu_des  */
 #sidebar {
   width: 220px;
   min-height: 100vh;
@@ -63,7 +64,6 @@ header .btn-dark {
   max-height: 100vh;  
 }
 
-
 .nav-item {
   font-weight: bold;
   font-size: 22px;
@@ -74,99 +74,101 @@ header .btn-dark {
   margin-bottom: 10px;
 }
 
-
+/* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
 .nav-pills .nav-link {
   font-size: 25px;   /* tamaño botones nav */
   color: #050733ff !important; 
   font-weight: bold;
 
 }
-
-
-/* tarjeta de curso */
-.card {
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.card-title {
-  font-weight: bold;
-  font-size: 28px;
-  color: #050733ff;
-}
-
-.form-label {
-  font-weight: bold;
-}
-
-
+/* ===== tablas: layout fijo + scroll ===== */
 .tabla-container {
-  max-width: 95%;   
-  margin: 30px auto;
-  overflow-x: auto;
-  border: none;    
-}
-
-.tabla {
+  display: flex;
   width: 100%;
-  border-collapse: collapse;
-  text-align: center;
-}
-
-.tabla th,
-.tabla td {
+  margin: 20px auto;
   border: 1px solid #ccc;
-  padding: 8px;
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden; /* evita overlays */
 }
 
-.fijo {
-  min-width: 100px;
-  background: #f9f9f9;
+/* ---- tabla fija (izquierda) ---- */
+.tabla-fija {
+  border-collapse: collapse;
+  min-width: 420px;
+  max-width: 420px;
+  background: #fff;
+}
+.tabla-fija th, .tabla-fija td {
+  border: 1px solid #ccc;
+  padding: 10px 12px;
+  text-align: center;
+  vertical-align: middle;
+}
+.tabla-fija thead th {
+  background-color: #050733ff;
+  color: white;
   font-weight: bold;
 }
-.tabla {
+
+/* ---- zona scrollable (derecha) ---- */
+.tabla-scroll {
+  overflow-x: auto;
+  width: calc(100% - 420px);
+}
+#tablaNotas {
   border-collapse: collapse;
+  min-width: 600px; /* evita compactar demasiado */
   width: 100%;
-  min-width: 800px;
+  background: #fff;
 }
-
-.tabla th, .tabla td {
+#tablaNotas th, #tablaNotas td {
   border: 1px solid #ccc;
-  padding: 8px;
+  padding: 10px;
   text-align: center;
-  min-width: 100px;
+  vertical-align: middle;
+  min-width: 120px; /* ancho de cada columna de nota */
 }
 
-.tabla th {
+/* header notas (color e inputs) */
+#tablaNotas thead th {
   background-color: #050733ff;
   color: white;
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 5;
+  height: 52px;
 }
 
-/* Columnas fijas a la izquierda */
-.fijo {
-  position: sticky;
-  left: 0;
-  background-color: #e4e6eb;
-  z-index: 1;
-}
-
-.fijo:nth-child(1) { left: 0; }
-.fijo:nth-child(2) { left: 120px; }
-.fijo:nth-child(3) { left: 240px; }
-
-.tabla input {
-  width: 90%;
-  padding: 4px;
+/* inputs dentro de celdas */
+#tablaNotas input[type="number"], .tabla-fija input[type="number"] {
+  width: 85px;
+  padding: 6px;
   border: 1px solid #999;
   border-radius: 4px;
   text-align: center;
 }
 
-.error {
-  border: 2px solid red;
-  background-color: #ffe0e0;
+/* input título de nota en header */
+.titulo-nota {
+  width: 90px;
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.35);
+  background: transparent;
+  color: white;
+  text-align: center;
+  font-size: 13px;
 }
+.titulo-nota:focus { outline: none; border-bottom: 1px solid #ffd54f; }
 
+/* botón eliminar (pequeño y a la derecha) */
+.remove-col {
+  margin-left: 6px;
+  color: #ffb3b3;
+  cursor: pointer;
+  font-weight: bold;
+}
+.remove-col:hover { color: #ff4d4d; }
+
+/* errores */
+.error { border: 2px solid red; background-color: #ffe0e0; }

@@ -10,8 +10,3 @@ Acudiente_bp = Blueprint('Acudiente', __name__, url_prefix='/acudiente')
 @Acudiente_bp.route('/paginainicio')
 def paginainicio():
     return render_template('Acudiente/Paginainicio_Acudiente.html')
-
-@Acudiente_bp.route('/perfil')
-@login_required
-def perfil():
-    return render_template('Acudiente/perfil.html', usuario=current_user)

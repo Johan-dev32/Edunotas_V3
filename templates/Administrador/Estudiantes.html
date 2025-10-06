@@ -141,7 +141,7 @@
 </li>
 
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
-  <li class="nav-item"><a href="{{ url_for('Administrador.horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+
 
  </ul>
  </div>
@@ -150,96 +150,109 @@
 <main class="container mt-4">
     <h2 class="fw-bold fs-1">GESTIÓN DE ESTUDIANTES</h2>
 
-    <div class="actions mb-3">
-      <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#agregarModal">Agregar Estudiante</button>
-    </div>
-
-    <div class="search-bar mb-3">
-      <input type="text" id="search" placeholder="Buscar estudiante..." onkeyup="buscarEstudiante()">
-    </div>
-
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Nombre Completo</th>
-          <th>Tipo.Doc</th>
-          <th>Documento</th>
-          <th>Correo</th>
-          <th>Teléfono</th>
-          <th>Dirección</th>
-          <th>Curso</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for e in estudiantes %}
-        <tr>
-          <td>{{ e.Nombre }} {{ e.Apellido }}</td>
-          <td>{{ e.TipoDocumento }}</td>
-          <td>{{ e.NumeroDocumento }}</td>
-          <td>{{ e.Correo }}</td>
-          <td>{{ e.Telefono }}</td>
-          <td>{{ e.Direccion }}</td>
-          <td>{{ e.Calle }}</td>
-          <td>
-            <!-- Botón Editar -->
-            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editarModal{{ e.ID_Usuario }}">Editar</button>
-
-            <!-- Botón Eliminar -->
-            <form method="POST" action="{{ url_for('Administrador.eliminar_estudiante', id=e.ID_Usuario) }}" style="display:inline;">
-              <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-            </form>
-          </td>
-        </tr>
-
-        <!-- Modal Editar -->
-        <div class="modal fade" id="editarModal{{ e.ID_Usuario }}" tabindex="-1">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <form action="{{ url_for('Administrador.actualizar_estudiante', id=e.ID_Usuario) }}" method="POST">
-                <div class="modal-header"><h5>Editar Estudiante</h5></div>
-                <div class="modal-body">
-                  <input type="text" name="Nombre" value="{{ e.Nombre }}" class="form-control mb-2">
-                  <input type="text" name="Apellido" value="{{ e.Apellido }}" class="form-control mb-2">
-                  <input type="text" name="TipoDocumento" value="{{ e.TipoDocumento }}" class="form-control mb-2">
-                  <input type="text" name="NumeroDocumento" value="{{ e.NumeroDocumento }}" class="form-control mb-2">
-                  <input type="email" name="Correo" value="{{ e.Correo }}" class="form-control mb-2">
-                  <input type="text" name="Telefono" value="{{ e.Telefono }}" class="form-control mb-2">
-                  <input type="text" name="Direccion" value="{{ e.Direccion }}" class="form-control mb-2">
-                  <input type="text" name="Curso" value="{{ e.Calle }}" class="form-control mb-2">
-                </div>
-                <div class="modal-footer">
-                  <button type="submit" class="btn btn-primary">Guardar</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <!-- Modal Agregar -->
-    <div class="modal fade" id="agregarModal" tabindex="-1">
-      <div class="modal-dialog">
-        <form action="{{ url_for('Administrador.agregar_estudiante') }}" method="POST" class="modal-content">
-          <div class="modal-header"><h5>Agregar Estudiante</h5></div>
-          <div class="modal-body">
-            <input type="text" name="Nombre" placeholder="Nombre" class="form-control mb-2">
-            <input type="text" name="Apellido" placeholder="Apellido" class="form-control mb-2">
-            <input type="text" name="TipoDocumento" placeholder="Tipo Documento" class="form-control mb-2">
-            <input type="text" name="NumeroDocumento" placeholder="Número Documento" class="form-control mb-2">
-            <input type="email" name="Correo" placeholder="Correo Institucional" class="form-control mb-2">
-            <input type="text" name="Telefono" placeholder="Teléfono" class="form-control mb-2">
-            <input type="text" name="Direccion" placeholder="Dirección" class="form-control mb-2">
-            <input type="text" name="Curso" placeholder="Curso" class="form-control mb-2">
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-success">Guardar</button>
-          </div>
-        </form>
+<div class="container mt-4 mb-5 form-container p-4 rounded shadow">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="fw-bold text-center flex-grow-1">Registrar Estudiante</h2>
+      <div class="usuario-icon">
+        <i class="bi bi-person-circle fs-3"></i>
+        <small>Usuario</small>
       </div>
     </div>
-  </main>
+    <p class="text-center fw-semibold">Por Favor Diligencie Todos Los Campos</p>
+
+    <!-- Datos Básicos -->
+    <h5 class="mt-4 mb-3 fw-bold">Datos Básicos</h5>
+    <div class="row g-3 align-items-center">
+      <!-- Foto -->
+      <div class="col-md-3 text-center">
+        <div class="border p-2 rounded upload-box">
+          <p>Sube una foto de perfil...</p>
+          <button class="btn btn-primary btn-sm">
+            <i class="bi bi-camera"></i> Tomar Foto
+          </button>
+        </div>
+      </div>
+
+      <!-- Nombre y documento -->
+      <div class="col-md-9">
+        <div class="mb-3">
+          <label class="form-label">Nombres y Apellidos:</label>
+          <input type="text" class="form-control" placeholder="Mateo Castro">
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <label class="form-label">Tipo de Documento:</label>
+            <select class="form-select">
+              <option selected>Seleccione...</option>
+              <option value="TI">TI</option>
+              <option value="CC">CC</option>
+              <option value="CE">CE</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Número de Documento:</label>
+            <input type="text" class="form-control" placeholder="1628746243">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fecha y otros datos -->
+    <div class="row mt-3">
+      <div class="col-md-4">
+        <label class="form-label">Fecha de Nacimiento:</label>
+        <input type="date" class="form-control">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Tipo de Sangre:</label>
+        <input type="text" class="form-control" placeholder="A+">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">EPS:</label>
+        <input type="text" class="form-control" placeholder="Famisanar">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Correo:</label>
+        <input type="email" class="form-control" placeholder="mateito_12344@gmail.com">
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-md-4">
+        <label class="form-label">Número de Teléfono:</label>
+        <input type="tel" class="form-control" placeholder="3204856395">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Curso:</label>
+        <select class="form-select">
+          <option selected>Seleccionar Curso</option>
+          <option>1103</option><option>1102</option><option>1101</option>
+          <option>1003</option><option>1002</option><option>1001</option>
+          <option>903</option><option>902</option><option>901</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Datos del acudiente -->
+    <h5 class="mt-4 mb-3 fw-bold">Datos del Acudiente</h5>
+    <div class="row">
+      <div class="col-md-6">
+        <label class="form-label">Nombre:</label>
+        <input type="text" class="form-control" placeholder="Nombre del acudiente">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Número de Teléfono:</label>
+        <input type="tel" class="form-control" placeholder="3204843995">
+      </div>
+    </div>
+
+    <!-- Botón -->
+    <div class="text-center mt-4">
+      <button class="btn btn-primary px-4">Registrar Estudiante</button>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
 
   <script src="/static/js/Administrador/Estudiantes.js"></script>
 </body>

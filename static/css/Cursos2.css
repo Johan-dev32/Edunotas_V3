@@ -99,29 +99,48 @@ header .btn-dark {
   font-size: 1.3rem;     
   color: #555;           
 }
-.sidebar {
-      background-color: #050733ff;
-      color: white;
-      min-height: 100vh;
-      padding: 20px;
-      border-radius: 10px;
-    }
-    .sidebar label {
-      font-weight: bold;
-      margin-top: 15px;
-    }
-    .descripcion-box {
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 20px;
-      background-color: white;
-      min-height: 500px;
-    }
-    .btn-custom {
-      background-color: #050733ff;
-      color: white;
-    }
-    .btn-custom:hover {
-      background-color: #080a55;
-      color: white;
-    }
+
+.btn-icon i {
+  font-size: 1.1rem;
+  color: #0d0d4d;
+  transition: 0.3s;
+}
+
+.btn-icon i:hover {
+  color: #198754; /* verde Bootstrap */
+}
+
+#tablaPromedios {
+  max-width: 100%;
+}
+
+.table td {
+  vertical-align: middle;
+}
+/* Encabezado azul oscuro */
+#tablaPromedios thead tr {
+  background-color: #050733ff !important;
+  color: #ffffff !important;
+}
+
+/* Filas existentes (por defecto de Bootstrap, fondo blanco) */
+#tablaPromedios tbody tr {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Efecto hover en filas existentes */
+#tablaPromedios tbody tr:hover {
+  background-color: #f1f1f1 !important;
+}
+
+/* Filas NUEVAS (con clase .nuevo-registro que pones desde JS) */
+#tablaPromedios tbody tr.nuevo-registro {
+  background-color: #050733ff !important;
+  color: #ffffff !important;
+}
+
+/* Hover en nuevas filas */
+#tablaPromedios tbody tr.nuevo-registro:hover {
+  background-color: #1a1d4d !important;
+}

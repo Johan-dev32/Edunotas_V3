@@ -367,3 +367,15 @@ margin-left: 900px;
     opacity: 1;
   }
 }
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;
+  max-height: 100vh;
+
+  /* Ocultar la barra de scroll pero permitir el desplazamiento */
+  scrollbar-width: none; /* Firefox */
+}
+
+.offcanvas1-body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari y Edge */
+}

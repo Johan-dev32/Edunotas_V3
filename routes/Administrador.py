@@ -8,6 +8,7 @@ from datetime import datetime
 from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad
 from flask_mail import Message
 import os
+
 from decimal import Decimal
 
 #Definir el Blueprint para el administardor
@@ -137,7 +138,6 @@ def agregar_estudiante():
             Rol='Estudiante',
             Estado='Activo',
             Direccion=direccion,
-            Calle=curso,
             Genero="Otro"
         )
         db.session.add(nuevo_estudiante)

@@ -603,7 +603,7 @@ def reporte():
     return render_template('Administrador/Reporte.html')
 
 
-@Administrador_bp.route('/detallesmateria/<int:curso_id>')
+@Administrador_bp.route('/detallesmateria/<int:curso_id>') 
 def detallesmateria(curso_id):
     materias = {
         601: "Español",
@@ -624,9 +624,16 @@ def detallesmateria(curso_id):
         1101: "Educación Física"
     }
 
-    materia_nombre = materias.get(curso_id, "Materia desconocida")
-    return render_template("Administrador/DetallesMateria.html", materia=materia_nombre)
+    # Obtener la materia según el curso (si existe)
+    materia = materias.get(curso_id, "Materia no encontrada")
 
+    # Enviar curso y materia al HTML
+    return render_template('Administrador/detallesmateria.html', curso=curso_id, materia=materia)
+
+
+    materia_nombre = materias.get(curso_id, "Materia desconocida")   
+    return render_template("Administrador/DetallesMateria.html", materia=materia_nombre)
+ 
 @Administrador_bp.route('/enviar_correo', methods=['GET', 'POST'])
 @login_required
 def enviar_correo():
@@ -689,3 +696,12 @@ def historialacademico2():
 def historialacademico3():
     periodo = request.args.get('periodo')
     return render_template('Administrador/HistorialAcademico3.html', periodo=periodo)
+
+@Administrador_bp.route('/configuracion_academica2')
+def configuracion_academica2():
+    return render_template('Administrador/ConfiguracionAcademica2.html')
+
+@Administrador_bp.route('/configuracion_academica3')
+def configuracion_academica3():
+    return render_template('Administrador/ConfiguracionAcademica3.html')
+

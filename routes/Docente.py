@@ -38,9 +38,17 @@ def registrotutorias():
 def tareas_actividades():
     return render_template('Docentes/Registrar_Tareas_Actividades.html')
 
-@Docente_bp.route('/tareas_actividades2')
-def tareas_actividades2():
-    return render_template('Docentes/Registrar_Tareas_Actividades2.html')
+@Docente_bp.route('/tareas_actividades2/<int:curso_id>')
+def tareas_actividades2(curso_id):
+    return render_template('Docentes/Registrar_Tareas_Actividades2.html', curso_id=curso_id)
+
+@Docente_bp.route('/tareas_actividades3/<int:curso_id>/<int:actividad_id>')
+def tareas_actividades3(curso_id, actividad_id):
+    return render_template('Docentes/Registrar_Tareas_Actividades3.html', 
+                           curso_id=curso_id, 
+                           actividad_id=actividad_id)
+
+
 
 @Docente_bp.route('/aprobacion_academica')
 def aprobacion_academica():

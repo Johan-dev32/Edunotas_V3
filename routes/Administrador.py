@@ -413,9 +413,10 @@ def asignaturas():
     return render_template('Administrador/Asignaturas.html')
 
 
-@Administrador_bp.route('/horarios')
-def horarios():
-    return render_template('Administrador/Horarios.html')
+@Administrador_bp.route('/horarios', defaults={'curso_id': None})
+@Administrador_bp.route('/horarios/<int:curso_id>')
+def horarios(curso_id):
+    return render_template('Administrador/Horarios.html', curso_id=curso_id)
 
 
 @Administrador_bp.route('/registro_notas/<int:curso_id>')
@@ -427,6 +428,10 @@ def registro_notas(curso_id):
 def notas_curso(curso_id):
     return render_template("Administrador/notas_curso.html", curso_id=curso_id)
 
+
+@Administrador_bp.route('/ver_horarios')
+def ver_horarios():
+    return render_template("Administrador/VerHorarios.html")
 
 @Administrador_bp.route('/notas_registro')
 def notas_registro():
@@ -675,10 +680,6 @@ def enviar_correo():
     # Si es GET, muestra el formulario
     return render_template("Administrador/Comunicaciòn.html")
 
-
-
-
-
 @Administrador_bp.route('/asistencia')
 def asistencia():
     return render_template('Administrador/Asistencia.html')
@@ -686,6 +687,10 @@ def asistencia():
 @Administrador_bp.route('/historialacademico2')
 def historialacademico2():
     return render_template('Administrador/HistorialAcademico2.html')
+
+@Administrador_bp.route('/evaluaciones')
+def evaluaciones():
+    return render_template('Administrador/evaluaciones.html')
 
 @Administrador_bp.route('/historialacademico3')
 def historialacademico3():

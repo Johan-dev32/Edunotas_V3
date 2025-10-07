@@ -259,6 +259,27 @@ def reset_password(token):
     return render_template('reset_password.html', token=token)
 
 
+@app.route('/enviar_notificacion', methods=['POST'])
+def enviar_notificacion():
+    data = request.get_json()
+    correo = data.get('correo')
+    titulo = data.get('titulo')
+    mensaje = data.get('mensaje')
+
+    if not correo or not titulo or not mensaje:
+        return jsonify({"status": "error", "msg": "Datos incompletos"})
+
+    try:
+        msg = Message(titulo, recipients=[correo])
+        msg.body = mensaje
+        mail.send(msg)
+
+        return jsonify({"status": "ok"})
+    except Exception as e:
+        print("Error al enviar correo:", e)
+        return jsonify({"status": "error", "msg": str(e)})
+
+
 
 app.register_blueprint(Administrador_bp)
 app.register_blueprint(Docente_bp)

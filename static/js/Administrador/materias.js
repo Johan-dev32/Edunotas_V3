@@ -39,4 +39,45 @@ function cargarMaterias(cursoId) {
       selectMaterias.appendChild(option);
     });
   }
+
+  // Escuchar cambios para actualizar la tabla
+  selectMaterias.addEventListener("change", actualizarMateriaEnTabla);
+
+  // Mostrar por defecto la primera materia
+  if (selectMaterias.options.length > 0) {
+    selectMaterias.selectedIndex = 0;
+    actualizarMateriaEnTabla();
+  }
 }
+
+// Función que actualiza la columna "Materia" de la tabla
+function actualizarMateriaEnTabla() {
+  const selectMaterias = document.getElementById("materia");
+  const materiaSeleccionada = selectMaterias.options[selectMaterias.selectedIndex]?.textContent;
+
+  if (!materiaSeleccionada) return;
+
+  // Solo tomamos las filas dentro del cuerpo (tbody)
+  const filas = document.querySelectorAll("#tablaInfo tbody tr");
+
+  filas.forEach(fila => {
+    const celdaMateria = fila.cells[3]; // Columna “Materia”
+    if (celdaMateria) {
+      celdaMateria.textContent = materiaSeleccionada;
+    }
+  });
+}
+document.addEventListener("DOMContentLoaded", () => {
+  const selectMateria = document.getElementById("materia");
+  const celdasMateria = document.querySelectorAll(".celda-materia");
+
+  if (selectMateria) {
+    selectMateria.addEventListener("change", () => {
+      const materiaSeleccionada = selectMateria.options[selectMateria.selectedIndex].textContent;
+
+      celdasMateria.forEach(celda => {
+        celda.textContent = materiaSeleccionada;
+      });
+    });
+  }
+});

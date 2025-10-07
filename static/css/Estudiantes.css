@@ -204,3 +204,35 @@ tr:hover {
   font-weight: bold;
 
 }
+
+
+.form-container {
+  border: 2px solid #050733ff;
+  background-color: #ffffff;
+}
+
+.upload-box {
+  background-color: #f1f1f1;
+}
+
+h2, h5 {
+  color: #050733ff;
+}
+
+.btn-primary {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #1b1e66;
+}
+
+.usuario-icon {
+  text-align: center;
+  color: #050733ff;
+}
+
+label {
+  font-weight: 600;
+}

@@ -281,6 +281,13 @@ def enviar_notificacion():
 
 
 
+
+from routes.Administrador import Administrador_bp
+from routes.Docente import Docente_bp
+from routes.Acudiente import Acudiente_bp
+from routes.Estudiante import Estudiante_bp
+
+
 app.register_blueprint(Administrador_bp)
 app.register_blueprint(Docente_bp)
 app.register_blueprint(Estudiante_bp)

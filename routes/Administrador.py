@@ -610,7 +610,7 @@ def reporte():
     return render_template('Administrador/Reporte.html')
 
 
-@Administrador_bp.route('/detallesmateria/<int:curso_id>')
+@Administrador_bp.route('/detallesmateria/<int:curso_id>') 
 def detallesmateria(curso_id):
     materias = {
         601: "Español",
@@ -631,54 +631,78 @@ def detallesmateria(curso_id):
         1101: "Educación Física"
     }
 
-    materia_nombre = materias.get(curso_id, "Materia desconocida")
-    return render_template("Administrador/DetallesMateria.html", materia=materia_nombre)
+    # Obtener la materia según el curso (si existe)
+    materia = materias.get(curso_id, "Materia no encontrada")
 
+    # Enviar curso y materia al HTML
+    return render_template('Administrador/detallesmateria.html', curso=curso_id, materia=materia)
+
+
+    materia_nombre = materias.get(curso_id, "Materia desconocida")   
+    return render_template("Administrador/DetallesMateria.html", materia=materia_nombre)
+ 
 @Administrador_bp.route('/enviar_correo', methods=['GET', 'POST'])
 @login_required
 def enviar_correo():
     if request.method == 'POST':
-        from app import mail  # ✅ Importación local, evita circular import
+
+        from app import mail  
+
 
         curso = request.form.get('curso')
         tipo = request.form.get('tipo')
-        destinatario = request.form.get('destinatario')
+        destinatario = request.form.get('destinatario') or request.form.get('emailDestino')
         archivo = request.files.get('archivo')
 
-        if not destinatario or not archivo:
-            flash("Faltan datos ❌", "danger")
-            return redirect(url_for('Administrador.paginainicio'))
+        print("➡ /enviar_correo llamado")
+        print("   curso:", curso, "tipo:", tipo, "destinatario:", destinatario)
+        print("   archivo:", getattr(archivo, 'filename', None))
+
+        if not destinatario:
+            flash("Falta el correo del destinatario.", "danger")
+            return redirect(url_for('Administrador.comunicacion'))
 
         try:
             msg = Message(
-                subject=f"{tipo} - Curso {curso}",
-                recipients=[destinatario]
+                subject=f"{tipo or 'Sin tipo'} - Curso {curso or 'N/A'}",
+                recipients=[destinatario],
             )
 
-            # 📌 Plantilla HTML bonita
-            msg.html = render_template(
-                "Administrador/CorreoAdjunto.html",
-                curso=curso,
-                tipo=tipo,
-                destinatario=destinatario
-            )
+            try:
+                msg.html = render_template(
+                    "Administrador/CorreoAdjunto.html",
+                    curso=curso,
+                    tipo=tipo,
+                    destinatario=destinatario
+                )
+            except Exception as tpl_err:
+                print("Error renderizando template:", tpl_err)
+                msg.body = f"Envío: {tipo} - Curso {curso}"
 
-            # 📎 Adjuntar archivo
-            msg.attach(
-                archivo.filename,
-                archivo.content_type,
-                archivo.read()
-            )
+            if archivo and archivo.filename:
+        
+                data = archivo.read()
+                print(f"   tamaño adjunto: {len(data)} bytes")
+       
+                msg.attach(archivo.filename, archivo.content_type or 'application/octet-stream', data)
+            else:
+                print("   No se adjuntó archivo")
 
             mail.send(msg)
             flash("Correo enviado correctamente ✅", "success")
+            print("✔ mail enviado a", destinatario)
+
         except Exception as e:
+   
+            import traceback
+            traceback.print_exc()
             flash(f"Error al enviar el correo: {e}", "danger")
 
-        return redirect(url_for('Administrador.paginainicio'))
+        return redirect(url_for('Administrador.comunicacion'))
 
-    # Si es GET, muestra el formulario
-    return render_template("Administrador/Comunicaciòn.html")
+  
+    return render_template("Administrador/Comunicacion.html")
+
 
 @Administrador_bp.route('/asistencia')
 def asistencia():
@@ -696,3 +720,12 @@ def evaluaciones():
 def historialacademico3():
     periodo = request.args.get('periodo')
     return render_template('Administrador/HistorialAcademico3.html', periodo=periodo)
+
+@Administrador_bp.route('/configuracion_academica2')
+def configuracion_academica2():
+    return render_template('Administrador/ConfiguracionAcademica2.html')
+
+@Administrador_bp.route('/configuracion_academica3')
+def configuracion_academica3():
+    return render_template('Administrador/ConfiguracionAcademica3.html')
+

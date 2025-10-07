@@ -17,10 +17,8 @@ mail = Mail()
 
 s = URLSafeTimedSerializer("clave_super_secreta")
 
-import pymysql
-
 # Importa el objeto 'db' y los modelos desde tu archivo de modelos
-from Controladores.models import db, Usuario, Acudiente, Curso, Matricula, Periodo, Asignatura, Docente_Asignatura, Programacion, Asistencia, Detalle_Asistencia, Cronograma_Actividades, Actividad, Actividad_Estudiante, Observacion
+from Controladores.models import db, Usuario
 
 # Configuración de la aplicación
 app = Flask(__name__)
@@ -66,8 +64,8 @@ with app.app_context():
     if not database_exists(engine.url):
         create_database(engine.url)
         print("Base de datos 'edunotas' creada exitosamente.")
-    db.create_all()
-    print("Tablas de la base de datos creadas exitosamente.")
+        db.create_all()
+        print("Tablas de la base de datos creadas exitosamente.")
     
 ###nuevo    
 def send_reset_email(user_email, user_name, token):
@@ -261,6 +259,27 @@ def reset_password(token):
     return render_template('reset_password.html', token=token)
 
 
+@app.route('/enviar_notificacion', methods=['POST'])
+def enviar_notificacion():
+    data = request.get_json()
+    correo = data.get('correo')
+    titulo = data.get('titulo')
+    mensaje = data.get('mensaje')
+
+    if not correo or not titulo or not mensaje:
+        return jsonify({"status": "error", "msg": "Datos incompletos"})
+
+    try:
+        msg = Message(titulo, recipients=[correo])
+        msg.body = mensaje
+        mail.send(msg)
+
+        return jsonify({"status": "ok"})
+    except Exception as e:
+        print("Error al enviar correo:", e)
+        return jsonify({"status": "error", "msg": str(e)})
+
+
 
 
 from routes.Administrador import Administrador_bp
@@ -275,5 +294,5 @@ app.register_blueprint(Estudiante_bp)
 app.register_blueprint(Acudiente_bp)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)

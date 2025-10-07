@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from flask_mail import Message
-from Controladores.models import db, Docente_Asignatura, Programacion, Asistencia, Detalle_Asistencia, Actividad, Actividad_Estudiante, Observacion
+from Controladores.models import db, Docente_Asignatura, Programacion, Asistencia, Detalle_Asistencia, Actividad, Actividad_Estudiante, Observacion, Notificacion
 import os
 from Controladores.models import (
     db, Usuario, Matricula, Asignatura, Cronograma_Actividades,
@@ -13,6 +13,21 @@ import datetime
 from decimal import Decimal
 #Definir el Blueprint para el administardor
 Docente_bp = Blueprint('Docente', __name__, url_prefix='/docente')
+
+@Docente_bp.route('/notificaciones', methods=['GET'])
+@login_required
+def obtener_notificaciones():
+    notificaciones = Notificacion.query.filter_by(usuario_id=current_user.id).order_by(Notificacion.fecha.desc()).all()
+    data = [
+        {
+            'titulo': n.titulo,
+            'contenido': n.contenido,
+            'fecha': n.fecha.strftime('%Y-%m-%d %H:%M:%S'),
+            'leido': n.leido
+        }
+        for n in notificaciones
+    ]
+    return jsonify(data)
 
 @Docente_bp.route('/paginainicio')
 def paginainicio():

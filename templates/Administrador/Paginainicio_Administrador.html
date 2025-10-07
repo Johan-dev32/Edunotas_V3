@@ -34,17 +34,45 @@
         });
     </script>
 
-  <!-- Dropdown mensajes -->
-  <div class="dropdown">
-    <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-      <span class="bi bi-envelope-fill"></span>
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <li><a class="dropdown-item" href="#">Ajustes</a></li>
-      <li><a class="dropdown-item" href="#">Opción 2</a></li>
-      <li><a class="dropdown-item" href="#">Opción 3</a></li>
+    <!-- Dropdown mensajes -->
+    <div class="dropdown">
+      <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="bi bi-envelope-fill"></span>
+      </button>
+      <ul class="dropdown-menu p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
+      <li class="mb-2"><h6 class="dropdown-header text-center">Enviar Notificación</h6></li>
+
+      <!-- FORMULARIO DENTRO DEL DROPDOWN -->
+      <form id="formNotificacionDropdown">
+        <div class="mb-2">
+          <label for="correoNoti" class="form-label small">Correo destino</label>
+          <input type="email" id="correoNoti" name="correo" class="form-control form-control-sm" placeholder="correo@ejemplo.com" required>
+        </div>
+
+        <div class="mb-2">
+          <label for="tituloNoti" class="form-label small">Asunto</label>
+          <input type="text" id="tituloNoti" name="titulo" class="form-control form-control-sm" placeholder="Asunto del mensaje" required>
+        </div>
+
+        <div class="mb-2">
+          <label for="mensajeNoti" class="form-label small">Mensaje</label>
+          <textarea id="mensajeNoti" name="mensaje" class="form-control form-control-sm" rows="3" placeholder="Escribe tu mensaje..." required></textarea>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary btn-sm">Enviar</button>
+        </div>
+      </form>
+
+      <!-- SECCIÓN DE NOTIFICACIONES RECIENTES -->
+      <li><hr class="dropdown-divider"></li>
+      <li class="text-center text-muted small">Últimas notificaciones</li>
+      <div id="notificacionesRecientes" class="mt-2" style="max-height: 150px; overflow-y: auto;">
+        <p class="text-center small text-secondary">Sin notificaciones recientes</p>
+      </div>
     </ul>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <!-- Dropdown usuario -->
   <div class="dropdown">
@@ -144,7 +172,6 @@
           <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
           <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
           <li class="nav-item"><a href="{{ url_for('Administrador.reporte') }}" class="nav-link text-white"><i class="bi bi-calendar2"></i></i> Generar reporte</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.inasistencias') }}" class="nav-link text-white"><i class="bi bi-calendar2"></i></i> Inasistencias</a></li>
 
           <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
             <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios

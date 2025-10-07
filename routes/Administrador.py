@@ -7,6 +7,8 @@ from flask import jsonify
 from datetime import datetime
 from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad
 from flask_mail import Message
+import os
+
 from decimal import Decimal
 
 #Definir el Blueprint para el administardor
@@ -411,8 +413,9 @@ def asignaturas():
     return render_template('Administrador/Asignaturas.html')
 
 
+@Administrador_bp.route('/horarios', defaults={'curso_id': None})
 @Administrador_bp.route('/horarios/<int:curso_id>')
-def horarios(curso_id=None):
+def horarios(curso_id):
     return render_template('Administrador/Horarios.html', curso_id=curso_id)
 
 

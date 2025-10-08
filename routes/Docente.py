@@ -49,19 +49,71 @@ def resumensemanal():
 def registrotutorias():
     return render_template('Docentes/RegistroTutorías.html')
 
-@Docente_bp.route('/tareas_actividades')
-def tareas_actividades():
-    return render_template('Docentes/Registrar_Tareas_Actividades.html')
+@Docente_bp.route('/tareas_actividades1')
+def tareas_actividades1():
+    return render_template('Docentes/Registrar_Tareas_Actividades1.html')
 
 @Docente_bp.route('/tareas_actividades2/<int:curso_id>')
 def tareas_actividades2(curso_id):
-    return render_template('Docentes/Registrar_Tareas_Actividades2.html', curso_id=curso_id)
+    return render_template('Docentes/Registrar_Tareas_Actividades2.html',  # 👈 corregido
+                           curso_id=curso_id,
+                           actividades=actividades)
+
 
 @Docente_bp.route('/tareas_actividades3/<int:curso_id>/<int:actividad_id>')
 def tareas_actividades3(curso_id, actividad_id):
     return render_template('Docentes/Registrar_Tareas_Actividades3.html', 
                            curso_id=curso_id, 
                            actividad_id=actividad_id)
+    
+actividades = []
+
+# -------------------------------
+# Mostrar lista de actividades
+# -------------------------------
+@Docente_bp.route('/tareas_actividades/<int:curso_id>')
+def tareas_actividades(curso_id):
+    return render_template('Docentes/Registrar_Tareas_Actividades2.html',  # 👈 corregido
+                           curso_id=curso_id,
+                           actividades=actividades)
+
+
+# -------------------------------
+# Crear nueva actividad
+# -------------------------------
+@Docente_bp.route('/crear_actividad/<int:curso_id>', methods=['GET', 'POST'])
+def crear_actividad(curso_id):
+    if request.method == 'POST':
+        # Recibir datos del formulario
+        titulo = request.form.get('titulo')
+        instrucciones = request.form.get('instrucciones')
+        fecha = request.form.get('fecha')
+        hora = request.form.get('hora')
+
+        # Crear la nueva actividad
+        nueva_actividad = {
+            "id": len(actividades) + 1,
+            "titulo": titulo,
+            "instrucciones": instrucciones,
+            "fecha": fecha,
+            "hora": hora
+        }
+
+        # Guardarla (en este ejemplo, solo en memoria)
+        actividades.append(nueva_actividad)
+
+        # Redirigir a la lista de actividades
+        return redirect(url_for('Docente.tareas_actividades', curso_id=curso_id))
+
+    # Si es GET, mostrar formulario vacío
+    return render_template('Docentes/Crear_Actividad.html',
+                           curso_id=curso_id,
+                           actividad_id=len(actividades) + 1)
+    
+@Docente_bp.route('/editar_actividad/<int:id_actividad>')
+def editar_actividad(id_actividad):
+    # Temporalmente solo muestra un mensaje o plantilla vacía
+    return f"Editar actividad {id_actividad} (en construcción)"
 
 
 

@@ -1,44 +1,49 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const inputPDF = document.getElementById("pdfUpload");
-  const fileInfo = document.getElementById("fileInfo");
-  const subirArchivoBtn = document.getElementById("subirArchivoBtn");
-  const cancelarEntregaBtn = document.getElementById("cancelarEntregaBtn");
-  const actividadTexto = document.getElementById("actividadTexto");
+const btnEscuchar = document.getElementById("btnEscuchar");
+    const descripcion = `{{ descripcion_actividad or 'Aquí el docente deja las instrucciones de la tarea.' }}`;
+    const pdfInput = document.getElementById("pdfUpload");
+    const archivoSubido = document.getElementById("archivoSubido");
+    const btnEntregar = document.getElementById("btnEntregar");
+    const btnCancelar = document.getElementById("btnCancelar");
+    const estadoEntrega = document.getElementById("estadoEntrega");
 
-  // Mostrar nombre del archivo PDF seleccionado
-  inputPDF.addEventListener("change", (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      fileInfo.innerHTML = `<p class="text-success fw-bold">Archivo seleccionado: ${file.name}</p>`;
-    }
-  });
+    // 🔊 Leer tarea en voz alta
+    btnEscuchar.addEventListener("click", () => {
+      const speech = new SpeechSynthesisUtterance(descripcion);
+      speech.lang = "es-ES";
+      speech.rate = 1;
+      window.speechSynthesis.speak(speech);
+    });
 
-  // Confirmar entrega
-  subirArchivoBtn.addEventListener("click", () => {
-    if (!inputPDF.files.length) {
-      alert("Primero selecciona un archivo PDF antes de subirlo.");
-      return;
-    }
+    // 📂 Mostrar nombre del PDF
+    pdfInput.addEventListener("change", () => {
+      const archivo = pdfInput.files[0];
+      if (archivo) {
+        archivoSubido.textContent = `Archivo seleccionado: ${archivo.name}`;
+      }
+    });
 
-    const confirmar = confirm("¿Seguro que quieres subir este archivo?");
-    if (confirmar) {
-      actividadTexto.innerHTML = "<h1 class='entregado-texto'>ENTREGADO</h1>";
-      subirArchivoBtn.classList.add("disabled");
-      subirArchivoBtn.textContent = "Archivo Subido";
-      cancelarEntregaBtn.classList.remove("d-none"); // Mostrar botón cancelar
-    }
-  });
+    // ✅ Entregar tarea con confirmación
+    btnEntregar.addEventListener("click", () => {
+      if (!pdfInput.files.length) {
+        alert("Por favor, selecciona un archivo PDF antes de entregar.");
+        return;
+      }
 
-  // Cancelar entrega
-  cancelarEntregaBtn.addEventListener("click", () => {
-    const confirmarCancel = confirm("¿Seguro que deseas cancelar la entrega?");
-    if (confirmarCancel) {
-      actividadTexto.innerHTML = "<h1 class='anulado-texto'>HAS ANULADO TU ENTREGA</h1>";
-      subirArchivoBtn.classList.remove("disabled");
-      subirArchivoBtn.textContent = "Subir archivo";
-      cancelarEntregaBtn.classList.add("d-none"); // Ocultar botón cancelar
-      inputPDF.value = ""; // Limpiar archivo
-      fileInfo.innerHTML = "";
-    }
-  });
-});
+      if (confirm("¿Estás seguro de que deseas entregar esta tarea?")) {
+        estadoEntrega.textContent = "✅ Has entregado la tarea con éxito.";
+        estadoEntrega.classList.add("text-success");
+        btnCancelar.classList.remove("d-none");
+        btnEntregar.disabled = true;
+      }
+    });
+
+    // ❌ Cancelar entrega
+    btnCancelar.addEventListener("click", () => {
+      if (confirm("¿Deseas cancelar la entrega?")) {
+        estadoEntrega.textContent = "⚠️ Has anulado tu entrega.";
+        estadoEntrega.classList.remove("text-success");
+        estadoEntrega.classList.add("text-danger");
+        btnEntregar.disabled = false;
+        btnCancelar.classList.add("d-none");
+      }
+    });

@@ -137,6 +137,17 @@ header .btn-dark {
   color: #050733ff;
 }
 
+.subtitulo-actividades {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 40px;
+  color: #050733ff;
+  text-align: center;   /* centrado */
+}
+.actividad-container {
+  color: #050733ff;
+}
+
 /* Barra superior */
 .top-bar {
   background-color: #050733ff;

@@ -46,3 +46,11 @@ def noticias_vistas():
 @Estudiante_bp.route('/circulares_estudiantes')
 def circulares_estudiantes():
     return render_template('Estudiante/CircularesEstudiantes.html')
+
+@Estudiante_bp.route('/materias')
+def materias():
+    return render_template('Estudiante/Materias.html')
+
+@Estudiante_bp.route('/tareas_actividades')
+def tareas_actividades():
+    return render_template('Estudiante/TareasActividades.html')

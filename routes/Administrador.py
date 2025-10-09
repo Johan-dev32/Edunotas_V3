@@ -716,6 +716,10 @@ def historialacademico2():
 def evaluaciones():
     return render_template('Administrador/evaluaciones.html')
 
+@Administrador_bp.route('/informe')
+def informe():
+    return render_template('Administrador/informe.html')
+
 @Administrador_bp.route('/historialacademico3')
 def historialacademico3():
     periodo = request.args.get('periodo')

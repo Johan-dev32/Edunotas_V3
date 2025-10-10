@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // === Mostrar nombre del PDF seleccionado ===
   pdfUpload.addEventListener('change', (event) => {
     const file = event.target.files[0];
-    uploadBox.innerHTML = ''; // limpiar contenido
+    uploadBox.innerHTML = '';
 
     if (file) {
       const fileName = document.createElement('p');
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // === Crear advertencia personalizada (modal simple con CSS) ===
+  // === Modal de advertencia antes de enviar ===
   function mostrarAdvertencia(mensaje, onAceptar, onCancelar) {
     const modal = document.createElement('div');
     modal.classList.add('modal-advertencia');
@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
     document.body.appendChild(modal);
 
-    // Eventos
     document.getElementById('btnAceptar').addEventListener('click', () => {
       modal.remove();
       onAceptar && onAceptar();
@@ -52,20 +51,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // === Al hacer clic en PUBLICAR ACTIVIDAD ===
   publicarBtn.addEventListener('click', () => {
+    const form = publicarBtn.closest('form'); // seleccionamos el formulario
     mostrarAdvertencia(
       '¿Deseas publicar esta actividad?',
-      () => mostrarMensaje('✅ Actividad publicada con éxito', 'success'),
+      () => form.submit(), // si acepta, se envía el formulario
       () => mostrarMensaje('❌ Publicación cancelada', 'danger')
     );
   });
 
-  // === Mostrar mensaje final ===
   function mostrarMensaje(texto, tipo) {
     const alerta = document.createElement('div');
     alerta.classList.add('alert', `alert-${tipo}`, 'position-fixed', 'bottom-0', 'end-0', 'm-4', 'shadow');
     alerta.textContent = texto;
     document.body.appendChild(alerta);
-
     setTimeout(() => alerta.remove(), 3000);
   }
 });

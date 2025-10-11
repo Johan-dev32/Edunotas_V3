@@ -54,7 +54,7 @@ class Acudiente(db.Model):
 
 
 # -----------------------------------------------------
-# Notificaciòn(nuevo)
+# Notificación(nuevo)
 # -----------------------------------------------------
 class Notificacion(db.Model):
     __tablename__ = "Notificacion"

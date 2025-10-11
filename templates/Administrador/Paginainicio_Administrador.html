@@ -35,44 +35,105 @@
     </script>
 
     <!-- Dropdown mensajes -->
-    <div class="dropdown">
-      <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-        <span class="bi bi-envelope-fill"></span>
-      </button>
-      <ul class="dropdown-menu p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
-      <li class="mb-2"><h6 class="dropdown-header text-center">Enviar Notificación</h6></li>
+    <!-- Dropdown mensajes (ADMINISTRADOR) -->
+<div class="dropdown">
+  <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="bi bi-envelope-fill"></span>
+  </button>
+  <ul class="dropdown-menu p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
+    <li class="mb-2"><h6 class="dropdown-header text-center">Enviar Notificación</h6></li>
 
-      <!-- FORMULARIO DENTRO DEL DROPDOWN -->
-      <form id="formNotificacionDropdown">
-        <div class="mb-2">
-          <label for="correoNoti" class="form-label small">Correo destino</label>
-          <input type="email" id="correoNoti" name="correo" class="form-control form-control-sm" placeholder="correo@ejemplo.com" required>
-        </div>
-
-        <div class="mb-2">
-          <label for="tituloNoti" class="form-label small">Asunto</label>
-          <input type="text" id="tituloNoti" name="titulo" class="form-control form-control-sm" placeholder="Asunto del mensaje" required>
-        </div>
-
-        <div class="mb-2">
-          <label for="mensajeNoti" class="form-label small">Mensaje</label>
-          <textarea id="mensajeNoti" name="mensaje" class="form-control form-control-sm" rows="3" placeholder="Escribe tu mensaje..." required></textarea>
-        </div>
-
-        <div class="d-grid">
-          <button type="submit" class="btn btn-primary btn-sm">Enviar</button>
-        </div>
-      </form>
-
-      <!-- SECCIÓN DE NOTIFICACIONES RECIENTES -->
-      <li><hr class="dropdown-divider"></li>
-      <li class="text-center text-muted small">Últimas notificaciones</li>
-      <div id="notificacionesRecientes" class="mt-2" style="max-height: 150px; overflow-y: auto;">
-        <p class="text-center small text-secondary">Sin notificaciones recientes</p>
+    <form id="formNotificacionDropdown">
+      <div class="mb-2">
+          <label for="destinoNoti" class="form-label small">Destino:</label>
+          <select id="destinoNoti" class="form-select form-select-sm">
+          <option value="todos">Todos los roles</option>
+          <option value="usuario">Usuario específico</option>
+          </select>
       </div>
-    </ul>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <div class="mb-2">
+          <label for="idDestinatario" class="form-label small">ID Destinatario:</label>
+          <input type="number" id="idDestinatario" class="form-control form-control-sm" placeholder="Ej: 1">
+        </div>
+
+      <div class="mb-2">
+        <label for="tituloNoti" class="form-label small">Asunto</label>
+        <input type="text" id="tituloNoti" class="form-control form-control-sm" placeholder="Asunto del mensaje" required>
+      </div>
+
+      <div class="mb-2">
+        <label for="mensajeNoti" class="form-label small">Mensaje</label>
+        <textarea id="mensajeNoti" class="form-control form-control-sm" rows="3" placeholder="Escribe tu mensaje..." required></textarea>
+      </div>
+
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary btn-sm">Enviar</button>
+      </div>
+    </form>
+
+    <li><hr class="dropdown-divider"></li>
+    <li class="text-center text-muted small">Últimas notificaciones</li>
+    <div id="notificacionesRecientes" class="mt-2" style="max-height: 150px; overflow-y: auto;">
+      <p class="text-center small text-secondary">Sin notificaciones recientes</p>
+    </div>
+  </ul>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById("formNotificacionDropdown").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const destino = document.getElementById("destinoNoti").value;
+  const idDestinatario = document.getElementById("idDestinatario").value;
+  const titulo = document.getElementById("tituloNoti").value;
+  const mensaje = document.getElementById("mensajeNoti").value;
+
+  let url = "/notificaciones/enviar_todos";
+  let body = { titulo: titulo, contenido: mensaje };
+
+  if (destino === "usuario") {
+    url = "/notificaciones/enviar";
+    body.destinatario_id = idDestinatario;
+  }
+
+  try {
+    const respuesta = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+
+    if (respuesta.ok) {
+      Swal.fire({
+        icon: "success",
+        title: "Notificación enviada",
+        text: destino === "todos"
+          ? "Notificación enviada a todos los roles"
+          : "Notificación enviada al usuario seleccionado.",
+        confirmButtonColor: "#5A4AE3"
+      });
+      e.target.reset();
+    } else {
+      const error = await respuesta.json();
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.error || "No se pudo enviar la notificación.",
+        confirmButtonColor: "#5A4AE3"
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    Swal.fire({
+      icon: "error",
+      title: "Error de conexión",
+      text: "No se pudo comunicar con el servidor.",
+      confirmButtonColor: "#5A4AE3"
+    });
+  }
+});
+</script>
 
   <!-- Dropdown usuario -->
   <div class="dropdown">

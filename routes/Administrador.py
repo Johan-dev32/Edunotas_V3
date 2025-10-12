@@ -449,6 +449,10 @@ def observador():
 def calculo_promedio():
     return render_template('Administrador/CalculoPromedio.html')
 
+@Administrador_bp.route('/encuesta')
+def encuesta():
+    return render_template('Administrador/Encuestas.html')
+
 @Administrador_bp.route('/crear_encuesta')
 def crear_encuesta():
     return render_template('Administrador/CrearEncuesta.html')

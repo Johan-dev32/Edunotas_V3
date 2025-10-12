@@ -733,3 +733,6 @@ def configuracion_academica2():
 def configuracion_academica3():
     return render_template('Administrador/ConfiguracionAcademica3.html')
 
+@Administrador_bp.route('/comunicacion2')
+def comunicacion2():
+    return render_template('Administrador/Comunicación2.html')

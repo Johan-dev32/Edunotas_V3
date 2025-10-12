@@ -130,3 +130,7 @@ header .btn-dark {
 .table-striped{
   font-family: 'Trebuchet MS',sans-serif;
 }
+.btn-wasap {
+  margin-left: -1050px;
+  margin-bottom: 30px;
+} 

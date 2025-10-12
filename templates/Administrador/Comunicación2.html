@@ -146,23 +146,15 @@
 
   <!-- MAIN -->
   <h1 class="text-center titulo-principal">COMUNICACION</h1>
-  <p class="text-center descripcion">Envia mensajes o documentos por Gmail</p>
+  <p class="text-center descripcion">Envia mensajes o documentos por Whatsapp</p>
 
   <div class="container mt-5">
     <div class="row">
-      <div class="text-center mt-3">
-
-    <a href="{{ url_for('Administrador.comunicacion2') }}" 
-       class="btn btn-wasap text-white px-4 py-2 fw-bold"
-       style="background-color: #050733ff; border-radius: 8px;">
-       <i class="bi bi-arrow-repeat me-2"></i> O POR WHATSAPP
-    </a>
-  </div>
 
       <!-- Formulario -->
       <div class="col-md-6">
         <form action="{{ url_for('Administrador.enviar_correo') }}" method="POST" enctype="multipart/form-data" class="card p-3 mb-3">
-          <label for="emailDestino" class="form-label">Correo del destinatario</label>
+          <label for="emailDestino" class="form-label">Numero del Destinatario</label>
           <input type="email" id="emailDestino" name="destinatario" class="form-control mb-3" placeholder="ejemplo@colegio.edu" required>
 
           <label for="courseSelect" class="form-label">Ciclo</label>
@@ -185,7 +177,7 @@
           <input type="file" id="fileInput" name="archivo" class="form-control mb-3" required>
 
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success"><i class="bi bi-envelope-fill"></i> Enviar por Gmail</button>
+            <button type="submit" class="btn btn-success"><i class="bi bi-envelope-fill"></i> Enviar por Whatsapp</button>
             <button type="reset" class="btn btn-danger"><i class="bi bi-trash"></i> Limpiar</button>
           </div>
         </form>

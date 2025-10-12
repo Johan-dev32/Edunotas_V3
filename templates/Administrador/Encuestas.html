@@ -7,7 +7,7 @@
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/EditarEliminarEncuesta.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Encuesta.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
@@ -48,6 +48,7 @@
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
         <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
         <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
       </ul>
     </div>
@@ -76,7 +77,14 @@
      <li class=""><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
     </ul>
   </div>
+
   <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+  <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
+  <li class="nav-item"><a href="{{ url_for('Administrador.reporte') }}" class="nav-link text-white"><i class="bi bi-calendar2"></i></i> Generar reporte</a></li>
+
+  <li class="nav-item"><a href="{{ url_for('Administrador.inasistencias') }}" class="nav-link text-white"><i class="bi bi-card-checklist"></i></i></i> Inasistencias</a></li>
+
+
   <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios" role="button" aria-expanded="false" aria-controls="submenuUsuarios">
     <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
@@ -85,8 +93,9 @@
   <div class="collapse" id="submenuUsuarios">
     <ul class="nav flex-column ms-3">
       <li class="nav-item">
+
         <a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white">
-          <i class="bi bi-person-fill-gear"></i> Profesores
+          <i class="bi bi-person-fill-gear"></i>Profesores
         </a>
       </li>
       <li class="nav-item">
@@ -102,7 +111,6 @@
     </ul>
   </div>
 </li>
-
 
 <li class="nav-item">
   <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuEncuestas" role="button" aria-expanded="false" aria-controls="submenuEncuestas">
@@ -132,27 +140,34 @@
 
   <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+
  </ul>
  </div>
 </div>
 
-<div class="container mt-4">
-  <div class="row">
+<!-- CONTENIDO PRINCIPAL -->
+  <main class="menu-encuestas">
+    <h1>Gestión de Encuestas</h1>
+    <button class="btn-encuesta btn-crear" onclick="redirigir('{{ url_for('Administrador.crear_encuesta') }}')">
+      <i class="bi bi-file-earmark-plus-fill"></i> Crear Encuesta
+    </button>
+    <button class="btn-encuesta btn-editar" onclick="redirigir('{{ url_for('Administrador.editar_eliminar_encuesta') }}')">
+      <i class="bi bi-pencil-square"></i> Editar / Eliminar
+    </button>
+    <button class="btn-encuesta btn-resultados" onclick="redirigir('{{ url_for('Administrador.resultados_encuesta') }}')">
+      <i class="bi bi-bar-chart-fill"></i> Ver Resultados
+    </button>
+  </main>
 
-  <!-- CONTENIDO  -->
-
-
-
-  
-<script>
-    
-    const CREAR_ENCUESTA_URL = "{{ url_for('Administrador.crear_encuesta') }}";
-    console.log("DEBUG: CREAR_ENCUESTA_URL seteada en HTML:", CREAR_ENCUESTA_URL); 
-</script>
+  <script>
+    function redirigir(pagina) {
+      window.location.href = pagina;
+    }
+  </script>
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="{{ url_for('static', filename='js/Administrador/EditarEliminarEncuesta.js') }}"></script>
+
   
 </body>
 </html>

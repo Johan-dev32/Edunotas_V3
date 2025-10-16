@@ -52,98 +52,60 @@
         <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
         <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
         <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+        <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
       </ul>
     </div>
   </header>
 <!--  MENU  -->
-  <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
- <div class="offcanvas-header">
-  <h5 class="offcanvas-title">MENÚ</h5>
-</div>
-<div class="offcanvas1-body">
-  <ul class="nav flex-column">
-  <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
-  <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas">
-   <i class="bi bi-caret-down-fill"></i> Notas 
-  </a>
-
-  <div class="collapse" id="submenuNotas">
-    <ul class="nav flex-column ms-3">
-     <li class=""><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-    </ul>
-    <ul class="nav flex-column ms-3">
-     <li class=""><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
-    </ul>
-    <ul class="nav flex-column ms-3">
-     <li class=""><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
-    </ul>
+  <section class="bg-light py-5 mt-5">
+  <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">MENÚ</h5>
   </div>
+  <div class="offcanvas1-body">
+    <ul class="nav flex-column">
+          <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+          
+          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
+          <div class="collapse" id="submenuNotas">
+            <ul class="nav flex-column ms-3">
+              <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
+             <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
 
-  <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-  <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
-  <li class="nav-item"><a href="{{ url_for('Administrador.reporte') }}" class="nav-link text-white"><i class="bi bi-calendar2"></i></i> Generar reporte</a></li>
-  <li class="nav-item"><a href="{{ url_for('Administrador.inasistencias') }}" class="nav-link text-white"><i class="bi bi-card-checklist"></i></i></i> Inasistencias</a></li>
 
-  <li class="nav-item">
-  <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios" role="button" aria-expanded="false" aria-controls="submenuUsuarios">
-    <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
-  </a>
 
-  <div class="collapse" id="submenuUsuarios">
-    <ul class="nav flex-column ms-3">
-      <li class="nav-item">
+            </ul>
+          </div>
 
-        <a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white">
-          <i class="bi bi-person-fill-gear"></i>Profesores
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white">
-          <i class="bi bi-person-fill"></i> Acudientes
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white">
-          <i class="bi bi-mortarboard-fill"></i> Estudiantes
-        </a>
-      </li>
-    </ul>
+          <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+          <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
+
+          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
+            <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
+          </a>
+          <div class="collapse" id="submenuUsuarios">
+            <ul class="nav flex-column ms-3">
+              <li><a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
+              <li><a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
+              <li><a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
+              <li><a href="{{ url_for('Administrador.repitentes') }}" class="nav-link text-white"><i class="bi bi-person-dash"></i> Lista Estudiantes Repitentes</a></li>
+              <li><a href="{{ url_for('Administrador.registro') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Registro Usuarios</a></li>
+            </ul>
+          </div>
+
+
+
+
+
+          <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+          <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+          
+        </ul>
+      </div>
+    </div>
   </div>
-</li>
-
-<li class="nav-item">
-  <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuEncuestas" role="button" aria-expanded="false" aria-controls="submenuEncuestas">
-    <i class="bi bi-caret-down-fill"></i> Encuestas
-  </a>
-
-  <div class="collapse" id="submenuEncuestas">
-    <ul class="nav flex-column ms-3">
-      <li class="nav-item">
-        <a href="{{ url_for('Administrador.crear_encuesta') }}" class="nav-link text-white">
-          <i class="bi bi-file-earmark-plus-fill"></i> Crear Encuesta
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="{{ url_for('Administrador.editar_eliminar_encuesta') }}" class="nav-link text-white">
-          <i class="bi bi-pencil-square"></i> Editar / Eliminar Encuesta
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="{{ url_for('Administrador.resultados_encuesta') }}" class="nav-link text-white">
-          <i class="bi bi-bar-chart-fill"></i> Ver Resultados
-        </a>
-      </li>
-    </ul>
-  </div>
-</li>
-
-  <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
-  <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-
- </ul>
- </div>
-</div>
-
+</section>
   <!-- MAIN -->
   <h1 class="text-center titulo-principal">COMUNICACION</h1>
   <p class="text-center descripcion">Envia mensajes o documentos por Whatsapp</p>

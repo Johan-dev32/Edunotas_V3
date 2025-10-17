@@ -93,5 +93,6 @@ def reportes_estudiante():
 
 @Estudiante_bp.route('/manual')
 def manual():
-    return render_template('Estudiante/Manual.html')
+    return render_template('Estudiante/ManualUsuario.html')
+
 

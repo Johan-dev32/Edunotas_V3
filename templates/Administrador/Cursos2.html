@@ -133,49 +133,65 @@
 </div>
 
   <section class="container py-5 mt-5">
-    <h1 class="text-center mb-4 titulo-principal">LISTA DE CURSOS</h1>
+  <h1 class="text-center mb-4 titulo-principal">LISTA DE CURSOS</h1>
 
-    <!-- Formulario -->
-    <form id="formEstudiante" class="mb-4">
-      <div class="row g-3 align-items-center">
-        <div class="col-md-3">
-          <input type="text" id="nombre" class="form-control" placeholder="Nombre" required>
-        </div>
-        <div class="col-md-3">
-          <input type="text" id="ciclo" class="form-control" placeholder="Ciclo" required>
-        </div>
-        <div class="col-md-2">
-          <input type="text" id="curso" class="form-control" placeholder="Curso" required>
-        </div>
-        <div class="col-md-2">
-          <input type="number" id="promedio" class="form-control" placeholder="Promedio" step="0.1" min="1" max="5" required>
-        </div>
-        <div class="col-md-2 d-grid">
-          <button type="submit" class="btn btn-success">
-            <i class="bi bi-person-plus-fill"></i> Agregar
-          </button>
-        </div>
+  <!-- 🔹 Botones de redirección arriba del formulario -->
+  <div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
+    <a href="{{ url_for('Administrador.evaluaciones') }}" class="btn btn-primary">
+      <i class="bi bi-credit-card-2-front"></i> Evaluaciones
+    </a>
+    <a href="{{ url_for('Administrador.informe') }}" class="btn btn-primary">
+      <i class="bi bi-graph-up"></i> Informe Desempeño
+    </a>
+    <a href="{{ url_for('Administrador.asistencia') }}" class="btn btn-primary">
+      <i class="bi bi-clipboard2-check-fill"></i> Asistencia
+    </a>
+    <a href="{{ url_for('Administrador.inasistencias') }}" class="btn btn-primary">
+      <i class="bi bi-clipboard-check"></i> Inasistencia
+    </a>
+  </div>
+
+  <!-- 🔹 Formulario -->
+  <form id="formEstudiante" class="mb-4">
+    <div class="row g-3 align-items-center">
+      <div class="col-md-3">
+        <input type="text" id="nombre" class="form-control" placeholder="Nombre" required>
       </div>
-    </form>
-
-    <!-- Tabla -->
-    <div class="table-responsive">
-      <table class="table table-bordered text-center align-middle" id="tablaPromedios">
-       <thead>
-  <tr style="background-color: #050733ff; color: white;">
-    <th>Nombre</th>
-    <th>Ciclo</th>
-    <th>Curso</th>
-    <th>Promedio</th>
-    <th>Acciones</th>
-  </tr>
-</thead>
-        <tbody>
-          <!-- Filas dinámicas aquí -->
-        </tbody>
-      </table>
+      <div class="col-md-3">
+        <input type="text" id="ciclo" class="form-control" placeholder="Ciclo" required>
+      </div>
+      <div class="col-md-2">
+        <input type="text" id="curso" class="form-control" placeholder="Curso" required>
+      </div>
+      <div class="col-md-2">
+        <input type="number" id="promedio" class="form-control" placeholder="Promedio" step="0.1" min="1" max="5" required>
+      </div>
+      <div class="col-md-2 d-grid">
+        <button type="submit" class="btn btn-success">
+          <i class="bi bi-person-plus-fill"></i> Agregar
+        </button>
+      </div>
     </div>
-  </section>
+  </form>
+
+  <!-- 🔹 Tabla -->
+  <div class="table-responsive">
+    <table class="table table-bordered text-center align-middle" id="tablaPromedios">
+      <thead>
+        <tr style="background-color: #050733ff; color: white;">
+          <th>Nombre</th>
+          <th>Ciclo</th>
+          <th>Curso</th>
+          <th>Promedio</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Filas dinámicas aquí -->
+      </tbody>
+    </table>
+  </div>
+</section>
 
   <script>
     const urlCitacion = "{{ url_for('Administrador.citacion') }}";

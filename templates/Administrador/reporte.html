@@ -13,7 +13,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
-</head>
+
 <body>
   <header class="d-flex align-items-center p-3 border-bottom w-100">
     <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
@@ -52,14 +52,15 @@
       </ul>
     </div>
   </header>
-<!--  MENU  -->
- <section class="bg-light py-5 mt-5">
-  <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title">MENÚ</h5>
-  </div>
-  <div class="offcanvas1-body">
-    <ul class="nav flex-column">
+
+  <!--  MENU  -->
+  <section class="bg-light py-5 mt-5">
+    <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">MENÚ</h5>
+      </div>
+      <div class="offcanvas1-body">
+        <ul class="nav flex-column">
           <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
           
           <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
@@ -67,10 +68,7 @@
             <ul class="nav flex-column ms-3">
               <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
               <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
-             <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
-
-
-
+              <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
             </ul>
           </div>
 
@@ -90,28 +88,21 @@
             </ul>
           </div>
 
-
-
-
-
           <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
           <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-          
         </ul>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-
-<div class="container mt-5">
   <!-- ENCABEZADO NUEVO -->
   <div class="titulo-contenedor text-center mb-4">
     <h2 class="titulo-principal">REPORTE DE NOTAS</h2>
     <p class="subtitulo">Consulta y genera el reporte de calificaciones</p>
-     <button class="btn btn-primary">Generar Reporte</button>
   </div>
-
+  
+  <!-- CONTENIDO DEL REPORTE -->
+  <div id="reporte" class="container mt-5">
     <table class="table table-bordered">
       <thead class="table-dark">
         <tr>
@@ -125,10 +116,12 @@
           <th>Observación</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="tablaNotas">
         <!-- tus filas aquí -->
       </tbody>
     </table>
+
+    <button id="btnGenerar" class="btn btn-primary">Generar Reporte</button>
 
     <div class="mt-4">
       <h5>Recomendaciones del Docente:</h5>
@@ -136,13 +129,11 @@
     </div>
 
     <div class="mt-4 text-end">
-      <button class="btn btn-success">Descargar PDF</button>
+      <button id="btnPDF" class="btn btn-success">Descargar PDF</button>
     </div>
   </div>
-</div>
-
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="{{ url_for('static', filename='js/Administrador//reporte.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/Administrador/reporte.js') }}"></script>
 </body>
 </html>

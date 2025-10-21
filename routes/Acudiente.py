@@ -15,6 +15,10 @@ def paginainicio():
 def ver_notas_e_informes():
     return render_template('Acudiente/Notas_Informes.html')
 
+@Acudiente_bp.route('/ver_citaciones')
+def ver_citaciones():
+    return render_template('Acudiente/ver_citaciones.html')
+
 @Acudiente_bp.route('/inasistencias_justificadas')
 def inasistencias_justificadas():
     return render_template('Acudiente/InasistenciasJustificadas.html')
@@ -30,3 +34,7 @@ def comunicados():
 @Acudiente_bp.route('/ver_observador_estudiante')
 def ver_observador_estudiante():
     return render_template('Acudiente/ObservadorEstudiante.html')
+
+@Acudiente_bp.route('/historial_academico')
+def historial_academico():
+    return render_template('Acudiente/Historial_academico.html')

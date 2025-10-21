@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colegio Fe y Alegría</title>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Iconos -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- CSS propio -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Estudiante/SubidaEvidencias.css') }}">
+</head>
+<body>
+
+<header class="d-flex align-items-center p-3 border-bottom w-100">
+  <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+    <i class="bi bi-list"></i>
+  </button>
+  <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+
+  <div class="dropdown ms-auto">
+    <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-envelope-fill"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+      <li><a class="dropdown-item" href="#">Ajustes</a></li>
+      <li><a class="dropdown-item" href="#">Opción 2</a></li>
+      <li><a class="dropdown-item" href="#">Opción 3</a></li>
+    </ul>
+  </div>
+
+  <div class="dropdown">
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-lines-fill"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
+</header>
+
+<!-- Menu lateral -->
+<div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">MENÚ</h5>
+  </div>
+  <div class="offcanvas-body">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="{{ url_for('Estudiante.paginainicio') }}" class="nav-link text-white">
+          <i class="bi bi-house-fill"></i> Inicio
+        </a>
+      </li>
+          <li><a href="{{ url_for('Estudiante.vernotas') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+          <li><a href="{{ url_for('Estudiante.materias') }}" class="nav-link text-white"><i class="bi bi-journal-text"></i> Entrega de Tareas</a></li>
+          <li><a href="{{ url_for('Estudiante.materialestudiante') }}" class="nav-link text-white"><i class="bi bi-folder2-open"></i> Material Didáctico</a></li>
+          <li><a href="{{ url_for('Estudiante.evaluaciones') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Evaluaciones</a></li>
+          <li><a href="{{ url_for('Estudiante.verhorario') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Ver Horario</a></li>
+          <li><a href="{{ url_for('Estudiante.tutorias') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Tutorías</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="container">
+  <h1 class="titulo">TAREAS O ACTIVIDADES</h1><br><br>
+
+  <div class="container mt-5 actividad-container">
+    <div class="row">
+      <!-- Lado izquierdo -->
+
+
+    <!-- Bloque editable -->
+     <div class="col-lg-4">
+        <div class="card p-4 shadow-sm border-0">
+          <h3 class="fw-bold text-center mb-4">ACT {{ actividad_id }}</h3>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">📅 Fecha de entrega</label>
+            <p class="form-control bg-light">{{ fecha_entrega or "No especificada" }}</p>
+          </div>
+
+          <div>
+            <label class="form-label fw-semibold">⏰ Hora de entrega</label>
+            <p class="form-control bg-light">{{ hora_entrega or "No especificada" }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel Derecho -->
+      <div class="col-lg-8">
+        <div class="card p-4 shadow-sm border-0">
+          <h4 class="fw-bold mb-4">Detalles de la Actividad</h4>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Título de la Actividad</label>
+            <p class="form-control bg-light">{{ titulo_actividad or "Título no disponible" }}</p>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Instrucciones o Descripción</label>
+            <div class="form-control bg-light" style="min-height: 150px;">
+              {{ descripcion_actividad or "Sin descripción disponible." }}
+            </div>
+          </div>
+
+          <!-- Archivo PDF -->
+          {% if actividad and actividad.PDF %}
+            <div class="upload-box border rounded py-5 mb-3 text-center">
+              <a href="{{ url_for('static', filename='uploads/' + pdf_nombre) }}" target="_blank" class="text-decoration-none">
+                <i class="bi bi-file-earmark-pdf-fill fs-1 text-danger"></i>
+                <p class="mt-2 fw-semibold text-dark">Ver archivo adjunto (PDF)</p>
+              </a>
+            </div>
+          {% else %}
+            <div class="upload-box border rounded py-5 mb-3 text-center text-muted">
+              <i class="bi bi-file-earmark fs-1"></i>
+              <p class="mt-2 fw-semibold">No hay archivo adjunto disponible</p>
+            </div>
+          {% endif %}
+
+          <form action="{{ url_for('Estudiante.enviar_evidencia', id_actividad=actividad_id) }}" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label for="archivo" class="form-label fw-semibold">📤 Subir tu evidencia</label>
+              <input class="form-control" type="file" name="archivo" id="archivo" required>
+            </div>
+            <button class="btn btn-primary w-100" type="submit">Enviar evidencia</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/Docente/registro_tareas3.js') }}"></script>
+</body>
+</html>

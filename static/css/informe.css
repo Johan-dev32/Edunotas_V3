@@ -2,6 +2,7 @@ body {
   background-color: #f8f9fa; 
   font-family: 'Trebuchet MS', sans-serif;
   color: #212529;
+
 }
 
 /* navbar */
@@ -82,80 +83,54 @@ header .btn-dark {
 
 }
 
-.titulo-principal {
-  font-size: 3rem;      
-  font-weight: 900;      
-  color: #050733ff;
-  margin-top: -30px;      
+h1 {
+  color: #212529; 
+  font-weight: bold;
 }
 
-.subtitulo {
-  font-size: 2rem;       
-  font-weight: 700;
-  color: #050733ff;        
+h3 {
+  color: #212529;
+  margin-top: 30px;
 }
 
-.descripcion {
-  font-size: 1.3rem;     
-  color: #555;           
+.table thead {
+  background-color: #212529;
+  color: white;
 }
 
-.btn-icon i {
-  font-size: 1.1rem;
-  color: #0d0d4d;
-  transition: 0.3s;
+.table tbody tr:hover {
+  background-color: #f2f2f2;
 }
 
-.btn-icon i:hover {
-  color: #198754; /* verde Bootstrap */
-}
-
-#tablaPromedios {
-  max-width: 100%;
-}
-
-.table td {
-  vertical-align: middle;
-}
-/* Encabezado azul oscuro */
-#tablaPromedios thead tr {
-  background-color: #050733ff !important;
-  color: #ffffff !important;
-}
-
-/* Filas existentes (por defecto de Bootstrap, fondo blanco) */
-#tablaPromedios tbody tr {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-}
-
-/* Efecto hover en filas existentes */
-#tablaPromedios tbody tr:hover {
-  background-color: #f1f1f1 !important;
-}
-
-/* Filas NUEVAS (con clase .nuevo-registro que pones desde JS) */
-#tablaPromedios tbody tr.nuevo-registro {
-  background-color: #050733ff !important;
-  color: #ffffff !important;
-}
-
-/* Hover en nuevas filas */
-#tablaPromedios tbody tr.nuevo-registro:hover {
-  background-color: #1a1d4d !important;
-}
-.btn-primary {
-  background-color: #050733ff;
-  border: none;
-  font-weight: 600;
-}
-
-.btn-primary:hover {
-  background-color: #1a1d4d;
-}
-
-.d-flex.gap-3 a {
-  font-size: 1.1rem;
+.container {
+  background: white;
+  padding: 25px;
   border-radius: 10px;
-  padding: 10px 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+select.form-select {
+  border: 2px solid #212529;
+}
+
+.charts-section {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+canvas {
+  width: 100% !important;
+  height: 250px !important;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.6rem;
+  }
+  h3 {
+    font-size: 1.2rem;
+  }
 }

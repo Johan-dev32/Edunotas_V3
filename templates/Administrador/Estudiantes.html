@@ -153,104 +153,96 @@
 <div class="container mt-4 mb-5 form-container p-4 rounded shadow">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2 class="fw-bold text-center flex-grow-1">Registrar Estudiante</h2>
-      <div class="usuario-icon">
-        <i class="bi bi-person-circle fs-3"></i>
-        <small>Usuario</small>
-      </div>
     </div>
     <p class="text-center fw-semibold">Por Favor Diligencie Todos Los Campos</p>
 
-    <!-- Datos Básicos -->
-    <h5 class="mt-4 mb-3 fw-bold">Datos Básicos</h5>
-    <div class="row g-3 align-items-center">
-      <!-- Foto -->
-      <div class="col-md-3 text-center">
-        <div class="border p-2 rounded upload-box">
-          <p>Sube una foto de perfil...</p>
-          <button class="btn btn-primary btn-sm">
-            <i class="bi bi-camera"></i> Tomar Foto
-          </button>
+    <form method="POST" action="{{ url_for('Administrador.agregar_estudiante') }}">
+  <h5 class="mt-4 mb-3 fw-bold">Datos Básicos</h5>
+
+  <div class="row g-3 align-items-center">
+    <div class="col-md-9">
+      <label class="form-label">Nombres:</label>
+      <input type="text" class="form-control" name="Nombre" required>
+
+      <label class="form-label mt-2">Apellidos:</label>
+      <input type="text" class="form-control" name="Apellido" required>
+
+      <div class="row mt-2">
+        <div class="col-md-6">
+          <label class="form-label">Tipo de Documento:</label>
+          <select class="form-select" name="TipoDocumento" required>
+            <option value="">Seleccione...</option>
+            <option value="TI">TI</option>
+            <option value="CC">CC</option>
+            <option value="CE">CE</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Número de Documento:</label>
+          <input type="text" class="form-control" name="NumeroDocumento" required>
         </div>
       </div>
-
-      <!-- Nombre y documento -->
-      <div class="col-md-9">
-        <div class="mb-3">
-          <label class="form-label">Nombres y Apellidos:</label>
-          <input type="text" class="form-control" placeholder="Mateo Castro">
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <label class="form-label">Tipo de Documento:</label>
-            <select class="form-select">
-              <option selected>Seleccione...</option>
-              <option value="TI">TI</option>
-              <option value="CC">CC</option>
-              <option value="CE">CE</option>
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Número de Documento:</label>
-            <input type="text" class="form-control" placeholder="1628746243">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Fecha y otros datos -->
-    <div class="row mt-3">
-      <div class="col-md-4">
-        <label class="form-label">Fecha de Nacimiento:</label>
-        <input type="date" class="form-control">
-      </div>
-      <div class="col-md-2">
-        <label class="form-label">Tipo de Sangre:</label>
-        <input type="text" class="form-control" placeholder="A+">
-      </div>
-      <div class="col-md-3">
-        <label class="form-label">EPS:</label>
-        <input type="text" class="form-control" placeholder="Famisanar">
-      </div>
-      <div class="col-md-3">
-        <label class="form-label">Correo:</label>
-        <input type="email" class="form-control" placeholder="mateito_12344@gmail.com">
-      </div>
-    </div>
-
-    <div class="row mt-3">
-      <div class="col-md-4">
-        <label class="form-label">Número de Teléfono:</label>
-        <input type="tel" class="form-control" placeholder="3204856395">
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">Curso:</label>
-        <select class="form-select">
-          <option selected>Seleccionar Curso</option>
-          <option>1103</option><option>1102</option><option>1101</option>
-          <option>1003</option><option>1002</option><option>1001</option>
-          <option>903</option><option>902</option><option>901</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Datos del acudiente -->
-    <h5 class="mt-4 mb-3 fw-bold">Datos del Acudiente</h5>
-    <div class="row">
-      <div class="col-md-6">
-        <label class="form-label">Nombre:</label>
-        <input type="text" class="form-control" placeholder="Nombre del acudiente">
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">Número de Teléfono:</label>
-        <input type="tel" class="form-control" placeholder="3204843995">
-      </div>
-    </div>
-
-    <!-- Botón -->
-    <div class="text-center mt-4">
-      <button class="btn btn-primary px-4">Registrar Estudiante</button>
     </div>
   </div>
+
+  <div class="row mt-3">
+    <div class="col-md-4">
+      <label class="form-label">Fecha de Nacimiento:</label>
+      <input type="date" class="form-control" name="FechaNacimiento" required>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Tipo de Sangre:</label>
+      <input type="text" class="form-control" name="TipoSangre">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">EPS:</label>
+      <input type="text" class="form-control" name="EPS">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Correo:</label>
+      <input type="email" class="form-control" name="Correo" required>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-md-4">
+      <label class="form-label">Teléfono:</label>
+      <input type="tel" class="form-control" name="Telefono" required>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Dirección:</label>
+      <input type="text" class="form-control" name="Direccion">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Curso:</label>
+      <select class="form-select" name="Curso">
+        <option selected>Seleccionar Curso</option>
+        <option>1103</option><option>1102</option><option>1101</option>
+        <option>1003</option><option>1002</option><option>1001</option>
+        <option>903</option><option>902</option><option>901</option>
+        <option>803</option><option>802</option><option>801</option>
+        <option>703</option><option>702</option><option>701</option>
+        <option>603</option><option>602</option><option>601</option>
+      </select>
+    </div>
+  </div>
+
+  <h5 class="mt-4 mb-3 fw-bold">Datos del Acudiente</h5>
+  <div class="row">
+    <div class="col-md-6">
+      <label class="form-label">Nombre del Acudiente:</label>
+      <input type="text" class="form-control" name="NombreAcudiente">
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Teléfono del Acudiente:</label>
+      <input type="tel" class="form-control" name="TelefonoAcudiente">
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <button type="submit" class="btn btn-primary px-4">Registrar Estudiante</button>
+  </div>
+</form>
 
   <!-- Bootstrap JS -->
 

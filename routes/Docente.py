@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from flask_mail import Message
+from werkzeug.utils import secure_filename
 from Controladores.models import db, Docente_Asignatura, Programacion, Asistencia, Detalle_Asistencia, Actividad, Actividad_Estudiante, Observacion, Notificacion
 import os
 from Controladores.models import (
@@ -49,13 +50,100 @@ def resumensemanal():
 def registrotutorias():
     return render_template('Docentes/RegistroTutorías.html')
 
-@Docente_bp.route('/tareas_actividades')
-def tareas_actividades():
-    return render_template('Docentes/Registrar_Tareas_Actividades.html')
+@Docente_bp.route('/tareas_actividades1')
+def tareas_actividades1():
+    return render_template('Docentes/Registrar_Tareas_Actividades1.html')
 
-@Docente_bp.route('/tareas_actividades2')
-def tareas_actividades2():
-    return render_template('Docentes/Registrar_Tareas_Actividades2.html')
+@Docente_bp.route('/tareas_actividades2/<int:curso_id>')
+def tareas_actividades2(curso_id):
+    return render_template('Docentes/Registrar_Tareas_Actividades2.html',  # 👈 corregido
+                           curso_id=curso_id,
+                           actividades=actividades)
+
+
+@Docente_bp.route('/tareas_actividades3/<int:curso_id>/<int:actividad_id>')
+def tareas_actividades3(curso_id, actividad_id):
+    # Buscar la actividad correspondiente
+    actividad = next((a for a in actividades if a["id"] == actividad_id), None)
+
+    if not actividad:
+        flash("No se encontró la actividad seleccionada.", "warning")
+        return redirect(url_for('Docente.tareas_actividades', curso_id=curso_id))
+
+    pdf_url = None
+    if actividad.get("pdf_nombre"):
+        pdf_url = url_for('static', filename=f'uploads/{actividad["pdf_nombre"]}')
+
+    return render_template('Docentes/Registrar_Tareas_Actividades3.html',
+                           curso_id=curso_id,
+                           actividad_id=actividad_id,
+                           titulo_actividad=actividad["titulo"],
+                           descripcion_actividad=actividad["instrucciones"],
+                           fecha_entrega=actividad["fecha"],
+                           hora_entrega=actividad["hora"],
+                           pdf_url=pdf_url)
+
+
+    
+actividades = []
+
+# -------------------------------
+# Mostrar lista de actividades
+# -------------------------------
+@Docente_bp.route('/tareas_actividades/<int:curso_id>')
+def tareas_actividades(curso_id):
+    return render_template('Docentes/Registrar_Tareas_Actividades2.html',  # 👈 corregido
+                           curso_id=curso_id,
+                           actividades=actividades)
+
+
+# -------------------------------
+# Crear nueva actividad
+# -------------------------------
+from werkzeug.utils import secure_filename
+import os
+from flask import request, redirect, url_for, render_template, flash
+
+@Docente_bp.route('/crear_actividad/<int:curso_id>', methods=['GET', 'POST'])
+@login_required
+def crear_actividad(curso_id):
+    if request.method == 'POST':
+        titulo = request.form.get('titulo')
+        instrucciones = request.form.get('instrucciones')
+        fecha = request.form.get('fecha')
+        hora = request.form.get('hora')
+
+        pdf_file = request.files.get('pdfUpload')
+        pdf_nombre = None
+        if pdf_file and pdf_file.filename != '':
+            upload_folder = os.path.join(os.getcwd(), 'static', 'uploads')
+            os.makedirs(upload_folder, exist_ok=True)
+            pdf_nombre = secure_filename(pdf_file.filename)
+            pdf_path = os.path.join(upload_folder, pdf_nombre)
+            pdf_file.save(pdf_path)
+
+        # Guardar en la base de datos
+        nueva_actividad = Actividad(
+            Titulo=titulo,
+            Tipo=instrucciones,
+            Fecha=fecha,
+            Estado='Pendiente',
+            ID_Curso=curso_id
+        )
+        db.session.add(nueva_actividad)
+        db.session.commit()
+
+        flash('Actividad creada correctamente ✅', 'success')
+        return redirect(url_for('Docente.tareas_actividades', curso_id=curso_id))
+
+    return render_template('Docentes/Crear_Actividad.html', curso_id=curso_id)
+    
+@Docente_bp.route('/editar_actividad/<int:id_actividad>')
+def editar_actividad(id_actividad):
+    # Temporalmente solo muestra un mensaje o plantilla vacía
+    return f"Editar actividad {id_actividad} (en construcción)"
+
+
 
 @Docente_bp.route('/aprobacion_academica')
 def aprobacion_academica():

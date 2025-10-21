@@ -10,40 +10,52 @@
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <!-- CSS propio -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/Cursos2.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/informe.css') }}">
 </head>
-
 <body>
   <header class="d-flex align-items-center p-3 border-bottom w-100">
-    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
       <i class="bi bi-list"></i>
     </button>
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
+
     <div class="dropdown ms-auto">
-      <button class="btn btn-edunotas position-relative dropdown-toggle" data-bs-toggle="dropdown">
+      <button 
+        class="btn btn-edunotas position-relative dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton1" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
         <span class="bi bi-envelope-fill"></span>
       </button>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
         <li><a class="dropdown-item" href="#">Ajustes</a></li>
         <li><a class="dropdown-item" href="#">Opción 2</a></li>
+        <li><a class="dropdown-item" href="#">Opción 3</a></li>
       </ul>
     </div>
 
+
     <div class="dropdown">
-      <button class="btn btn-usuario dropdown-toggle" data-bs-toggle="dropdown">
+      <button 
+        class="btn btn-usuario dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton2" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
         <span class="bi bi-person-lines-fill"></span>
       </button>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+
         <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
         <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
         <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
       </ul>
     </div>
   </header>
-
-  <!-- MENU -->
-   <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
+<!--  MENU  -->
+  <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
  <div class="offcanvas-header">
   <h5 class="offcanvas-title">MENÚ</h5>
 </div>
@@ -69,7 +81,6 @@
   <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
   <li class="nav-item"><a href="{{ url_for('Administrador.reporte') }}" class="nav-link text-white"><i class="bi bi-calendar2"></i></i> Generar reporte</a></li>
-
   <li class="nav-item"><a href="{{ url_for('Administrador.inasistencias') }}" class="nav-link text-white"><i class="bi bi-card-checklist"></i></i></i> Inasistencias</a></li>
 
   <li class="nav-item">
@@ -132,71 +143,83 @@
  </div>
 </div>
 
-  <section class="container py-5 mt-5">
-  <h1 class="text-center mb-4 titulo-principal">LISTA DE CURSOS</h1>
-
-  <!-- 🔹 Botones de redirección arriba del formulario -->
-  <div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
-    <a href="{{ url_for('Administrador.evaluaciones') }}" class="btn btn-primary">
-      <i class="bi bi-credit-card-2-front"></i> Evaluaciones
-    </a>
-    <a href="{{ url_for('Administrador.informe') }}" class="btn btn-primary">
-      <i class="bi bi-graph-up"></i> Informe Desempeño
-    </a>
-    <a href="{{ url_for('Administrador.asistencia') }}" class="btn btn-primary">
-      <i class="bi bi-clipboard2-check-fill"></i> Asistencia
-    </a>
-    <a href="{{ url_for('Administrador.inasistencias') }}" class="btn btn-primary">
-      <i class="bi bi-clipboard-check"></i> Inasistencia
-    </a>
+  <!-- SIDEBAR (sin cambios) -->
+  <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
+    <!-- contenido del sidebar -->
   </div>
 
-  <!-- 🔹 Formulario -->
-  <form id="formEstudiante" class="mb-4">
-    <div class="row g-3 align-items-center">
-      <div class="col-md-3">
-        <input type="text" id="nombre" class="form-control" placeholder="Nombre" required>
-      </div>
-      <div class="col-md-3">
-        <input type="text" id="ciclo" class="form-control" placeholder="Ciclo" required>
-      </div>
-      <div class="col-md-2">
-        <input type="text" id="curso" class="form-control" placeholder="Curso" required>
-      </div>
-      <div class="col-md-2">
-        <input type="number" id="promedio" class="form-control" placeholder="Promedio" step="0.1" min="1" max="5" required>
-      </div>
-      <div class="col-md-2 d-grid">
-        <button type="submit" class="btn btn-success">
-          <i class="bi bi-person-plus-fill"></i> Agregar
-        </button>
+  <!-- CONTENIDO -->
+  <div class="container mt-4">
+    <h1 class="text-center mb-4">Informe de Desempeño - EduNotas</h1>
+
+    <!-- Selector -->
+    <div class="mb-3">
+      <label for="cicloSelect" class="form-label">Seleccionar ciclo:</label>
+      <select id="cicloSelect" class="form-select">
+        <option value="">Seleccione un ciclo</option>
+        <option value="1">Primer Ciclo</option>
+        <option value="2">Segundo Ciclo</option>
+        <option value="3">Tercer Ciclo</option>
+      </select>
+    </div>
+
+    <!-- Tabla grupo -->
+    <div class="table-responsive mb-4">
+      <table class="table table-bordered text-center" id="tablaGrupo">
+        <thead class="table-dark">
+          <tr>
+            <th>Grado</th>
+            <th>Curso</th>
+            <th>Director de Grupo</th>
+            <th>N° de Estudiantes</th>
+            <th>Promedio del Grupo</th>
+            <th>Puesto del Grupo</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Estudiantes -->
+    <h3 class="mb-3">Listado de Estudiantes</h3>
+    <div class="table-responsive mb-5">
+      <table class="table table-striped" id="tablaEstudiantes">
+        <thead class="table-danger">
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Asistencias</th>
+            <th>Fallas</th>
+            <th>Retardos</th>
+            <th>Observaciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Gráficas -->
+    <div class="charts-section">
+      <h3 class="text-center mb-3">Gráficas de Rendimiento</h3>
+      <div class="row">
+        <div class="col-md-4"><canvas id="graficaAcademica"></canvas></div>
+        <div class="col-md-4"><canvas id="graficaAsistencia"></canvas></div>
+        <div class="col-md-4"><canvas id="graficaConducta"></canvas></div>
       </div>
     </div>
-  </form>
-
-  <!-- 🔹 Tabla -->
-  <div class="table-responsive">
-    <table class="table table-bordered text-center align-middle" id="tablaPromedios">
-      <thead>
-        <tr style="background-color: #050733ff; color: white;">
-          <th>Nombre</th>
-          <th>Ciclo</th>
-          <th>Curso</th>
-          <th>Promedio</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Filas dinámicas aquí -->
-      </tbody>
-    </table>
   </div>
-</section>
 
-  <script>
-    const urlCitacion = "{{ url_for('Administrador.citacion') }}";
-  </script>
-  <script src="{{ url_for('static', filename='js/Administrador/Cursos2.js') }}"></script>
+  <!-- Botones -->
+  <div class="text-center mt-4 mb-5">
+    <button id="btnPDF" class="btn btn-danger me-2">Exportar PDF</button>
+    <button id="btnExcel" class="btn btn-success">Exportar Excel</button>
+  </div>
+
+  <!-- Librerías -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/Administrador/informe.js') }}"></script>
 </body>
 </html>

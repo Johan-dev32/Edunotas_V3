@@ -21,6 +21,9 @@ header {
   margin: 0;
   margin-left: 60px;
 }
+.titulo-principal{
+  margin-top: -120px !important;
+}
 
 header .btn-dark {
   background-color: #050733ff;

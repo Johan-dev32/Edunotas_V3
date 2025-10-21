@@ -449,6 +449,10 @@ def observador():
 def calculo_promedio():
     return render_template('Administrador/CalculoPromedio.html')
 
+@Administrador_bp.route('/encuesta')
+def encuesta():
+    return render_template('Administrador/Encuestas.html')
+
 @Administrador_bp.route('/crear_encuesta')
 def crear_encuesta():
     return render_template('Administrador/CrearEncuesta.html')
@@ -733,3 +737,6 @@ def configuracion_academica2():
 def configuracion_academica3():
     return render_template('Administrador/ConfiguracionAcademica3.html')
 
+@Administrador_bp.route('/comunicacion2')
+def comunicacion2():
+    return render_template('Administrador/Comunicación2.html')

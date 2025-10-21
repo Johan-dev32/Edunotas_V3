@@ -54,3 +54,44 @@ def materias():
 @Estudiante_bp.route('/tareas_actividades')
 def tareas_actividades():
     return render_template('Estudiante/TareasActividades.html')
+
+@Estudiante_bp.route('/notas_consultar')
+def notas_consultar():
+    return render_template('Estudiante/NotasConsultar.html')
+
+@Estudiante_bp.route('/notas_registro')
+def notas_registro():
+    return render_template('Estudiante/NotasRegistro.html')
+
+@Estudiante_bp.route('/calculo_promedio')
+def calculo_promedio():
+    return render_template('Estudiante/CalculoPromedio.html')
+
+@Estudiante_bp.route('/observador')
+def observador():  
+    return render_template('Estudiante/Observador.html')
+
+@Estudiante_bp.route('/aprobacion_academica')
+def aprobacion_academica():
+    return render_template('Estudiante/AprobacionAcademica.html')
+
+@Estudiante_bp.route('/citaciones')
+def citaciones():
+    return render_template('Estudiante/Citaciones.html')
+
+@Estudiante_bp.route('/historial_academico')
+def historial_academico():
+    return render_template('Estudiante/HistorialAcademico.html')
+
+@Estudiante_bp.route('/certificados')
+def certificados():
+    return render_template('Estudiante/Certificados.html')
+
+@Estudiante_bp.route('/reportes_estudiante')
+def reportes_estudiante():
+    return render_template('Estudiante/ReportesEstudiante.html')
+
+@Estudiante_bp.route('/manual')
+def manual():
+    return render_template('Estudiante/Manual.html')
+

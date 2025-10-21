@@ -48,15 +48,19 @@ header .btn-dark {
   background: linear-gradient(180deg, #11064e, #ffffff);
   border-radius: 8px;
 }
-.titulo-principal{
- margin-top: 20px;
- font-weight: bolder;
+
+.titulo-principal {
+  font-size: 40px;
+  font-weight: bolder;
+  color: #050733ff;
+  margin: 0;
 }
+
 .descripcion {
   font-size: 1.3rem;     
   color: #555;           
-
 }
+
 .offcanvas {
   font-size: 25px;
 }
@@ -66,7 +70,6 @@ header .btn-dark {
   font-weight: bold;
   font-size: 30px;
 }
-
 
 .offcanvas1-body {
   flex-grow: 1;
@@ -78,12 +81,12 @@ header .btn-dark {
   font-weight: bold;
   font-size: 22px;
 }
+
 #sidebar .nav-link {
-  font-size: 18px;   /* tamaño menú hamburguesa */
+  font-size: 18px;
   font-weight: bold;
   margin-bottom: 10px;
 }
-
 
 header h2 {
   font-size: 1.3rem;
@@ -110,4 +113,50 @@ header h2 {
 
 .btn-report {
   float: right;
+}
+
+/* 🔹 Encabezado tipo "Gestión de Asignaturas" */
+.titulo-contenedor {
+  text-align: center;
+  margin-top: 60px;
+  margin-bottom: 40px;
+}
+
+.titulo-principal {
+  font-size: 42px;
+  font-weight: 900;
+  color: #050733ff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.subtitulo {
+  font-size: 17px;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* 🔹 Contenedor de tarjeta igual estilo */
+.card {
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: none;
+  padding: 20px 30px;
+}
+
+/* 🔹 Botón principal */
+.btn-report {
+  background-color: #050733ff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.btn-report:hover {
+  background-color: #23295d;
 }

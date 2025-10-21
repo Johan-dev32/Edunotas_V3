@@ -1,7 +1,42 @@
 body {
+  background-color: #f8f9fa; 
+  font-family: 'Trebuchet MS', sans-serif;
+  color: #212529;
+}
+
+/* navbar */
+header {
+  background-color: white;
+  color: #050733ff;
   font-family: 'Trebuchet MS', sans-serif;
 }
 
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas {
+  background-color: #050733ff;
+  color: #fff;
+}
+
+.btn-usuario {
+  background-color: #050733ff;
+  color: #fff;
+  margin-left: 10px;
+}
+
+/*  menu_des  */
 #sidebar {
   width: 220px;
   min-height: 100vh;
@@ -12,299 +47,131 @@ body {
   background: linear-gradient(180deg, #11064e, #ffffff);
   border-radius: 8px;
 }
-header {
-  background-color: rgb(255, 255, 255); /* azul */
-  color: rgb(255, 0, 0); /* texto en blanco */
+
+.offcanvas {
+  font-size: 25px;
 }
 
-/* Cambiar color del título */
-.titulo-header {
- 
-  color: #050733ff;
-  font-size: 40px;
-  font-weight: bolder;
-  font-family: 'Trebuchet MS', sans-serif;
-  margin: 0;
-  margin-left: 60px;  /* lo acercas/separas de la izquierda */
+.offcanvas-title {
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px;
 }
 
-/* Botón hamburguesa con color claro */
-header .btn-dark {
-  background-color: #050733ff;
-  border: none;
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
 }
 
 
-/* Botón de iniciar sesión */
-header .btn-outline-primary {
-  color: #050733ff;
-  border-color: #050733ff;
-  margin-left: 900px;
-
-}
-
-.btn-edunotas {
-    background-color: #050733ff; 
-    color: rgb(255, 255, 255);        
-    margin-left: 800px;
-
-}
-.btn-usuario {
-  background-color: #050733ff; 
-    color: rgb(255, 255, 255);        
-    margin-left: 10px;
-}
-
-
-header .btn-outline-primary:hover {
-  background-color: white;
-  color: #ffffff;
-}
-/* Menú lateral */
-.sidebar {
-  position: fixed;
-  left: -250px;
-  top: 0;
-  width: 250px;
-  height: 100%;
-  background: linear-gradient(to bottom, #3a7bd5, #3a6073, #e96443);
-  color: white;
-  padding: 20px;
-  transition: 0.3s;
-  z-index: 1000;
-}
-
-.sidebar h2 {
-  margin-bottom: 20px;
+.nav-item {
+  font-weight: bold;
   font-size: 22px;
 }
-
-.sidebar a {
-  display: block;
-  color: white;
-  text-decoration: none;
-  margin: 15px 0;
-  font-size: 18px;
-  transition: 0.2s;
-}
-
-.sidebar a:hover {
+#sidebar .nav-link {
+  font-size: 18px;   /* tamaño menú hamburguesa */
   font-weight: bold;
-}
-
-/* Capa oscura */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  z-index: 900;
-}
-
-h2 {
   margin-bottom: 10px;
 }
-
-table {
-  border-collapse: collapse;
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
-}
-
-button {
-  padding: 8px 15px;
-  margin-top: 10px;
-  cursor: pointer;
-}
-body {
-  font-family: 'Trebuchet MS', sans-serif;
-}
-
-#sidebar {
-  width: 220px;
-  min-height: 100vh;
-  background: linear-gradient(180deg, #3b61ea, #fc8e75);
-}
-
-#sidebar .nav-link:hover {
-  background: linear-gradient(180deg, #3b61ea, #fc8e75);
-  border-radius: 8px;
-}
-header {
-  background-color: rgb(255, 255, 255); /* azul */
-  color: rgb(255, 0, 0); /* texto en blanco */
-}
-
-/* Cambiar color del título */
-.titulo-header {
- 
+.titulo-principal {
   color: #050733ff;
-  font-size: 40px;
+  font-size: 2rem;
+  letter-spacing: 1px;
   font-weight: bolder;
-  font-family: 'Trebuchet MS', sans-serif;
-  margin: 0;
-  margin-left: 60px;  /* lo acercas/separas de la izquierda */
 }
 
-/* Botón hamburguesa con color claro */
-header .btn-dark {
+.descripcion {
+  font-size: 1rem;
+  color: #555;
+}
+
+
+.table-azul th {
+  background-color: #050733ff !important;
+  color: white !important;
+  border: none !important;
+}
+
+.table-azul th:first-child {
+  border-top-left-radius: 10px;
+}
+.table-azul th:last-child {
+  border-top-right-radius: 10px;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+.table tbody tr:hover {
+  background-color: #e1e5ff;
+}
+
+.text-azul {
+  color: #050733ff;
+}
+/* ===== MODAL PERSONALIZADO ===== */
+#modalFormulario {
+  position: fixed;
+  inset: 0;
+  display: none; /* oculto por defecto */
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1050;
+}
+
+/* Cuando el modal está visible (tu JS le quita la clase .oculto) */
+#modalFormulario:not(.oculto) {
+  display: flex;
+}
+
+/* Contenedor del contenido del modal */
+.modal-content {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 25px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  animation: aparecer 0.2s ease-in-out;
+}
+
+/* Animación de entrada */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Encabezado del modal */
+.modal-content h5 {
+  color: #050733ff;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* Botones dentro del modal */
+.modal-content .btn-success {
   background-color: #050733ff;
   border: none;
 }
 
-
-/* Botón de iniciar sesión */
-header .btn-outline-primary {
-  color: #050733ff;
-  border-color: #050733ff;
-  margin-left: 900px;
-
+.modal-content .btn-success:hover {
+  background-color: #1a1773;
 }
 
-.btn-edunotas {
-    background-color: #050733ff; 
-    color: rgb(255, 255, 255);        
-    margin-left: 800px;
-
-}
-.btn-usuario {
-  background-color: #050733ff; 
-    color: rgb(255, 255, 255);        
-    margin-left: 10px;
+.modal-content .btn-secondary {
+  background-color: #6c757d;
+  border: none;
 }
 
-
-header .btn-outline-primary:hover {
-  background-color: white;
-  color: #ffffff;
-}
-/* Menú lateral */
-.sidebar {
-  position: fixed;
-  left: -250px;
-  top: 0;
-  width: 250px;
-  height: 100%;
-  background: linear-gradient(to bottom, #3a7bd5, #3a6073, #e96443);
-  color: white;
-  padding: 20px;
-  transition: 0.3s;
-  z-index: 1000;
-}
-
-.sidebar h2 {
-  margin-bottom: 20px;
-  font-size: 22px;
-}
-
-.sidebar a {
-  display: block;
-  color: white;
-  text-decoration: none;
-  margin: 15px 0;
-  font-size: 18px;
-  transition: 0.2s;
-}
-
-.sidebar a:hover {
-  font-weight: bold;
-}
-
-/* Capa oscura */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  z-index: 900;
-}
-.container1 {
-    margin: 3%;
-}
-
-.container2 {
-    margin: 3%;
-}
-
-.oculto {
-  display: none;
-}
- 
-
-/* Fondo oscuro semitransparente */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Fondo negro translúcido */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000; /* Encima de todo */
-}
-
-/* Contenedor del formulario (el cuadro blanco) */
-.modal-contenido {
-  background-color: #fff;
-  padding: 30px 25px;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-  width: 100%;
-  max-width: 400px;
-}
-
-/* Oculta el modal con esta clase */
-.oculto {
-  display: none;
-}
-
-/* Estilos generales del formulario */
-.modal-contenido h2 {
-  margin-top: 0;
-  font-size: 22px;
-}
-
-.modal-contenido label {
-  display: block;
-  margin-top: 10px;
-  font-weight: bold;
-}
-
-.modal-contenido input {
-  width: 100%;
-  padding: 8px;
-  margin-top: 4px;
-  box-sizing: border-box;
-}
-
-.acciones {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-.acciones button {
-  padding: 8px 16px;
-  border: 1px solid #999;
-  background-color: #f0f0f0;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.acciones button:hover {
-  background-color: #e0e0e0;
+.modal-content .btn-secondary:hover {
+  background-color: #5a6268;
 }

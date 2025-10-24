@@ -54,7 +54,7 @@ class Acudiente(db.Model):
 
 
 # -----------------------------------------------------
-# Notificaciòn(nuevo)
+# Notificación(nuevo)
 # -----------------------------------------------------
 class Notificacion(db.Model):
     __tablename__ = "Notificacion"
@@ -98,13 +98,21 @@ class Matricula(db.Model):
     ID_Matricula = db.Column(Integer, primary_key=True, autoincrement=True)
     ID_Estudiante = db.Column(Integer, ForeignKey('Usuario.ID_Usuario'), nullable=False)
     ID_Curso = db.Column(Integer, ForeignKey('Curso.ID_Curso'), nullable=False)
-    AnioLectivo = db.Column(YEAR, nullable=False)
+    Correo = db.Column(String(150))
+    FechaNacimiento = db.Column(Date)
+    DepNacimiento = db.Column(String(100))
+    TipoDocumento = db.Column(String(50))
+    NumeroDocumento = db.Column(String(50))
+    AnioLectivo = db.Column(Integer, nullable=False)
 
     # Relaciones
     estudiante = relationship('Usuario', back_populates='matriculas', foreign_keys=[ID_Estudiante])
     curso = relationship('Curso', back_populates='matriculas', foreign_keys=[ID_Curso])
     observaciones = relationship('Observacion', back_populates='matricula', lazy='dynamic')
     actividades_estudiante = relationship('Actividad_Estudiante', back_populates='matricula', lazy='dynamic')
+
+    def __repr__(self):
+        return f"<Matricula Estudiante={self.ID_Estudiante}, Curso={self.ID_Curso}, Año={self.AnioLectivo}>"
 
 
 # -----------------------------------------------------
@@ -272,3 +280,4 @@ class Observacion(db.Model):
     # Relaciones
     programacion = relationship('Programacion', back_populates='observaciones', foreign_keys=[ID_Horario])
     matricula = relationship('Matricula', back_populates='observaciones', foreign_keys=[ID_Matricula])
+    

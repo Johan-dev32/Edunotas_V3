@@ -9,11 +9,57 @@
     
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRÍA</h2> 
 
+
+  <!-- Dropdown mensajes -->
+ 
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const res = await fetch("/notificaciones/mis_notificaciones");
+    const data = await res.json();
+
+    const lista = document.getElementById("notificacionesRecientes");
+    const contador = document.getElementById("contadorMensajes");
+
+    if (data.length === 0) {
+      lista.innerHTML = "<p class='text-center small text-secondary'>Sin notificaciones</p>";
+      contador.style.display = "none";
+    } else {
+      lista.innerHTML = "";
+      data.forEach(n => {
+        lista.innerHTML += `
+          <div class="alert alert-light border mb-1">
+            <strong>${n.titulo}</strong><br>
+            <small>${n.contenido}</small><br>
+            <small class="text-muted">${n.fecha}</small>
+          </div>`;
+      });
+
+      contador.textContent = data.length;
+      contador.style.display = "inline";
+    }
+  } catch (error) {
+    console.error("Error al cargar notificaciones:", error);
+  }
+});
+</script>
+
+
+  <!-- Dropdown usuario -->
+  <div class="dropdown ms-2">
+    <ul class="dropdown-menu" aria-labelledby="userMenu" id="dropdownSTUDENT">
+      <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
+      <li><a class="dropdown-item" href="{{ url_for('Estudiante.manual') }}">Manual de Usuario</a></li>
+      <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
+    </ul>
+  </div>
+
     <div class="dropdown ms-auto me-2">
         <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
             <span class="bi bi-envelope-fill"></span>
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none;">
-                0
+                
             </span>
         </button>
         <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="dropdownMenuButton" style="min-width: 300px;">
@@ -34,6 +80,7 @@
         <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
     </ul>
 </div>
+
 </header>
 {% endblock %}
 

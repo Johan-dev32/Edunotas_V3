@@ -46,8 +46,21 @@
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
   </div>
-  <div class="offcanvas1-body">
+  <div class="offcanvas-body">
     <ul class="nav flex-column">
+
+      <li class="nav-item">
+        <a href="{{ url_for('Estudiante.paginainicio') }}" class="nav-link text-white">
+          <i class="bi bi-house-fill"></i> Inicio
+        </a>
+      </li>
+          <li><a href="{{ url_for('Estudiante.vernotas') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+          <li><a href="{{ url_for('Estudiante.materias') }}" class="nav-link text-white"><i class="bi bi-journal-text"></i> Entrega de Tareas</a></li>
+          <li><a href="{{ url_for('Estudiante.materialestudiante') }}" class="nav-link text-white"><i class="bi bi-folder2-open"></i> Material Didáctico</a></li>
+          <li><a href="{{ url_for('Estudiante.evaluaciones') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Evaluaciones</a></li>
+          <li><a href="{{ url_for('Estudiante.verhorario') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Ver Horario</a></li>
+          <li><a href="{{ url_for('Estudiante.tutorias') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Tutorías</a></li>
+
       <li class="nav-item"><a href="{{ url_for('Estudiante.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio </a></li>
       <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas </a>
       <div class="collapse" id="submenuNotas">
@@ -63,6 +76,7 @@
       <li class="nav-item"><a href="{{ url_for('Estudiante.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones </a></li>
       <li class="nav-item"><a href="{{ url_for('Estudiante.historial_academico') }}" class="nav-link text-white"><i class="bi bi-clock"></i> Historial Académico </a></li>
       <li class="nav-item"><a href="{{ url_for('Estudiante.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
+
     </ul>
   </div>
 </div>
@@ -81,31 +95,21 @@
   <h1 class="titulo">TAREAS O ACTIVIDADES</h1><br><br>
 
     <!-- Actividades -->
-    <section class="actividades">
-  <div class="actividad">
-    <span>ACT 1</span>
-    <a href="{{ url_for('Estudiante.subidaevidencias',) }}" class="btn">Enviar Tareas - Actividades</a>
-  </div>
-  <div class="actividad">
-    <span>ACT 2</span>
-    <a href="{{ url_for('Estudiante.subidaevidencias',) }}" class="btn">Enviar Tareas - Actividades</a>
-  </div>
-  <div class="actividad">
-    <span>ACT 3</span>
-    <a href="{{ url_for('Estudiante.subidaevidencias',) }}" class="btn">Enviar Tareas - Actividades</a>
-  </div>
-  <div class="actividad">
-    <span>ACT 4</span>
-    <a href="{{ url_for('Estudiante.subidaevidencias',) }}" class="btn">Enviar Tareas - Actividades</a>
-  </div>
-  <div class="actividad">
-    <span>ACT 5</span>
-    <a href="{{ url_for('Estudiante.subidaevidencias',) }}" class="btn">Enviar Tareas - Actividades</a>
-  </div>
-  <div class="actividad">
-    <span>ACT 6</span>
-    <a href="{{ url_for('Estudiante.subidaevidencias',) }}" class="btn">Enviar Tareas - Actividades</a>
-  </div>
+<section class="actividades">
+  {% if actividades %}
+    {% for act, rel in actividades %}
+      <div class="actividad">
+        <span>{{ act.Titulo or "Sin título" }}</span>
+        <p class="text-muted">{{ act.Tipo or "Tarea" }}</p>
+        <p><strong>Fecha:</strong> {{ act.Fecha.strftime('%Y-%m-%d') if act.Fecha else "No definida" }}</p>
+        <a href="{{ url_for('Estudiante.subida_evidencias', id_actividad=act.ID_Actividad) }}" class="btn">
+          Enviar Tareas - Actividades
+        </a>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-center mt-4 text-muted">No tienes actividades asignadas.</p>
+  {% endif %}
 </section>
 
   </main>

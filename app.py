@@ -10,6 +10,7 @@ from routes.Administrador import Administrador_bp
 from routes.Docente import Docente_bp
 from routes.Acudiente import Acudiente_bp
 from routes.Estudiante import Estudiante_bp
+from routes.notificaciones_routes import notificaciones_bp
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired,BadSignature
 
@@ -259,40 +260,12 @@ def reset_password(token):
     return render_template('reset_password.html', token=token)
 
 
-@app.route('/enviar_notificacion', methods=['POST'])
-def enviar_notificacion():
-    data = request.get_json()
-    correo = data.get('correo')
-    titulo = data.get('titulo')
-    mensaje = data.get('mensaje')
-
-    if not correo or not titulo or not mensaje:
-        return jsonify({"status": "error", "msg": "Datos incompletos"})
-
-    try:
-        msg = Message(titulo, recipients=[correo])
-        msg.body = mensaje
-        mail.send(msg)
-
-        return jsonify({"status": "ok"})
-    except Exception as e:
-        print("Error al enviar correo:", e)
-        return jsonify({"status": "error", "msg": str(e)})
-
-
-
-
-from routes.Administrador import Administrador_bp
-from routes.Docente import Docente_bp
-from routes.Acudiente import Acudiente_bp
-from routes.Estudiante import Estudiante_bp
-
 
 app.register_blueprint(Administrador_bp)
 app.register_blueprint(Docente_bp)
 app.register_blueprint(Estudiante_bp)
 app.register_blueprint(Acudiente_bp)
-
+app.register_blueprint(notificaciones_bp)
 
 if __name__ == '__main__':
     app.run(debug=True)

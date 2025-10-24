@@ -1,0 +1,296 @@
+/* ---------------------------------- */
+/* 1. ESTILOS GENERALES Y FUENTE     */
+/* ---------------------------------- */
+body {
+    font-family: 'Trebuchet MS', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    background-color: #f8f9fa; 
+}
+
+/* Animación FinisherHeader (Comentada en HTML, solo si se reactiva) */
+#finisher-canvas {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh; 
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Variables de Color */
+:root {
+    --primary-dark: #050733ff;
+    --secondary-dark: #0c09a5;
+    --text-light: #ffffff;
+    --font-bolder: 800;
+}
+
+/* APLICACIÓN GLOBAL DE BOLDER A ELEMENTOS DE TEXTO CLAVE */
+h1, h2, h3, h4, h5, h6,
+.titulo-header,
+.btn,
+.nav-link,
+.card-text,
+.section-title,
+.section-subtitle,
+.accordion-button {
+    font-weight: var(--font-bolder) !important;
+}
+
+/* ---------------------------------- */
+/* 2. ENCABEZADO (HEADER)             */
+/* ---------------------------------- */
+header {
+    background-color: var(--text-light);
+    color: var(--primary-dark); 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+}
+
+.titulo-header {
+    color: var(--primary-dark);
+    font-size: 40px; 
+    margin-left: 20px !important;
+}
+
+.titulo-2 {
+ font-size: 40px;
+ margin-top: 30px;
+margin-bottom: 30px;
+
+}
+
+
+/* Botones del header */
+header .btn-primary-dark {
+    background-color: var(--primary-dark);
+    border: none;
+    color: var(--text-light);
+}
+.btn-edunotas, .btn-usuario {
+    background-color: var(--primary-dark); 
+    color: var(--text-light); 
+    border: none;
+}
+.btn-edunotas:hover, .btn-usuario:hover, header .btn-primary-dark:hover {
+    background-color: var(--secondary-dark); 
+    color: var(--text-light);
+}
+
+/* ---------------------------------- */
+/* 3. MENÚ LATERAL (OFFCANVAS)        */
+/* ---------------------------------- */
+#sidebar {
+    width: 250px; 
+    background: linear-gradient(180deg, var(--secondary-dark), var(--primary-dark));
+}
+
+#sidebar .offcanvas-title {
+    font-size: 1.8rem;
+}
+
+#sidebar .nav-link {
+    font-size: 1rem;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+#sidebar .nav-link:hover, 
+#sidebar .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15); 
+    color: var(--text-light) !important;
+}
+
+/* Botón cerrar blanco */
+.btn-close-white {
+    filter: invert(1);
+}
+
+/* ---------------------------------- */
+/* 4. SECCIÓN DE TARJETAS (DASHBOARD) */
+/* ---------------------------------- */
+
+.section-title {
+    color: var(--primary-dark);
+    font-size: 1.8rem;
+}
+
+/* Contenedor general */
+.menu-card {
+    display: flex;
+    justify-content: center;
+}
+
+/* Tarjeta individual */
+.menu-card .card {
+    background-color: #ffffff !important;
+    color: var(--primary-dark) !important;
+    border-radius: 12px;
+    width: 100%;
+    height: 180px;
+    padding: 20px 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    /* 🔹 Animación inicial */
+    opacity: 0;
+    transform: translateY(40px);
+    animation: subirSuave 0.8s ease-out forwards;
+    transition: all 0.3s ease !important; /* ✅ fuerza la transición */
+}
+
+/* 🔹 Aparición escalonada */
+.menu-card:nth-child(1) .card { animation-delay: 0.1s; }
+.menu-card:nth-child(2) .card { animation-delay: 0.2s; }
+.menu-card:nth-child(3) .card { animation-delay: 0.3s; }
+.menu-card:nth-child(4) .card { animation-delay: 0.4s; }
+.menu-card:nth-child(5) .card { animation-delay: 0.5s; }
+.menu-card:nth-child(6) .card { animation-delay: 0.6s; }
+
+@keyframes subirSuave {
+    0% {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ✅ Hover funciona sobre el enlace y sobre la tarjeta */
+.menu-card:hover .card,
+.menu-card .card:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
+}
+
+/* Ícono */
+.menu-icon {
+    font-size: 2.7rem;
+    margin-bottom: 8px;
+    color: var(--primary-dark);
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* 🔹 Efecto hover sobre el ícono */
+.menu-card:hover .menu-icon {
+    transform: scale(1.15);
+    color: var(--secondary-dark); /* se ilumina un poco */
+}
+
+/* ---------------------------------- */
+/* 5. NOTICIAS Y CIRCULARES           */
+/* ---------------------------------- */
+.section-subtitle {
+    color: var(--primary-dark);
+    font-size: 1.5rem;
+}
+
+.news-edit-icon {
+    font-size: 1.5rem;
+    color: var(--primary-dark);
+    transition: color 0.2s;
+}
+
+.text-primary-dark-hover:hover {
+    color: var(--secondary-dark) !important;
+}
+
+/* Noticia destacada */
+.noticia-destacada {
+    background-color: var(--primary-dark) !important;
+    min-height: 250px; 
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.noticia-destacada:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.noticia-destacada h5 {
+    font-size: 1.3rem;
+}
+
+/* Circulares */
+.accordion-button {
+    background-color: #e9ecef !important; 
+    color: var(--primary-dark) !important;
+    font-family: 'Trebuchet MS', sans-serif;
+    border-radius: 8px !important;
+}
+.accordion-button:not(.collapsed) {
+    background-color: var(--secondary-dark) !important;
+    color: var(--text-light) !important;
+}
+.accordion-body {
+    background-color: var(--text-light); 
+    border: 1px solid #dee2e6;
+    border-top: none;
+    font-weight: 700; 
+}
+
+/* ---------------------------------- */
+/* 6. RESPONSIVE Y UTILIDADES         */
+/* ---------------------------------- */
+@media (max-width: 767px) {
+    .titulo-header {
+        font-size: 1.2rem;
+        margin-left: 10px !important;
+    }
+    .menu-card {
+        padding: 5px;
+    }
+    .menu-icon {
+        font-size: 2.3rem; /* Un poco más pequeño en móvil */
+    }
+    .menu-text {
+        font-size: 0.9rem;
+    }
+}
+/* 🔹 Botón de usuario — sin fondo, sin borde, solo el ícono */
+.btn-usuario {
+    background: none !important;        /* sin fondo */
+    border: none !important;            /* sin borde */
+    color: var(--primary-dark) !important; /* color del ícono */
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;                 /* cuadrado/redondo según necesidad */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    padding: 0;
+    box-shadow: none !important;
+}
+
+/* Al pasar el mouse — sin fondo azul */
+.btn-usuario:hover,
+.btn-usuario:focus,
+.btn-usuario:active {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--secondary-dark) !important; /* solo cambia el color del ícono */
+    outline: none !important;
+}
+
+/* 🔹 Evita que Bootstrap le ponga el ícono de desplegable (flechita ↓) */
+.btn-usuario::after {
+    display: none !important;
+}
+.txt-ultimo{
+  font-size: 12px;
+  color: #666464;
+}

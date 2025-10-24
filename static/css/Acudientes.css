@@ -203,6 +203,7 @@ tr:hover {
   font-weight: bold;
 
 }
-.tabla{
-  background-color: #050733ff;
+.tabla thead th {
+  background-color: #050733ff !important;
+  color: white !important;
 }

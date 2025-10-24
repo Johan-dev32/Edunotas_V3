@@ -11,6 +11,7 @@
   <!-- CSS propio -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/Registro.css') }}">
 </head>
+
 <body>
     <header class="d-flex align-items-center p-3 border-bottom w-100">
     <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
@@ -105,6 +106,18 @@
     </div>
   </div>
 </section>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="alert-container">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 
     <div class="container d-flex justify-content-center align-items-center min-vh-100">
   <div class="form-container shadow p-4 rounded bg-white">
@@ -124,14 +137,14 @@
                 <label class="block text-gray-700 font-medium mb-1" for="correo">Correo Electrónico</label>
                 <input class="input-field" type="email" id="correo" name="Correo" required>
             </div>
-            <div>
-                <label class="block text-gray-700 font-medium mb-1" for="contrasena">Contraseña</label>
-                <input class="input-field" type="password" id="contrasena" name="Contrasena" required>
-            </div>
-            <div>
-                <label class="block text-gray-700 font-medium mb-1" for="contrasena">Confirmar contraseña</label>
-                <input class="input-field" type="password" id="contrasena" name="Contrasena" required>
-            </div>
+         <div>
+  <label for="contrasena">Contraseña</label>
+  <input type="password" id="contrasena" name="Contrasena" required class="input-field">
+</div>
+<div>
+  <label for="confirmar_contrasena">Confirmar contraseña</label>
+  <input type="password" id="confirmar_contrasena" name="ConfirmarContrasena" required class="input-field">
+</div>
             <div>
                 <label class="block text-gray-700 font-medium mb-1" for="numero-documento">Número de Documento</label>
                 <input class="input-field" type="text" id="numero-documento" name="NumeroDocumento" required>

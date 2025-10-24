@@ -274,13 +274,19 @@ def eliminar_acudiente(id):
 
 # ----------------- OTRAS VISTAS -----------------
 
-@Administrador_bp.route ('/registro', methods=['GET', 'POST'])
+@Administrador_bp.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
+        # --- Imprime lo que llega (diagnóstico) ---
+        print("==== /administrador/registro POST recibido ====")
+        print("request.form:", request.form)
+        print("request.files:", request.files)
+
         nombre = request.form.get('Nombre')
         apellido = request.form.get('Apellido')
         correo = request.form.get('Correo')
         contrasena = request.form.get('Contrasena')
+        confirmar = request.form.get('ConfirmarContrasena') or request.form.get('Confirmar')  # por si el campo se llama distinto
         numero_documento = request.form.get('NumeroDocumento')
         telefono = request.form.get('Telefono')
         direccion = request.form.get('Direccion')
@@ -290,18 +296,27 @@ def registro():
         estado = request.form.get('Estado', 'Activo')
         genero = request.form.get('Genero', '')
 
+        # Validaciones básicas
         if not all([nombre, apellido, correo, contrasena, numero_documento, telefono, direccion, rol]):
-            flash('Por favor, completa todos los campos requeridos.')
-            return render_template('Administrador/Registro.html')
+            flash('Por favor, completa todos los campos requeridos.', 'warning')
+            return redirect(url_for('Administrador.registro'))
+
+        # Validar confirmación de contraseña (si existe campo confirmar)
+        if confirmar is not None and contrasena != confirmar:
+            flash('Las contraseñas no coinciden.', 'warning')
+            return redirect(url_for('Administrador.registro'))
 
         try:
+            # Verificar si ya existe el correo
             existing_user = Usuario.query.filter_by(Correo=correo).first()
             if existing_user:
-                flash('El correo ya está registrado.')
-                return render_template('Administrador/Registro.html')
+                flash('El correo ya está registrado.', 'warning')
+                return redirect(url_for('Administrador.registro'))
 
+            # Hashear contraseña
             hashed_password = generate_password_hash(contrasena)
-            
+
+            # Crear el usuario
             new_user = Usuario(
                 Nombre=nombre,
                 Apellido=apellido,
@@ -315,18 +330,30 @@ def registro():
                 Estado=estado,
                 Genero=genero
             )
-            
-            
+
             db.session.add(new_user)
             db.session.commit()
-        
+
+            print("-> Usuario registrado: ", correo)
+            flash('Usuario registrado correctamente ✅', 'success')
+            return redirect(url_for('Administrador.registro'))
+
         except SQLAlchemyError as e:
             db.session.rollback()
-            flash(f'Error al registrar: {str(e)}')
-            return render_template('Administrador/Registro.html')
+            # muestra el error en consola para depurar
+            import traceback
+            traceback.print_exc()
+            flash(f'Error al registrar (SQLAlchemy): {str(e)}', 'danger')
+            return redirect(url_for('Administrador.registro'))
+        except Exception as e:
+            db.session.rollback()
+            import traceback
+            traceback.print_exc()
+            flash(f'Error inesperado al registrar: {str(e)}', 'danger')
+            return redirect(url_for('Administrador.registro'))
 
+    # GET → render
     return render_template('Administrador/Registro.html')
-
 
 @Administrador_bp.route('/api/repitentes', methods=['POST'])
 @login_required

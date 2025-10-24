@@ -280,3 +280,4 @@ class Observacion(db.Model):
     # Relaciones
     programacion = relationship('Programacion', back_populates='observaciones', foreign_keys=[ID_Horario])
     matricula = relationship('Matricula', back_populates='observaciones', foreign_keys=[ID_Matricula])
+    

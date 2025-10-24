@@ -105,13 +105,16 @@ header .btn-dark {
 .status.sent { color: green; font-weight: bold; }
 .status.err { color: red; font-weight: bold; }
 
-.titulo-principal{
- font-size: 40px;      
-  font-weight: bold;      
-  color: #050733ff;    
-  font-family:'Trebuchet MS', sans-serif;
-  margin-top: 30px;
+.titulo-principal {
+  font-size: 40px;
+  font-weight: bold;
+  color: #050733ff;
+  margin-top: -90px; 
+  text-align: center;
 }
+
+
+
 .descripcion {
   font-size: 1.3rem;     
   color: #555;           
@@ -130,3 +133,7 @@ header .btn-dark {
 .table-striped{
   font-family: 'Trebuchet MS',sans-serif;
 }
+.btn-wasap {
+  margin-left: -1050px;
+  margin-bottom: 30px;
+} 

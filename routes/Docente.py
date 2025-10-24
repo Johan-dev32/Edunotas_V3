@@ -2,12 +2,10 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from flask_mail import Message
 from werkzeug.utils import secure_filename
-from Controladores.models import db, Docente_Asignatura, Programacion, Asistencia, Detalle_Asistencia, Actividad, Actividad_Estudiante, Observacion, Notificacion
+from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Notificacion, Programacion, Observacion)
+from datetime import date
 import os
-from Controladores.models import (
-    db, Usuario, Matricula, Asignatura, Cronograma_Actividades,
-    Actividad, Actividad_Estudiante, Periodo
-)
+
 import datetime
 
 
@@ -197,7 +195,52 @@ def calculo_promedio():
 
 @Docente_bp.route('/observador')
 def observador():
-    return render_template('Docentes/Observador.html')
+    observaciones = (
+        db.session.query(Observacion, Usuario)
+        .join(Matricula, Observacion.ID_Matricula == Matricula.ID_Matricula)
+        .join(Usuario, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+        .add_columns(
+            Observacion.Fecha,
+            Observacion.Descripcion,
+            Observacion.Recomendacion,
+            Usuario.Nombre,
+            Usuario.Apellido
+        )
+        .all()
+    )
+
+    matriculas = Matricula.query.all()
+    return render_template('docentes/observador.html', observaciones=observaciones, matriculas=matriculas)
+
+
+@Docente_bp.route('/agregar_observacion', methods=['POST'])
+def agregar_observacion():
+    try:
+        id_matricula = request.form['id_matricula']
+        descripcion = request.form['descripcion']
+        tipo = request.form['tipo']
+        nivel_importancia = request.form['nivel_importancia']
+        recomendacion = request.form['recomendacion']
+
+        nueva_observacion = Observacion(
+            Fecha=date.today(),
+            Descripcion=descripcion,
+            Tipo=tipo,
+            NivelImportancia=nivel_importancia,
+            Recomendacion=recomendacion,
+            Estado='Activa',
+            ID_Horario=None,
+            ID_Matricula=id_matricula
+        )
+
+        db.session.add(nueva_observacion)
+        db.session.commit()
+        flash('✅ Observación agregada correctamente', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error al agregar observación: {e}', 'danger')
+
+    return redirect(url_for('docentes.observador'))
 
 @Docente_bp.route('/horarios')
 def horarios():

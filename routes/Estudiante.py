@@ -100,3 +100,43 @@ def enviar_evidencia(id_actividad):
     archivo.save(os.path.join(upload_folder, filename))
     flash('Evidencia subida correctamente.', 'success')
     return redirect(url_for('Estudiante.tareas_actividades'))
+
+@Estudiante_bp.route('/notas_consultar')
+def notas_consultar():
+    return render_template('Estudiante/NotasConsultar.html')
+
+@Estudiante_bp.route('/notas_registro')
+def notas_registro():
+    return render_template('Estudiante/NotasRegistro.html')
+
+@Estudiante_bp.route('/calculo_promedio')
+def calculo_promedio():
+    return render_template('Estudiante/CalculoPromedio.html')
+
+@Estudiante_bp.route('/observador')
+def observador():  
+    return render_template('Estudiante/Observador.html')
+
+@Estudiante_bp.route('/aprobacion_academica')
+def aprobacion_academica():
+    return render_template('Estudiante/AprobacionAcademica.html')
+
+@Estudiante_bp.route('/citaciones')
+def citaciones():
+    return render_template('Estudiante/Citaciones.html')
+
+@Estudiante_bp.route('/historial_academico')
+def historial_academico():
+    return render_template('Estudiante/HistorialAcademico.html')
+
+@Estudiante_bp.route('/certificados')
+def certificados():
+    return render_template('Estudiante/Certificados.html')
+
+@Estudiante_bp.route('/reportes_estudiante')
+def reportes_estudiante():
+    return render_template('Estudiante/ReportesEstudiante.html')
+
+@Estudiante_bp.route('/manual')
+def manual():
+    return render_template('Estudiante/ManualUsuario.html')

@@ -54,11 +54,11 @@ def agregar_docente():
             Telefono=telefono,
             Rol='Docente',
             Estado='Activo',
-            Direccion=profesion,  # profesión
+            Direccion=profesion,
             Genero="Otro"
         )
 
-        # Guardar ciclo en atributo no oficial (Calle en BD)
+        
         nuevo_docente.Calle = ciclo
 
         db.session.add(nuevo_docente)
@@ -126,7 +126,6 @@ def estudiantes():
 @login_required
 def agregar_estudiante():
     try:
-        # Datos del formulario
         nombre = request.form['Nombre']
         apellido = request.form['Apellido']
         correo = request.form['Correo']
@@ -141,7 +140,7 @@ def agregar_estudiante():
         acudiente = request.form['NombreAcudiente']
         tel_acudiente = request.form['TelefonoAcudiente']
 
-        # Crear usuario
+        
         hashed_password = generate_password_hash("123456")
         nuevo_estudiante = Usuario(
             Nombre=nombre,
@@ -159,9 +158,16 @@ def agregar_estudiante():
         db.session.add(nuevo_estudiante)
         db.session.commit()
 
-        # Crear matrícula vinculada
+        
+        curso_obj = Curso.query.filter_by(Nombre=curso).first()
+        if not curso_obj:
+            flash("❌ El curso seleccionado no existe", "danger")
+            return redirect(url_for('Administrador.estudiantes'))
+
+        
         matricula = Matricula(
             ID_Estudiante=nuevo_estudiante.ID_Usuario,
+            ID_Curso=curso_obj.ID_Curso,
             Correo=correo,
             FechaNacimiento=fecha_nac,
             DepNacimiento="Desconocido",
@@ -173,6 +179,7 @@ def agregar_estudiante():
         db.session.commit()
 
         flash("✅ Estudiante registrado correctamente", "success")
+
     except SQLAlchemyError as e:
         db.session.rollback()
         flash(f"❌ Error al registrar estudiante: {str(e)}", "danger")
@@ -476,6 +483,10 @@ def observador():
 def calculo_promedio():
     return render_template('Administrador/CalculoPromedio.html')
 
+@Administrador_bp.route('/encuesta')
+def encuesta():
+    return render_template('Administrador/Encuestas.html')
+
 @Administrador_bp.route('/crear_encuesta')
 def crear_encuesta():
     return render_template('Administrador/CrearEncuesta.html')
@@ -760,3 +771,6 @@ def configuracion_academica2():
 def configuracion_academica3():
     return render_template('Administrador/ConfiguracionAcademica3.html')
 
+@Administrador_bp.route('/comunicacion2')
+def comunicacion2():
+    return render_template('Administrador/Comunicación2.html')

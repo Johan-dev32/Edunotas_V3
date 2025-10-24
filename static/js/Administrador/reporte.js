@@ -36,7 +36,7 @@ document.getElementById("btnPDF").addEventListener("click", async () => {
 
   const pdf = new jsPDF("p", "mm", "a4");
   const pageWidth = pdf.internal.pageSize.getWidth();
-  const imgWidth = pageWidth - 20; // márgenes
+  const imgWidth = pageWidth - 20; 
   const imgHeight = canvas.height * imgWidth / canvas.width;
 
   pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);

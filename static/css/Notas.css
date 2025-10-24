@@ -88,18 +88,14 @@ header .btn-dark {
   height: auto;
 }
 
-.logo-container img {
-  max-width: 250px; 
-  height: auto;
-}
-
 
 /* titulos */
 
 .titulo-principal {
   font-size: 3rem;      
   font-weight: 900;      
-  color: #050733ff;      
+  color: #050733ff; 
+  margin-top: -40px;     
 }
 
 .subtitulo {

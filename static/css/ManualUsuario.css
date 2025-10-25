@@ -109,13 +109,12 @@ header .btn-outline-primary:hover {
   margin-bottom: 80px;
 }
 .card {
-  max-width: 800px;   /* ancho máximo */
+  max-width: 800px;   
   max-height: 4000px;
-  /* centrar horizontalmente */
-  font-size: 11 px;  /* letras un poco más pequeñas */
+  font-size: 11 px;  
 }
 .custom-card {
-  margin-left: 450px;  /* lo mueve a la derecha */
+  margin-left: 450px;  
 }
 .card-header{
   background-color: #050733ff;

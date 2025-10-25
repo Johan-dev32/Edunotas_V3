@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colegio Fe y Alegría</title>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Iconos -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- CSS propio -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Materias.css') }}">
+
+</head>
+<body>
+
+
+  <header class="d-flex align-items-center p-3 border-bottom w-100">
+    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+
+
+    <div class="dropdown ms-auto">
+      <button 
+        class="btn btn-edunotas position-relative dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton1" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
+        <span class="bi bi-envelope-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li><a class="dropdown-item" href="#">Ajustes</a></li>
+        <li><a class="dropdown-item" href="#">Opción 2</a></li>
+        <li><a class="dropdown-item" href="#">Opción 3</a></li>
+      </ul>
+    </div>
+
+
+    <div class="dropdown">
+      <button 
+        class="btn btn-usuario dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton2" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
+        <span class="bi bi-person-lines-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
+        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+        <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
+      </ul>
+    </div>
+  </header>
+
+
+
+<!--  MENU  -->
+ <section class="bg-light py-5 mt-5">
+  <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">MENÚ</h5>
+  </div>
+  <div class="offcanvas1-body">
+    <ul class="nav flex-column">
+          <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+          
+          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
+          <div class="collapse" id="submenuNotas">
+            <ul class="nav flex-column ms-3">
+              <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
+             <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+
+
+
+            </ul>
+          </div>
+
+          <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+          <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
+
+          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
+            <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
+          </a>
+          <div class="collapse" id="submenuUsuarios">
+            <ul class="nav flex-column ms-3">
+              <li><a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
+              <li><a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
+              <li><a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
+              <li><a href="{{ url_for('Administrador.repitentes') }}" class="nav-link text-white"><i class="bi bi-person-dash"></i> Lista Estudiantes Repitentes</a></li>
+              <li><a href="{{ url_for('Administrador.registro') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Registro Usuarios</a></li>
+            </ul>
+          </div>
+
+
+
+
+
+          <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+          <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+          
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- titulos -->
+
+
+    <!-- Encabezado con botón -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="text-center flex-grow-1">
+        <h1 class="titulo-principal mb-0">MATERIAS</h1>
+        <p class="descripcion">Mira las Materias de los cursos</p>
+      </div>
+
+      <!-- Botón Crear Materia -->
+    </div>
+  <!-- Calendario -->
+   
+  <div class="periodos-card">
+
+  <form id="formPeriodos" class="periodos-grid">
+    </form>
+      
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">ESPAÑOL</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=ESPAÑOL" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">MATEMÁTICAS</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=MATEMÁTICAS" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">INGLÉS</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=INGLÉS" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+      </div>
+          <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">SOCIALES</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=SOCIALES" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">ÉTICA</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=ÉTICA" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">FILOSOFIÁ</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=FILOSOFIÁ" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<br><br>
+      
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">ARTÍSTICA</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=ARTÍSTICA" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">BIOLOGÍA</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=BIOLOGÍA" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">FÍSICA</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=FÍSICA" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+      </div>
+          <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">QUÍMICA</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=QUÍMICA" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">RELIGIÓN</h4>
+            <a href="{{ url_for('Estudiante.notas_curso') }}?materia=RELIGIÓN" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">TECNOLOGÍA</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=TECNOLOGÍA" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<br><br>
+      <!-- Ciclo 3 -->
+      <h3 class="mb-3 text-center"></h3>
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">INFORMATICA</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=INFORMATICA" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">P.T.I</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=P.T.I" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">RUTA</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=RUTA" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="card text-center curso-card">
+            <div class="card-body">
+              <h4 class="card-title">EDUCACIÓN FÍSICA</h4>
+              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=EDUCACIÓN FÍSICA" class="btn btn-primary">Ver Notas</a>
+            </div>
+          </div>
+        </div>
+        
+          </div>
+        </div>
+      </div>
+  </section>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   <script src="{{ url_for('static', filename='js/Estudiante/Vernotas.js') }}"></script>
+</body>
+</html>

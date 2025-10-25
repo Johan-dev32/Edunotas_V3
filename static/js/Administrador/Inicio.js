@@ -141,95 +141,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-
-// 🔔 Manejo de notificaciones (campanita)
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("formNotificacionDropdown");
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const datos = {
-      correo: document.getElementById("correoNoti").value.trim(),
-      titulo: document.getElementById("tituloNoti").value.trim(),
-      mensaje: document.getElementById("mensajeNoti").value.trim()
-    };
-
-    if (!datos.correo || !datos.titulo || !datos.mensaje) {
-      Swal.fire("Campos incompletos", "Por favor llena todos los campos.", "warning");
-      return;
-    }
-
-    try {
-      const res = await fetch("/enviar_notificacion", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(datos)
-      });
-
-      const result = await res.json();
-
-      if (result.status === "ok") {
-        Swal.fire("✅ Enviado", "La notificación se envió correctamente.", "success");
-
-        // Agregar notificación a la lista de recientes
-        const lista = document.getElementById("notificacionesRecientes");
-        const nueva = document.createElement("div");
-        nueva.classList.add("border-bottom", "pb-1", "mb-1");
-        nueva.innerHTML = `
-          <strong>${datos.titulo}</strong><br>
-          <small>${datos.mensaje}</small><br>
-          <span class="text-muted small">${datos.correo}</span>
-        `;
-        lista.prepend(nueva);
-
-        // Limpiar formulario
-        form.reset();
-      } else {
-        throw new Error(result.msg || "Error desconocido");
-      }
-    } catch (error) {
-      Swal.fire("❌ Error", "No se pudo enviar la notificación.", "error");
-      console.error(error);
-    }
-  });
-});
-
-const contador = document.getElementById("contadorMensajes");
-  const listaMensajes = document.getElementById("listaMensajes");
-  const sonido = document.getElementById("notificacionSonido");
-
-  async function cargarNotificaciones() {
-    try {
-      const response = await fetch("/notificaciones");
-      const data = await response.json();
-      mostrarNotificaciones(data);
-    } catch (error) {
-      console.error("Error cargando notificaciones:", error);
-    }
-  }
-
-  function mostrarNotificaciones(data) {
-    listaMensajes.innerHTML = "";
-    if (data.length === 0) {
-      listaMensajes.innerHTML = "<p class='text-center text-muted mb-0'>No tienes mensajes nuevos.</p>";
-      contador.style.display = "none";
-      return;
-    }
-
-    contador.style.display = "inline-block";
-    contador.textContent = data.length;
-
-    data.forEach(n => {
-      const item = document.createElement("li");
-      item.classList.add("dropdown-item", "border-bottom", "small");
-      item.innerHTML = `<strong>${n.titulo}</strong><br>${n.contenido}<br><small class="text-muted">${n.fecha}</small>`;
-      listaMensajes.appendChild(item);
-    });
-  }
-
-  // Refresca cada cierto tiempo (por ejemplo, cada 15 segundos)
-  setInterval(cargarNotificaciones, 15000);
-
-  // Carga inicial
-  cargarNotificaciones();
+setInterval(async () => {
+  const respuesta = await fetch("/notificaciones/mis_notificaciones");
+  const notificaciones = await respuesta.json();
+  const contadorMensajes = document.getElementById("contadorMensajes");
+  contadorMensajes.textContent = notificaciones.length;
+  contadorMensajes.style.display = notificaciones.length > 0 ? "inline" : "none";
+}, 15000); 

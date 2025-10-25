@@ -79,6 +79,7 @@ header .btn-dark {
   font-size: 2rem;
   letter-spacing: 1px;
   font-weight: bolder;
+  margin-top: -70px;
 }
 
 .descripcion {

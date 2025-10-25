@@ -46,6 +46,21 @@
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
   </div>
+
+  <div class="offcanvas-body">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="{{ url_for('Estudiante.paginainicio') }}" class="nav-link text-white">
+          <i class="bi bi-house-fill"></i> Inicio
+        </a>
+      </li>
+          <li><a href="{{ url_for('Estudiante.vernotas') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+          <li><a href="{{ url_for('Estudiante.materias') }}" class="nav-link text-white"><i class="bi bi-journal-text"></i> Entrega de Tareas</a></li>
+          <li><a href="{{ url_for('Estudiante.materialestudiante') }}" class="nav-link text-white"><i class="bi bi-folder2-open"></i> Material Didáctico</a></li>
+          <li><a href="{{ url_for('Estudiante.evaluaciones') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Evaluaciones</a></li>
+          <li><a href="{{ url_for('Estudiante.verhorario') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Ver Horario</a></li>
+          <li><a href="{{ url_for('Estudiante.tutorias') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Tutorías</a></li>
+
 <div class="offcanvas1-body">
     <ul class="nav flex-column">
       <li class="nav-item"><a href="{{ url_for('Estudiante.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio </a></li>
@@ -110,19 +125,27 @@
           </div>
 
           <!-- Archivo PDF -->
-          {% if pdf_nombre %}
-          <div class="upload-box border rounded py-5 mb-3 text-center">
-            <a href="{{ url_for('static', filename='uploads/' + pdf_nombre) }}" target="_blank" class="text-decoration-none">
-              <i class="bi bi-file-earmark-pdf-fill fs-1 text-danger"></i>
-              <p class="mt-2 fw-semibold text-dark">Ver archivo adjunto (PDF)</p>
-            </a>
-          </div>
+          {% if actividad and actividad.PDF %}
+            <div class="upload-box border rounded py-5 mb-3 text-center">
+              <a href="{{ url_for('static', filename='uploads/' + pdf_nombre) }}" target="_blank" class="text-decoration-none">
+                <i class="bi bi-file-earmark-pdf-fill fs-1 text-danger"></i>
+                <p class="mt-2 fw-semibold text-dark">Ver archivo adjunto (PDF)</p>
+              </a>
+            </div>
           {% else %}
-          <div class="upload-box border rounded py-5 mb-3 text-center text-muted">
-            <i class="bi bi-file-earmark-excel-fill fs-1"></i>
-            <p class="mt-2 fw-semibold">No hay archivo adjunto</p>
-          </div>
+            <div class="upload-box border rounded py-5 mb-3 text-center text-muted">
+              <i class="bi bi-file-earmark fs-1"></i>
+              <p class="mt-2 fw-semibold">No hay archivo adjunto disponible</p>
+            </div>
           {% endif %}
+
+          <form action="{{ url_for('Estudiante.enviar_evidencia', id_actividad=actividad_id) }}" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label for="archivo" class="form-label fw-semibold">📤 Subir tu evidencia</label>
+              <input class="form-control" type="file" name="archivo" id="archivo" required>
+            </div>
+            <button class="btn btn-primary w-100" type="submit">Enviar evidencia</button>
+          </form>
         </div>
       </div>
     </div>

@@ -2,12 +2,10 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from flask_mail import Message
 from werkzeug.utils import secure_filename
-from Controladores.models import db, Docente_Asignatura, Programacion, Asistencia, Detalle_Asistencia, Actividad, Actividad_Estudiante, Observacion, Notificacion
+from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Notificacion, Programacion, Observacion)
+from datetime import date
 import os
-from Controladores.models import (
-    db, Usuario, Matricula, Asignatura, Cronograma_Actividades,
-    Actividad, Actividad_Estudiante, Periodo
-)
+
 import datetime
 
 
@@ -105,6 +103,7 @@ import os
 from flask import request, redirect, url_for, render_template, flash
 
 @Docente_bp.route('/crear_actividad/<int:curso_id>', methods=['GET', 'POST'])
+@login_required
 def crear_actividad(curso_id):
     if request.method == 'POST':
         titulo = request.form.get('titulo')
@@ -112,7 +111,6 @@ def crear_actividad(curso_id):
         fecha = request.form.get('fecha')
         hora = request.form.get('hora')
 
-        # Subir PDF
         pdf_file = request.files.get('pdfUpload')
         pdf_nombre = None
         if pdf_file and pdf_file.filename != '':
@@ -121,31 +119,22 @@ def crear_actividad(curso_id):
             pdf_nombre = secure_filename(pdf_file.filename)
             pdf_path = os.path.join(upload_folder, pdf_nombre)
             pdf_file.save(pdf_path)
-            print("✅ PDF guardado en:", pdf_path)
-        else:
-            print("⚠️ No se recibió PDF")
 
-        # Crear la actividad
-        nueva_actividad = {
-            "id": len(actividades) + 1,
-            "titulo": titulo,
-            "instrucciones": instrucciones,
-            "fecha": fecha,
-            "hora": hora,
-            "pdf_nombre": pdf_nombre
-        }
+        # Guardar en la base de datos
+        nueva_actividad = Actividad(
+            Titulo=titulo,
+            Tipo=instrucciones,
+            Fecha=fecha,
+            Estado='Pendiente',
+            ID_Curso=curso_id
+        )
+        db.session.add(nueva_actividad)
+        db.session.commit()
 
-        actividades.append(nueva_actividad)
+        flash('Actividad creada correctamente ✅', 'success')
+        return redirect(url_for('Docente.tareas_actividades', curso_id=curso_id))
 
-        # Redirigir a detalles
-        return redirect(url_for('Docente.tareas_actividades3',
-                                curso_id=curso_id,
-                                actividad_id=nueva_actividad["id"]))
-
-    # GET: mostrar formulario
-    return render_template('Docentes/Crear_Actividad.html',
-                           curso_id=curso_id,
-                           actividad_id=len(actividades) + 1)
+    return render_template('Docentes/Crear_Actividad.html', curso_id=curso_id)
     
 @Docente_bp.route('/editar_actividad/<int:id_actividad>')
 def editar_actividad(id_actividad):
@@ -206,7 +195,52 @@ def calculo_promedio():
 
 @Docente_bp.route('/observador')
 def observador():
-    return render_template('Docentes/Observador.html')
+    observaciones = (
+        db.session.query(Observacion, Usuario)
+        .join(Matricula, Observacion.ID_Matricula == Matricula.ID_Matricula)
+        .join(Usuario, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+        .add_columns(
+            Observacion.Fecha,
+            Observacion.Descripcion,
+            Observacion.Recomendacion,
+            Usuario.Nombre,
+            Usuario.Apellido
+        )
+        .all()
+    )
+
+    matriculas = Matricula.query.all()
+    return render_template('docentes/observador.html', observaciones=observaciones, matriculas=matriculas)
+
+
+@Docente_bp.route('/agregar_observacion', methods=['POST'])
+def agregar_observacion():
+    try:
+        id_matricula = request.form['id_matricula']
+        descripcion = request.form['descripcion']
+        tipo = request.form['tipo']
+        nivel_importancia = request.form['nivel_importancia']
+        recomendacion = request.form['recomendacion']
+
+        nueva_observacion = Observacion(
+            Fecha=date.today(),
+            Descripcion=descripcion,
+            Tipo=tipo,
+            NivelImportancia=nivel_importancia,
+            Recomendacion=recomendacion,
+            Estado='Activa',
+            ID_Horario=None,
+            ID_Matricula=id_matricula
+        )
+
+        db.session.add(nueva_observacion)
+        db.session.commit()
+        flash('✅ Observación agregada correctamente', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error al agregar observación: {e}', 'danger')
+
+    return redirect(url_for('docentes.observador'))
 
 @Docente_bp.route('/horarios')
 def horarios():

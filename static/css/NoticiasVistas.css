@@ -76,10 +76,11 @@ header .btn-dark {
 
 /* Títulos */
 .titulo-principal {
-  font-size: 40px;      
-  font-weight: bold;  
-  margin-top: 20px;    
-  color: #050733ff;      
+  font-size: 3rem;      
+  font-weight: 900;      
+  color: #050733ff;    
+  margin-left: 50px;  
+  margin-top: -90px;
 }
 
 .descripcion {

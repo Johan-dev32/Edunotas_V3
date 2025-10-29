@@ -101,7 +101,7 @@ header .btn-dark {
   font-weight: 900;      
   color: #050733ff;    
   margin-left: 50px;  
-  margin-top: -30px;
+  margin-top: 30px;
 }
 
 
@@ -110,95 +110,56 @@ header .btn-dark {
   color: #555;  
   margin-left: 50px;         
 }
-
-section.bg-light {
-  margin-top: 10px !important;
-  padding-top: 30px !important;
-}
-/* los cuadros de curso */
-.curso-card {
-  border: 2px solid #050733ff;
-  border-radius: 10px;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+.detalle-contenedor {
+  max-width: 900px;
+  margin: 40px auto;
+  background-color: #fff;
+  border: 3px solid #050733ff;
+  border-radius: 15px;
+  padding: 40px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
 }
 
-.curso-card:hover {
-  transform: scale(1.05);
-  background-color: #eef5ff;
-}
-
-.curso-card .card-title {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #050733ff;
-}
-
-.curso-card .btn {
-  margin-top: 10px;
-  background-color: #050733ff;
-  border: none;
-}
-
-.curso-card .btn:hover {
-  background-color: #3b61ea;
-}
-
-.periodos-card {
-  width: 100%;
-  background: #ffffff;
-  border: 2px solid #050733ff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 8px 24px rgba(12,18,40,0.08);
-  font-family: 'Trebuchet MS', sans-serif;
-  margin-bottom: 30px;
-}
-
-.periodos-card h5 {
-  color: #050733ff;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-/* Contenedor en grid */
-.periodos-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 periodos en fila */
-  gap: 15px;
-}
-
-.periodo {
+.detalle-contenido {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  background: #f9f9fc;
-  border: 1px solid #dce1ef;
-  border-radius: 8px;
-  padding: 10px;
+  gap: 1.2rem;
 }
 
-.periodo label {
-  color: #050733ff;
-  font-size: 14px;
-  text-align: center;
+/* INFO GENERAL */
+.info-general p {
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+  color: #333;
 }
 
-.periodo input[type="date"] {
-  font-size: 13px;
-  padding: 5px;
+/* MENSAJE DOCENTE */
+.mensaje-docente {
+  background-color: #f9f9fb;
+  border-left: 5px solid #050733ff;
+  font-size: 0.95rem;
+  color: #333;
 }
 
-#guardarPeriodos {
+/* BOTÓN */
+.btn-edunotas {
   background-color: #050733ff;
+  color: #fff;
   border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.3rem;
   font-weight: bold;
-  width: 150px;   /* tamaño fijo más pequeño */
-  height: 40px;
+  transition: background-color 0.2s ease;
 }
 
-#guardarPeriodos:hover {
-  background-color: #3b61ea;
+.btn-edunotas:hover {
+  background-color: #080a99;
 }
-.btn-crearmateria{
-  margin-left: -120px;
+
+/* FOOTER */
+.footer {
+  background-color: white;
+  color: #050733ff;
+ 
+  font-weight: bold;
 }

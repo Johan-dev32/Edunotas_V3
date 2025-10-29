@@ -76,7 +76,6 @@ header .btn-primary-dark {
     background-color: var(--primary-dark); 
     color: var(--text-light); 
     border: none;
-    margin-left: 30px;
 }
 .btn-edunotas:hover, .btn-usuario:hover, header .btn-primary-dark:hover {
     background-color: var(--secondary-dark); 

@@ -24,10 +24,19 @@ def vernotas():
 def materialestudiante():
     return render_template('Estudiante/MaterialEstudiante.html')
 
-@Estudiante_bp.route('/evaluaciones')
-def evaluaciones():
-    return render_template('Estudiante/Evaluaciones.html')
+@Estudiante_bp.route('/entregatareas')
+def entregatareas():
+    return render_template('Estudiante/EntregaTareas.html')
 
+@Estudiante_bp.route('/entregatareas2')
+def entregatareas2():
+    return render_template('Estudiante/EntregaTareas2.html')
+
+@Estudiante_bp.route('/entregatareas3')
+def entregatareas3():
+    return render_template('Estudiante/EntregaTareas3.html')
+
+                                                 
 @Estudiante_bp.route('/tutorias')
 def tutorias():
     return render_template('Estudiante/Tutorias.html')
@@ -101,13 +110,7 @@ def enviar_evidencia(id_actividad):
     flash('Evidencia subida correctamente.', 'success')
     return redirect(url_for('Estudiante.tareas_actividades'))
 
-@Estudiante_bp.route('/notas_consultar')
-def notas_consultar():
-    return render_template('Estudiante/NotasConsultar.html')
 
-@Estudiante_bp.route('/notas_registro')
-def notas_registro():
-    return render_template('Estudiante/NotasRegistro.html')
 
 @Estudiante_bp.route('/calculo_promedio')
 def calculo_promedio():
@@ -116,6 +119,10 @@ def calculo_promedio():
 @Estudiante_bp.route('/observador')
 def observador():  
     return render_template('Estudiante/Observador.html')
+
+@Estudiante_bp.route('/observador2')
+def observador2():
+    return render_template('Estudiante/Observador2.html')
 
 @Estudiante_bp.route('/aprobacion_academica')
 def aprobacion_academica():
@@ -140,3 +147,9 @@ def reportes_estudiante():
 @Estudiante_bp.route('/manual')
 def manual():
     return render_template('Estudiante/ManualUsuario.html')
+
+#sub-vistas
+
+@Estudiante_bp.route('/notas_curso')
+def notas_curso():
+    return render_template('Estudiante/NotasCurso.html')

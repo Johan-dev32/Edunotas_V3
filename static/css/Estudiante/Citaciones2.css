@@ -108,58 +108,22 @@ header .btn-dark {
 .descripcion {
   font-size: 1.3rem;     
   color: #555;  
-  margin-left: 50px;         
+  margin-left: 50px;   
+  margin-top: 20px;      
 }
-.detalle-contenedor {
-  max-width: 900px;
-  margin: 40px auto;
-  background-color: #fff;
-  border: 3px solid #050733ff;
-  border-radius: 15px;
-  padding: 40px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
-}
-
-.detalle-contenido {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-
-/* INFO GENERAL */
-.info-general p {
+/* Ajustes adicionales para la vista detallada */
+.card-citacion p {
   font-size: 1rem;
-  margin-bottom: 0.4rem;
-  color: #333;
+  color: #444;
+  line-height: 1.6;
 }
 
-/* MENSAJE DOCENTE */
-.mensaje-docente {
-  background-color: #f9f9fb;
-  border-left: 5px solid #050733ff;
-  font-size: 0.95rem;
-  color: #333;
+.badge {
+  font-size: 1rem;
+  padding: 8px 12px;
 }
 
-/* BOTÓN */
-.btn-edunotas {
-  background-color: #050733ff;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1.3rem;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
-}
-
-.btn-edunotas:hover {
-  background-color: #080a99;
-}
-
-/* FOOTER */
-.footer {
-  background-color: white;
-  color: #050733ff;
- 
-  font-weight: bold;
+hr {
+  border-top: 2px solid #050733ff;
+  opacity: 0.4;
 }

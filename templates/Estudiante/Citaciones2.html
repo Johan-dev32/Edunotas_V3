@@ -10,7 +10,7 @@
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <!-- CSS propio -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/Estudiante/Tutorias.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Estudiante/Citaciones2.css') }}">
 </head>
 <body>
 
@@ -44,7 +44,7 @@
   </header>
 
   <!-- Menú lateral -->
-  <section>
+  <section class="bg-light py-5 mt-5">
   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
@@ -74,80 +74,65 @@
 
   <div class="d-flex justify-content-between align-items-center mb-4">
   <div class="text-center flex-grow-1">
-    <h1 class="titulo-principal mb-0">TUTORIAS</h1>
-    <p class="descripcion">Mira las tutorias que te hacen</p>
+    <h1 class="titulo-principal mb-0">CITACIONES</h1>
+    <p class="descripcion">Mira detalladamente las Citaciones pendientes que te hacen</p>
   </div>
 </div>
 
+<div class="container mt-5 mb-5">
+    <div class="card card-citacion mx-auto p-4" style="max-width: 1000px;">
+      
 
- <div class="container mt-4">
-  <div class="grid-tutorias">
+      <div class="card-body">
+        
 
-    <!-- Registro 1 -->
-    <div class="detalle-contenedor">
-      <h2 class="titulo-principal2">TUTORIA 1</h2>
-      <p class="descripcion">Información registrada por el administrador o docente.</p>
-      <div class="info-general">
-        <p><strong>Nombre:</strong> Juan Camilo Rivera Duquino</p>
-        <p><strong>Rol:</strong> Estudiante</p>
-        <p><strong>Tema:</strong> Estrategias de estudio</p>
-        <p><strong>Fecha:</strong> 28/10/2025</p>
-        <p><strong>Curso:</strong> Matemáticas 10°</p>
-        <p><strong>Motivo:</strong> Bajo rendimiento</p>
-      </div>
-      <div class="mensaje-docente">
-        <strong>Observaciones:</strong>
-        <p>Se recomienda dedicar 30 min diarios a ejercicios y asistir a tutorías semanales.</p>
+        <div class="mb-3">
+          <strong>Fecha de Citación:</strong> <br>
+          <span>12/10/2025</span>
+        </div>
+
+        <div class="mb-3">
+          <strong>Docente/Administrador:</strong> <br>
+          <span>Prof. Laura Mendoza</span>
+        </div>
+
+        <div class="mb-3">
+          <strong>Correo del Remitente:</strong> <br>
+          <span>mate@gmail.com</span>
+        </div>
+
+        <div class="mb-3">
+          <strong>Asunto:</strong> <br>
+          <span>Bajo rendimiento en exámenes</span>
+        </div>
+
+        <div class="mb-3">
+          <strong>Mensaje de Citación:</strong> <br>
+          <p class="mt-2">
+            Estudiante, se le cita para revisar su rendimiento académico en el área de Matemáticas. 
+            Durante las últimas evaluaciones ha presentado un desempeño por debajo del promedio esperado.
+            Se solicita su asistencia al aula de tutorías el día <strong>15 de octubre de 2025 a las 10:00 a.m.</strong> 
+            para conversar sobre estrategias de mejora y apoyo académico.
+          </p>
+        </div>
+
+        <div class="mb-3">
+          <strong>Estado de Citación:</strong> <br>
+          <span class="badge bg-warning text-dark">Pendiente de asistencia</span>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="text-center">
+          <button class="btn btn-ver px-5" onclick="window.location.href='citaciones.html'">← Volver a Mis Citaciones</button>
+        </div>
       </div>
     </div>
-
-    <!-- Registro 2 -->
-    <div class="detalle-contenedor">
-      <h2 class="titulo-principal2">Tutoría 2</h2>
-      <p class="descripcion">Información registrada por el administrador o docente.</p>
-      <div class="info-general">
-        <p><strong>Nombre:</strong> Juan Camilo Rivera Duquino</p>
-        <p><strong>Rol:</strong> Estudiante</p>
-        <p><strong>Tema:</strong> Organización del tiempo</p>
-        <p><strong>Fecha:</strong> 05/11/2025</p>
-        <p><strong>Curso:</strong> Ciencias 10°</p>
-        <p><strong>Motivo:</strong> Falta de planificación</p>
-      </div>
-      <div class="mensaje-docente">
-        <strong>Observaciones:</strong>
-        <p>Se sugiere crear un horario semanal y registrar avances diarios.</p>
-      </div>
-    </div>
-
-    <!-- Registro 3 -->
-    <div class="detalle-contenedor">
-      <h2 class="titulo-principal2">Tutoría 3</h2>
-      <p class="descripcion">Información registrada por el administrador o docente.</p>
-      <div class="info-general">
-        <p><strong>Nombre:</strong> Juan Camilo Rivera Duquino</p>
-        <p><strong>Rol:</strong> Estudiante</p>
-        <p><strong>Tema:</strong> Preparación para exámenes</p>
-        <p><strong>Fecha:</strong> 12/11/2025</p>
-        <p><strong>Curso:</strong> Inglés 10°</p>
-        <p><strong>Motivo:</strong> Dificultad en comprensión de textos</p>
-      </div>
-      <div class="mensaje-docente">
-        <strong>Observaciones:</strong>
-        <p>Se recomienda leer textos en inglés diariamente y hacer resúmenes.</p>
-      </div>
-    </div>
-
   </div>
-</div>
-
-<footer class="footer text-center">
-  EduNotas &copy; 2025
-</footer>
 
 
-   
-   
-   
+
+
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <!-- JavaScript externo -->
   <script src="{{ url_for('static', filename='js/Rstudiante/Crear_Actividad.js') }}"></script>

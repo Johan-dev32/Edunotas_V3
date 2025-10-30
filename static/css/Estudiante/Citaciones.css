@@ -108,58 +108,60 @@ header .btn-dark {
 .descripcion {
   font-size: 1.3rem;     
   color: #555;  
-  margin-left: 50px;         
+  margin-left: 50px;   
+  margin-top: 20px;      
 }
-.detalle-contenedor {
-  max-width: 900px;
-  margin: 40px auto;
-  background-color: #fff;
-  border: 3px solid #050733ff;
-  border-radius: 15px;
-  padding: 40px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
-}
-
-.detalle-contenido {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
+/* Tarjetas de citaciones */
+.card-citacion {
+  border-left: 8px solid #050733ff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  transition: transform 0.2s ease;
 }
 
-/* INFO GENERAL */
-.info-general p {
-  font-size: 1rem;
-  margin-bottom: 0.4rem;
-  color: #333;
+.card-citacion:hover {
+  transform: translateY(-5px);
 }
 
-/* MENSAJE DOCENTE */
-.mensaje-docente {
-  background-color: #f9f9fb;
-  border-left: 5px solid #050733ff;
-  font-size: 0.95rem;
-  color: #333;
-}
-
-/* BOTÓN */
-.btn-edunotas {
+/* Cabecera de cada card */
+.card-header {
   background-color: #050733ff;
-  color: #fff;
+  color: white;
+  font-weight: bold;
+}
+
+/* Botones */
+.btn-ver {
+  background-color: #050733ff;
+  color: white;
+  font-weight: bold;
+}
+
+.btn-ver:hover {
+  background-color: #070b86;
+  color: white;
+}
+
+/* Botón cerrar sesión */
+.btn-dark {
+  background-color: #050733ff !important;
   border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1.3rem;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
 }
 
-.btn-edunotas:hover {
-  background-color: #080a99;
+.btn-dark:hover {
+  background-color: #070b86 !important;
+}
+.btn-usuario:hover,
+.btn-usuario:focus,
+.btn-usuario:active {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--secondary-dark) !important; /* solo cambia el color del ícono */
+    outline: none !important;
 }
 
-/* FOOTER */
-.footer {
-  background-color: white;
-  color: #050733ff;
- 
-  font-weight: bold;
+/* 🔹 Evita que Bootstrap le ponga el ícono de desplegable (flechita ↓) */
+.btn-usuario::after {
+    display: none !important;
 }

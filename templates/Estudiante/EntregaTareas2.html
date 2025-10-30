@@ -45,30 +45,33 @@
   </header>
 
   <!-- Menú lateral -->
-  <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title">MENÚ</h5>
-    </div>
-    <div class="offcanvas1-body">
-      <ul class="nav flex-column">
-        <li class="nav-item"><a href="{{ url_for('Docente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
-        <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas </a>
-        <div class="collapse" id="submenuNotas">
-          <ul class="nav flex-column ms-3">
-            <li><a href="{{ url_for('Docente.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-search"></i> Consultar Notas</a></li>
-            <li><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Registrar Notas</a></li>
-            <li><a href="{{ url_for('Docente.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-calculator"></i> Cálculo de Promedios</a></li>
-          </ul>
-        </div>
-        <li class="nav-item"><a href="{{ url_for('Docente.tareas_actividades1') }}" class="nav-link text-white"><i class="bi bi-book-half"></i> Registro de Tareas y Actividades</a></li>
-        <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-        <li class="nav-item"><a href="{{ url_for('Docente.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Aprobación Académica</a></li>
-        <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones</a></li>
-        <li class="nav-item"><a href="{{ url_for('Docente.historial_academico') }}" class="nav-link text-white"><i class="bi bi-clock"></i> Historial Académico</a></li>
-        <li class="nav-item"><a href="{{ url_for('Docente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
-      </ul>
+  <section class="bg-light py-5 mt-5">
+  <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">MENÚ</h5>
+  </div>
+  <div class="offcanvas1-body">
+    <ul class="nav flex-column">
+          <li class="nav-item"><a href="{{ url_for('Estudiante.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+          
+          <li  class="nav-item"><a href="{{url_for('Estudiante.vernotas') }}" class="nav-link text-white"><i class="bi bi-journal-text"></i> Notas</a></li>
+
+          <li class="nav-item"><a href="{{url_for('Estudiante.entregatareas')}}" class= "nav-link text-white"><i class="bi bi-folder2-open"></i> Material Didactico</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.verhorario') }}" class="nav-link text-white"><i class="bi bi-calendar2-range"></i> Ver Horario</a></li>
+          <li class="nav-item"><a href="{{url_for('Estudiante.tutorias')}}" class="nav-link text-white"><i class="bi bi-people-fill menu-icon"></i> Tutorias</a></li>
+         
+
+          <li class="nav-item"><a href="{{ url_for('Estudiante.evaluaciones') }}" class="nav-link text-white"><i class="bi bi-journal-bookmark-fill"></i> Evaluaciones</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.noticias_vistas') }}" class="nav-link text-white"><i class="bi bi-newspaper"></i> Noticias</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.comunicacion') }}" class="nav-link text-white"><i class="bi bi-chat-dots menu-icon"></i> Comunicación</a></li>
+          <li class="nav-item"><a href="{{url_for('Estudiante.citaciones')}}" class="nav-link text-white"><i class="bi bi-person-video3"></i> Citaciones</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.encuestas') }}" class="nav-link text-white"><i class="bi bi-card-checklist"></i> Encuestas</a></li>
+        </ul>
+      </div>
     </div>
   </div>
+</section>
 
   <!-- Contenido principal -->
   <main class="container">

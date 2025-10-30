@@ -119,7 +119,7 @@ header .btn-dark {
 
 /* ========== TITULOS DE LA VISTA ACTIVIDADES ========== */
 .titulo {
-  margin-top: 30px;
+  margin-top: -90px;
   font-size: 2.5rem;
   font-weight: bold;
   color: #050733ff;

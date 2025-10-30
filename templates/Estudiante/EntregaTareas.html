@@ -67,43 +67,21 @@
   </div>
   <div class="offcanvas1-body">
     <ul class="nav flex-column">
-          <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
           
-          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
-          <div class="collapse" id="submenuNotas">
-            <ul class="nav flex-column ms-3">
-              <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
-             <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+          <li  class="nav-item"><a href="{{url_for('Estudiante.vernotas') }}" class="nav-link text-white"><i class="bi bi-journal-text"></i> Notas</a></li>
 
+          <li class="nav-item"><a href="{{url_for('Estudiante.entregatareas')}}" class= "nav-link text-white"><i class="bi bi-folder2-open"></i> Material Didactico</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.verhorario') }}" class="nav-link text-white"><i class="bi bi-calendar2-range"></i> Ver Horario</a></li>
+          <li class="nav-item"><a href="{{url_for('Estudiante.tutorias')}}" class="nav-link text-white"><i class="bi bi-people-fill menu-icon"></i> Tutorias</a></li>
+         
 
-
-            </ul>
-          </div>
-
-          <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
-
-          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
-            <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
-          </a>
-          <div class="collapse" id="submenuUsuarios">
-            <ul class="nav flex-column ms-3">
-              <li><a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
-              <li><a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
-              <li><a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
-              <li><a href="{{ url_for('Administrador.repitentes') }}" class="nav-link text-white"><i class="bi bi-person-dash"></i> Lista Estudiantes Repitentes</a></li>
-              <li><a href="{{ url_for('Administrador.registro') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Registro Usuarios</a></li>
-            </ul>
-          </div>
-
-
-
-
-
-          <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-          
+          <li class="nav-item"><a href="{{ url_for('Estudiante.evaluaciones') }}" class="nav-link text-white"><i class="bi bi-journal-bookmark-fill"></i> Evaluaciones</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.noticias_vistas') }}" class="nav-link text-white"><i class="bi bi-newspaper"></i> Noticias</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.comunicacion') }}" class="nav-link text-white"><i class="bi bi-chat-dots menu-icon"></i> Comunicación</a></li>
+          <li class="nav-item"><a href="{{url_for('Estudiante.citaciones')}}" class="nav-link text-white"><i class="bi bi-person-video3"></i> Citaciones</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.encuestas') }}" class="nav-link text-white"><i class="bi bi-card-checklist"></i> Encuestas</a></li>
         </ul>
       </div>
     </div>
@@ -118,7 +96,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div class="text-center flex-grow-1">
         <h1 class="titulo-principal mb-0">MATERIAS</h1>
-        <p class="descripcion">Mira las tareas de tus Materias</p>
+        <p class="descripcion">Mira y entrega las tareas de tus Materias</p>
       </div>
 
       <!-- Botón Crear Materia -->

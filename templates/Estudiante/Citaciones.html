@@ -22,13 +22,7 @@
     </button>
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
-   <div class="dropdown ms-2">
-    <ul class="dropdown-menu" aria-labelledby="userMenu" id="dropdownSTUDENT">
-      <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
-      <li><a class="dropdown-item" href="{{ url_for('Estudiante.manual') }}">Manual de Usuario</a></li>
-      <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
-    </ul>
-  </div>
+ 
 
     <div class="dropdown ms-auto me-2">
         <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -124,7 +118,7 @@
             <p><strong>Correo:</strong> admin.colegio@gmail.com</p>
             <p><strong>Asunto:</strong> Citación administrativa</p>
             <p><strong>Citación:</strong> Se requiere su presencia en la oficina administrativa para revisar asuntos disciplinarios.</p>
-            <button class="btn btn-ver mt-2 w-100">Ver Detalles</button>
+            <button class="btn btn-ver mt-2 w-100"><a href ="{{ url_for('Estudiante.citaciones2') }}" class="nav-link text-white">Ver Detalles</a></button>
           </div>
         </div>
       </div>
@@ -140,7 +134,7 @@
             <p><strong>Correo:</strong> docente.castellano@gmail.com</p>
             <p><strong>Asunto:</strong> Falta de participación en clase</p>
             <p><strong>Citación:</strong> Se le invita a una tutoría para conversar sobre su participación y trabajo en grupo.</p>
-            <button class="btn btn-ver mt-2 w-100">Ver Detalles</button>
+            <button class="btn btn-ver mt-2 w-100"><a href="{{ url_for('Estudiante.citaciones2') }}" class="nav-link text-white">Ver Detalles</a></button>
           </div>
         </div>
       </div>

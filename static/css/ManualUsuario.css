@@ -96,11 +96,16 @@ header .btn-outline-primary:hover {
 
 
 }
-.titulo{
-  margin-left:600px;
-  font-size: 40px;
-  margin-top: 30px;
-  font-weight: bold;
+.titulo-principal {
+  font-size: 3rem;      
+  font-weight: bolder;      
+  color: #050733ff;    
+  margin-left: 50px;  
+  margin-top: 40px;
+  font-family: 'Trebuchet MS', sans-serif;
+  
+
+
 }
 .texto1{
   margin-left: 550px;

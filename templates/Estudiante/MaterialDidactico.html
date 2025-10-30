@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colegio Fe y Alegría</title>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Iconos -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- CSS propio -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Estudiante/material.css') }}">
+
+</head>
+<body>
+  <header>
+    <div class="wrap topbar">
+      <div>
+        <h1>Material Didáctico</h1>
+        <div class="small">Accede a los recursos que tus docentes suben para cada curso.</div>
+      </div>
+      <div class="search">
+        <input id="searchInput" type="search" placeholder="Buscar por título, descripción o curso...">
+        <select id="filterType">
+          <option value="all">Todos los tipos</option>
+          <option value="explicacion">Explicación en clase</option>
+          <option value="tarea">Tarea domiciliaria</option>
+          <option value="refuerzo">Actividad de refuerzo</option>
+          <option value="lectura">Lectura complementaria</option>
+        </select>
+        <button id="openUpload">Subir material</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <main>
+      <nav class="side">
+        <div class="menu">
+          <a href="#" class="active">Material Didáctico</a>
+          <a href="#">Mis Descargas</a>
+          <a href="#">Favoritos</a>
+        </div>
+        <div style="height:14px"></div>
+        <div class="menu">
+          <div style="font-weight:700;margin-bottom:8px">Cursos</div>
+          <div id="coursesList" class="small"></div>
+        </div>
+      </nav>
+
+      <section class="content">
+        <div class="controls">
+          <div class="small">Mostrando <span id="count">0</span> materiales</div>
+          <div style="flex:1"></div>
+          <select id="courseFilter">
+            <option value="all">Todos los cursos</option>
+          </select>
+        </div>
+
+        <div id="grid" class="grid"></div>
+        <div id="empty" class="empty" style="display:none">No se encontró material. Prueba otra búsqueda o filtro.</div>
+      </section>
+    </main>
+  </div>
+
+  <!-- modal subir -->
+  <div id="modal" class="modal" role="dialog" aria-hidden="true">
+    <div class="dialog">
+      <h3>Subir material (simulado)</h3>
+      <p class="small">Este formulario almacena los recursos en tu navegador (localStorage). Los archivos no se suben a un servidor real.</p>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <div style="flex:1">
+          <label>Título</label>
+          <input id="mTitle" type="text" placeholder="Ej: Clase 3 - Ecuaciones">
+          <label>Curso</label>
+          <input id="mCourse" type="text" placeholder="Ej: Álgebra 11A">
+          <label>Tipo de uso</label>
+          <select id="mType">
+            <option value="explicacion">Explicación en clase</option>
+            <option value="tarea">Tarea domiciliaria</option>
+            <option value="refuerzo">Actividad de refuerzo</option>
+            <option value="lectura">Lectura complementaria</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label>Descripción</label>
+          <textarea id="mDesc" placeholder="Breve descripción del material"></textarea>
+          <label>Enlace o archivo (URL o arrastra texto)</label>
+          <input id="mLink" type="text" placeholder="https://... o escribe 'audio:...' para simular un podcast">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button id="saveMaterial">Guardar</button>
+        <button id="closeModal" class="ghost">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- detalle -->
+  <div id="detailModal" class="modal">
+    <div class="dialog" style="max-width:640px">
+      <h3 id="dTitle">Título</h3>
+      <div class="small" id="dMeta"></div>
+      <p id="dDesc"></p>
+      <div id="dContent"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button id="dDownload">Descargar / Abrir</button>
+        <button id="dClose" class="ghost">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   <script src="{{ url_for('static', filename='js/Estudiante/material.js') }}"></script>
+</body>
+</html>

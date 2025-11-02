@@ -8,6 +8,11 @@ from flask_login import UserMixin
 
 db = SQLAlchemy()
 
+
+
+
+
+
 # -----------------------------------------------------
 # Usuario
 # -----------------------------------------------------
@@ -34,9 +39,24 @@ class Usuario(db.Model, UserMixin):
     asistencias_detalle = relationship('Detalle_Asistencia', back_populates='estudiante', lazy='dynamic', foreign_keys='Detalle_Asistencia.ID_Estudiante')
     cursos_dirige = relationship('Curso', back_populates='director', lazy='dynamic', foreign_keys='Curso.DirectorGrupo')
     notificaciones = relationship('Notificacion', back_populates='usuario', lazy='dynamic')
+    
+    # Relación con Matricula (el usuario puede ser estudiante)
+    matriculas = relationship(
+        'Matricula',
+        back_populates='estudiante',
+        lazy='dynamic',
+        foreign_keys='Matricula.ID_Estudiante'
+    )
 
     def get_id(self):
         return str(self.ID_Usuario)
+    
+    @property
+    def matriculas_estudiante(self):
+        if self.Rol == 'Estudiante':
+            return self.matriculas.all()
+        return []
+
 
 
 # -----------------------------------------------------
@@ -114,9 +134,29 @@ class Matricula(db.Model):
     curso = relationship('Curso', back_populates='matriculas', foreign_keys=[ID_Curso])
     observaciones = relationship('Observacion', back_populates='matricula', lazy='dynamic')
     actividades_estudiante = relationship('Actividad_Estudiante', back_populates='matricula', lazy='dynamic')
+    
+    # Relación con Usuario (el estudiante que se matricula)
+    estudiante = relationship(
+        'Usuario',
+        back_populates='matriculas',
+        foreign_keys=[ID_Estudiante]
+    )
+
+    # Relación con Curso
+    curso = relationship(
+        'Curso',
+        back_populates='matriculas',
+        foreign_keys=[ID_Curso]
+    )
 
     def __repr__(self):
         return f"<Matricula Estudiante={self.ID_Estudiante}, Curso={self.ID_Curso}, Año={self.AnioLectivo}>"
+    
+    @property
+    def matriculas_estudiante(self):
+        if self.Rol == 'Estudiante':
+            return self.matriculas.all()
+        return []
 
 
 # -----------------------------------------------------
@@ -242,10 +282,13 @@ class Actividad(db.Model):
     Titulo = db.Column(String(200), nullable=False)
     Tipo = db.Column(Enum('Taller', 'Examen', 'Proyecto', 'Participacion', 'Grupo'))
     Fecha = db.Column(Date)
+    Descripcion = db.Column(Text)
+    Hora = db.Column(Time)
+    ArchivoPDF = db.Column(String(255))
     ID_Cronograma_Actividades = db.Column(Integer, ForeignKey('Cronograma_Actividades.ID_Cronograma_Actividades'), nullable=False)
     Estado = db.Column(Enum('Pendiente', 'Calificada', 'Cancelada'))
     Porcentaje = db.Column(DECIMAL(5, 2))
-
+    
     cronograma = relationship('Cronograma_Actividades', back_populates='actividades', foreign_keys=[ID_Cronograma_Actividades])
     estudiantes = relationship('Actividad_Estudiante', back_populates='actividad', lazy='dynamic')
 

@@ -101,7 +101,7 @@ header .btn-dark {
   font-weight: 900;      
   color: #050733ff;    
   margin-left: 50px;  
-  margin-top: 30px;
+  margin-top: -90px;
 }
 
 
@@ -162,4 +162,38 @@ header .btn-dark {
   color: #050733ff;
  
   font-weight: bold;
+}
+.btn-usuario {
+    background: none !important;        /* sin fondo */
+    border: none !important;            /* sin borde */
+    color: var(--primary-dark) !important; /* color del ícono */
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;                 /* cuadrado/redondo según necesidad */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    padding: 0;
+    box-shadow: none !important;
+}
+
+/* Al pasar el mouse — sin fondo azul */
+.btn-usuario:hover,
+.btn-usuario:focus,
+.btn-usuario:active {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--secondary-dark) !important; /* solo cambia el color del ícono */
+    outline: none !important;
+}
+
+/* 🔹 Evita que Bootstrap le ponga el ícono de desplegable (flechita ↓) */
+.btn-usuario::after {
+    display: none !important;
+}
+.txt-ultimo{
+  font-size: 12px;
+  color: #666464;
 }

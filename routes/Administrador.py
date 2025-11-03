@@ -5,12 +5,15 @@ from werkzeug.security import generate_password_hash
 from sqlalchemy import func
 from flask import jsonify
 from datetime import datetime, date
-from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad
+from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion
 from flask_mail import Message
+import sys
 import os
 
 from decimal import Decimal
 
+
+sys.stdout.reconfigure(encoding='utf-8')
 #Definir el Blueprint para el administardor
 Administrador_bp = Blueprint('Administrador', __name__, url_prefix='/administrador')
 
@@ -117,79 +120,75 @@ def eliminar_docente(id):
 @Administrador_bp.route('/estudiantes')
 @login_required
 def estudiantes():
-    # Muestra los estudiantes registrados
     estudiantes = Usuario.query.filter_by(Rol='Estudiante').all()
-    return render_template('Administrador/Estudiantes.html', estudiantes=estudiantes)
+    cursos = Curso.query.filter_by(Estado='Activo').all()
+    return render_template('Administrador/Estudiantes.html', estudiantes=estudiantes, cursos=cursos)
 
 
 @Administrador_bp.route('/agregar_estudiante', methods=['POST'])
-@login_required
 def agregar_estudiante():
     try:
         nombre = request.form['Nombre']
         apellido = request.form['Apellido']
+        tipo_documento = request.form['TipoDocumento']
+        numero_documento = request.form['NumeroDocumento']
         correo = request.form['Correo']
-        tipo_doc = request.form['TipoDocumento']
-        numero_doc = request.form['NumeroDocumento']
         telefono = request.form['Telefono']
         direccion = request.form['Direccion']
-        curso = request.form['Curso']
-        fecha_nac = request.form['FechaNacimiento']
-        
 
-        
-        hashed_password = generate_password_hash("123456")
+        # 🔒 Generar una contraseña por defecto (puedes cambiar la lógica si quieres)
+        contrasena_plana = numero_documento  # o podrías usar una aleatoria
+        contrasena_hash = generate_password_hash(contrasena_plana, method='pbkdf2:sha256')
+
+        # Crear el nuevo usuario
         nuevo_estudiante = Usuario(
+            Rol='Estudiante',
             Nombre=nombre,
             Apellido=apellido,
+            TipoDocumento=tipo_documento,
+            NumeroDocumento=numero_documento,
             Correo=correo,
-            Contrasena=hashed_password,
-            TipoDocumento=tipo_doc,
-            NumeroDocumento=numero_doc,
             Telefono=telefono,
             Direccion=direccion,
-            Rol='Estudiante',
-            Estado='Activo',
-            Genero='Otro'
+            Contrasena=contrasena_hash
         )
+
         db.session.add(nuevo_estudiante)
         db.session.commit()
 
-        
-        curso_obj = Curso.query.filter_by(Nombre=curso).first()
-        if not curso_obj:
-            flash("❌ El curso seleccionado no existe", "danger")
-        
-            return redirect(url_for('Administrador.estudiantes'))
+        print(f"✅ Estudiante registrado correctamente: {nombre} {apellido}")
+        return jsonify({'success': True, 'id_estudiante': nuevo_estudiante.ID_Usuario})
 
-        
-        matricula = Matricula(
-            ID_Estudiante=nuevo_estudiante.ID_Usuario,
-            ID_Curso=curso_obj.ID_Curso,
-            Correo=correo,
-            FechaNacimiento=fecha_nac,
-            DepNacimiento="Desconocido",
-            TipoDocumento=tipo_doc,
-            NumeroDocumento=numero_doc,
-            AnioLectivo=date.today().year
+    except Exception as e:
+            print("❌ Error al registrar estudiante:", e)
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)})
+    
+@Administrador_bp.route('/agregar_matricula', methods=['POST'])
+def agregar_matricula():
+    try:
+        nueva_matricula = Matricula(
+            ID_Estudiante=request.form['ID_Estudiante'],
+            ID_Curso=request.form['ID_Curso'],
+            Correo=request.form['Correo'],
+            FechaNacimiento=request.form['FechaNacimiento'],
+            DepNacimiento=request.form.get('DepNacimiento'),
+            TipoDocumento=request.form['TipoDocumento'],
+            NumeroDocumento=request.form['NumeroDocumento'],
+            AnioLectivo=request.form['AnioLectivo']
         )
-        db.session.add(matricula)
+
+        db.session.add(nueva_matricula)
         db.session.commit()
 
-        flash("✅ Estudiante registrado correctamente", "success")
-        
-        
-       
-            
+        flash("✅ Matrícula registrada correctamente", "success")
+        return redirect(url_for('Administrador.estudiantes'))
 
-
-
-
-    except SQLAlchemyError as e:
+    except Exception as e:
         db.session.rollback()
-        flash(f"❌ Error al registrar estudiante: {str(e)}", "danger")
-
-    return redirect(url_for('Administrador.estudiantes'))
+        print("❌ Error al registrar matrícula:", e)
+        flash("Error al registrar matrícula", "danger")
+        return redirect(url_for('Administrador.estudiantes'))
 
 
 @Administrador_bp.route('/actualizar_estudiante/<int:id>', methods=['POST'])
@@ -507,9 +506,60 @@ def notas_registro():
 def notas_consultar():
     return render_template('Administrador/Notas_Consultar.html')
 
+# GESTIÓN DE LA OBSERVACIÓN #
+
 @Administrador_bp.route('/observador')
 def observador():
-    return render_template('Administrador/Observador.html')
+    observaciones = (
+            db.session.query(Observacion, Usuario)
+            .join(Matricula, Observacion.ID_Matricula == Matricula.ID_Matricula)
+            .join(Usuario, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+            .all()
+            )
+    return render_template('Administrador/Observador.html', observaciones=observaciones)
+
+
+@Administrador_bp.route('/observador/registrar', methods=['POST'])
+def registrar_observacion():
+    data = request.form
+
+    # Validar campos requeridos
+    nombre = data.get('nombre')
+    tipo = data.get('tipo')
+    nivel = data.get('nivelImportancia')
+    fecha_str = data.get('fecha')
+    descripcion = data.get('descripcion')
+    recomendacion = data.get('recomendacion')
+
+    if not all([nombre, tipo, nivel, fecha_str, descripcion, recomendacion]):
+        return jsonify({"status": "error", "message": "Todos los campos son obligatorios"}), 400
+
+    # Convertir fecha de string a objeto datetime.date
+    try:
+        fecha = datetime.strptime(fecha_str, "%Y-%m-%d").date()
+    except ValueError:
+        return jsonify({"status": "error", "message": "Formato de fecha inválido"}), 400
+
+    # Crear la observación
+    nueva_obs = Observacion(
+        Fecha=fecha,
+        Descripcion=descripcion,
+        Tipo=tipo,
+        NivelImportancia=nivel,
+        Recomendacion=recomendacion,
+        Estado='Activa',
+        ID_Horario=None,  
+        ID_Matricula=None
+    )
+
+    try:
+        db.session.add(nueva_obs)
+        db.session.commit()
+        return jsonify({"status": "ok", "message": "Observación registrada correctamente"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": "error", "message": f"Error al guardar: {str(e)}"}), 500
+
 
 @Administrador_bp.route('/calculo_promedio')
 def calculo_promedio():
@@ -637,7 +687,7 @@ def cursos2():
 
         return redirect(url_for('Administrador.cursos2'))
 
-    # 👇 para GET (mostrar cursos)
+    # para GET (mostrar cursos)
     cursos = Curso.query.all()
     usuarios = Usuario.query.all()
     return render_template('Administrador/Cursos2.html', cursos=cursos, usuarios=usuarios)

@@ -10,9 +10,8 @@
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <!-- CSS propio -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/Estudiante/Observador2.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Estudiante/Citaciones2.css') }}">
 </head>
-
 <body>
 
   <!-- Header -->
@@ -79,44 +78,68 @@
   </div>
 </section>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
   <div class="text-center flex-grow-1">
-    <h1 class="titulo-principal mb-0">OBSERVADOR</h1>
-    <p class="descripcion">Mira las Anotaciones que te hacen</p>
+    <h1 class="titulo-principal mb-0">CITACIONES</h1>
+    <p class="descripcion">Mira detalladamente las Citaciones pendientes que te hacen</p>
   </div>
 </div>
-<div class="detalle-contenedor">
-    <div class="detalle-contenido">
 
-      <!-- Información general -->
-      <div class="info-general mb-4">
-        <p><strong>Título:</strong> Buen desempeño en clase</p>
-        <p><strong>Materia:</strong> Matemáticas</p>
-        <p><strong>Profesor(a):</strong> Laura Gómez</p>
-        <p><strong>Dirigido a:</strong> Juan Camilo Rivera</p>
-        <p><strong>Fecha:</strong> 22 de octubre de 2025</p>
-      </div>
-
-      <!-- Mensaje del docente -->
-      <div class="mensaje-docente p-3 rounded">
-        <h5 class="fw-bold mb-3 text-center">Mensaje del Docente</h5>
-        <p>
-          El estudiante ha demostrado responsabilidad en sus deberes, mantiene un excelente comportamiento y participa activamente en clase.
-          Además, ha mostrado progreso constante en el desarrollo de sus habilidades académicas y compromiso con su grupo de trabajo.
-        </p>
-      </div>
-
+<div class="container mt-5 mb-5">
+    <div class="card card-citacion mx-auto p-4" style="max-width: 1000px;">
       
+
+      <div class="card-body">
+        
+
+        <div class="mb-3">
+          <strong>Fecha de Citación:</strong> <br>
+          <span>12/10/2025</span>
+        </div>
+
+        <div class="mb-3">
+          <strong>Docente/Administrador:</strong> <br>
+          <span>Prof. Laura Mendoza</span>
+        </div>
+
+        <div class="mb-3">
+          <strong>Correo del Remitente:</strong> <br>
+          <span>mate@gmail.com</span>
+        </div>
+
+        <div class="mb-3">
+          <strong>Asunto:</strong> <br>
+          <span>Bajo rendimiento en exámenes</span>
+        </div>
+
+        <div class="mb-3">
+          <strong>Mensaje de Citación:</strong> <br>
+          <p class="mt-2">
+            Estudiante, se le cita para revisar su rendimiento académico en el área de Matemáticas. 
+            Durante las últimas evaluaciones ha presentado un desempeño por debajo del promedio esperado.
+            Se solicita su asistencia al aula de tutorías el día <strong>15 de octubre de 2025 a las 10:00 a.m.</strong> 
+            para conversar sobre estrategias de mejora y apoyo académico.
+          </p>
+        </div>
+
+        <div class="mb-3">
+          <strong>Estado de Citación:</strong> <br>
+          <span class="badge bg-warning text-dark">Pendiente de asistencia</span>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="text-center">
+          <button class="btn btn-ver px-5" onclick="window.location.href='citaciones.html'">← Volver a Mis Citaciones</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="footer text-center p-3 mt-5">
-    <p>© 2025 EduNotas | Observador del Estudiante</p>
-  </footer>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <!-- JavaScript externo -->
   <script src="{{ url_for('static', filename='js/Rstudiante/Crear_Actividad.js') }}"></script>
 

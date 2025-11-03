@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Observador</title>
 
-  <!-- Bootstrap -->
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <!-- CSS -->
+  <!-- CSS propio -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/Observador.css') }}">
 </head>
 <body>
@@ -39,158 +39,148 @@
         <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
         <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuración Académica</a></li>
         <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
+        <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Académico</a></li>
       </ul>
     </div>
   </header>
 
   <!-- SIDEBAR -->
-<section class="bg-light py-5 mt-5">
   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title">MENÚ</h5>
-  </div>
-  <div class="offcanvas1-body">
-    <ul class="nav flex-column">
-          <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
-          
-          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
-          <div class="collapse" id="submenuNotas">
-            <ul class="nav flex-column ms-3">
-              <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
-             <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">MENÚ</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+        
+        <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
+        <div class="collapse" id="submenuNotas">
+          <ul class="nav flex-column ms-3">
+            <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+            <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>
+            <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Cálculo de Promedio</a></li>
+          </ul>
+        </div>
 
+        <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+        <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
 
+        <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios"><i class="bi bi-caret-down-fill"></i> Gestión de Usuarios</a>
+        <div class="collapse" id="submenuUsuarios">
+          <ul class="nav flex-column ms-3">
+            <li><a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
+            <li><a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
+            <li><a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
+            <li><a href="{{ url_for('Administrador.repitentes') }}" class="nav-link text-white"><i class="bi bi-person-dash"></i> Lista Estudiantes Repitentes</a></li>
+            <li><a href="{{ url_for('Administrador.registro') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Registro Usuarios</a></li>
+          </ul>
+        </div>
 
-            </ul>
-          </div>
-
-          <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
-
-          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
-            <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
-          </a>
-          <div class="collapse" id="submenuUsuarios">
-            <ul class="nav flex-column ms-3">
-              <li><a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
-              <li><a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
-              <li><a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
-              <li><a href="{{ url_for('Administrador.repitentes') }}" class="nav-link text-white"><i class="bi bi-person-dash"></i> Lista Estudiantes Repitentes</a></li>
-              <li><a href="{{ url_for('Administrador.registro') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Registro Usuarios</a></li>
-            </ul>
-          </div>
-
-
-
-
-
-          <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-          
-        </ul>
-      </div>
+        <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+        <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+      </ul>
     </div>
   </div>
-</section>
 
   <!-- MAIN -->
   <main class="container my-4">
-
-    <!-- Título y descripción -->
     <div class="text-center mb-4">
       <h1 class="titulo-principal fw-bold">OBSERVADOR DE ESTUDIANTES</h1>
       <p class="descripcion text-muted">Gestiona las observaciones y control de cupos por grupo</p>
     </div>
 
-    <!-- CARD -->
-    <div class="card shadow-lg p-4 rounded-4">
-      <!-- Control de cupos -->
-      <div class="table-responsive mb-4">
-        <h4 class="text-azul fw-semibold mb-3">Control de Cupos</h4>
-        <table class="table table-hover text-center align-middle">
-          <thead class="table-azul">
-            <tr>
-              <th>Registrados</th>
-              <th>Grupo</th>
-              <th>Cupos Disponibles</th>
-              <th>Máximo</th>
-            </tr>
-          </thead>
-          <tbody id="tablaCupos">
-            <tr><td>28</td><td>1001</td><td>2</td><td>30</td></tr>
-            <tr><td>25</td><td>1002</td><td>5</td><td>30</td></tr>
-            <tr><td>30</td><td>1003</td><td>0</td><td>30</td></tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="text-center mb-4">
+      <button id="btnAbrirFormulario" class="btn btn-success">Agregar Observación</button>
+    </div>
 
-      <!-- Botón -->
-      <div class="text-center mb-4">
-        <button id="btnAbrirFormulario" class="btn btn-success">Agregar Observación</button>
-      </div>
-
-      <!-- Tabla Observador -->
-      <div class="table-responsive">
-        <h4 class="text-azul fw-semibold mb-3">Observador de Estudiantes</h4>
-        <table class="table table-hover text-center align-middle">
-          <thead class="table-azul">
-            <tr>
-              <th>Nombre</th>
-              <th>Comportamiento</th>
-              <th>Actitud</th>
-              <th>Avances</th>
-              <th>Dificultades</th>
-              <th>Seguimiento</th>
-            </tr>
-          </thead>
-          <tbody id="tablaObservador"></tbody>
-        </table>
-      </div>
+    <div class="table-responsive">
+      <h4 class="text-azul fw-semibold mb-3">Observador de Estudiantes</h4>
+      <table class="table table-hover text-center align-middle">
+        <thead class="table-azul">
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Nivel de Importancia</th>
+            <th>Fecha</th>
+            <th>Descripción</th>
+            <th>Recomendación</th>
+          </tr>
+        </thead>
+        <tbody id="tablaObservador">
+          {% for obs, est in observaciones %}
+          <tr>
+            <td>{{ est.Nombre }} {{ est.Apellido }}</td>
+            <td>{{ obs.Tipo }}</td>
+            <td>{{ obs.NivelImportancia }}</td>
+            <td>{{ obs.Fecha.strftime('%d/%m/%Y') if obs.Fecha else '' }}</td>
+            <td class="text-start"><pre class="mb-0">{{ obs.Descripcion }}</pre></td>
+            <td class="text-start"><pre class="mb-0">{{ obs.Recomendacion }}</pre></td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" class="text-muted">No hay observaciones registradas</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </main>
 
-  <!-- MODAL -->
-  <div id="modalFormulario" class="modal oculto">
-    <div class="modal-dialog">
-      <div class="modal-content p-5">
-        <h2 class="text-center text-azul mb-3 fw-bold">AGREGAR OBSERVACIÓN</h2>
+  <!-- MODAL CORREGIDO -->
+<div class="modal fade" id="modalFormulario" tabindex="-1" aria-labelledby="modalFormularioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-4">
+      <div class="modal-header border-0">
+        <h2 class="modal-title text-azul fw-bold">AGREGAR OBSERVACIÓN</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
         <form id="formObservacion">
-          <div class="mb-3">
-            <label>Nombre del estudiante</label>
-            <input type="text" id="nombre" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label>Comportamiento</label>
-            <input type="text" id="comportamiento" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label>Actitud</label>
-            <input type="text" id="actitud" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label>Avances</label>
-            <input type="text" id="avances" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label>Dificultades</label>
-            <input type="text" id="dificultades" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label>Seguimiento</label>
-            <input type="text" id="seguimiento" class="form-control" required>
-          </div>
-          <div class="d-flex justify-content-end mt-4">
-            <button type="submit" class="btn btn-success me-2">Agregar</button>
-            <button type="button" id="btnCancelar" class="btn btn-secondary">Cancelar</button>
-          </div>
+          <input type="text" name="nombre" placeholder="Nombre" required class="form-control mb-2">
+          <input type="text" name="tipo" placeholder="Tipo" required class="form-control mb-2">
+          <input type="text" name="nivelImportancia" placeholder="Nivel de Importancia" required class="form-control mb-2">
+          <input type="date" name="fecha" required class="form-control mb-2">
+          <textarea name="descripcion" placeholder="Descripción" required class="form-control mb-2"></textarea>
+          <textarea name="recomendacion" placeholder="Recomendación" required class="form-control mb-2"></textarea>
+          <button type="submit" class="btn btn-success mt-2">Agregar</button>
         </form>
       </div>
     </div>
   </div>
+</div>
 
+
+  <!-- JS de Bootstrap -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JS de observador -->
+  <script>
+  document.getElementById("formObservacion").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+
+      try {
+          const response = await fetch("/administrador/observador/registrar", {
+              method: "POST",
+              body: formData
+          });
+          const result = await response.json();
+          console.log(result);
+          alert(result.message || "Prueba completada");
+          if(result.status === "ok") location.reload();
+      } catch (error) {
+          console.error(error);
+          alert("Error al conectar con el servidor");
+      }
+  });
+
+  // Abrir modal con botón
+  document.getElementById("btnAbrirFormulario").addEventListener("click", function() {
+      const modal = new bootstrap.Modal(document.getElementById("modalFormulario"));
+      modal.show();
+  });
+  </script>
   <script src="{{ url_for('static', filename='js/Administrador/observador.js') }}"></script>
 </body>
 </html>

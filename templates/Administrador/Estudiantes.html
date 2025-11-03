@@ -9,77 +9,62 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/Estudiantes.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
+
 <body>
+  <!-- HEADER -->
   <header class="d-flex align-items-center p-3 border-bottom w-100">
-<button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
-  <i class="bi bi-list"></i>
-</button>
-<h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
-<div class="dropdown">
-    
-  <button 
-    class="btn btn-edunotas position-relative dropdown-toggle" 
-    type="button" 
-    id="dropdownMenuButton" 
-    data-bs-toggle="dropdown" 
-    aria-expanded="false">
-    <span class="bi bi-envelope-fill"></span>
-  </button>
-  
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <li><a class="dropdown-item" href="#">Ajustes</a></li>
-    <li><a class="dropdown-item" href="#">Opción 2</a></li>
-    <li><a class="dropdown-item" href="#">Opción 3</a></li>
-  </ul>
-</div>
+    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRÍA</h2>
 
-<!--Botón menu de usuario-->
+    <!-- MENÚ DE NOTIFICACIONES -->
+    <div class="dropdown ms-auto me-3">
+      <button class="btn btn-edunotas position-relative dropdown-toggle" data-bs-toggle="dropdown">
+        <span class="bi bi-envelope-fill"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#">Ajustes</a></li>
+        <li><a class="dropdown-item" href="#">Opción 2</a></li>
+        <li><a class="dropdown-item" href="#">Opción 3</a></li>
+      </ul>
+    </div>
 
-<div class="dropdown">
-  <button 
-    class="btn btn-usuario dropdown-toggle" 
-    type="button" 
-    id="dropdownMenuButton" 
-    data-bs-toggle="dropdown" 
-    aria-expanded="false">
-    <span class="bi bi-person-lines-fill"></span>
-  </button>
-
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-    <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
-    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-    <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
-  </ul>
-</div>
-
-</a>
+    <!-- MENÚ DE USUARIO -->
+    <div class="dropdown">
+      <button class="btn btn-usuario dropdown-toggle" data-bs-toggle="dropdown">
+        <span class="bi bi-person-lines-fill"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('Administrador.configuracion_academica') }}">Configuración Académica</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('Administrador.historialacademico') }}">Historial Académico</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
+      </ul>
+    </div>
   </header>
 
-<!--  MENU  -->
+  <!-- MENÚ LATERAL -->
   <section class="bg-light">
-  <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title">MENÚ</h5>
-  </div>
-  <div class="offcanvas1-body">
-    <ul class="nav flex-column">
-          <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
-          
+    <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">MENÚ</h5>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="nav flex-column">
+          <li><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+
           <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
           <div class="collapse" id="submenuNotas">
             <ul class="nav flex-column ms-3">
               <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
-             <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
-
-
-
+              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Registrar Notas</a></li>
+              <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-calculator"></i> Cálculo de Promedio</a></li>
             </ul>
           </div>
 
-          <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
+          <li><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+          <li><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
 
           <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
             <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
@@ -89,104 +74,180 @@
               <li><a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
               <li><a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
               <li><a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
-              <li><a href="{{ url_for('Administrador.repitentes') }}" class="nav-link text-white"><i class="bi bi-person-dash"></i> Lista Estudiantes Repitentes</a></li>
+              <li><a href="{{ url_for('Administrador.repitentes') }}" class="nav-link text-white"><i class="bi bi-person-dash"></i> Repitentes</a></li>
               <li><a href="{{ url_for('Administrador.registro') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Registro Usuarios</a></li>
             </ul>
           </div>
 
-
-
-
-
-          <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-          
+          <li><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignaturas</a></li>
+          <li><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-calendar3"></i> Horarios</a></li>
         </ul>
       </div>
     </div>
+  </section>
+
+  <!-- FORMULARIO DE REGISTRO -->
+  <main class="container mt-4">
+    <h2 class="fw-bold fs-1 text-center">GESTIÓN DE ESTUDIANTES</h2>
+
+    <div class="container mt-4 mb-5 form-container p-4 rounded shadow">
+      <h2 class="fw-bold text-center mb-3">Registrar Estudiante</h2>
+      <p class="text-center fw-semibold">Por favor diligencie todos los campos</p>
+
+      <!-- FORMULARIO ESTUDIANTE -->
+      <form id="formEstudiante" method="POST" action="{{ url_for('Administrador.agregar_estudiante') }}">
+        <h5 class="mt-4 mb-3 fw-bold">Datos Básicos</h5>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Nombres:</label>
+            <input type="text" class="form-control" name="Nombre" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Apellidos:</label>
+            <input type="text" class="form-control" name="Apellido" required>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-6">
+            <label class="form-label">Tipo de Documento:</label>
+            <select class="form-select" name="TipoDocumento" required>
+              <option value="">Seleccione...</option>
+              <option value="TI">TI</option>
+              <option value="CC">CC</option>
+              <option value="CE">CE</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Número de Documento:</label>
+            <input type="text" class="form-control" name="NumeroDocumento" required>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-6">
+            <label class="form-label">Fecha de Nacimiento:</label>
+            <input type="date" class="form-control" name="FechaNacimiento" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Correo:</label>
+            <input type="email" class="form-control" name="Correo" required>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-4">
+            <label class="form-label">Teléfono:</label>
+            <input type="tel" class="form-control" name="Telefono" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Dirección:</label>
+            <input type="text" class="form-control" name="Direccion">
+          </div>
+          <div class="col-md-4">
+            <label for="Curso" class="form-label">Curso:</label>
+            <select name="Curso" id="Curso" class="form-select" required>
+              {% for curso in cursos %}
+                <option value="{{ curso.ID_Curso }}">{{ curso.Grado }} {{ curso.Grupo }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-primary px-4">Registrar Estudiante</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- MODAL MATRÍCULA -->
+  <div class="modal fade" id="modalMatricula" tabindex="-1" aria-labelledby="matriculaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="formMatricula" method="POST" action="{{ url_for('Administrador.agregar_matricula') }}">
+          <div class="modal-header">
+            <h5 class="modal-title" id="matriculaLabel">Registrar Matrícula</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            <input type="hidden" name="ID_Estudiante" id="ID_Estudiante">
+
+            <div class="mb-3">
+              <label class="form-label">Curso:</label>
+              <select name="ID_Curso" class="form-select" required>
+                {% for curso in cursos %}
+                  <option value="{{ curso.ID_Curso }}">{{ curso.Grado }}°{{ curso.Grupo }} - {{ curso.Anio }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Correo:</label>
+              <input type="email" name="Correo" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Departamento Nacimiento:</label>
+              <input type="text" name="DepNacimiento" class="form-control">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Fecha de Nacimiento:</label>
+              <input type="date" name="FechaNacimiento" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Tipo de Documento:</label>
+              <select name="TipoDocumento" class="form-select">
+                <option value="TI">TI</option>
+                <option value="CC">CC</option>
+                <option value="CE">CE</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Número de Documento:</label>
+              <input type="text" name="NumeroDocumento" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Año Lectivo:</label>
+              <input type="number" name="AnioLectivo" class="form-control" value="2025" required>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Registrar Matrícula</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
-</section>
 
-<main class="container mt-4">
-    <h2 class="fw-bold fs-1">GESTIÓN DE ESTUDIANTES</h2>
+  <!-- SCRIPT FUNCIONAL -->
+  <script>
+  document.getElementById("formEstudiante").addEventListener("submit", async function(event) {
+    event.preventDefault();
 
-<div class="container mt-4 mb-5 form-container p-4 rounded shadow">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="fw-bold text-center flex-grow-1">Registrar Estudiante</h2>
-    </div>
-    <p class="text-center fw-semibold">Por Favor Diligencie Todos Los Campos</p>
+    const form = event.target;
+    const formData = new FormData(form);
 
-    <form method="POST" action="{{ url_for('Administrador.agregar_estudiante') }}">
-  <h5 class="mt-4 mb-3 fw-bold">Datos Básicos</h5>
+    const response = await fetch(form.action, { method: "POST", body: formData });
+    const data = await response.json().catch(() => null);
 
-  <div class="row g-3">
-    <div class="col-md-6">
-      <label class="form-label">Nombres:</label>
-      <input type="text" class="form-control" name="Nombre" required>
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Apellidos:</label>
-      <input type="text" class="form-control" name="Apellido" required>
-    </div>
-  </div>
+    if (data && data.success) {
+      alert("✅ Estudiante registrado correctamente");
+      document.getElementById("ID_Estudiante").value = data.id_estudiante;
+      const modal = new bootstrap.Modal(document.getElementById("modalMatricula"));
+      modal.show();
+    } else {
+      alert("❌ Error al registrar estudiante");
+    }
+  });
+  </script>
 
-  <div class="row g-3 mt-2">
-    <div class="col-md-6">
-      <label class="form-label">Tipo de Documento:</label>
-      <select class="form-select" name="TipoDocumento" required>
-        <option value="">Seleccione...</option>
-        <option value="TI">TI</option>
-        <option value="CC">CC</option>
-        <option value="CE">CE</option>
-      </select>
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Número de Documento:</label>
-      <input type="text" class="form-control" name="NumeroDocumento" required>
-    </div>
-  </div>
-
-  <div class="row g-3 mt-2">
-    <div class="col-md-6">
-      <label class="form-label">Fecha de Nacimiento:</label>
-      <input type="date" class="form-control" name="FechaNacimiento" required>
-    </div>
-    <div class="col-md-6">
-      <label class="form-label">Correo:</label>
-      <input type="email" class="form-control" name="Correo" required>
-    </div>
-  </div>
-
-  <div class="row g-3 mt-2">
-    <div class="col-md-4">
-      <label class="form-label">Teléfono:</label>
-      <input type="tel" class="form-control" name="Telefono" required>
-    </div>
-    <div class="col-md-4">
-      <label class="form-label">Dirección:</label>
-      <input type="text" class="form-control" name="Direccion">
-    </div>
-    <div class="col-md-4">
-      <label class="form-label">Curso:</label>
-      <select class="form-select" name="Curso">
-        <option selected>Seleccionar Curso</option>
-        <option>1103</option><option>1102</option><option>1101</option>
-        <option>1003</option><option>1002</option><option>1001</option>
-        <option>903</option><option>902</option><option>901</option>
-        <option>803</option><option>802</option><option>801</option>
-        <option>703</option><option>702</option><option>701</option>
-        <option>603</option><option>602</option><option>601</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="text-center mt-4">
-    <button type="submit" class="btn btn-primary px-4">Registrar Estudiante</button>
-  </div>
-</form>
-
-  <!-- Bootstrap JS -->
-
-  <script src="/static/js/Administrador/Estudiantes.js"></script>
 </body>
 </html>

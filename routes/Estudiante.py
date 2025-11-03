@@ -36,6 +36,10 @@ def entregatareas2():
 def entregatareas3():
     return render_template('Estudiante/EntregaTareas3.html')
 
+@Estudiante_bp.route('/evaluaciones')
+def evaluaciones():
+    return render_template('Estudiante/Evaluaciones.html')
+
                                                  
 @Estudiante_bp.route('/tutorias')
 def tutorias():
@@ -132,6 +136,10 @@ def aprobacion_academica():
 def citaciones():
     return render_template('Estudiante/Citaciones.html')
 
+@Estudiante_bp.route('/citaciones2')
+def citaciones2():
+    return render_template('Estudiante/Citaciones2.html')
+
 @Estudiante_bp.route('/historial_academico')
 def historial_academico():
     return render_template('Estudiante/HistorialAcademico.html')
@@ -153,3 +161,11 @@ def manual():
 @Estudiante_bp.route('/notas_curso')
 def notas_curso():
     return render_template('Estudiante/NotasCurso.html')
+
+@Estudiante_bp.route('/comunicacion')
+def comunicacion():
+    return render_template('Estudiante/Comunicacion.html')
+
+@Estudiante_bp.route('/encuestas')
+def encuestas():
+    return render_template('Estudiante/Encuestas.html')

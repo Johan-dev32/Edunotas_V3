@@ -68,7 +68,6 @@ function crearBloque(celda, data = null) {
         bloque.innerHTML = `
             <input type="text" placeholder="Materia" class="bloque-input bloque-materia">
             <input type="text" placeholder="Docente" class="bloque-input bloque-docente">
-            <input type="text" placeholder="Aula" class="bloque-input bloque-aula">
             <span class="bloque-close">&times;</span>
         `;
         const materiaInput = bloque.querySelector('.bloque-materia');
@@ -163,5 +162,23 @@ function generarPDF(curso_id) {
     }).from(contenido).save();
 }
 
-// Inicialización
-cargarBloques();
+fetch(`/api/curso/${curso_id}/bloques`)
+    .then(r => r.json())
+    .then(data => {
+        const tbody = document.querySelector('#horario-table tbody');
+        tbody.innerHTML = ""; // limpiar
+
+        for(let i=0; i<data.bloques; i++){
+            tbody.innerHTML += `
+            <tr>
+              <td>Bloque ${i+1}</td>
+              <td data-dia="lun" data-hora="${i}"></td>
+              <td data-dia="mar" data-hora="${i}"></td>
+              <td data-dia="mie" data-hora="${i}"></td>
+              <td data-dia="jue" data-hora="${i}"></td>
+              <td data-dia="vie" data-hora="${i}"></td>
+            </tr>`;
+        }
+
+        cargarBloques();
+    });

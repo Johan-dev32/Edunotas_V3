@@ -1,13 +1,13 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
 from sqlalchemy import func
-from flask import jsonify
 from datetime import datetime, date
 from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad
 from flask_mail import Message
 import os
+
 
 from decimal import Decimal
 
@@ -135,10 +135,7 @@ def agregar_estudiante():
         direccion = request.form['Direccion']
         curso = request.form['Curso']
         fecha_nac = request.form['FechaNacimiento']
-        eps = request.form['EPS']
-        sangre = request.form['TipoSangre']
-        acudiente = request.form['NombreAcudiente']
-        tel_acudiente = request.form['TelefonoAcudiente']
+        
 
         
         hashed_password = generate_password_hash("123456")
@@ -162,6 +159,7 @@ def agregar_estudiante():
         curso_obj = Curso.query.filter_by(Nombre=curso).first()
         if not curso_obj:
             flash("❌ El curso seleccionado no existe", "danger")
+        
             return redirect(url_for('Administrador.estudiantes'))
 
         
@@ -179,6 +177,13 @@ def agregar_estudiante():
         db.session.commit()
 
         flash("✅ Estudiante registrado correctamente", "success")
+        
+        
+       
+            
+
+
+
 
     except SQLAlchemyError as e:
         db.session.rollback()
@@ -474,11 +479,99 @@ def asignaturas():
     return render_template('Administrador/Asignaturas.html')
 
 
+#----------------------parte de horarios-------------------
 @Administrador_bp.route('/horarios', defaults={'curso_id': None})
 @Administrador_bp.route('/horarios/<int:curso_id>')
 def horarios(curso_id):
-    return render_template('Administrador/Horarios.html', curso_id=curso_id)
+    if curso_id is None:
+        return redirect(url_for('Administrador.ver_horarios'))
 
+    c = Curso.query.get(curso_id)
+    if not c:
+        return "Curso no encontrado", 404
+
+    asignaciones = Docente_Asignatura.query.filter_by(ID_Curso=curso_id).all()
+
+    return render_template(
+        'Administrador/Horarios.html',
+        curso=c,
+        asignaciones=asignaciones
+    )
+    
+@Administrador_bp.route('/ver_horarios')
+def ver_horarios():
+    # traer todos los cursos activos
+    cursos = Curso.query.filter_by(Estado='Activo').all()
+
+    # armar diccionario de ciclos
+    ciclos = {
+        1: [],
+        2: [],
+        3: []
+    }
+
+    for c in cursos:
+        g = int(c.Grado)
+        if g in (6,7):
+            ciclos[1].append(c)
+        elif g in (8,9):
+            ciclos[2].append(c)
+        elif g in (10,11):
+            ciclos[3].append(c)
+
+    return render_template("Administrador/VerHorarios.html", ciclos=ciclos)
+
+@Administrador_bp.route('/guardar_horario', methods=['POST'])
+def guardar_horario():
+    try:
+        data = request.get_json()
+
+        # aquí data será una lista de bloques
+        # cada bloque tendrá: dia / hora / materia / docente / etc
+
+        print("DATA RECIBIDA:", data)  # DEBUG
+
+        return jsonify({"status":"ok"}), 200
+
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({"status":"error","msg":str(e)}),500
+    
+    
+@Administrador_bp.route('/api/cursos')
+def api_cursos():
+    try:
+        cursos = Curso.query.filter_by(Estado="Activo").all()
+        
+        data = []
+        for c in cursos:
+            data.append({
+                "id": c.ID_Curso,
+                "nombre": f"{c.Grado}-{c.Grupo}"
+            })
+
+        return jsonify(data), 200
+
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({"error": str(e)}), 500
+    
+    
+@Administrador_bp.route('/api/curso/<int:id_curso>/bloques')
+def api_bloques(id_curso):
+
+    c = Curso.query.get(id_curso)
+    if not c:
+        return jsonify({"error": "curso no existe"}), 404
+
+    grado = int(c.Grado)  # como es varchar lo convertimos
+
+    if grado >= 9:
+        bloques = 10
+    else:
+        bloques = 9
+
+    return jsonify({"bloques": bloques}), 200
 
 @Administrador_bp.route('/registro_notas/<int:curso_id>')
 def registro_notas(curso_id):
@@ -490,9 +583,7 @@ def notas_curso(curso_id):
     return render_template("Administrador/notas_curso.html", curso_id=curso_id)
 
 
-@Administrador_bp.route('/ver_horarios')
-def ver_horarios():
-    return render_template("Administrador/VerHorarios.html")
+
 
 @Administrador_bp.route('/notas_registro')
 def notas_registro():
@@ -576,7 +667,7 @@ def historial_repitente(id_estudiante):
         Matricula.AnioLectivo,
         Curso.Grado.label("Curso"),
         db.func.avg(Actividad.Calificacion).label("Promedio")
-    ).join(Curso, Curso.ID_Matricula == Matricula.ID_Matricula) \
+    ).join(Curso, Curso.ID_Curso == Matricula.ID_Curso) \
      .join(Actividad, Actividad.ID_Matricula == Matricula.ID_Matricula) \
      .filter(Matricula.ID_Estudiante == id_estudiante) \
      .group_by(Matricula.AnioLectivo, Curso.Grado) \
@@ -599,6 +690,7 @@ def historial_repitente(id_estudiante):
 
 @Administrador_bp.route('/cursos')
 def cursos():
+    cursos = Curso.query.all()
     return render_template('Administrador/Cursos.html', cursos=cursos)
 
 @Administrador_bp.route('/historialacademico')
@@ -637,24 +729,30 @@ def cursos2():
     return render_template('Administrador/Cursos2.html', cursos=cursos, usuarios=usuarios)
 
 @Administrador_bp.route('/agregar_curso', methods=['POST'])
-@login_required
 def agregar_curso():
-    grado = request.form['grado']
-    grupo = request.form['grupo']
-    anio = request.form['anio']
-    director_id = request.form['director']
+    try:
+        grado = request.form['Grado']
+        grupo = request.form['Grupo']
+        anio = request.form['Anio']
+        estado = request.form['Estado']
+        director = request.form['DirectorGrupo']
 
-    # Aquí guardas en la BD
-    nuevo_curso = Curso(
-        grado=grado,
-        grupo=grupo,
-        anio=anio,
-        director_id=director_id
-    )
-    db.session.add(nuevo_curso)
-    db.session.commit()
+        nuevo_curso = Curso(
+            Grado=grado,
+            Grupo=grupo,
+            Anio=anio,
+            Estado=estado,
+            DirectorGrupo=director
+        )
 
-    flash("Curso agregado exitosamente", "success")
+        db.session.add(nuevo_curso)
+        db.session.commit()
+
+        flash('Curso agregado exitosamente.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al agregar el curso: {e}', 'danger')
+
     return redirect(url_for('Administrador.cursos2'))
 
 

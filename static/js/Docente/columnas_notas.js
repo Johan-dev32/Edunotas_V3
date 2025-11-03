@@ -1,9 +1,4 @@
-// columnas_notas.js (versión corregida)
-// Requisitos: en tu HTML debe existir:
-//  - <input type="hidden" id="cursoId" value="{{ curso_id }}">
-//  - <select id="materias"></select>
-//  - <button id="agregarColumnaBtn">...</button>
-//  - <table id="tablaNotas"> ... </table>
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const cursoIdEl = document.getElementById('cursoId');

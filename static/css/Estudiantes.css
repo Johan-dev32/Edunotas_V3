@@ -236,3 +236,25 @@ h2, h5 {
 label {
   font-weight: 600;
 }
+
+/* Alinear los campos de forma uniforme */
+.form-container .form-label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-container .form-control,
+.form-container .form-select {
+  width: 100%;
+}
+
+/* Espaciado y alineación visual uniforme */
+.form-container .row {
+  align-items: center;
+}
+
+/* Centrar todo dentro del formulario */
+.form-container form {
+  max-width: 900px;
+  margin: 0 auto;
+}

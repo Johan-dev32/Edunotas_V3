@@ -123,73 +123,36 @@
     </div>
   </div>
 
-  <div class="table-responsive" id="horario-contenido">
-    <table class="table table-bordered table-striped text-center horario-table" id="horario-table">
-      <thead class="table-dark">
-        <tr>
-          <th>Hora</th>
-          <th>Lunes</th>
-          <th>Martes</th>
-          <th>Miércoles</th>
-          <th>Jueves</th>
-          <th>Viernes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>7:00 - 7:50</td>
-          <td data-dia="lun" data-hora="0"></td>
-          <td data-dia="mar" data-hora="0"></td>
-          <td data-dia="mie" data-hora="0"></td>
-          <td data-dia="jue" data-hora="0"></td>
-          <td data-dia="vie" data-hora="0"></td>
-        </tr>
-        <tr>
-          <td>7:50 - 8:40</td>
-          <td data-dia="lun" data-hora="1"></td>
-          <td data-dia="mar" data-hora="1"></td>
-          <td data-dia="mie" data-hora="1"></td>
-          <td data-dia="jue" data-hora="1"></td>
-          <td data-dia="vie" data-hora="1"></td>
-        </tr>
-        <tr>
-          <td>8:40 - 9:30</td>
-          <td data-dia="lun" data-hora="2"></td>
-          <td data-dia="mar" data-hora="2"></td>
-          <td data-dia="mie" data-hora="2"></td>
-          <td data-dia="jue" data-hora="2"></td>
-          <td data-dia="vie" data-hora="2"></td>
-        </tr>
-        <tr>
-          <td>9:30 - 9:50</td>
-          <td colspan="5" class="recreo-cell"><i class="bi bi-cup-hot-fill"></i> RECREO</td>
-        </tr>
-        <tr>
-          <td>9:50 - 10:40</td>
-          <td data-dia="lun" data-hora="3"></td>
-          <td data-dia="mar" data-hora="3"></td>
-          <td data-dia="mie" data-hora="3"></td>
-          <td data-dia="jue" data-hora="3"></td>
-          <td data-dia="vie" data-hora="3"></td>
-        </tr>
-        <tr>
-          <td>10:40 - 11:30</td>
-          <td data-dia="lun" data-hora="4"></td>
-          <td data-dia="mar" data-hora="4"></td>
-          <td data-dia="mie" data-hora="4"></td>
-          <td data-dia="jue" data-hora="4"></td>
-          <td data-dia="vie" data-hora="4"></td>
-        </tr>
-        <tr>
-          <td>11:30 - 12:20</td>
-          <td data-dia="lun" data-hora="5"></td>
-          <td data-dia="mar" data-hora="5"></td>
-          <td data-dia="mie" data-hora="5"></td>
-          <td data-dia="jue" data-hora="5"></td>
-          <td data-dia="vie" data-hora="5"></td>
-        </tr>
-      </tbody>
-    </table>
+<div class="table-responsive" id="horario-contenido">
+  <table class="table table-bordered table-striped text-center horario-table" id="horario-table">
+    <thead class="table-dark">
+      <tr>
+        <th>Hora</th>
+        <th>Lunes</th>
+        <th>Martes</th>
+        <th>Miércoles</th>
+        <th>Jueves</th>
+        <th>Viernes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- aquí irán los bloques de horario por JS -->
+    </tbody>
+  </table>
+</div>
+
+<!-- Lista de asignaciones disponibles -->
+<div class="container mt-3">
+  <h5>Asignaciones disponibles:</h5>
+  <div id="lista-asignaciones">
+    {% for a in asignaciones %}
+      <div class="bloque-asignacion"
+           draggable="true"
+           data-materia="{{ a.asignatura.Nombre }}"
+           data-docente="{{ a.docente.Nombre }}">
+        {{ a.asignatura.Nombre }} - {{ a.docente.Nombre }}
+      </div>
+    {% endfor %}
   </div>
 </div>
 

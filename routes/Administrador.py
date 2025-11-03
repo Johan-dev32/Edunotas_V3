@@ -511,45 +511,49 @@ def notas_consultar():
 @Administrador_bp.route('/observador')
 def observador():
     observaciones = (
-            db.session.query(Observacion, Usuario)
-            .join(Matricula, Observacion.ID_Matricula == Matricula.ID_Matricula)
-            .join(Usuario, Matricula.ID_Estudiante == Usuario.ID_Usuario)
-            .all()
-            )
-    return render_template('Administrador/Observador.html', observaciones=observaciones)
+        db.session.query(Observacion, Usuario)
+        .join(Matricula, Observacion.ID_Matricula == Matricula.ID_Matricula)
+        .join(Usuario, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+        .all()
+    )
+
+    estudiantes = Usuario.query.filter_by(Rol='Estudiante').all()
+
+    return render_template(
+        'Administrador/Observador.html',
+        observaciones=observaciones,
+        estudiantes=estudiantes
+    )
 
 
 @Administrador_bp.route('/observador/registrar', methods=['POST'])
 def registrar_observacion():
     data = request.form
 
-    # Validar campos requeridos
-    nombre = data.get('nombre')
-    tipo = data.get('tipo')
-    nivel = data.get('nivelImportancia')
-    fecha_str = data.get('fecha')
-    descripcion = data.get('descripcion')
-    recomendacion = data.get('recomendacion')
+    id_estudiante = data.get('id_estudiante')
+    if not id_estudiante:
+        return jsonify({"status": "error", "message": "Debe seleccionar un estudiante"}), 400
 
-    if not all([nombre, tipo, nivel, fecha_str, descripcion, recomendacion]):
-        return jsonify({"status": "error", "message": "Todos los campos son obligatorios"}), 400
+    # Buscar matrícula del estudiante
+    matricula = Matricula.query.filter_by(ID_Estudiante=id_estudiante).first()
+    if not matricula:
+        return jsonify({"status": "error", "message": "El estudiante no tiene matrícula asignada"}), 400
 
-    # Convertir fecha de string a objeto datetime.date
-    try:
-        fecha = datetime.strptime(fecha_str, "%Y-%m-%d").date()
-    except ValueError:
-        return jsonify({"status": "error", "message": "Formato de fecha inválido"}), 400
-
-    # Crear la observación
+    # Buscar horario según la matrícula
+    horario = Programacion.query.filter_by(ID_Curso=matricula.ID_Curso).first()
+    if not horario:
+        return jsonify({"status": "error", "message": "No hay horario asociado al estudiante"}), 400
+    
     nueva_obs = Observacion(
-        Fecha=fecha,
-        Descripcion=descripcion,
-        Tipo=tipo,
-        NivelImportancia=nivel,
-        Recomendacion=recomendacion,
+        Fecha=datetime.strptime(data.get('fecha'), "%Y-%m-%d").date(),
+        Descripcion=data.get('descripcion'),
+        Tipo=data.get('tipo'),
+        NivelImportancia=data.get('nivelImportancia'),
+        Recomendacion=data.get('recomendacion'),
         Estado='Activa',
-        ID_Horario=None,  
-        ID_Matricula=None
+        ID_Horario=horario.ID_Programacion,
+        ID_Matricula=matricula.ID_Matricula,
+        ID_Estudiante=id_estudiante
     )
 
     try:

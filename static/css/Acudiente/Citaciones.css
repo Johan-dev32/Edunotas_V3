@@ -1,0 +1,181 @@
+body {
+  background-color: #f8f9fa; 
+  font-family: 'Trebuchet MS', sans-serif;
+  color: #212529;
+}
+
+/* navbar */
+header {
+  background-color: white;
+  color: #050733ff;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas {
+  background-color: #050733ff;
+  color: #fff;
+}
+
+.btn-usuario {
+  background-color: #050733ff;
+  color: #fff;
+  margin-left: 10px;
+}
+
+/*  menu_des  */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+.offcanvas {
+  font-size: 25px;
+}
+
+.offcanvas-title {
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+.nav-item {
+  font-weight: bold;
+  font-size: 22px;
+}
+#sidebar .nav-link {
+  font-size: 18px;   /* tamaño menú hamburguesa */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
+.nav-pills .nav-link {
+  font-size: 25px;   /* tamaño botones nav */
+  color: #050733ff !important; 
+  font-weight: bold;
+
+}
+
+
+.logo-container {
+  width: auto;
+  height: auto;
+}
+
+.logo-container img {
+  max-width: 250px; 
+  height: auto;
+}
+
+
+/* titulos */
+
+.titulo-principal {
+  font-size: 3rem;      
+  font-weight: 900;      
+  color: #050733ff;    
+  margin-left: 50px;  
+  margin-top: -90px;
+}
+
+
+.descripcion {
+  font-size: 1.3rem;     
+  color: #555;  
+  margin-left: 50px;   
+  margin-top: 20px;      
+}
+/* Tarjetas de citaciones */
+.card-citacion {
+  border-left: 8px solid #050733ff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+}
+
+.card-citacion:hover {
+  transform: translateY(-5px);
+}
+
+/* Cabecera de cada card */
+.card-header {
+  background-color: #050733ff;
+  color: white;
+  font-weight: bold;
+}
+
+/* Botones */
+.btn-ver {
+  background-color: #050733ff;
+  color: white;
+  font-weight: bold;
+}
+
+.btn-ver:hover {
+  background-color: #070b86;
+  color: white;
+}
+
+/* Botón cerrar sesión */
+.btn-dark {
+  background-color: #050733ff !important;
+  border: none;
+}
+
+.btn-dark:hover {
+  background-color: #070b86 !important;
+}
+.btn-usuario:hover,
+.btn-usuario:focus,
+.btn-usuario:active {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--secondary-dark) !important; /* solo cambia el color del ícono */
+    outline: none !important;
+}
+
+/* 🔹 Evita que Bootstrap le ponga el ícono de desplegable (flechita ↓) */
+.btn-usuario::after {
+    display: none !important;
+}
+.btn-usuario {
+    background: none !important;        /* sin fondo */
+    border: none !important;            /* sin borde */
+    color: var(--primary-dark) !important; /* color del ícono */
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;                 /* cuadrado/redondo según necesidad */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    padding: 0;
+    box-shadow: none !important;
+}

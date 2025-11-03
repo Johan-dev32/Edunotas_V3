@@ -32,10 +32,11 @@ def entregatareas():
 def entregatareas2():
     return render_template('Estudiante/EntregaTareas2.html')
 
-@Estudiante_bp.route('/evaluaciones')
-def evaluaciones():
-    return render_template('Estudiante/Evaluaciones.html')
+@Estudiante_bp.route('/entregatareas3')
+def entregatareas3():
+    return render_template('Estudiante/EntregaTareas3.html')
 
+                                                 
 @Estudiante_bp.route('/tutorias')
 def tutorias():
     return render_template('Estudiante/Tutorias.html')
@@ -118,6 +119,10 @@ def calculo_promedio():
 @Estudiante_bp.route('/observador')
 def observador():  
     return render_template('Estudiante/Observador.html')
+
+@Estudiante_bp.route('/observador2')
+def observador2():
+    return render_template('Estudiante/Observador2.html')
 
 @Estudiante_bp.route('/aprobacion_academica')
 def aprobacion_academica():

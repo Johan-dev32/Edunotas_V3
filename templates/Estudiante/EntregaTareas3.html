@@ -4,14 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Colegio Fe y Alegría</title>
+  
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <!-- CSS propio -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/Estudiante/material.css') }}">
-
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Estudiante/EntregaTareas3.css') }}">
 </head>
+
 <body>
 
   <!-- Header -->
@@ -50,7 +51,7 @@
     </div>
     <div class="offcanvas1-body">
       <ul class="nav flex-column">
-        <li class="nav-item"><a href="{{ url_for('Estudiante.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+        <li class="nav-item"><a href="{{ url_for('Docente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
         <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas </a>
         <div class="collapse" id="submenuNotas">
           <ul class="nav flex-column ms-3">
@@ -69,48 +70,71 @@
     </div>
   </div>
 
-<main class="container">
-<section class="search-area">
-<input id="search" type="search" placeholder="Buscar material, título o asignatura..." aria-label="Buscar material" />
+  <!-- Contenido principal -->
+  <main class="container">
+    <h1 class="titulo">CREA LA TAREA O ACTIVIDAD</h1>
+    <br><br>
 
+    <div class="container actividad-container">
+      <div class="row">
+        <!-- 🧩 Formulario con enctype y name=pdfUpload -->
+  
 
-<select id="filter-type" aria-label="Filtrar por tipo">
-<option value="all">Todos los tipos</option>
-<option value="documento">Documentos</option>
-<option value="enlace">Enlaces</option>
-<option value="video">Videos/Podcasts</option>
-</select>
+  <div class="row">
+    <!-- Panel izquierdo -->
+    <div class="col-lg-4">
+      <div class="card p-4 shadow-sm border-0">
+        <h3 class="fw-bold text-center mb-4">ACT <span class="numero">{{ actividad_id }}</span></h3>
 
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Fecha de entrega</label>
+          <input type="date" class="form-control" name="fecha" required>
+        </div>
 
-<select id="filter-course" aria-label="Filtrar por asignatura">
-<option value="all">Todas las asignaturas</option>
-</select>
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Hora de entrega</label>
+          <input type="text" class="form-control" name="hora" placeholder="Ej: 23:59" required>
+        </div>
+      </div>
+    </div>
 
+    <!-- Panel derecho -->
+    <div class="col-lg-8">
+      <div class="card p-4 shadow-sm border-0">
+        <h4 class="fw-bold mb-4">Detalles de la Actividad</h4>
 
-<button id="clear-filters" class="btn small">Limpiar</button>
-</section>
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Título de la Actividad</label>
+          <input type="text" class="form-control" name="titulo" placeholder="Escribe el título de la actividad..." required>
+        </div>
 
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Instrucciones o Descripción</label>
+          <textarea class="form-control" rows="5" name="instrucciones" placeholder="Describe aquí la tarea..." required></textarea>
+        </div>
 
-<section id="material" class="materials">
-<!-- Lista de materiales renderizada por JS -->
-<div id="materials-list" class="materials-list" aria-live="polite"></div>
-</section>
-</main>
+        <!-- Subida de PDF -->
+        <div class="upload-box border rounded py-5 mb-3 text-center">
+          <label for="pdfUpload" class="d-block cursor-pointer">
+            <i class="bi bi-file-earmark-pdf-fill fs-1 text-danger"></i>
+            <p class="mt-2 fw-semibold">Adjuntar material en PDF</p>
+          </label>
+          <input type="file" id="pdfUpload" name="pdfUpload" accept="application/pdf" hidden>
+        </div>
 
+        <!-- Botón de publicar -->
+       <button type="submit" class="btn btn-subir w-100 py-3 fs-5">PUBLICAR ACTIVIDAD</button>      </div>
+    </div>
+  </div>
+</form>
+      </div>
+    </div>
+  </main>
 
-<!-- Modal para ver detalle -->
-<dialog id="detailModal" class="modal">
-<button id="closeModal" class="close">✕</button>
-<div class="modal-content">
-<h3 id="modal-title"></h3>
-<p id="modal-course" class="meta"></p>
-<p id="modal-desc"></p>
-<p class="meta"><strong>Tipo de uso:</strong> <span id="modal-usage"></span></p>
-<div id="modal-links"></div>
-</div>
-</dialog>
-
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-   <script src="{{ url_for('static', filename='js/Estudiante/material.js') }}"></script>
+  <!-- JavaScript externo -->
+  <script src="{{ url_for('static', filename='js/Rstudiante/Crear_Actividad.js') }}"></script>
+
 </body>
 </html>

@@ -135,10 +135,7 @@ def agregar_estudiante():
         direccion = request.form['Direccion']
         curso = request.form['Curso']
         fecha_nac = request.form['FechaNacimiento']
-        eps = request.form['EPS']
-        sangre = request.form['TipoSangre']
-        acudiente = request.form['NombreAcudiente']
-        tel_acudiente = request.form['TelefonoAcudiente']
+        
 
         
         hashed_password = generate_password_hash("123456")
@@ -162,6 +159,7 @@ def agregar_estudiante():
         curso_obj = Curso.query.filter_by(Nombre=curso).first()
         if not curso_obj:
             flash("❌ El curso seleccionado no existe", "danger")
+        
             return redirect(url_for('Administrador.estudiantes'))
 
         
@@ -179,6 +177,13 @@ def agregar_estudiante():
         db.session.commit()
 
         flash("✅ Estudiante registrado correctamente", "success")
+        
+        
+       
+            
+
+
+
 
     except SQLAlchemyError as e:
         db.session.rollback()
@@ -599,6 +604,7 @@ def historial_repitente(id_estudiante):
 
 @Administrador_bp.route('/cursos')
 def cursos():
+    cursos = Curso.query.all()
     return render_template('Administrador/Cursos.html', cursos=cursos)
 
 @Administrador_bp.route('/historialacademico')
@@ -637,24 +643,30 @@ def cursos2():
     return render_template('Administrador/Cursos2.html', cursos=cursos, usuarios=usuarios)
 
 @Administrador_bp.route('/agregar_curso', methods=['POST'])
-@login_required
 def agregar_curso():
-    grado = request.form['grado']
-    grupo = request.form['grupo']
-    anio = request.form['anio']
-    director_id = request.form['director']
+    try:
+        grado = request.form['Grado']
+        grupo = request.form['Grupo']
+        anio = request.form['Anio']
+        estado = request.form['Estado']
+        director = request.form['DirectorGrupo']
 
-    # Aquí guardas en la BD
-    nuevo_curso = Curso(
-        grado=grado,
-        grupo=grupo,
-        anio=anio,
-        director_id=director_id
-    )
-    db.session.add(nuevo_curso)
-    db.session.commit()
+        nuevo_curso = Curso(
+            Grado=grado,
+            Grupo=grupo,
+            Anio=anio,
+            Estado=estado,
+            DirectorGrupo=director
+        )
 
-    flash("Curso agregado exitosamente", "success")
+        db.session.add(nuevo_curso)
+        db.session.commit()
+
+        flash('Curso agregado exitosamente.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al agregar el curso: {e}', 'danger')
+
     return redirect(url_for('Administrador.cursos2'))
 
 

@@ -1,0 +1,35 @@
+:root{
+--bg:#f8fafc;
+--accent:#28527a;
+--muted:#6b7280;
+--card:#ffffff;
+--radius:10px;
+--border:#e5e7eb;
+--recreo:#f9fafb;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:#0f172a}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:linear-gradient(90deg,var(--accent),#1b91c2);color:#fff}
+.menu{display:flex;gap:14px}
+.menu-item{color:#fff;text-decoration:none;font-weight:600}
+.menu-item.active{text-decoration:underline}
+.container{max-width:1100px;margin:24px auto;padding:0 16px}
+.section-title{margin-top:0;color:var(--accent)}
+.info-text{color:var(--muted);margin-bottom:20px}
+.table-wrapper{overflow-x:auto;background:var(--card);border-radius:var(--radius);box-shadow:0 6px 14px rgba(12,20,36,0.06);}
+.schedule-table{width:100%;border-collapse:collapse;min-width:800px;text-align:center}
+.schedule-table th{background:#e2e8f0;padding:12px;font-weight:600}
+.schedule-table td{padding:16px;border:1px solid var(--border);border-radius:6px;font-weight:500;color:#fff}
+.schedule-table tr.recreo td{background:var(--recreo);color:#374151;font-weight:600;font-size:15px}
+.footer{text-align:center;padding:16px;color:var(--muted);font-size:14px;margin-top:20px}
+
+
+/* Colores por materia */
+.lengua{background:#a855f7}
+.matematica{background:#3b82f6}
+.ciencias{background:#10b981}
+.ingles{background:#f97316}
+.educacion-fisica{background:#ef4444}
+.educacion-artistica{background:#f59e0b}
+.humanismo{background:#8b5cf6}
+.proyecto{background:#14b8a6}

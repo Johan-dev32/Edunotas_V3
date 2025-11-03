@@ -82,63 +82,94 @@ header .btn-dark {
 
 }
 
+
+.logo-container {
+  width: auto;
+  height: auto;
+}
+
+.logo-container img {
+  max-width: 250px; 
+  height: auto;
+}
+
+
+/* titulos */
+
 .titulo-principal {
   font-size: 3rem;      
   font-weight: 900;      
   color: #050733ff;    
-  margin-top: -170px;  
+  margin-left: 50px;  
+  margin-top: 30px;
 }
 
-.subtitulo {
-  font-size: 2rem;       
-  font-weight: 700;
-  color: #050733ff;        
-}
 
 .descripcion {
   font-size: 1.3rem;     
-  color: #555;           
+  color: #555;  
+  margin-left: 50px;         
 }
-.sidebar {
-      background-color: #050733ff;
-      color: white;
-      min-height: 100vh;
-      padding: 20px;
-      border-radius: 10px;
-    }
-    .sidebar label {
-      font-weight: bold;
-      margin-top: 15px;
-    }
-    .descripcion-box {
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 20px;
-      background-color: white;
-      min-height: 500px;
-    }
-    .btn-custom {
-      background-color: #050733ff;
-      color: white;
-    }
-    .btn-custom:hover {
-      background-color: #080a55;
-      color: white;
-    }
-.container-fluid{
-  margin-left: -80px;
-  margin-bottom: 20px;
+/* CONTENEDOR GENERAL DEL OBSERVADOR */
+.observador-contenedor {
+  max-width: 1300px;
+  margin: 40px auto;
+  background-color: #fff;
+  border: 3px solid #050733ff; /* borde azul alrededor */
+  border-radius: 15px;
+  padding: 30px 40px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
-.contenedor-texto{
-  margin-left: 40px;
+
+/* CONTENEDOR INTERNO QUE CRECE AUTOMÁTICAMENTE */
+.anotaciones-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
-.texto-citacion{
-  margin-left: 40px;
-  font-weight: bold;
-  margin-top: 20px;
+
+/* CADA ANOTACIÓN */
+.anotacion-item {
+  background-color: #fdfdfd;
+  border-left: 5px solid #050733ff;
+  border-radius: 8px;
+  padding: 1rem 1.3rem;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
-.texto-citaciones{
-  font-weight: bold;
-  font-family: 'Trebuchet MS', sans-serif;
-  margin-left: 60px;
+
+.anotacion-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* TEXTO MÁS PEQUEÑO */
+.anotacion-item h5 {
+  font-size: 1rem;
+  color: #050733ff;
+}
+
+.anotacion-item p {
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.texto-anotacion {
+  font-size: 0.88rem;
+  color: #555;
+}
+
+/* BOTÓN */
+.btn-edunotas {
+  background-color: #050733ff;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  padding: 0.35rem 0.8rem;
+  transition: background-color 0.2s ease;
+}
+
+.btn-edunotas:hover {
+  background-color: #080a99;
 }

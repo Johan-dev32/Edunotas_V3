@@ -1,154 +1,148 @@
-// --- Datos iniciales ---
-const SAMPLE = [
-  {id:1,title:'Clase 1 - Introducción a funciones',course:'Matemáticas ',type:'explicacion',desc:'Presentación y ejemplos básicos',link:'https://example.com/presentacion.pdf'},
-  {id:2,title:'Tarea semana 2',course:'Biología ',type:'tarea',desc:'Preguntas sobre cap. 3',link:'https://drive.google.com/file/d/xxx'},
-  {id:3,title:'Podcast: Historia breve',course:'Historia ',type:'lectura',desc:'Episodio sobre la independencia',link:'audio:https://podcasts.example/ep1.mp3'},
-  {id:4,title:'Video: Experimento 5',course:'Química ',type:'refuerzo',desc:'Demostración en laboratorio',link:'https://youtube.com/watch?v=videoid'}
+// Datos simulados - en un sistema real vendrían del servidor
+const materials = [
+  {
+    id:1,
+    title:'Introducción a Álgebra - Guía de estudio',
+    description:'Documento con los conceptos básicos y ejercicios propuestos.',
+    course:'Matemáticas I',
+    type:'documento', // documento | enlace | video
+    usage:'Lectura complementaria',
+    files:[{label:'PDF - Guía', url:'#'}]
+  },
+  {
+    id:2,
+    title:'Video: Técnicas de resolución de problemas',
+    description:'Video grabado por el docente con ejemplos resueltos en exámenes.',
+    course:'Matemáticas I',
+    type:'video',
+    usage:'Explicación en clase',
+    files:[{label:'YouTube', url:'https://www.youtube.com/'}]
+  },
+  {
+    id:3,
+    title:'Enlace interactivo - Juegos de vocabulario',
+    description:'Plataforma recomendada para reforzar vocabulario.',
+    course:'Lengua y Literatura',
+    type:'enlace',
+    usage:'Actividad de refuerzo',
+    files:[{label:'Sitio', url:'https://example.com'}]
+  }
 ];
 
-// --- Claves y acceso al DOM ---
-const KEY = 'materiales_v1';
-const grid = document.getElementById('grid');
-const count = document.getElementById('count');
-const empty = document.getElementById('empty');
-const searchInput = document.getElementById('searchInput');
-const filterType = document.getElementById('filterType');
-const courseFilter = document.getElementById('courseFilter');
-const coursesList = document.getElementById('coursesList');
-
-// modales
-const modal = document.getElementById('modal');
-const openUpload = document.getElementById('openUpload');
+// Init
+const materialsList = document.getElementById('materials-list');
+const searchInput = document.getElementById('search');
+const filterType = document.getElementById('filter-type');
+const filterCourse = document.getElementById('filter-course');
+const clearBtn = document.getElementById('clear-filters');
+const modal = document.getElementById('detailModal');
+const modalTitle = document.getElementById('modal-title');
+const modalDesc = document.getElementById('modal-desc');
+const modalCourse = document.getElementById('modal-course');
+const modalUsage = document.getElementById('modal-usage');
+const modalLinks = document.getElementById('modal-links');
 const closeModal = document.getElementById('closeModal');
-const saveMaterial = document.getElementById('saveMaterial');
 
-const detailModal = document.getElementById('detailModal');
-const dClose = document.getElementById('dClose');
-const dDownload = document.getElementById('dDownload');
-
-// --- Métodos de almacenamiento ---
-function loadMaterials(){
-  const raw = localStorage.getItem(KEY);
-  if(!raw){
-    localStorage.setItem(KEY, JSON.stringify(SAMPLE));
-    return SAMPLE;
-  }
-  try { return JSON.parse(raw); }
-  catch(e){ localStorage.setItem(KEY, JSON.stringify(SAMPLE)); return SAMPLE; }
+function populateCourseFilter(){
+  const courses = Array.from(new Set(materials.map(m => m.course)));
+  courses.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    filterCourse.appendChild(opt);
+  });
 }
 
-function saveMaterials(list){ localStorage.setItem(KEY, JSON.stringify(list)); }
+function renderMaterials(list){
+  materialsList.innerHTML = '';
+  if(list.length === 0){
+    materialsList.innerHTML = '<div class="card">No se encontraron materiales.</div>';
+    return;
+  }
 
-// --- Renderizado principal ---
-function render(){
-  const all = loadMaterials();
-  const q = searchInput.value.trim().toLowerCase();
-  const type = filterType.value;
-  const course = courseFilter.value;
-
-  let filtered = all.filter(m => {
-    if(type !== 'all' && m.type !== type) return false;
-    if(course !== 'all' && m.course !== course) return false;
-    if(!q) return true;
-    return (m.title + m.desc + m.course).toLowerCase().includes(q);
-  });
-
-  grid.innerHTML = '';
-  empty.style.display = filtered.length === 0 ? 'block' : 'none';
-  count.textContent = filtered.length;
-
-  const courses = Array.from(new Set(all.map(x => x.course))).sort();
-  coursesList.innerHTML = courses.map(c => `<div>${c}</div>`).join('');
-  courseFilter.innerHTML = '<option value="all">Todos los cursos</option>' + courses.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
-
-  filtered.forEach(m => {
+  list.forEach(m => {
     const card = document.createElement('article');
     card.className = 'card';
     card.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div class="meta">${escapeHtml(m.course)}</div>
-          <div class="title">${escapeHtml(m.title)}</div>
-        </div>
-        <div class="badges"><div class="badge">${typeLabel(m.type)}</div></div>
+      <h4>${escapeHtml(m.title)}</h4>
+      <p class="meta">${escapeHtml(m.course)} • ${typeLabel(m.type)}</p>
+      <p>${truncate(escapeHtml(m.description),120)}</p>
+      <div class="actions">
+        <button class="btn view" data-id="${m.id}">Ver detalle</button>
+        <button class="primary" data-id="${m.id}">Abrir recurso</button>
       </div>
-      <div class="small">${escapeHtml(m.desc)}</div>
-      <footer>
-        <div class="small">${new Date().toLocaleDateString()}</div>
-        <button class="openBtn" data-id="${m.id}">Ver</button>
-      </footer>`;
-    grid.appendChild(card);
+    `;
+
+    const viewBtn = card.querySelector('.view');
+    const openBtn = card.querySelector('.primary');
+
+    viewBtn.addEventListener('click', () => openModal(m.id));
+    openBtn.addEventListener('click', () => openResource(m));
+
+    materialsList.appendChild(card);
   });
-
-  document.querySelectorAll('.openBtn').forEach(b => b.addEventListener('click', e => {
-    openDetail(Number(e.currentTarget.dataset.id));
-  }));
 }
 
-// --- Helpers ---
-function escapeHtml(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function typeLabel(t){ return {explicacion:'Explicación',tarea:'Tarea',refuerzo:'Refuerzo',lectura:'Lectura'}[t] || t; }
+function typeLabel(t){
+  if(t==='documento') return 'Documento';
+  if(t==='video') return 'Video/Podcast';
+  if(t==='enlace') return 'Enlace externo';
+  return t;
+}
 
-// --- Detalle de material ---
-function openDetail(id){
-  const all = loadMaterials();
-  const m = all.find(x => x.id === id);
+function openModal(id){
+  const m = materials.find(x => x.id === Number(id));
   if(!m) return;
-
-  document.getElementById('dTitle').textContent = m.title;
-  document.getElementById('dMeta').textContent = `${m.course} • ${typeLabel(m.type)}`;
-  document.getElementById('dDesc').textContent = m.desc;
-  const dContent = document.getElementById('dContent');
-  dContent.innerHTML = '';
-
-  if(m.link){
-    if(m.link.startsWith('audio:')){
-      const src = m.link.replace('audio:','');
-      dContent.innerHTML = `<audio controls src="${escapeHtml(src)}"></audio>`;
-      dDownload.onclick = () => window.open(src,'_blank');
-    } else if(m.link.includes('youtube')||m.link.includes('youtu.be')){
-      const url = new URL(m.link);
-      let vid = url.searchParams.get('v') || m.link.split('v=')[1] || m.link.split('/').pop();
-      dContent.innerHTML = `<div style="position:relative;padding-top:56%"><iframe src="https://www.youtube.com/embed/${escapeHtml(vid)}" style="position:absolute;inset:0;width:100%;height:100%;border:0" allowfullscreen></iframe></div>`;
-      dDownload.onclick = () => window.open(m.link,'_blank');
-    } else {
-      dContent.innerHTML = `<div class='small'>Enlace / archivo: <a href='#' id='dLink'>Abrir</a></div>`;
-      document.getElementById('dLink').addEventListener('click', e => { e.preventDefault(); window.open(m.link,'_blank'); });
-      dDownload.onclick = () => window.open(m.link,'_blank');
-    }
-  }
-
-  detailModal.classList.add('show');
+  modalTitle.textContent = m.title;
+  modalCourse.textContent = `${m.course}`;
+  modalDesc.textContent = m.description;
+  modalUsage.textContent = m.usage;
+  modalLinks.innerHTML = '';
+  m.files.forEach(f => {
+    const a = document.createElement('a');
+    a.href = f.url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = f.label;
+    a.className = 'btn';
+    modalLinks.appendChild(a);
+  });
+  modal.showModal();
 }
 
-// --- Subir material ---
-openUpload.addEventListener('click', () => modal.classList.add('show'));
-closeModal.addEventListener('click', () => modal.classList.remove('show'));
-dClose.addEventListener('click', () => detailModal.classList.remove('show'));
+function openResource(m){
+  // En el caso real, abriría el archivo o enlace. Aquí usamos la primera URL si existe.
+  if(m.files && m.files.length>0 && m.files[0].url !== '#'){
+    window.open(m.files[0].url, '_blank', 'noopener');
+  } else {
+    alert('Recurso no disponible para abrir (simulación).');
+  }
+}
 
-saveMaterial.addEventListener('click', () => {
-  const title = document.getElementById('mTitle').value.trim();
-  const course = document.getElementById('mCourse').value.trim() || 'Sin curso';
-  const type = document.getElementById('mType').value;
-  const desc = document.getElementById('mDesc').value.trim();
-  const link = document.getElementById('mLink').value.trim();
+closeModal.addEventListener('click', () => modal.close());
+modal.addEventListener('cancel', (e) => e.preventDefault());
 
-  if(!title){ alert('El título es obligatorio'); return; }
+function applyFilters(){
+  const q = searchInput.value.trim().toLowerCase();
+  const type = filterType.value;
+  const course = filterCourse.value;
+  const results = materials.filter(m => {
+    const matchesQ = q === '' || [m.title,m.description,m.course].join(' ').toLowerCase().includes(q);
+    const matchesType = type === 'all' || m.type === type;
+    const matchesCourse = course === 'all' || m.course === course;
+    return matchesQ && matchesType && matchesCourse;
+  });
+  renderMaterials(results);
+}
+searchInput.addEventListener('input', applyFilters);
+filterType.addEventListener('change', applyFilters);
+filterCourse.addEventListener('change', applyFilters);
+clearBtn.addEventListener('click', () => {searchInput.value=''; filterType.value='all'; filterCourse.value='all'; applyFilters();});
 
-  const all = loadMaterials();
-  const id = all.reduce((a,b) => Math.max(a,b.id), 0) + 1;
-  all.push({id,title,course,type,desc,link});
-  saveMaterials(all);
-  modal.classList.remove('show');
+// Helpers
+function truncate(str, n){ return (str.length>n)? str.slice(0,n-1)+'…' : str; }
+function escapeHtml(unsafe){ return unsafe.replace(/[&<"'`=/]/g, function(s){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','=':'&#x3D;','`':'&#x60;'})[s]; }); }
 
-  document.getElementById('mTitle').value = '';
-  document.getElementById('mCourse').value = '';
-  document.getElementById('mDesc').value = '';
-  document.getElementById('mLink').value = '';
-  render();
-});
+// Start
+populateCourseFilter();
+renderMaterials(materials);
 
-[searchInput, filterType, courseFilter].forEach(el => el.addEventListener('input', render));
-
-render();
-document.addEventListener('keydown', e => { if(e.key === 'Escape'){ modal.classList.remove('show'); detailModal.classList.remove('show'); } });

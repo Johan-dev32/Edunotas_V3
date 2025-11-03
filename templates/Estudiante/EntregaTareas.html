@@ -118,7 +118,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div class="text-center flex-grow-1">
         <h1 class="titulo-principal mb-0">MATERIAS</h1>
-        <p class="descripcion">Mira las Materias de los cursos</p>
+        <p class="descripcion">Mira las tareas de tus Materias</p>
       </div>
 
       <!-- Botón Crear Materia -->
@@ -135,7 +135,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">ESPAÑOL</h4>
-              <a href="{{ url_for('Estudiante.entregatareas2') }}" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=ESPAÑOL" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -143,7 +143,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">MATEMÁTICAS</h4>
-              <a href="{{ url_for('Estudiante.entregatareas2') }}" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=MATEMÁTICAS" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -151,7 +151,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">INGLÉS</h4>
-              <a href="{{ url_for('Estudiante.entregatareas2') }}" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=INGLÉS" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -161,7 +161,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">SOCIALES</h4>
-              <a href="{{ url_for('Estudiante.entregatareas2') }}" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=SOCIALES" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -169,7 +169,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">ÉTICA</h4>
-              <a href="{{ url_for('Estudiante.entregatareas2') }}" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=ÉTICA" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -177,7 +177,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">FILOSOFIÁ</h4>
-              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=FILOSOFIÁ" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=FILOSOFIÁ" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -191,7 +191,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">ARTÍSTICA</h4>
-              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=ARTÍSTICA" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=ARTÍSTICA" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -199,7 +199,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">BIOLOGÍA</h4>
-              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=BIOLOGÍA" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=BIOLOGÍA" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -207,7 +207,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">FÍSICA</h4>
-              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=FÍSICA" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=FÍSICA" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -217,7 +217,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">QUÍMICA</h4>
-              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=QUÍMICA" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=QUÍMICA" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -225,7 +225,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">RELIGIÓN</h4>
-            <a href="{{ url_for('Estudiante.notas_curso') }}?materia=RELIGIÓN" class="btn btn-primary">Ver Tareas</a>
+            <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=RELIGIÓN" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -233,7 +233,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">TECNOLOGÍA</h4>
-              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=TECNOLOGÍA" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=TECNOLOGÍA" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -247,7 +247,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">INFORMATICA</h4>
-              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=INFORMATICA" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=INFORMATICA" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -255,7 +255,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">P.T.I</h4>
-              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=P.T.I" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=P.T.I" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -263,7 +263,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">RUTA</h4>
-              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=RUTA" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=RUTA" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>
@@ -274,7 +274,7 @@
           <div class="card text-center curso-card">
             <div class="card-body">
               <h4 class="card-title">EDUCACIÓN FÍSICA</h4>
-              <a href="{{ url_for('Estudiante.notas_curso') }}?materia=EDUCACIÓN FÍSICA" class="btn btn-primary">Ver Tareas</a>
+              <a href="{{ url_for('Estudiante.entregatareas2') }}?materia=EDUCACIÓN FÍSICA" class="btn btn-primary">Ver Tareas</a>
             </div>
           </div>
         </div>

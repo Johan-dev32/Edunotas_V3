@@ -10,7 +10,7 @@
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <!-- CSS propio -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/Docente/Crear_Actividad.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Estudiante/EntregaTareas2.css') }}">
 </head>
 
 <body>
@@ -72,67 +72,118 @@
 
   <!-- Contenido principal -->
   <main class="container">
-    <h1 class="titulo">CREA LA TAREA O ACTIVIDAD</h1>
+    <h1 class="titulo">TAREAS PENDIENTES DE </h1>
     <br><br>
 
-    <div class="container actividad-container">
-      <div class="row">
-        <!-- 🧩 Formulario con enctype y name=pdfUpload -->
-  <div class="row">
-    <!-- Panel izquierdo -->
-    <div class="col-lg-4">
-      <div class="card p-4 shadow-sm border-0">
-        <h3 class="fw-bold text-center mb-4">ACT <span class="numero">{{ actividad_id }}</span></h3>
+    <div class="row">
+            <div class="col-lg-3 mb-4">
+                <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                    <div class="card-body">
+                        <h5 class="fw-bold text-dark">Próximas entregas</h5>
+                        <hr>
+                        
+                        <div class="mb-3">
+                            <p class="mb-0 fw-semibold text-truncate">Tarea: Reporte de lectura</p>
+                            <small class="text-danger fw-bold">Fecha límite: Vie, 08 Nov</small>
+                        </div>
+                        
+                         <div class="mb-3">
+                            <p class="mb-0 fw-semibold text-truncate">Actividad: Exposición cultural</p>
+                            <small class="text-danger fw-bold">Fecha límite: Lun, 11 Nov</small>
+                        </div>
+                        
+                        <p class="text-muted fst-italic">¡No tienes nada por entregar pronto! 🎉</p>
+                        
+                        <a href="#" class="btn btn-sm btn-link p-0 ver-todo-btn">Ver todas las tareas</a>
+                    </div>
+                </div>
+            </div>
 
-        <div class="mb-4">
-          <label class="form-label fw-semibold">Fecha de entrega</label>
-          <input type="date" class="form-control" name="fecha" required>
+<div class="col-lg-9">
+  <div class="card post-card mb-3 shadow-sm post-tarea">
+    <div class="card-body">
+      <div class="d-flex align-items-center">
+        <div class="icon-circle me-3"><i class="bi bi-journal-text fs-4"></i></div>
+        <div>
+          <h6 class="mb-0 fw-bold">
+            Jonathan David Espitia Rivera ha publicado una nueva tarea:
+            <span class="text-main-color">TAREA: ENSAYO DE UN ESCRITOR CLÁSICO</span>
+          </h6>
+          <small class="text-muted">Publicado: 25 Octubre (Última modificación: 25 Octubre)</small>
         </div>
 
-        <div class="mb-4">
-          <label class="form-label fw-semibold">Hora de entrega</label>
-          <input type="text" class="form-control" name="hora" placeholder="Ej: 23:59" required>
-        </div>
+        <button class="btn btn-sm btn-link text-dark ms-auto" type="button">
+          <i class="bi bi-three-dots-vertical"></i>
+        </button>
       </div>
-    </div>
 
-    <!-- Panel derecho -->
-    <div class="col-lg-8">
-      <div class="card p-4 shadow-sm border-0">
-        <h4 class="fw-bold mb-4">Detalles de la Actividad</h4>
-
-        <div class="mb-4">
-          <label class="form-label fw-semibold">Título de la Actividad</label>
-          <input type="text" class="form-control" name="titulo" placeholder="Escribe el título de la actividad..." required>
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label fw-semibold">Instrucciones o Descripción</label>
-          <textarea class="form-control" rows="5" name="instrucciones" placeholder="Describe aquí la tarea..." required></textarea>
-        </div>
-
-        <!-- Subida de PDF -->
-        <div class="upload-box border rounded py-5 mb-3 text-center">
-          <label for="pdfUpload" class="d-block cursor-pointer">
-            <i class="bi bi-file-earmark-pdf-fill fs-1 text-danger"></i>
-            <p class="mt-2 fw-semibold">Adjuntar material en PDF</p>
-          </label>
-          <input type="file" id="pdfUpload" name="pdfUpload" accept="application/pdf" hidden>
-        </div>
-
-        <!-- Botón de publicar -->
-       <button type="submit" class="btn btn-subir w-100 py-3 fs-5">PUBLICAR ACTIVIDAD</button>      </div>
+      <!-- 🔹 Botón de redirección -->
+      <div class="text-end mt-3">
+        <a href="{{ url_for('Estudiante.entregatareas3') }}" class="btn btn-primary btn-sm">
+          <i class="bi bi-upload"></i> Ver / Entregar Tarea
+        </a>
+      </div>
     </div>
   </div>
-</form>
+
+
+               <div class="card post-card mb-3 shadow-sm post-material">
+  <div class="card-body">
+    <div class="d-flex align-items-center">
+      <div class="icon-circle me-3"><i class="bi bi-book fs-4"></i></div>
+      <div>
+        <h6 class="mb-0 fw-bold">
+          Jonathan David Espitia Rivera ha publicado nuevo material:
+          <span class="text-main-color">GUÍA DE REFERENCIAS APA V.7</span>
+        </h6>
+        <small class="text-muted">Publicado: 23 Octubre (Última modificación: 23 Octubre)</small>
       </div>
+
+      <button class="btn btn-sm btn-link text-dark ms-auto" type="button">
+        <i class="bi bi-three-dots-vertical"></i>
+      </button>
     </div>
-  </main>
+
+    <!-- 🔹 Botón de redirección -->
+    <div class="text-end mt-3">
+      <a href="{{ url_for('Estudiante.entregatareas3') }}" class="btn btn-success btn-sm">
+        <i class="bi bi-eye"></i> Ver / Descargar Material
+      </a>
+    </div>
+  </div>
+</div>
+
+              <div class="card post-card mb-3 shadow-sm post-material">
+  <div class="card-body">
+    <div class="d-flex align-items-center">
+      <div class="icon-circle me-3"><i class="bi bi-book fs-4"></i></div>
+      <div>
+        <h6 class="mb-0 fw-bold">
+          Jonathan David Espitia Rivera ha publicado nuevo material:
+          <span class="text-main-color">GUÍA DE REFERENCIAS APA V.7</span>
+        </h6>
+        <small class="text-muted">Publicado: 23 Octubre (Última modificación: 23 Octubre)</small>
+      </div>
+
+      <button class="btn btn-sm btn-link text-dark ms-auto" type="button">
+        <i class="bi bi-three-dots-vertical"></i>
+      </button>
+    </div>
+
+    <!-- 🔹 Botón de redirección -->
+    <div class="text-end mt-3">
+      <a href="{{ url_for('Estudiante.entregatareas3') }}" class="btn btn-success btn-sm">
+        <i class="bi bi-eye"></i> Ver / Descargar Material
+      </a>
+    </div>
+  </div>
+</div>
+    </main>
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <!-- JavaScript externo -->
-  <script src="{{ url_for('static', filename='js/Docente/Crear_Actividad.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/Estudiante/EntregaTareas2.js') }}"></script>
 
 </body>
 </html>

@@ -1,0 +1,58 @@
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colegio Fe y Alegría</title>
+  
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Iconos -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- CSS propio -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Estudiante/verhorario.css') }}">
+</head>
+
+<body>
+<header class="topbar">
+<div class="brand">EduNotas</div>
+<nav class="menu">
+<a href="#" class="menu-item">Inicio</a>
+<a href="#horario" class="menu-item active">Ver mi horario</a>
+<a href="#perfil" class="menu-item">Perfil</a>
+</nav>
+</header>
+
+
+<main class="container">
+<h2 class="section-title">Mi horario académico</h2>
+<p class="info-text">Consulta tus clases de lunes a viernes. Esta vista es solo de lectura, cualquier cambio será gestionado por el administrador.</p>
+
+
+<section id="horario" class="schedule">
+<div class="table-wrapper">
+<table id="scheduleTable" class="schedule-table">
+<thead>
+<tr>
+<th>Hora</th>
+<th>Lunes</th>
+<th>Martes</th>
+<th>Miércoles</th>
+<th>Jueves</th>
+<th>Viernes</th>
+</tr>
+</thead>
+<tbody id="scheduleBody"></tbody>
+</table>
+</div>
+</section>
+</main>
+
+
+<footer class="footer">© EduNotas - Vista estudiante • Horario solo consulta</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- JavaScript externo -->
+<script src="{{ url_for('static', filename='js/Estudiante/verhorario.js') }}"></script>
+
+</body>
+</html>

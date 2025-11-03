@@ -114,43 +114,72 @@
   </div>
 
   <!-- 🔹 Formulario -->
-  <form id="formEstudiante" class="mb-4">
-    <div class="row g-3 align-items-center">
-      <div class="col-md-3">
-        <input type="text" id="nombre" class="form-control" placeholder="Nombre" required>
-      </div>
-      <div class="col-md-3">
-        <input type="text" id="ciclo" class="form-control" placeholder="Ciclo" required>
-      </div>
-      <div class="col-md-2">
-        <input type="text" id="curso" class="form-control" placeholder="Curso" required>
-      </div>
-      <div class="col-md-2">
-        <input type="number" id="promedio" class="form-control" placeholder="Promedio" step="0.1" min="1" max="5" required>
-      </div>
-      <div class="col-md-2 d-grid">
-        <button type="submit" class="btn btn-success">
-          <i class="bi bi-person-plus-fill"></i> Agregar
-        </button>
-      </div>
+  <form id="formCurso" method="POST" action="{{ url_for('Administrador.agregar_curso') }}" class="mb-4">
+  <div class="row g-3 align-items-center">
+    <div class="col-md-2">
+      <input type="text" name="Grado" class="form-control" placeholder="Grado" required>
     </div>
-  </form>
+    <div class="col-md-1">
+      <input type="text" name="Grupo" class="form-control" placeholder="Grupo" required>
+    </div>
+    <div class="col-md-2">
+      <input type="number" name="Anio" class="form-control" placeholder="Año" required>
+    </div>
+    <div class="col-md-2">
+      <select name="Estado" class="form-select" required>
+        <option value="Activo">Activo</option>
+        <option value="Inactivo">Inactivo</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <input type="number" name="DirectorGrupo" class="form-control" placeholder="ID del Director" required>
+    </div>
+    <div class="col-md-2 d-grid">
+      <button type="submit" class="btn btn-success">
+        <i class="bi bi-person-plus-fill"></i> Agregar
+      </button>
+    </div>
+  </div>
+</form>
 
   <!-- 🔹 Tabla -->
   <div class="table-responsive">
     <table class="table table-bordered text-center align-middle" id="tablaPromedios">
       <thead>
         <tr style="background-color: #050733ff; color: white;">
-          <th>Nombre</th>
-          <th>Ciclo</th>
-          <th>Curso</th>
-          <th>Promedio</th>
+          <th>Grado</th>
+          <th>Grupo</th>
+          <th>Año</th>
+          <th>Estado</th>
+          <th>DirectorGrupo</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <!-- Filas dinámicas aquí -->
-      </tbody>
+  {% for curso in cursos %}
+  <tr>
+    <td>{{ curso.Grado }}</td>
+    <td>{{ curso.Grupo }}</td>
+    <td>{{ curso.Anio }}</td>
+    <td>{{ curso.Estado }}</td>
+    <td>
+      {% if curso.director %}
+        {{ curso.director.Nombre }} {{ curso.director.Apellido }}
+      {% else %}
+        Sin asignar
+      {% endif %}
+    </td>
+    <td>
+      <button class="btn btn-sm btn-primary">Editar</button>
+      <button class="btn btn-sm btn-danger">Eliminar</button>
+    </td>
+  </tr>
+  {% else %}
+  <tr>
+    <td colspan="6">No hay cursos registrados.</td>
+  </tr>
+  {% endfor %}
+</tbody>
     </table>
   </div>
 </section>

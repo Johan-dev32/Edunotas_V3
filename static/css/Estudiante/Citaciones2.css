@@ -108,66 +108,24 @@ header .btn-dark {
 .descripcion {
   font-size: 1.3rem;     
   color: #555;  
-  margin-left: 50px;         
+  margin-left: 50px;   
+  margin-top: 20px;      
 }
-.grid-tutorias {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-}
-
-/* Tarjetas más cuadradas y pequeñas */
-.detalle-contenedor {
-  background-color: #fff;
-  border: 2px solid #050733ff;
-  border-radius: 10px;
-  padding: 15px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+/* Ajustes adicionales para la vista detallada */
+.card-citacion p {
+  font-size: 1rem;
+  color: #444;
+  line-height: 1.6;
 }
 
-.titulo-principal {
-  font-size: 3rem;      
-  font-weight: 900;      
-  color: #050733ff;    
-  margin-left: 50px;  
-  margin-top: 30px;
+.badge {
+  font-size: 1rem;
+  padding: 8px 12px;
 }
 
-
-.descripcion {
-  font-size: 1.3rem;     
-  color: #555;  
-  margin-left: 50px;         
-}
-/* Texto interno más pequeño */
-.info-general p {
-  font-size: 0.8rem;
-  margin-bottom: 0.3rem;
-  color: #333;
-}
-
-.mensaje-docente {
-  background-color: #f9f9fb;
-  border-left: 4px solid #050733ff;
-  font-size: 15px;
-  color: #333;
-  padding: 8px;
-  margin-top: 5px;
-  border-radius: 5px;
-}
-
-.footer {
-  background-color: white;
-  color: #050733ff;
-  font-weight: bold;
-  padding: 10px 0;
-  margin-top: 30px;
-}
-.titulo-principal2 {
-  font-size: 30px;      
-  font-weight: 900;      
-  color: #050733ff;    
-  margin-left: 120px;
+hr {
+  border-top: 2px solid #050733ff;
+  opacity: 0.4;
 }
 .btn-usuario {
     background: none !important;        /* sin fondo */

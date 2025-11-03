@@ -108,83 +108,49 @@ header .btn-dark {
 .descripcion {
   font-size: 1.3rem;     
   color: #555;  
-  margin-left: 50px;         
+  margin-left: 50px;   
+  margin-top: 20px;      
 }
-.grid-tutorias {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-}
-
-/* Tarjetas más cuadradas y pequeñas */
-.detalle-contenedor {
-  background-color: #fff;
-  border: 2px solid #050733ff;
-  border-radius: 10px;
-  padding: 15px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+/* Tarjetas de citaciones */
+.card-citacion {
+  border-left: 8px solid #050733ff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  transition: transform 0.2s ease;
 }
 
-.titulo-principal {
-  font-size: 3rem;      
-  font-weight: 900;      
-  color: #050733ff;    
-  margin-left: 50px;  
-  margin-top: 30px;
+.card-citacion:hover {
+  transform: translateY(-5px);
 }
 
-
-.descripcion {
-  font-size: 1.3rem;     
-  color: #555;  
-  margin-left: 50px;         
-}
-/* Texto interno más pequeño */
-.info-general p {
-  font-size: 0.8rem;
-  margin-bottom: 0.3rem;
-  color: #333;
-}
-
-.mensaje-docente {
-  background-color: #f9f9fb;
-  border-left: 4px solid #050733ff;
-  font-size: 15px;
-  color: #333;
-  padding: 8px;
-  margin-top: 5px;
-  border-radius: 5px;
-}
-
-.footer {
-  background-color: white;
-  color: #050733ff;
+/* Cabecera de cada card */
+.card-header {
+  background-color: #050733ff;
+  color: white;
   font-weight: bold;
-  padding: 10px 0;
-  margin-top: 30px;
-}
-.titulo-principal2 {
-  font-size: 30px;      
-  font-weight: 900;      
-  color: #050733ff;    
-  margin-left: 120px;
-}
-.btn-usuario {
-    background: none !important;        /* sin fondo */
-    border: none !important;            /* sin borde */
-    color: var(--primary-dark) !important; /* color del ícono */
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;                 /* cuadrado/redondo según necesidad */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    padding: 0;
-    box-shadow: none !important;
 }
 
-/* Al pasar el mouse — sin fondo azul */
+/* Botones */
+.btn-ver {
+  background-color: #050733ff;
+  color: white;
+  font-weight: bold;
+}
+
+.btn-ver:hover {
+  background-color: #070b86;
+  color: white;
+}
+
+/* Botón cerrar sesión */
+.btn-dark {
+  background-color: #050733ff !important;
+  border: none;
+}
+
+.btn-dark:hover {
+  background-color: #070b86 !important;
+}
 .btn-usuario:hover,
 .btn-usuario:focus,
 .btn-usuario:active {
@@ -199,7 +165,17 @@ header .btn-dark {
 .btn-usuario::after {
     display: none !important;
 }
-.txt-ultimo{
-  font-size: 12px;
-  color: #666464;
+.btn-usuario {
+    background: none !important;        /* sin fondo */
+    border: none !important;            /* sin borde */
+    color: var(--primary-dark) !important; /* color del ícono */
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;                 /* cuadrado/redondo según necesidad */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    padding: 0;
+    box-shadow: none !important;
 }

@@ -9,7 +9,7 @@
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <!-- CSS propio -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/NoticiasVistas.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Estudiante/NoticiasVistas.css') }}">
 </head>
 <body>
 
@@ -21,34 +21,32 @@
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
     <!-- Dropdown mensajes -->
-  <div class="dropdown ms-auto">
-    <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-      <span class="bi bi-envelope-fill"></span>
-      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none;">
-        0
-      </span>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="dropdownMenuButton" style="min-width: 300px;">
-      <li id="listaMensajes">
-        <p class="text-center text-muted mb-0">No tienes mensajes nuevos.</p>
-      </li>
-    </ul>
-  </div>
-
-    <div class="dropdown">
-      <button 
-        class="btn btn-usuario dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton2" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
-        <span class="bi bi-person-lines-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-      </ul>
+<div class="dropdown ms-auto me-2">
+        <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="bi bi-envelope-fill"></span>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none;">
+                
+            </span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="dropdownMenuButton" style="min-width: 300px;">
+            <li id="listaMensajes">
+                <p class="text-center text-muted mb-0">No tienes mensajes nuevos.</p>
+            </li>
+        </ul>
     </div>
+
+      <div class="dropdown">
+    <button class="btn btn-usuario" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-person-circle"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu" id="dropdownSTUDENT">
+        <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('Estudiante.manual') }}">Manual de Usuario</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
+    </ul>
+</div>
+
   </header>
 
 <!--  MENU  -->
@@ -61,8 +59,8 @@
         <ul class="nav flex-column">
           <li class="nav-item"><a href="{{ url_for('Estudiante.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
               <li><a href="{{ url_for('Estudiante.vernotas') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Estudiante.subidaevidencias') }}" class="nav-link text-white"><i class="bi bi-journal-text"></i> Entrega de Tareas/Actividades</a></li>
-              <li><a href="{{ url_for('Estudiante.materialestudiante') }}" class="nav-link text-white"><i class="bi bi-folder2-open"></i> Material Didáctico</a></li>
+             
+              <li><a href="{{ url_for('Estudiante.MaterialDidactico') }}" class="nav-link text-white"><i class="bi bi-folder2-open"></i> Material Didáctico</a></li>
               <li><a href="{{ url_for('Estudiante.evaluaciones') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Evaluaciones</a></li>
               <li><a href="{{ url_for('Estudiante.verhorario') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Ver Horario</a></li>
               <li><a href="{{ url_for('Estudiante.tutorias') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Tutorias</a></li>

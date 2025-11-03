@@ -52,31 +52,34 @@
 
 
 
-<!--  MENU  -->
- <section class="">
+  <!-- Menú lateral -->
+  <section class="bg-light py-5 mt-5">
   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
   </div>
   <div class="offcanvas1-body">
-    <ul class="nav flex-column">
-          <li class="nav-item"><a href="{{ url_for('Estudiante.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
-          
-          <li  class="nav-item"><a href="{{url_for('Estudiante.vernotas') }}" class="nav-link text-white"><i class="bi bi-journal-text"></i> Notas</a></li>
+      <ul class="nav flex-column">
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.ver_notas') }}" class="nav-link text-white"><i class="bi bi-journal-text"></i> Notas del Estudiante</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.inasistencias_justificadas') }}" class="nav-link text-white"><i class="bi bi-person-x"></i> Inasistencias Justificadas</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.informes_academicos') }}" class="nav-link text-white"><i class="bi bi-folder2-open"></i> Informe de Tareas</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.ver_observador_estudiante') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador del Estudiante</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.ver_citaciones') }}" class="nav-link text-white"><i class="bi bi-person-video3"></i> Citaciones</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.comunicados') }}" class="nav-link text-white"><i class="bi bi-megaphone"></i> Comunicados</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.historial_academico') }}" class="nav-link text-white"><i class="bi bi-archive-fill"></i> Historial Académico</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-bookmark-fill"></i> Manual de Usuario</a></li>
 
-          <li class="nav-item"><a href="{{url_for('Estudiante.entregatareas')}}" class= "nav-link text-white"><i class="bi bi-folder2-open"></i> Material Didactico</a></li>
-          <li class="nav-item"><a href="{{ url_for('Estudiante.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-          <li class="nav-item"><a href="{{ url_for('Estudiante.verhorario') }}" class="nav-link text-white"><i class="bi bi-calendar2-range"></i> Ver Horario</a></li>
-          <li class="nav-item"><a href="{{url_for('Estudiante.tutorias')}}" class="nav-link text-white"><i class="bi bi-people-fill menu-icon"></i> Tutorias</a></li>
-         
-
-          <li class="nav-item"><a href="{{ url_for('Estudiante.evaluaciones') }}" class="nav-link text-white"><i class="bi bi-journal-bookmark-fill"></i> Evaluaciones</a></li>
-          <li class="nav-item"><a href="{{ url_for('Estudiante.noticias_vistas') }}" class="nav-link text-white"><i class="bi bi-newspaper"></i> Noticias</a></li>
-          <li class="nav-item"><a href="{{ url_for('Estudiante.comunicacion') }}" class="nav-link text-white"><i class="bi bi-chat-dots menu-icon"></i> Comunicación</a></li>
-          <li class="nav-item"><a href="{{url_for('Estudiante.citaciones')}}" class="nav-link text-white"><i class="bi bi-person-video3"></i> Citaciones</a></li>
-          <li class="nav-item"><a href="{{ url_for('Estudiante.encuestas') }}" class="nav-link text-white"><i class="bi bi-card-checklist"></i> Encuestas</a></li>
-        </ul>
-      </div>
+      </ul>
     </div>
   </div>
 </section>
@@ -112,50 +115,51 @@
  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
 
 
-       <h2>Manual de Usuario – Estudiante</h2>
+     <h2>Manual de Usuario – Acudiente</h2>
 
 <h3>1. Introducción</h3>
 <p>
-Este manual está diseñado para los estudiantes que usarán el sistema
-<strong>EduNotas</strong>. Su finalidad es explicar cómo consultar sus calificaciones,
-revisar su asistencia, comunicarse con los docentes y acceder a los reportes de su
-desempeño académico.
+Este manual está dirigido a los acudientes o padres de familia que utilizan el sistema 
+<strong>EduNotas</strong>. Su objetivo es orientar en el seguimiento académico y disciplinario 
+de los estudiantes, permitiendo una comunicación directa con la institución educativa.
 </p>
 
 <h3>2. Acceso al sistema</h3>
 <p>
-El estudiante deberá ingresar con las credenciales asignadas (usuario y contraseña).
-Al entrar, verá un panel con acceso directo a sus cursos, notas y asistencia.
+El acudiente debe ingresar con las credenciales asignadas por la institución 
+(usuario y contraseña). Una vez dentro, podrá visualizar la información académica, 
+asistencia y notificaciones del estudiante a su cargo.
 </p>
 
 <h3>3. Funciones principales</h3>
 <ul>
-  <li><strong>Consultar calificaciones:</strong> Ver las notas obtenidas en cada asignatura, evaluaciones y trabajos.</li>
-  <li><strong>Revisar asistencia:</strong> Confirmar sus registros de asistencias, tardanzas e inasistencias.</li>
-  <li><strong>Ver reportes:</strong> Descargar reportes individuales de desempeño académico.</li>
-  <li><strong>Comunicación:</strong> Recibir notificaciones y mensajes de docentes o de la institución.</li>
+  <li><strong>Consultar calificaciones:</strong> Revisar las notas obtenidas por el estudiante en cada asignatura.</li>
+  <li><strong>Ver asistencia:</strong> Controlar las inasistencias y tardanzas registradas.</li>
+  <li><strong>Historial disciplinario:</strong> Acceder a observaciones o reportes de comportamiento.</li>
+  <li><strong>Notificaciones:</strong> Recibir avisos importantes de la institución.</li>
+  <li><strong>Comunicación:</strong> Enviar y recibir mensajes con docentes o coordinadores.</li>
 </ul>
 
 <h3>4. Pasos de uso</h3>
 <ol>
-  <li>Iniciar sesión en el sistema con su usuario y contraseña.</li>
-  <li>Seleccionar la opción deseada: <em>Notas, Asistencia, Reportes</em>.</li>
-  <li>Revisar la información actualizada sobre su desempeño académico.</li>
-  <li>Guardar o descargar reportes cuando sea necesario.</li>
-  <li>Cerrar sesión después de cada uso para proteger la cuenta.</li>
+  <li>Ingresar al sistema con su usuario y contraseña.</li>
+  <li>Seleccionar el menú correspondiente: <em>Notas, Asistencia, Observador</em>.</li>
+  <li>Consultar el estado académico y disciplinario del estudiante.</li>
+  <li>Descargar reportes si es necesario.</li>
+  <li>Cerrar sesión después de cada consulta para mantener la seguridad.</li>
 </ol>
 
 <h3>5. Recomendaciones</h3>
 <ul>
-  <li>Revisar periódicamente las calificaciones para estar al día con su rendimiento.</li>
-  <li>Verificar los registros de asistencia y reportar inconsistencias al docente.</li>
-  <li>Leer siempre las notificaciones enviadas por la institución.</li>
+  <li>Consultar regularmente las notas y asistencia para estar al tanto del progreso del estudiante.</li>
+  <li>Atender las notificaciones enviadas por la institución.</li>
+  <li>Usar el canal de comunicación para aclarar dudas o situaciones con los docentes.</li>
 </ul>
 
 <h3>6. Soporte</h3>
 <p>
-En caso de problemas con el acceso o con la información mostrada, el estudiante debe
-comunicarse con su docente o con el área de soporte del sistema.
+En caso de inconvenientes con el acceso o con la información, el acudiente debe 
+contactar al área de coordinación académica o soporte institucional.
 </p>
     
 

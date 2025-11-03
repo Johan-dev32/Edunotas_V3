@@ -11,13 +11,21 @@ Acudiente_bp = Blueprint('Acudiente', __name__, url_prefix='/acudiente')
 def paginainicio():
     return render_template('Acudiente/Paginainicio_Acudiente.html')
 
-@Acudiente_bp.route('/ver_notas_e_informes')
-def ver_notas_e_informes():
-    return render_template('Acudiente/Notas_Informes.html')
+@Acudiente_bp.route('/ver_notas')
+def ver_notas():
+    return render_template('Acudiente/ver_notas.html')
+
+@Acudiente_bp.route('/ver_notas2')
+def ver_notas2():
+    return render_template('Acudiente/ver_notas2.html')
 
 @Acudiente_bp.route('/ver_citaciones')
 def ver_citaciones():
     return render_template('Acudiente/ver_citaciones.html')
+
+@Acudiente_bp.route('/ver_citaciones2')
+def ver_citaciones2():
+    return render_template('Acudiente/ver_citaciones2.html')
 
 @Acudiente_bp.route('/inasistencias_justificadas')
 def inasistencias_justificadas():
@@ -35,6 +43,16 @@ def comunicados():
 def ver_observador_estudiante():
     return render_template('Acudiente/ObservadorEstudiante.html')
 
+
+@Acudiente_bp.route('/ver_observador_estudiante2')
+def ver_observador_estudiante2():
+    return render_template('Acudiente/ObservadorEstudiante2.html')
+
 @Acudiente_bp.route('/historial_academico')
 def historial_academico():
     return render_template('Acudiente/Historial_academico.html')
+
+@Acudiente_bp.route('/manual')
+def manual():
+    return render_template('Acudiente/ManualUsuario.html')
+

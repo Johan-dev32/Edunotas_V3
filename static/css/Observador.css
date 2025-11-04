@@ -79,7 +79,7 @@ header .btn-dark {
   font-size: 2rem;
   letter-spacing: 1px;
   font-weight: bolder;
-  margin-top: -70px;
+  margin-top: 70px;
 }
 
 .descripcion {
@@ -111,21 +111,7 @@ header .btn-dark {
 .text-azul {
   color: #050733ff;
 }
-/* ===== MODAL PERSONALIZADO ===== */
-#modalFormulario {
-  position: fixed;
-  inset: 0;
-  display: none; /* oculto por defecto */
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.6);
-  z-index: 1050;
-}
 
-/* Cuando el modal está visible (tu JS le quita la clase .oculto) */
-#modalFormulario:not(.oculto) {
-  display: flex;
-}
 
 /* Contenedor del contenido del modal */
 .modal-content {

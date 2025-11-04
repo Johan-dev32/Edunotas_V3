@@ -42,7 +42,8 @@
     </button>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu" id="dropdownSTUDENT">
         <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('Estudiante.manual') }}">Manual de Usuario</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('Acudiente.manual') }}">Manual de Usuario</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('Acudiente.historial_academico') }}">Historial Academico</a></li>
         <li><hr class="dropdown-divider"></li>
         <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
     </ul>
@@ -59,6 +60,21 @@
     <h5 class="offcanvas-title">MENÚ</h5>
   </div>
   <div class="offcanvas1-body">
+<<<<<<< HEAD
+    <ul class="nav flex-column">
+                    <li class="nav-item"><a href="{{ url_for('Acudiente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+          
+          <li  class="nav-item"><a href="{{url_for('Acudiente.ver_notas') }}" class="nav-link text-white"><i class="bi bi-list-stars "></i> Notas</a></li>
+          <li class="nav-item"><a href="{{url_for('Acudiente.ver_citaciones')}}" class="nav-link text-white"><i class="bi bi-person-rolodex menu-icon"></i> Citaciones</a></li>
+          <li class="nav-item"><a href="{{url_for('Acudiente.inasistencias_justificadas')}}" class="nav-link text-white"><i class="bi bi-journal-text menu-icon"></i> Asistencias justificadas</a></li>
+          <li class="nav-item"><a href="{{url_for('Acudiente.informes_academicos')}}" class="nav-link text-white"><i class="bi bi-folder2-open menu-icon"></i> Informe de Tareas</a></li>
+          <li class="nav-item"><a href="{{url_for('Acudiente.comunicados')}}" class="nav-link text-white"><i class="bi bi-pencil-square menu-icon"></i> Comunicados</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+          <li class="nav-item"><a href="{{url_for('Acudiente.comunicacion')}}" class="nav-link text-white"><i class="bi bi-chat-dots menu-icon"></i> Comunicación</a></li>
+          <li class="nav-item"><a href="{{url_for('Acudiente.horarios')}}" class="nav-link text-white"><i class="bi bi-calendar4-week menu-icon"></i> Horarios</a></li>
+        </ul>
+      </div>
+=======
       <ul class="nav flex-column">
         
         <li class="nav-item"><a href="{{ url_for('Acudiente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
@@ -80,6 +96,7 @@
         <li class="nav-item"><a href="{{ url_for('Acudiente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-bookmark-fill"></i> Manual de Usuario</a></li>
 
       </ul>
+>>>>>>> b4b27bff86b08da1204f5e397cdde8f76390fde5
     </div>
   </div>
 </section>

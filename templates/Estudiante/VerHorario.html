@@ -1,0 +1,103 @@
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colegio Fe y Alegría</title>
+  
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Iconos -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- CSS propio -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Estudiante/verhorario.css') }}">
+</head>
+
+  <!-- Header -->
+  <header class="d-flex align-items-center p-3 border-bottom w-100">
+    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+
+    <div class="dropdown ms-auto">
+      <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="bi bi-envelope-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li><a class="dropdown-item" href="#">Ajustes</a></li>
+        <li><a class="dropdown-item" href="#">Opción 2</a></li>
+        <li><a class="dropdown-item" href="#">Opción 3</a></li>
+      </ul>
+    </div>
+
+    <div class="dropdown">
+      <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="bi bi-person-lines-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+      </ul>
+    </div>
+  </header>
+
+<!--  MENU  -->
+ <section class="">
+  <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">MENÚ</h5>
+  </div>
+  <div class="offcanvas1-body">
+    <ul class="nav flex-column">
+          <li class="nav-item"><a href="{{ url_for('Estudiante.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+          
+          <li  class="nav-item"><a href="{{url_for('Estudiante.vernotas') }}" class="nav-link text-white"><i class="bi bi-journal-text"></i> Notas</a></li>
+
+          <li class="nav-item"><a href="{{url_for('Estudiante.entregatareas')}}" class= "nav-link text-white"><i class="bi bi-folder2-open"></i> Material Didactico</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.verhorario') }}" class="nav-link text-white"><i class="bi bi-calendar2-range"></i> Ver Horario</a></li>
+          <li class="nav-item"><a href="{{url_for('Estudiante.tutorias')}}" class="nav-link text-white"><i class="bi bi-people-fill menu-icon"></i> Tutorias</a></li>
+         
+
+          <li class="nav-item"><a href="{{ url_for('Estudiante.evaluaciones') }}" class="nav-link text-white"><i class="bi bi-journal-bookmark-fill"></i> Evaluaciones</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.noticias_vistas') }}" class="nav-link text-white"><i class="bi bi-newspaper"></i> Noticias</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.comunicacion') }}" class="nav-link text-white"><i class="bi bi-chat-dots menu-icon"></i> Comunicación</a></li>
+          <li class="nav-item"><a href="{{url_for('Estudiante.citaciones')}}" class="nav-link text-white"><i class="bi bi-person-video3"></i> Citaciones</a></li>
+          <li class="nav-item"><a href="{{ url_for('Estudiante.encuestas') }}" class="nav-link text-white"><i class="bi bi-card-checklist"></i> Encuestas</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main class="container">
+<h2 class="section-title">Mi horario académico</h2>
+<p class="info-text">Consulta tus clases de lunes a viernes. Esta vista es solo de lectura, cualquier cambio será gestionado por el administrador.</p>
+
+
+<section id="horario" class="schedule">
+<div class="table-wrapper">
+<table id="scheduleTable" class="schedule-table">
+<thead>
+<tr>
+<th>Hora</th>
+<th>Lunes</th>
+<th>Martes</th>
+<th>Miércoles</th>
+<th>Jueves</th>
+<th>Viernes</th>
+</tr>
+</thead>
+<tbody id="scheduleBody"></tbody>
+</table>
+</div>
+</section>
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- JavaScript externo -->
+<script src="{{ url_for('static', filename='js/Estudiante/verhorario.js') }}"></script>
+
+</body>
+</html>

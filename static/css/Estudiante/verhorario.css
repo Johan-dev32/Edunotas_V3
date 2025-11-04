@@ -1,0 +1,214 @@
+:root {
+    --bg: #f8fafc;
+    --accent: #28527a;
+    --muted: #6b7280;
+    --card: #ffffff;
+    --radius: 10px;
+    --border: #e5e7eb;
+    --recreo: #f9fafb;
+}
+
+* {
+    box-sizing: border-box
+}
+
+body {
+  background-color: #f8f9fa; 
+  font-family: 'Trebuchet MS', sans-serif;
+  color: #212529;
+}
+
+/* ========== NAVBAR SUPERIOR GENERAL ========== */
+header {
+  background-color: white;
+  color: #050733ff;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  margin: 0;
+  margin-left: 60px;
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas {
+  background-color: #050733ff;
+  color: #fff;
+}
+
+.btn-usuario {
+  background-color: #050733ff;
+  color: #fff;
+  margin-left: 10px;
+}
+
+/* ========== MENU LATERAL ========== */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+.offcanvas {
+  font-size: 25px;
+}
+
+.offcanvas-title {
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+.nav-item {
+  font-weight: bold;
+  font-size: 22px;
+}
+
+#sidebar .nav-link {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* SOLO botones nav-pills */
+.nav-pills .nav-link {
+  font-size: 25px;   
+  color: #050733ff !important; 
+  font-weight: bold;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    background: linear-gradient(90deg, var(--accent), #1b91c2);
+    color: #fff
+}
+
+.menu {
+    display: flex;
+    gap: 14px
+}
+
+.menu-item {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600
+}
+
+.menu-item.active {
+    text-decoration: underline
+}
+
+.container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 16px
+}
+
+.section-title {
+  margin-top: 0;
+  color: var(--accent);
+  text-align: center;
+  color: #212529;
+}
+
+
+.info-text {
+    color: var(--muted);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 6px 14px rgba(12, 20, 36, 0.06);
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+    text-align: center
+}
+
+.schedule-table th {
+    background: #e2e8f0;
+    padding: 12px;
+    font-weight: 600
+}
+
+.schedule-table td {
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-weight: 500;
+    color: #fff
+}
+
+.schedule-table tr.recreo td {
+    background: var(--recreo);
+    color: #374151;
+    font-weight: 600;
+    font-size: 15px
+}
+
+.schedule-table td:first-child {
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+
+/* Colores por materia */
+.lengua {
+    background: #11064e
+}
+
+.matematica {
+    background: #432fb7
+}
+
+.ciencias {
+    background: #312674
+}
+
+.ingles {
+    background: #8779d6
+}
+
+.educacion-fisica {
+    background: #746da0
+}
+
+.educacion-artistica {
+    background: #452bda
+}
+
+.humanismo {
+    background: #8f87c0
+}
+
+.proyecto {
+    background: #3d1df4
+}

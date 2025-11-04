@@ -20,9 +20,9 @@ def verhorario():
 def vernotas():
     return render_template('Estudiante/VerNotas.html')
 
-@Estudiante_bp.route('/materialestudiante')
-def materialestudiante():
-    return render_template('Estudiante/MaterialEstudiante.html')
+@Estudiante_bp.route('/MaterialDidactico')
+def MaterialDidactico():
+    return render_template('Estudiante/MaterialDidactico.html')
 
 @Estudiante_bp.route('/entregatareas')
 def entregatareas():

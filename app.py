@@ -183,11 +183,6 @@ def perfil_rol(rol):
             return render_template("inicio_acudiente.html")
         else:
             return "Rol no válido", 404
-        
-        
-@app.route('/manual')
-def manual():
-    return render_template('manual.html')
 
 
 @app.route('/logout')

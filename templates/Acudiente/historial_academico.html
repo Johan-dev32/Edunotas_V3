@@ -1,14 +1,24 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Colegio Fe y Alegría</title>
+=======
+<DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <title>Colegio Fe y Alegría</title>
+>>>>>>> b4b27bff86b08da1204f5e397cdde8f76390fde5
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <!-- CSS propio -->
+<<<<<<< HEAD
   <link rel="stylesheet" href="{{ url_for('static', filename='css/Acudiente/HistorialAcademico.css') }}">
 
 </head>
@@ -16,11 +26,19 @@
 
 
   <header class="d-flex align-items-center p-3 border-bottom w-100">
+=======
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Acudiente/historial.css') }}">
+
+</head>
+<body>
+<header class="d-flex align-items-center p-3 border-bottom w-100">
+>>>>>>> b4b27bff86b08da1204f5e397cdde8f76390fde5
     <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
       <i class="bi bi-list"></i>
     </button>
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
+<<<<<<< HEAD
 
     <div class="dropdown ms-auto">
       <button 
@@ -40,28 +58,58 @@
 
 
    <div class="dropdown">
+=======
+    <div class="dropdown ms-auto me-2">
+        <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="bi bi-envelope-fill"></span>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none;">
+                
+            </span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="dropdownMenuButton" style="min-width: 300px;">
+            <li id="listaMensajes">
+                <p class="text-center text-muted mb-0">No tienes mensajes nuevos.</p>
+            </li>
+        </ul>
+    </div>
+
+      <div class="dropdown">
+>>>>>>> b4b27bff86b08da1204f5e397cdde8f76390fde5
     <button class="btn btn-usuario" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="bi bi-person-circle"></i>
     </button>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu" id="dropdownSTUDENT">
         <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
+<<<<<<< HEAD
         <li><a class="dropdown-item" href="{{ url_for('Acudiente.manual') }}">Manual de Usuario</a></li>
         <li><a class="dropdown-item" href="{{ url_for('Acudiente.historial_academico') }}">Historial Academico</a></li>
+=======
+        <li><a class="dropdown-item" href="{{ url_for('Estudiante.manual') }}">Manual de Usuario</a></li>
+>>>>>>> b4b27bff86b08da1204f5e397cdde8f76390fde5
         <li><hr class="dropdown-divider"></li>
         <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
     </ul>
 </div>
+<<<<<<< HEAD
   </header>
 
 
 
 <!--  MENU  -->
 
+=======
+
+  </header>
+
+  <!-- Menú lateral -->
+  <section class="bg-light py-5 mt-5">
+>>>>>>> b4b27bff86b08da1204f5e397cdde8f76390fde5
   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
   </div>
   <div class="offcanvas1-body">
+<<<<<<< HEAD
     <ul class="nav flex-column">
           <li class="nav-item"><a href="{{ url_for('Acudiente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
           
@@ -149,3 +197,99 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+=======
+      <ul class="nav flex-column">
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.ver_notas') }}" class="nav-link text-white"><i class="bi bi-journal-text"></i> Notas del Estudiante</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.inasistencias_justificadas') }}" class="nav-link text-white"><i class="bi bi-person-x"></i> Inasistencias Justificadas</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.informes_academicos') }}" class="nav-link text-white"><i class="bi bi-folder2-open"></i> Informe de Tareas</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.ver_observador_estudiante') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador del Estudiante</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.ver_citaciones') }}" class="nav-link text-white"><i class="bi bi-person-video3"></i> Citaciones</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.comunicados') }}" class="nav-link text-white"><i class="bi bi-megaphone"></i> Comunicados</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.historial_academico') }}" class="nav-link text-white"><i class="bi bi-archive-fill"></i> Historial Académico</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-bookmark-fill"></i> Manual de Usuario</a></li>
+
+      </ul>
+    </div>
+  </div>
+</section>
+
+  <div class="container">
+    <h2>Consulta del historial académico</h2>
+    <p>Ingresa el número de identificación del estudiante para consultar su información académica.</p>
+
+    <div class="busqueda">
+      <input type="text" id="buscarDocumento" placeholder="Número de identificación del estudiante">
+      <button id="btnBuscar">Buscar</button>
+    </div>
+
+    <div id="infoEstudiante" class="oculto">
+      <h3>Datos del estudiante</h3>
+      <div class="datos-estudiante">
+        <p><strong>Nombre:</strong> <span id="nombre"></span></p>
+        <p><strong>Documento:</strong> <span id="documento"></span></p>
+        <p><strong>Grado:</strong> <span id="grado"></span></p>
+        <p><strong>Curso:</strong> <span id="curso"></span></p>
+      </div>
+
+      <h3>Datos académicos</h3>
+      <div class="periodo">
+        <label for="periodoSelect">Selecciona el período:</label>
+        <select id="periodoSelect">
+          <option value="">-- Selecciona --</option>
+          <option value="1">Primer período</option>
+          <option value="2">Segundo período</option>
+          <option value="3">Tercer período</option>
+          <option value="4">Cuarto período</option>
+        </select>
+      </div>
+
+      <div id="tablaNotas" class="oculto">
+        <table>
+          <thead>
+            <tr>
+              <th>Materia</th>
+              <th>Nota 1</th>
+              <th>Nota 2</th>
+              <th>Nota 3</th>
+              <th>Nota Final</th>
+            </tr>
+          </thead>
+          <tbody id="notasBody"></tbody>
+        </table>
+
+        <div class="resultado-final">
+          <p><strong>Resultado final del período:</strong> <span id="resultadoFinal"></span></p>
+        </div>
+
+        <div id="recuperaciones" class="oculto">
+          <h4>Recuperaciones</h4>
+          <ul id="listaRecuperaciones"></ul>
+        </div>
+
+        <div id="observaciones" class="oculto">
+          <h4>Observaciones</h4>
+          <p id="textoObservaciones"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alerta">
+      ⚠️ Solo puedes consultar el historial académico de tu niñ@. No puedes editar ni modificar la información.
+    </div>
+  </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- JavaScript externo -->
+  <script src="{{ url_for('static', filename='js/Acudiente/historial.js') }}"></script>
+</html>
+>>>>>>> b4b27bff86b08da1204f5e397cdde8f76390fde5

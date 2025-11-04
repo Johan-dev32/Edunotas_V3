@@ -50,7 +50,6 @@
 </div>
 
   </header>
-
   <!-- Menú lateral -->
   <section class="bg-light py-5 mt-5">
   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
@@ -58,6 +57,7 @@
     <h5 class="offcanvas-title">MENÚ</h5>
   </div>
   <div class="offcanvas1-body">
+<<<<<<< HEAD
     <ul class="nav flex-column">
                     <li class="nav-item"><a href="{{ url_for('Acudiente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
           
@@ -69,6 +69,31 @@
           <li class="nav-item"><a href="{{ url_for('Estudiante.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
           <li class="nav-item"><a href="{{url_for('Acudiente.comunicacion')}}" class="nav-link text-white"><i class="bi bi-chat-dots menu-icon"></i> Comunicación</a></li>
           <li class="nav-item"><a href="{{url_for('Acudiente.horarios')}}" class="nav-link text-white"><i class="bi bi-calendar4-week menu-icon"></i> Horarios</a></li>
+=======
+      <ul class="nav flex-column">
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.ver_notas') }}" class="nav-link text-white"><i class="bi bi-journal-text"></i> Notas del Estudiante</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.inasistencias_justificadas') }}" class="nav-link text-white"><i class="bi bi-person-x"></i> Inasistencias Justificadas</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.informes_academicos') }}" class="nav-link text-white"><i class="bi bi-folder2-open"></i> Informe de Tareas</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.ver_observador_estudiante') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador del Estudiante</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.ver_citaciones') }}" class="nav-link text-white"><i class="bi bi-person-video3"></i> Citaciones</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.comunicados') }}" class="nav-link text-white"><i class="bi bi-megaphone"></i> Comunicados</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.historial_academico') }}" class="nav-link text-white"><i class="bi bi-archive-fill"></i> Historial Académico</a></li>
+        
+        <li class="nav-item"><a href="{{ url_for('Acudiente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-bookmark-fill"></i> Manual de Usuario</a></li>
+
+      </ul>
+    </div>
+  </div>
+>>>>>>> b4b27bff86b08da1204f5e397cdde8f76390fde5
 </section>
 
 <div class="d-flex justify-content-between align-items-center mb-4">

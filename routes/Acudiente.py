@@ -56,3 +56,10 @@ def historial_academico():
 def manual():
     return render_template('Acudiente/ManualUsuario.html')
 
+@Acudiente_bp.route('/comunicacion')
+def comunicacion():
+    return render_template('Acudiente/Comunicacion.html')
+
+@Acudiente_bp.route('/horarios')
+def horarios():
+    return render_template('Acudiente/Horarios.html')

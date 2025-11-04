@@ -473,12 +473,64 @@ def usuarios():
     return render_template('Administrador/Usuarios.html')
 
 
-@Administrador_bp.route('/asignaturas')
+# CREAR ASIGNATURAS #
+
+@Administrador_bp.route('/asignaturas', methods=['GET'])
 def asignaturas():
-    return render_template('Administrador/Asignaturas.html')
+    # Obtener docentes activos
+    docentes = Usuario.query.filter_by(Rol='Docente', Estado='Activo').all()
+    
+    # Obtener asignaturas junto al docente asignado
+    asignaturas = db.session.query(
+        Asignatura,
+        Usuario
+    ).join(Docente_Asignatura, Docente_Asignatura.ID_Asignatura == Asignatura.ID_Asignatura)\
+     .join(Usuario, Usuario.ID_Usuario == Docente_Asignatura.ID_Docente)\
+     .all()
+    
+    return render_template('Administrador/Asignaturas.html', asignaturas=asignaturas, docentes=docentes)
+
+
+@Administrador_bp.route('/asignaturas/guardar', methods=['POST'])
+def guardar_asignatura():
+    nombre = request.form.get('nombre')
+    descripcion = request.form.get('descripcion')
+    ciclo = request.form.get('ciclo')
+    id_docente = request.form.get('id_docente')
+
+    if not all([nombre, id_docente]):
+        return jsonify({"error": "Faltan datos obligatorios"}), 400
+
+    try:
+        id_docente = int(id_docente)
+
+        docente = Usuario.query.get(id_docente)
+        if not docente:
+            return jsonify({"error": "Docente no encontrado"}), 404
+
+        asignatura = Asignatura(
+            Nombre=nombre,
+            Descripcion=descripcion,
+            Grado=ciclo,
+            Estado='Activa'
+        )
+
+        relacion = Docente_Asignatura(docente=docente, asignatura=asignatura)
+
+        db.session.add(asignatura)
+        db.session.add(relacion)
+        db.session.commit()
+
+        return jsonify({"success": "Asignatura registrada correctamente"})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
 
 
 @Administrador_bp.route('/horarios', defaults={'curso_id': None})
+
 @Administrador_bp.route('/horarios/<int:curso_id>')
 def horarios(curso_id):
     return render_template('Administrador/Horarios.html', curso_id=curso_id)
@@ -505,6 +557,7 @@ def notas_registro():
 @Administrador_bp.route('/notas_consultar')
 def notas_consultar():
     return render_template('Administrador/Notas_Consultar.html')
+
 
 # GESTIÓN DE LA OBSERVACIÓN #
 
@@ -540,23 +593,24 @@ def registrar_observacion():
         return jsonify({"status": "error", "message": "El estudiante no tiene matrícula asignada"}), 400
 
     # Buscar horario según la matrícula
-    horario = Programacion.query.filter_by(ID_Curso=matricula.ID_Curso).first()
-    if not horario:
-        return jsonify({"status": "error", "message": "No hay horario asociado al estudiante"}), 400
-    
-    nueva_obs = Observacion(
-        Fecha=datetime.strptime(data.get('fecha'), "%Y-%m-%d").date(),
-        Descripcion=data.get('descripcion'),
-        Tipo=data.get('tipo'),
-        NivelImportancia=data.get('nivelImportancia'),
-        Recomendacion=data.get('recomendacion'),
-        Estado='Activa',
-        ID_Horario=horario.ID_Programacion,
-        ID_Matricula=matricula.ID_Matricula,
-        ID_Estudiante=id_estudiante
-    )
+    horario_obj = Programacion.query.filter_by(ID_Curso=matricula.ID_Curso).first()
+    horario_id = horario_obj.ID_Programacion if horario_obj else None
 
+    # Ahora no falla si horario es None
     try:
+        nueva_obs = Observacion(
+            Fecha=datetime.strptime(data.get('fecha'), "%Y-%m-%d").date(),
+            Descripcion=data.get('descripcion'),
+            Tipo=data.get('tipo'),
+            NivelImportancia=data.get('nivelImportancia'),
+            Recomendacion=data.get('recomendacion'),
+            Estado='Activa',
+            ID_Horario=horario_id,
+            ID_Matricula=matricula.ID_Matricula,
+            ID_Estudiante=id_estudiante
+        )
+
+
         db.session.add(nueva_obs)
         db.session.commit()
         return jsonify({"status": "ok", "message": "Observación registrada correctamente"})

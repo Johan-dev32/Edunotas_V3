@@ -245,17 +245,23 @@
           <thead class="table-azul">
             <tr>
               <th>Nombre</th>
+              <th>Curso</th>
               <th>Tipo</th>
               <th>Nivel de Importancia</th>
               <th>Fecha</th>
               <th>Descripción</th>
               <th>Recomendación</th>
+              <th>Estado</th>
             </tr>
           </thead>
-          <tbody id="tablaObservador">
+          <tbody>
             {% for obs, est in observaciones %}
             <tr>
               <td>{{ est.Nombre }} {{ est.Apellido }}</td>
+              <td>
+                {{ obs.matricula.curso.NombreCurso if obs.matricula and
+                obs.matricula.curso else '' }}
+              </td>
               <td>{{ obs.Tipo }}</td>
               <td>{{ obs.NivelImportancia }}</td>
               <td>{{ obs.Fecha.strftime('%d/%m/%Y') if obs.Fecha else '' }}</td>
@@ -265,10 +271,11 @@
               <td class="text-start">
                 <pre class="mb-0">{{ obs.Recomendacion }}</pre>
               </td>
+              <td>{{ obs.Estado }}</td>
             </tr>
             {% else %}
             <tr>
-              <td colspan="6" class="text-muted">
+              <td colspan="8" class="text-muted">
                 No hay observaciones registradas
               </td>
             </tr>
@@ -278,18 +285,16 @@
       </div>
     </main>
 
-    <!-- MODAL CORREGIDO -->
+    <!-- MODAL DE REGISTRO -->
 <div class="modal fade" id="modalFormulario" tabindex="-1" aria-labelledby="modalFormularioLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content p-4">
       <div class="modal-header border-0">
-          <h2 class="modal-title text-azul fw-bold">AGREGAR OBSERVACIÓN</h2>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
+        <h2 class="modal-title text-azul fw-bold">AGREGAR OBSERVACIÓN</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
       <div class="modal-body">
         <form id="formObservacion">
-
-          <!-- SELECT DE ESTUDIANTES -->
           <select name="id_estudiante" class="form-control mb-2" required>
             <option value="" selected disabled>Seleccione un estudiante</option>
             {% for est in estudiantes %}
@@ -297,12 +302,9 @@
             {% endfor %}
           </select>
 
-          <!-- (por ahora) horario fijo -->
-          <input type="hidden" name="id_horario" value="1">
-
-          <input type="text" name="tipo" placeholder="Tipo" required class="form-control mb-2">
-          <input type="text" name="nivelImportancia" placeholder="Nivel de Importancia" required class="form-control mb-2">
-          <input type="date" name="fecha" required class="form-control mb-2">
+          <input type="text" name="tipo" placeholder="Tipo" required class="form-control mb-2" />
+          <input type="text" name="nivelImportancia" placeholder="Nivel de Importancia" required class="form-control mb-2" />
+          <input type="date" name="fecha" required class="form-control mb-2" />
           <textarea name="descripcion" placeholder="Descripción" required class="form-control mb-2"></textarea>
           <textarea name="recomendacion" placeholder="Recomendación" required class="form-control mb-2"></textarea>
 
@@ -313,45 +315,41 @@
   </div>
 </div>
 
-    <!-- JS de Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- JS de observador -->
-    <script>
-      document
-        .getElementById("formObservacion")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
-          const formData = new FormData(this);
+<!-- JS para manejo del modal y formulario -->
+<script>
+document.getElementById("btnAbrirFormulario").addEventListener("click", function() {
+  const modal = new bootstrap.Modal(document.getElementById("modalFormulario"));
+  modal.show();
+});
 
-          try {
-            const response = await fetch(
-              "/administrador/observador/registrar",
-              {
-                method: "POST",
-                body: formData,
-              }
-            );
-            const result = await response.json();
-            console.log(result);
-            alert(result.message || "Prueba completada");
-            if (result.status === "ok") location.reload();
-          } catch (error) {
-            console.error(error);
-            alert("Error al conectar con el servidor");
-          }
-        });
+document.getElementById("formObservacion").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const formData = new FormData(this);
 
-      // Abrir modal con botón
-      document
-        .getElementById("btnAbrirFormulario")
-        .addEventListener("click", function () {
-          const modal = new bootstrap.Modal(
-            document.getElementById("modalFormulario")
-          );
-          modal.show();
-        });
-    </script>
-    <script src="{{ url_for('static', filename='js/Administrador/observador.js') }}"></script>
+  try {
+    const response = await fetch("/administrador/observador/registrar", {
+      method: "POST",
+      body: formData
+    });
+
+    const result = await response.json();
+    console.log(result); // Para ver el mensaje completo del servidor
+
+    if(result.status === "ok") {
+      alert(result.message);
+      location.reload(); // Recarga la tabla
+    } else {
+      alert("Error: " + result.message);
+    }
+
+  } catch (error) {
+    console.error(error);
+    alert("Error al conectar con el servidor");
+  }
+});
+</script>
   </body>
 </html>

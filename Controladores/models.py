@@ -205,6 +205,8 @@ class Docente_Asignatura(db.Model):
     docente = relationship('Usuario', back_populates='docente_asignaturas', foreign_keys=[ID_Docente])
     asignatura = relationship('Asignatura', back_populates='docente_asignaturas', foreign_keys=[ID_Asignatura])
     programaciones = relationship('Programacion', back_populates='docente_asignatura', lazy='dynamic')
+    
+
 
 
 # -----------------------------------------------------

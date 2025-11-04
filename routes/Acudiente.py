@@ -52,7 +52,18 @@ def ver_observador_estudiante2():
 def historial_academico():
     return render_template('Acudiente/Historial_academico.html')
 
+@Acudiente_bp.route('/historial_academico2')
+def historial_academico2():
+    return render_template('Acudiente/historial_academico2.html')
+
 @Acudiente_bp.route('/manual')
 def manual():
     return render_template('Acudiente/ManualUsuario.html')
 
+@Acudiente_bp.route('/comunicacion')
+def comunicacion():
+    return render_template('Acudiente/Comunicacion.html')
+
+@Acudiente_bp.route('/horarios')
+def horarios():
+    return render_template('Acudiente/Horarios.html')

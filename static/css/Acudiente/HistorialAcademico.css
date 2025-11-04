@@ -99,13 +99,15 @@ header .btn-dark {
 .titulo-principal {
   font-size: 3rem;      
   font-weight: 900;      
-  color: #050733ff;      
+  color: #050733ff;   
+  margin-top: -30px;   
 }
 
 .subtitulo {
   font-size: 2rem;       
   font-weight: 700;
-  color: #050733ff;        
+  color: #050733ff;  
+  margin-top: 70px;      
 }
 
 .descripcion {
@@ -113,49 +115,77 @@ header .btn-dark {
   color: #555;           
 }
 
-.card {
+
+
+.custom-input {
   border: 2px solid #050733ff;
+  font-family: 'Trebuchet MS', sans-serif;
+  border-radius: 50px;   /* 🔥 circular en ambos lados */
+  padding: 10px 15px;
 }
 
-.btn-custom {
+.custom-icon {
   background-color: #050733ff;
   color: white;
-  font-weight: bold;
+  border: 2px solid #050733ff;
+  border-radius: 50px 0 0 50px; /* redondo en el lado izquierdo */
 }
 
-.btn-custom:hover {
-  background-color: #23265cff;
-  color: #fff;
+.input-group .custom-input {
+  border-radius: 0 50px 50px 0; /* redondo en el lado derecho */
 }
 
-.icono-pdf {
-  font-size: 2rem;
+
+
+.input-group-text {
+  background-color: transparent;
+  border: none;
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
   color: #050733ff;
 }
 
-.editando {
-  border: 2px dashed #050733ff;
-  padding: 10px;
-  border-radius: 8px;
-  background-color: #f0f2ff;
-}
-.btn-warning, .btn-custom{
-  margin-bottom: 10px;
-  background-color: #050733ff;
-  color: #ffffff;
-}
-/* Cambiar botón warning al color institucional */
-.btn-warning {
-  background-color: #050733ff !important;
-  border-color: #050733ff !important;
-  color: #fff !important; /* texto blanco */
+.card {
+  border: 2px solid #050733ff;
+  border-radius: 12px;
 }
 
-/* Evitar que se ponga amarillo al pasar el mouse */
-.btn-warning:hover,
-.btn-warning:focus,
-.btn-warning:active {
-  background-color: #23265c !important;  /* un tono más claro/oscuro */
-  border-color: #23265c !important;
-  color: #fff !important;
+h6 {
+  color: #050733ff;
+}
+.btn-usuario {
+    background: none !important;        /* sin fondo */
+    border: none !important;            /* sin borde */
+    color: var(--primary-dark) !important; /* color del ícono */
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;                 /* cuadrado/redondo según necesidad */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    padding: 0;
+    box-shadow: none !important;
+}
+
+/* Al pasar el mouse — sin fondo azul */
+.btn-usuario:hover,
+.btn-usuario:focus,
+.btn-usuario:active {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--secondary-dark) !important; /* solo cambia el color del ícono */
+    outline: none !important;
+}
+
+/* 🔹 Evita que Bootstrap le ponga el ícono de desplegable (flechita ↓) */
+.btn-usuario::after {
+    display: none !important;
+}
+.txt-ultimo{
+  font-size: 12px;
+  color: #666464;
 }

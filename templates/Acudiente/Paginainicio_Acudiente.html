@@ -30,6 +30,7 @@
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu" id="dropdownSTUDENT">
         <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
         <li><a class="dropdown-item" href="{{ url_for('Acudiente.manual') }}">Manual de Usuario</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('Acudiente.historial_academico') }}">Historial Academico</a></li>
         <li><hr class="dropdown-divider"></li>
         <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
     </ul>
@@ -66,7 +67,7 @@
         <a href="{{ url_for('Acudiente.ver_citaciones') }}" class="menu-card text-decoration-none">
             <div class="card shadow-sm text-center">
                 <div class="card-body">
-                    <i class="bi bi-calendar-event menu-icon"></i>
+                    <i class="bi bi-person-rolodex menu-icon"></i>
                     <p class="card-text menu-text">Ver Citaciones del Estudiante</p>
                 </div>
             </div>
@@ -93,8 +94,8 @@
                 </div>
             </div>
         </a>
+    
     </div>
-
     <div class="col-6 col-sm-4 col-md-3 col-lg-2">
         <a href="{{ url_for('Acudiente.comunicados') }}" class="menu-card text-decoration-none">
             <div class="card shadow-sm text-center">
@@ -105,12 +106,12 @@
             </div>
         </a>
     </div>
-
+   </div>
     <div class="col-6 col-sm-4 col-md-3 col-lg-2">
         <a href="{{ url_for('Acudiente.ver_observador_estudiante') }}" class="menu-card text-decoration-none">
             <div class="card shadow-sm text-center">
                 <div class="card-body">
-                    <i class="bi bi-people-fill menu-icon"></i>
+                    <i class="bi bi-person-workspace menu-icon"></i>
                     <p class="card-text menu-text">Observador Estudiante</p>
                 </div>
             </div>
@@ -118,11 +119,22 @@
     </div>
 
     <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-        <a href="{{ url_for('Acudiente.historial_academico') }}" class="menu-card text-decoration-none">
+        <a href="{{ url_for('Acudiente.comunicacion') }}" class="menu-card text-decoration-none">
             <div class="card shadow-sm text-center">
                 <div class="card-body">
-                    <i class="bi bi-backpack4 menu-icon"></i>
-                    <p class="card-text menu-text">Historial Académico</p>
+                    <i class="bi bi-chat-dots menu-icon manu-icon"></i>
+                    <p class="card-text menu-text">Comunicación</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+        <a href="{{ url_for('Acudiente.horarios') }}" class="menu-card text-decoration-none">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <i class="bi bi-calendar4-week menu-icon"></i>
+                    <p class="card-text menu-text">Horarios</p>
                 </div>
             </div>
         </a>

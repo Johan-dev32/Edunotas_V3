@@ -121,6 +121,7 @@ def indexacudiente():
     return render_template("Acudiente/Paginainicio_Acudiente.html", usuario=current_user)
 
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -138,33 +139,30 @@ def login():
             flash("Contraseña incorrecta.")
             return redirect(url_for('login'))
 
-        
-        rol_usuario = usuario.Rol  
-
-        if rol_usuario != rol:
+        if usuario.Rol != rol:
             flash("El rol seleccionado no coincide con el asignado al usuario.")
             return redirect(url_for('login'))
 
-        
         login_user(usuario)
         flash('Inicio de sesión exitoso')
 
-        
-        rol = usuario.Rol
-
         if rol == 'Administrador':
-            return redirect(url_for('indexadministrador'))
+            return redirect(url_for('loading', destino='indexadministrador'))
         elif rol == 'Docente':
-            return redirect(url_for('indexdocente'))
+            return redirect(url_for('loading', destino='indexdocente'))
         elif rol == 'Estudiante':
-            return redirect(url_for('indexestudiante'))
+            return redirect(url_for('loading', destino='indexestudiante'))
         elif rol == 'Acudiente':
-            return redirect(url_for('indexacudiente'))
+            return redirect(url_for('loading', destino='indexacudiente'))
         else:
             flash("Rol no reconocido en el sistema.")
             return redirect(url_for('login'))
 
     return render_template('login.html')
+
+@app.route('/loading/<destino>')
+def loading(destino):
+    return render_template('loading.html', destino=destino)
 
 @app.route("/perfil")
 @login_required
@@ -270,3 +268,5 @@ app.register_blueprint(notificaciones_bp)
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
+

@@ -224,13 +224,14 @@ class Programacion(db.Model):
     HoraInicio = db.Column(Time)
     HoraFin = db.Column(Time)
     Dia = db.Column(String(20))
+    ID_Bloque = db.Column(db.Integer, db.ForeignKey('Bloques.ID_Bloque'), nullable=True)
+    
 
     curso = relationship('Curso', back_populates='programaciones', foreign_keys=[ID_Curso])
     docente_asignatura = relationship('Docente_Asignatura', back_populates='programaciones', foreign_keys=[ID_Docente_Asignatura])
     asistencias = relationship('Asistencia', back_populates='programacion', lazy='dynamic')
     observaciones = relationship('Observacion', back_populates='programacion', lazy='dynamic')
     docente = relationship('Usuario', back_populates='programaciones_docente', foreign_keys=[ID_Docente])
-    ID_Bloque = db.Column(db.Integer, db.ForeignKey('Bloques.ID_Bloque'), nullable=True)
     bloque = db.relationship('Bloques')
 
 

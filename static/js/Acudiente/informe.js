@@ -1,7 +1,7 @@
 // Datos simulados
 const estudiantes = [
   {
-    documento: "1145224616",
+    documento: "12345678",
     nombre: "Juan Sebastián Gómez",
     curso: "902",
     tareas: [

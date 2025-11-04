@@ -2,7 +2,21 @@ let editMode = false;
 let dragged = null;
 const curso_id = document.body.dataset.cursoId;
 
-// Toggle modo edición
+// horas fijas reales
+const horas = [
+  {inicio:"06:45", fin:"07:30"},
+  {inicio:"07:30", fin:"08:30"},
+  {inicio:"08:30", fin:"09:20"},
+  {descanso:true},
+  {inicio:"09:50", fin:"10:40"},
+  {inicio:"10:40", fin:"11:30"},
+  {inicio:"11:30", fin:"12:30"},
+  {descanso:true},
+  {inicio:"13:30", fin:"14:20"},
+  {inicio:"14:20", fin:"15:30"}
+];
+
+// ------------------- Toggle modo edición -------------------
 function toggleEditMode() {
     editMode = !editMode;
     const btn = document.querySelector('.btn-success');
@@ -11,58 +25,25 @@ function toggleEditMode() {
         : '<i class="bi bi-pencil-square"></i> Modo Edición';
     btn.classList.toggle('btn-warning', editMode);
 
-    document.querySelectorAll('.bloque').forEach(b => {
-        const bt = b.querySelector('.bloque-texto');
-        if (bt) bt.setAttribute('draggable', editMode);
+    document.querySelectorAll('.bloque-texto').forEach(b => {
+        b.setAttribute('draggable', editMode);
     });
 
-    const fueraTabla = document.getElementById('fuera-tabla');
-    fueraTabla.style.display = editMode ? 'flex' : 'none';
+    document.getElementById('fuera-tabla').style.display = editMode ? 'flex' : 'none';
 }
 
-// Cargar bloques desde localStorage
-function cargarBloques() {
-    const data = JSON.parse(localStorage.getItem(`horario_${curso_id}`) || '[]');
-    data.forEach(b => {
-        let celda;
-        if (b.fuera) celda = document.getElementById('fuera-tabla');
-        else celda = document.querySelector(`td[data-dia="${b.dia}"][data-hora="${b.hora}"]`);
-        if (celda) crearBloque(celda, b);
-    });
-}
-
-// Guardar bloques en localStorage
-function guardarBloques() {
-    const data = [];
-    document.querySelectorAll('.bloque').forEach(b => {
-        const parent = b.parentElement;
-        const bloqueTexto = b.querySelector('.bloque-texto');
-        if (!bloqueTexto) return;
-        let dia = parent.dataset.dia || 'fuera';
-        let hora = parent.dataset.hora || 'fuera';
-        data.push({
-            dia,
-            hora,
-            contenido: bloqueTexto.innerHTML.replace('<span class="bloque-close">&times;</span>', '').trim(),
-            fuera: parent.id === 'fuera-tabla'
-        });
-    });
-    localStorage.setItem(`horario_${curso_id}`, JSON.stringify(data));
-}
-
-// Crear bloque
+// ------------------- Crear bloque -------------------
 function crearBloque(celda, data = null) {
-    if (!editMode && !data) return;
-    if (!data && celda.querySelector('.bloque')) return; // Bloque único por celda
-
     const bloque = document.createElement('div');
     bloque.className = 'bloque';
 
     if (data) {
-        bloque.innerHTML = `<div class="bloque-texto" draggable="${editMode}">
-            ${data.contenido}
-            <span class="bloque-close">&times;</span>
-        </div>`;
+        bloque.innerHTML = `<div class="bloque-texto" draggable="${editMode}" 
+                                data-id="${data.id}">
+                                <strong>${data.materia}</strong><br>
+                                ${data.docente}<br>
+                                <span class="bloque-close">&times;</span>
+                            </div>`;
         activarBloque(bloque);
     } else {
         bloque.innerHTML = `
@@ -72,27 +53,19 @@ function crearBloque(celda, data = null) {
         `;
         const materiaInput = bloque.querySelector('.bloque-materia');
         const docenteInput = bloque.querySelector('.bloque-docente');
-        const aulaInput = bloque.querySelector('.bloque-aula');
         const closeBtn = bloque.querySelector('.bloque-close');
 
-        materiaInput.addEventListener('input', e => e.target.value = e.target.value.replace(/[^a-zA-Z\s]/g, ''));
-        docenteInput.addEventListener('input', e => e.target.value = e.target.value.replace(/[^a-zA-Z\s]/g, ''));
-
-        [materiaInput, docenteInput, aulaInput].forEach(input => {
+        [materiaInput, docenteInput].forEach(input => {
             input.addEventListener('keypress', e => {
                 if (e.key === 'Enter') {
                     const materia = materiaInput.value.trim();
                     const docente = docenteInput.value.trim();
-                    const aula = aulaInput.value.trim();
 
-                    bloque.innerHTML = `
-                        <div class="bloque-texto" draggable="${editMode}">
-                            <strong>${materia}</strong><br>
-                            ${docente}<br>
-                            Aula: ${aula}
-                            <span class="bloque-close">&times;</span>
-                        </div>
-                    `;
+
+                    bloque.innerHTML = `<div class="bloque-texto" draggable="${editMode}">
+                        <strong>${materia}</strong><br>${docente}<br>
+                        <span class="bloque-close">&times;</span>
+                    </div>`;
                     activarBloque(bloque);
                     guardarBloques();
                 }
@@ -101,14 +74,13 @@ function crearBloque(celda, data = null) {
 
         closeBtn.addEventListener('click', () => {
             bloque.remove();
-            guardarBloques();
         });
     }
 
     celda.appendChild(bloque);
 }
 
-// Activar drag & drop y botón cerrar
+// ------------------- Activar drag & drop -------------------
 function activarBloque(bloque) {
     const bloqueTexto = bloque.querySelector('.bloque-texto');
     if (!bloqueTexto) return;
@@ -116,42 +88,109 @@ function activarBloque(bloque) {
     bloqueTexto.setAttribute('draggable', editMode);
 
     bloqueTexto.addEventListener('dragstart', e => dragged = bloque);
-    bloqueTexto.addEventListener('dragend', e => {
-        dragged = null;
-        guardarBloques();
-    });
+    bloqueTexto.addEventListener('dragend', e => dragged = null);
 
-    // Cada vez que se crea o mueve, reactivamos botón de cierre
     const closeBtn = bloqueTexto.querySelector('.bloque-close');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            bloque.remove();
-            guardarBloques();
-        });
-    }
+    if (closeBtn) closeBtn.addEventListener('click', () => bloque.remove());
 }
 
-// Drag & Drop de celdas
-document.querySelectorAll('#horario-table td, #fuera-tabla').forEach(td => {
-    td.addEventListener('dblclick', () => {
-        // Solo permitir celdas que tengan data-dia
-        if (!td.dataset.dia || td.classList.contains('recreo-cell')) return;
-        crearBloque(td);
+// ------------------- Inicializar tabla -------------------
+async function initTabla() {
+    const tbody = document.querySelector('#horario-table tbody');
+    tbody.innerHTML = '';
+
+    horas.forEach(h => {
+        if (h.descanso) {
+            tbody.innerHTML += `
+            <tr>
+              <td colspan="6" class="bg-warning fw-bold">DESCANSO</td>
+            </tr>`;
+        } else {
+            tbody.innerHTML += `
+            <tr data-inicio="${h.inicio}" data-fin="${h.fin}">
+              <td>${h.inicio} - ${h.fin}</td>
+              <td data-dia="Lunes" data-hora="${h.inicio}"></td>
+              <td data-dia="Martes" data-hora="${h.inicio}"></td>
+              <td data-dia="Miércoles" data-hora="${h.inicio}"></td>
+              <td data-dia="Jueves" data-hora="${h.inicio}"></td>
+              <td data-dia="Viernes" data-hora="${h.inicio}"></td>
+            </tr>`;
+        }
     });
 
-    td.addEventListener('dragover', e => e.preventDefault());
-    td.addEventListener('drop', e => {
-        e.preventDefault();
-        if (!editMode || !dragged) return;
-        if (td.querySelector('.bloque') && td.id !== 'fuera-tabla') return;
-        td.appendChild(dragged);
-        // Reasignar evento de cierre por si se movió
-        activarBloque(dragged);
-        guardarBloques();
+    // Drag & drop en celdas
+    document.querySelectorAll('#horario-table td, #fuera-tabla').forEach(td => {
+        td.addEventListener('dragover', e => e.preventDefault());
+        td.addEventListener('drop', e => {
+            e.preventDefault();
+            if (!editMode || !dragged) return;
+            if (td.querySelector('.bloque') && td.id !== 'fuera-tabla') return;
+            td.appendChild(dragged);
+        });
+
+        td.addEventListener('dblclick', () => {
+            if (!editMode) return;
+            if (!td.dataset.dia) return;
+            crearBloque(td);
+        });
     });
+
+    cargarBloques();
+}
+
+// ------------------- Cargar bloques desde DB -------------------
+async function cargarBloques() {
+    const resp = await fetch(`/api/curso/${curso_id}/bloques_db`);
+    const data = await resp.json();
+    console.log("DATA:", data);
+    data.forEach(b => {
+        const celda = document.querySelector(
+            `td[data-dia="${b.dia}"][data-hora="${b.hora_inicio}"]`
+        );
+        if (celda) crearBloque(celda, b);
+    });
+}
+
+// ------------------- Guardar bloques en DB -------------------
+async function guardarBloques() {
+    if (!editMode) return;
+
+    const bloques = [];
+    document.querySelectorAll('.bloque').forEach(b => {
+        const parent = b.parentElement;
+        const bloqueTexto = b.querySelector('.bloque-texto');
+        if (!bloqueTexto) return;
+
+        let dia = parent.dataset.dia || null;
+        let hora = parent.dataset.hora || null;
+
+        let contenido = bloqueTexto.innerHTML.replace('<span class="bloque-close">&times;</span>', '').trim();
+        let partes = contenido.split('<br>');
+        let materia = partes[0].replace(/<strong>|<\/strong>/g, '');
+        let docente = partes[1] || '';
+
+        bloques.push({ dia, hora, materia, docente, id: bloqueTexto.dataset.id || null, curso_id: curso_id });
+    });
+
+    await fetch('/guardar_horario', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bloques)
+    });
+}
+
+// ------------------- Inicializar asignaciones -------------------
+document.querySelectorAll('.bloque-asignacion').forEach(bloque => {
+    bloque.classList.add('bloque');
+    const contenido = `<div class="bloque-texto" draggable="${editMode}">
+        ${bloque.dataset.materia} - ${bloque.dataset.docente}
+        <span class="bloque-close">&times;</span>
+    </div>`;
+    bloque.innerHTML = contenido;
+    activarBloque(bloque);
 });
 
-// PDF
+// ------------------- PDF -------------------
 function generarPDF(curso_id) {
     const contenido = document.getElementById('horario-contenido');
     html2pdf().set({
@@ -162,23 +201,5 @@ function generarPDF(curso_id) {
     }).from(contenido).save();
 }
 
-fetch(`/api/curso/${curso_id}/bloques`)
-    .then(r => r.json())
-    .then(data => {
-        const tbody = document.querySelector('#horario-table tbody');
-        tbody.innerHTML = ""; // limpiar
-
-        for(let i=0; i<data.bloques; i++){
-            tbody.innerHTML += `
-            <tr>
-              <td>Bloque ${i+1}</td>
-              <td data-dia="lun" data-hora="${i}"></td>
-              <td data-dia="mar" data-hora="${i}"></td>
-              <td data-dia="mie" data-hora="${i}"></td>
-              <td data-dia="jue" data-hora="${i}"></td>
-              <td data-dia="vie" data-hora="${i}"></td>
-            </tr>`;
-        }
-
-        cargarBloques();
-    });
+// ------------------- Ejecutar -------------------
+document.addEventListener('DOMContentLoaded', () => initTabla());

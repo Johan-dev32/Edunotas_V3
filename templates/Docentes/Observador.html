@@ -117,6 +117,8 @@
               <tr>
                 <th>Fecha</th>
                 <th>Estudiante</th>
+                <th>tipo</th>
+                <th>NivelImportancia</th>
                 <th>Descripción</th>
                 <th>Recomendación</th>
               </tr>
@@ -126,6 +128,8 @@
               <tr>
                 <td>{{ obs.Fecha.strftime('%Y-%m-%d') }}</td>
                 <td>{{ obs.Nombre }} {{ obs.Apellido }}</td>
+                <td>{{ obs.tipo }}</td>
+                <td>{{ obs.nivel_importancia }}</td>
                 <td>{{ obs.Descripcion }}</td>
                 <td>{{ obs.Recomendacion }}</td>
               </tr>

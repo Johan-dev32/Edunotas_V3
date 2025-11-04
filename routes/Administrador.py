@@ -4,13 +4,16 @@ from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
 from sqlalchemy import func
 from datetime import datetime, date
-from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad
+from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion
 from flask_mail import Message
+import sys
 import os
 
 
 from decimal import Decimal
 
+
+sys.stdout.reconfigure(encoding='utf-8')
 #Definir el Blueprint para el administardor
 Administrador_bp = Blueprint('Administrador', __name__, url_prefix='/administrador')
 
@@ -117,79 +120,75 @@ def eliminar_docente(id):
 @Administrador_bp.route('/estudiantes')
 @login_required
 def estudiantes():
-    # Muestra los estudiantes registrados
     estudiantes = Usuario.query.filter_by(Rol='Estudiante').all()
-    return render_template('Administrador/Estudiantes.html', estudiantes=estudiantes)
+    cursos = Curso.query.filter_by(Estado='Activo').all()
+    return render_template('Administrador/Estudiantes.html', estudiantes=estudiantes, cursos=cursos)
 
 
 @Administrador_bp.route('/agregar_estudiante', methods=['POST'])
-@login_required
 def agregar_estudiante():
     try:
         nombre = request.form['Nombre']
         apellido = request.form['Apellido']
+        tipo_documento = request.form['TipoDocumento']
+        numero_documento = request.form['NumeroDocumento']
         correo = request.form['Correo']
-        tipo_doc = request.form['TipoDocumento']
-        numero_doc = request.form['NumeroDocumento']
         telefono = request.form['Telefono']
         direccion = request.form['Direccion']
-        curso = request.form['Curso']
-        fecha_nac = request.form['FechaNacimiento']
-        
 
-        
-        hashed_password = generate_password_hash("123456")
+        # 🔒 Generar una contraseña por defecto (puedes cambiar la lógica si quieres)
+        contrasena_plana = numero_documento  # o podrías usar una aleatoria
+        contrasena_hash = generate_password_hash(contrasena_plana, method='pbkdf2:sha256')
+
+        # Crear el nuevo usuario
         nuevo_estudiante = Usuario(
+            Rol='Estudiante',
             Nombre=nombre,
             Apellido=apellido,
+            TipoDocumento=tipo_documento,
+            NumeroDocumento=numero_documento,
             Correo=correo,
-            Contrasena=hashed_password,
-            TipoDocumento=tipo_doc,
-            NumeroDocumento=numero_doc,
             Telefono=telefono,
             Direccion=direccion,
-            Rol='Estudiante',
-            Estado='Activo',
-            Genero='Otro'
+            Contrasena=contrasena_hash
         )
+
         db.session.add(nuevo_estudiante)
         db.session.commit()
 
-        
-        curso_obj = Curso.query.filter_by(Nombre=curso).first()
-        if not curso_obj:
-            flash("❌ El curso seleccionado no existe", "danger")
-        
-            return redirect(url_for('Administrador.estudiantes'))
+        print(f"✅ Estudiante registrado correctamente: {nombre} {apellido}")
+        return jsonify({'success': True, 'id_estudiante': nuevo_estudiante.ID_Usuario})
 
-        
-        matricula = Matricula(
-            ID_Estudiante=nuevo_estudiante.ID_Usuario,
-            ID_Curso=curso_obj.ID_Curso,
-            Correo=correo,
-            FechaNacimiento=fecha_nac,
-            DepNacimiento="Desconocido",
-            TipoDocumento=tipo_doc,
-            NumeroDocumento=numero_doc,
-            AnioLectivo=date.today().year
+    except Exception as e:
+            print("❌ Error al registrar estudiante:", e)
+            db.session.rollback()
+            return jsonify({'success': False, 'error': str(e)})
+    
+@Administrador_bp.route('/agregar_matricula', methods=['POST'])
+def agregar_matricula():
+    try:
+        nueva_matricula = Matricula(
+            ID_Estudiante=request.form['ID_Estudiante'],
+            ID_Curso=request.form['ID_Curso'],
+            Correo=request.form['Correo'],
+            FechaNacimiento=request.form['FechaNacimiento'],
+            DepNacimiento=request.form.get('DepNacimiento'),
+            TipoDocumento=request.form['TipoDocumento'],
+            NumeroDocumento=request.form['NumeroDocumento'],
+            AnioLectivo=request.form['AnioLectivo']
         )
-        db.session.add(matricula)
+
+        db.session.add(nueva_matricula)
         db.session.commit()
 
-        flash("✅ Estudiante registrado correctamente", "success")
-        
-        
-       
-            
+        flash("✅ Matrícula registrada correctamente", "success")
+        return redirect(url_for('Administrador.estudiantes'))
 
-
-
-
-    except SQLAlchemyError as e:
+    except Exception as e:
         db.session.rollback()
-        flash(f"❌ Error al registrar estudiante: {str(e)}", "danger")
-
-    return redirect(url_for('Administrador.estudiantes'))
+        print("❌ Error al registrar matrícula:", e)
+        flash("Error al registrar matrícula", "danger")
+        return redirect(url_for('Administrador.estudiantes'))
 
 
 @Administrador_bp.route('/actualizar_estudiante/<int:id>', methods=['POST'])
@@ -524,19 +523,59 @@ def ver_horarios():
 @Administrador_bp.route('/guardar_horario', methods=['POST'])
 def guardar_horario():
     try:
-        data = request.get_json()
+        data = request.get_json()  # lista de bloques
+        for b in data:
+            materia = b.get('materia')
+            docente = b.get('docente')
+            dia = b.get('dia')
+            hora_inicio = b.get('hora')
+            hora_fin = b.get('hora_fin', None)
+            
+            
+            from datetime import time
 
-        # aquí data será una lista de bloques
-        # cada bloque tendrá: dia / hora / materia / docente / etc
+            hora_num = int(b.get('hora')) if b.get('hora') is not None else None
+            hora_inicio = time(hora_num, 0) if hora_num is not None else None
+            hora_fin = time(hora_num+1, 0) if hora_num is not None else None
 
-        print("DATA RECIBIDA:", data)  # DEBUG
+            # Buscar asignación existente
+            asignacion = Docente_Asignatura.query.join(Docente_Asignatura.asignatura)\
+                .join(Docente_Asignatura.docente)\
+                .filter(Asignatura.Nombre==materia, Usuario.Nombre==docente, Docente_Asignatura.ID_Curso==b.get('curso_id'))\
+                .first()
+            
+            if not asignacion:
+                continue  # o registrar error si quieres
 
-        return jsonify({"status":"ok"}), 200
+            # Revisar si ya existe la programación
+            prog = Programacion.query.filter_by(
+                ID_Docente_Asignatura=asignacion.ID_Docente_Asignatura,
+                ID_Curso=b.get('curso_id'),
+                Dia=dia,
+                HoraInicio=hora_inicio
+            ).first()
+            
+            if not prog:
+                prog = Programacion(
+                    ID_Docente_Asignatura=asignacion.ID_Docente_Asignatura,
+                    ID_Curso=b.get('curso_id'),
+                    ID_Docente=asignacion.ID_Docente,
+                    Dia=dia,
+                    HoraInicio=hora_inicio,
+                    HoraFin=hora_fin
+                )
+                db.session.add(prog)
+            else:
+                prog.HoraFin = hora_fin
+                prog.Dia = dia
+                prog.ID_Docente = asignacion.ID_Docente
+            
+        db.session.commit()
+        return jsonify({"status": "ok"}), 200
 
     except Exception as e:
         print("ERROR:", e)
-        return jsonify({"status":"error","msg":str(e)}),500
-    
+        return jsonify({"status": "error", "msg": str(e)}), 500    
     
 @Administrador_bp.route('/api/cursos')
 def api_cursos():
@@ -557,21 +596,126 @@ def api_cursos():
         return jsonify({"error": str(e)}), 500
     
     
-@Administrador_bp.route('/api/curso/<int:id_curso>/bloques')
-def api_bloques(id_curso):
-
+@Administrador_bp.route('/api/curso/<int:id_curso>/programacion')
+def api_programacion(id_curso):
     c = Curso.query.get(id_curso)
     if not c:
-        return jsonify({"error": "curso no existe"}), 404
+        return jsonify({"error": "Curso no existe"}), 404
 
-    grado = int(c.Grado)  # como es varchar lo convertimos
+    programaciones = Programacion.query.filter_by(ID_Curso=id_curso).all()
+    data = []
 
-    if grado >= 9:
-        bloques = 10
-    else:
-        bloques = 9
+    for p in programaciones:
+        data.append({
+            "ID_Docente_Asignatura": p.ID_Docente_Asignatura,
+            "materia": p.docente_asignatura.asignatura.Nombre,
+            "docente": p.docente_asignatura.docente.Nombre,
+            "Dia": p.Dia,
+            "Hora": str(p.HoraInicio)  # o un índice de bloque
+        })
 
-    return jsonify({"bloques": bloques}), 200
+    return jsonify({"programacion": data}), 200
+
+@Administrador_bp.route('/api/curso/<int:id_curso>/asignaciones')
+def api_asignaciones(id_curso):
+    asignaciones = Docente_Asignatura.query.filter_by(ID_Curso=id_curso).all()
+    data = []
+
+    for a in asignaciones:
+        data.append({
+            "id": a.ID_Docente_Asignatura,
+            "texto": f"{a.asignatura.Nombre} - {a.docente.Nombre}"
+        })
+
+    return jsonify(data), 200
+
+
+@Administrador_bp.route('/api/curso/<int:id_curso>/bloques_db')
+def api_bloques_db(id_curso):
+
+    def dia_to_short(dia):
+        mapa = {
+            "Lunes": "lun",
+            "Martes": "mar",
+            "Miércoles": "mie",
+            "Jueves": "jue",
+            "Viernes": "vie"
+        }
+        return mapa.get(dia, None)
+
+    def hora_to_bloque(hora):
+        mapa = {
+            "06:45": 0,
+            "07:30": 1,
+            "08:00": 1,
+            "08:30": 2,
+            "09:00": 2,
+            "09:50": 3,
+            "10:00": 3,
+            "10:40": 4,
+            "11:30": 5,
+            "13:30": 6,
+            "14:20": 7
+        }
+        return mapa.get(hora, None)
+
+    programaciones = Programacion.query.filter_by(ID_Curso=id_curso).all()
+    data = []
+
+    for p in programaciones:
+        inicio = p.HoraInicio.strftime('%H:%M') if p.HoraInicio else None
+
+        data.append({
+            "id": p.ID_Programacion,
+            "materia": p.docente_asignatura.asignatura.Nombre,
+            "docente": p.docente_asignatura.docente.Nombre,
+            "dia": dia_to_short(p.Dia),
+            "hora": hora_to_bloque(inicio),
+        })
+
+    return jsonify(data), 200
+
+
+@Administrador_bp.route('/api/curso/<int:id_curso>/bloques')
+def api_bloques(id_curso):
+    asignaciones = Docente_Asignatura.query.filter_by(ID_Curso=id_curso).all()
+
+    data = []
+    for a in asignaciones:
+        data.append({
+            "id_da": a.ID_Docente_Asignatura,
+            "materia": a.asignatura.Nombre,
+            "docente": a.docente.Nombre
+        })
+
+    return jsonify(data), 200
+
+@Administrador_bp.route('/api/curso/<int:id_curso>/num_bloques')
+def api_num_bloques(id_curso):
+    total = Programacion.query.filter_by(ID_Curso=id_curso).count()
+    return jsonify({"bloques": total}), 200
+
+@Administrador_bp.route('/obtener_programacion', methods=['GET'])
+def obtener_programacion():
+    try:
+        programaciones = Programacion.query.all()
+        data = []
+        for p in programaciones:
+            data.append({
+                "curso_id": p.ID_Curso,
+                "docente_asignatura_id": p.ID_Docente_Asignatura,
+                "dia": p.Dia,
+                "hora_inicio": p.HoraInicio.strftime('%H:%M') if p.HoraInicio else None,
+                "hora_fin": p.HoraFin.strftime('%H:%M') if p.HoraFin else None
+            })
+
+        return jsonify(data), 200
+
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({"status": "error", "msg": str(e)}), 500
+
+#----------------------------------------------------------------------------
 
 @Administrador_bp.route('/registro_notas/<int:curso_id>')
 def registro_notas(curso_id):
@@ -593,9 +737,64 @@ def notas_registro():
 def notas_consultar():
     return render_template('Administrador/Notas_Consultar.html')
 
+# GESTIÓN DE LA OBSERVACIÓN #
+
 @Administrador_bp.route('/observador')
 def observador():
-    return render_template('Administrador/Observador.html')
+    observaciones = (
+        db.session.query(Observacion, Usuario)
+        .join(Matricula, Observacion.ID_Matricula == Matricula.ID_Matricula)
+        .join(Usuario, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+        .all()
+    )
+
+    estudiantes = Usuario.query.filter_by(Rol='Estudiante').all()
+
+    return render_template(
+        'Administrador/Observador.html',
+        observaciones=observaciones,
+        estudiantes=estudiantes
+    )
+
+
+@Administrador_bp.route('/observador/registrar', methods=['POST'])
+def registrar_observacion():
+    data = request.form
+
+    id_estudiante = data.get('id_estudiante')
+    if not id_estudiante:
+        return jsonify({"status": "error", "message": "Debe seleccionar un estudiante"}), 400
+
+    # Buscar matrícula del estudiante
+    matricula = Matricula.query.filter_by(ID_Estudiante=id_estudiante).first()
+    if not matricula:
+        return jsonify({"status": "error", "message": "El estudiante no tiene matrícula asignada"}), 400
+
+    # Buscar horario según la matrícula
+    horario = Programacion.query.filter_by(ID_Curso=matricula.ID_Curso).first()
+    if not horario:
+        return jsonify({"status": "error", "message": "No hay horario asociado al estudiante"}), 400
+    
+    nueva_obs = Observacion(
+        Fecha=datetime.strptime(data.get('fecha'), "%Y-%m-%d").date(),
+        Descripcion=data.get('descripcion'),
+        Tipo=data.get('tipo'),
+        NivelImportancia=data.get('nivelImportancia'),
+        Recomendacion=data.get('recomendacion'),
+        Estado='Activa',
+        ID_Horario=horario.ID_Programacion,
+        ID_Matricula=matricula.ID_Matricula,
+        ID_Estudiante=id_estudiante
+    )
+
+    try:
+        db.session.add(nueva_obs)
+        db.session.commit()
+        return jsonify({"status": "ok", "message": "Observación registrada correctamente"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": "error", "message": f"Error al guardar: {str(e)}"}), 500
+
 
 @Administrador_bp.route('/calculo_promedio')
 def calculo_promedio():
@@ -723,7 +922,7 @@ def cursos2():
 
         return redirect(url_for('Administrador.cursos2'))
 
-    # 👇 para GET (mostrar cursos)
+    # para GET (mostrar cursos)
     cursos = Curso.query.all()
     usuarios = Usuario.query.all()
     return render_template('Administrador/Cursos2.html', cursos=cursos, usuarios=usuarios)

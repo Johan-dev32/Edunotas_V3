@@ -7,7 +7,6 @@ from sqlalchemy.dialects.mysql import YEAR
 from flask_login import UserMixin
 
 db = SQLAlchemy()
-
 # -----------------------------------------------------
 # Usuario
 # -----------------------------------------------------
@@ -34,9 +33,29 @@ class Usuario(db.Model, UserMixin):
     asistencias_detalle = relationship('Detalle_Asistencia', back_populates='estudiante', lazy='dynamic', foreign_keys='Detalle_Asistencia.ID_Estudiante')
     cursos_dirige = relationship('Curso', back_populates='director', lazy='dynamic', foreign_keys='Curso.DirectorGrupo')
     notificaciones = relationship('Notificacion', back_populates='usuario', lazy='dynamic')
+    
+    # Relación con Matricula (el usuario puede ser estudiante)
+    matriculas = relationship(
+        'Matricula',
+        back_populates='estudiante',
+        lazy='dynamic',
+        foreign_keys='Matricula.ID_Estudiante'
+    )
+    
+    # Relaciones nuevas
+    programaciones_docente = relationship('Programacion', back_populates='docente', lazy='dynamic')
+    actividades_entregadas = relationship('Actividad_Estudiante', back_populates='estudiante', lazy='dynamic')
+    observaciones_estudiante = relationship('Observacion', back_populates='estudiante', lazy='dynamic')
 
     def get_id(self):
         return str(self.ID_Usuario)
+    
+    @property
+    def matriculas_estudiante(self):
+        if self.Rol == 'Estudiante':
+            return self.matriculas.all()
+        return []
+
 
 
 # -----------------------------------------------------
@@ -92,6 +111,9 @@ class Curso(db.Model):
     cronogramas = relationship('Cronograma_Actividades', back_populates='curso', lazy='dynamic')
     programaciones = relationship('Programacion', back_populates='curso', lazy='dynamic')
     docente_asignaturas = relationship('Docente_Asignatura', back_populates='curso', lazy='dynamic')
+    actividades = relationship('Actividad', back_populates='curso', lazy='dynamic')
+    asistencias = relationship('Detalle_Asistencia', back_populates='curso', lazy='dynamic')
+    
 
 
 # -----------------------------------------------------
@@ -115,9 +137,29 @@ class Matricula(db.Model):
     curso = relationship('Curso', back_populates='matriculas', foreign_keys=[ID_Curso])
     observaciones = relationship('Observacion', back_populates='matricula', lazy='dynamic')
     actividades_estudiante = relationship('Actividad_Estudiante', back_populates='matricula', lazy='dynamic')
+    
+    # Relación con Usuario (el estudiante que se matricula)
+    estudiante = relationship(
+        'Usuario',
+        back_populates='matriculas',
+        foreign_keys=[ID_Estudiante]
+    )
+
+    # Relación con Curso
+    curso = relationship(
+        'Curso',
+        back_populates='matriculas',
+        foreign_keys=[ID_Curso]
+    )
 
     def __repr__(self):
         return f"<Matricula Estudiante={self.ID_Estudiante}, Curso={self.ID_Curso}, Año={self.AnioLectivo}>"
+    
+    @property
+    def matriculas_estudiante(self):
+        if self.Rol == 'Estudiante':
+            return self.matriculas.all()
+        return []
 
 
 # -----------------------------------------------------
@@ -178,6 +220,7 @@ class Programacion(db.Model):
     ID_Programacion = db.Column(Integer, primary_key=True, autoincrement=True)
     ID_Curso = db.Column(Integer, ForeignKey('Curso.ID_Curso'), nullable=False)
     ID_Docente_Asignatura = db.Column(Integer, ForeignKey('Docente_Asignatura.ID_Docente_Asignatura'), nullable=False)
+    ID_Docente = db.Column(Integer, ForeignKey('Usuario.ID_Usuario'))
     HoraInicio = db.Column(Time)
     HoraFin = db.Column(Time)
     Dia = db.Column(String(20))
@@ -186,8 +229,23 @@ class Programacion(db.Model):
     docente_asignatura = relationship('Docente_Asignatura', back_populates='programaciones', foreign_keys=[ID_Docente_Asignatura])
     asistencias = relationship('Asistencia', back_populates='programacion', lazy='dynamic')
     observaciones = relationship('Observacion', back_populates='programacion', lazy='dynamic')
+    docente = relationship('Usuario', back_populates='programaciones_docente', foreign_keys=[ID_Docente])
+    ID_Bloque = db.Column(db.Integer, db.ForeignKey('Bloques.ID_Bloque'), nullable=True)
+    bloque = db.relationship('Bloques')
 
 
+# -----------------------------------------------------
+# Bloques de horarios
+# -----------------------------------------------------
+
+class Bloques(db.Model):
+    __tablename__ = 'Bloques'
+    ID_Bloque = db.Column(db.Integer, primary_key=True)
+    Nombre_Bloque = db.Column(db.String(50), nullable=False)
+    HoraInicio = db.Column(db.Time, nullable=False)
+    HoraFin = db.Column(db.Time, nullable=False)
+    
+    
 # -----------------------------------------------------
 # Asistencia
 # -----------------------------------------------------
@@ -211,11 +269,13 @@ class Detalle_Asistencia(db.Model):
     ID_Detalle_Asistencia = db.Column(Integer, primary_key=True, autoincrement=True)
     ID_Asistencia = db.Column(Integer, ForeignKey('Asistencia.ID_Asistencia'), nullable=False)
     ID_Estudiante = db.Column(Integer, ForeignKey('Usuario.ID_Usuario'), nullable=False)
+    ID_Curso = db.Column(Integer, ForeignKey('Curso.ID_Curso'))
     Estado_Asistencia = db.Column(Enum('Presente', 'Ausente', 'Justificado'))
     Observaciones = db.Column(Text)
 
     asistencia = relationship('Asistencia', back_populates='detalles', foreign_keys=[ID_Asistencia])
     estudiante = relationship('Usuario', back_populates='asistencias_detalle', foreign_keys=[ID_Estudiante])
+    curso = relationship('Curso', back_populates='asistencias', foreign_keys=[ID_Curso])
 
 
 # -----------------------------------------------------
@@ -245,11 +305,16 @@ class Actividad(db.Model):
     Titulo = db.Column(String(200), nullable=False)
     Tipo = db.Column(Enum('Taller', 'Examen', 'Proyecto', 'Participacion', 'Grupo'))
     Fecha = db.Column(Date)
+    Descripcion = db.Column(Text)
+    Hora = db.Column(Time)
+    ArchivoPDF = db.Column(String(255))
     ID_Cronograma_Actividades = db.Column(Integer, ForeignKey('Cronograma_Actividades.ID_Cronograma_Actividades'), nullable=False)
+    ID_Curso = db.Column(Integer, ForeignKey('Curso.ID_Curso'))
     Estado = db.Column(Enum('Pendiente', 'Calificada', 'Cancelada'))
     Porcentaje = db.Column(DECIMAL(5, 2))
-
+    
     cronograma = relationship('Cronograma_Actividades', back_populates='actividades', foreign_keys=[ID_Cronograma_Actividades])
+    curso = relationship('Curso', back_populates='actividades', foreign_keys=[ID_Curso])
     estudiantes = relationship('Actividad_Estudiante', back_populates='actividad', lazy='dynamic')
 
 
@@ -262,11 +327,13 @@ class Actividad_Estudiante(db.Model):
     ID_Actividad_Estudiante = db.Column(Integer, primary_key=True, autoincrement=True)
     ID_Actividad = db.Column(Integer, ForeignKey('Actividad.ID_Actividad'), nullable=False)
     ID_Matricula = db.Column(Integer, ForeignKey('Matricula.ID_Matricula'), nullable=False)
+    ID_Estudiante = db.Column(Integer, ForeignKey('Usuario.ID_Usuario'))
     Observaciones = db.Column(Text)
     Calificacion = db.Column(DECIMAL(5, 2))
 
     actividad = relationship('Actividad', back_populates='estudiantes', foreign_keys=[ID_Actividad])
     matricula = relationship('Matricula', back_populates='actividades_estudiante', foreign_keys=[ID_Matricula])
+    estudiante = relationship('Usuario', back_populates='actividades_entregadas', foreign_keys=[ID_Estudiante])
 
 
 # -----------------------------------------------------
@@ -284,6 +351,8 @@ class Observacion(db.Model):
     Estado = db.Column(Enum('Activa', 'Inactiva'))
     ID_Horario = db.Column(Integer, ForeignKey('Programacion.ID_Programacion'))
     ID_Matricula = db.Column(Integer, ForeignKey('Matricula.ID_Matricula'))
+    ID_Estudiante = db.Column(Integer, ForeignKey('Usuario.ID_Usuario'))
 
     programacion = relationship('Programacion', back_populates='observaciones', foreign_keys=[ID_Horario])
     matricula = relationship('Matricula', back_populates='observaciones', foreign_keys=[ID_Matricula])
+    estudiante = relationship('Usuario', back_populates='observaciones_estudiante', foreign_keys=[ID_Estudiante])

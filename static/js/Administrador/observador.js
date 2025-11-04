@@ -1,51 +1,34 @@
-// Referencias a elementos reales en tu HTML
-const btnAbrirFormulario = document.getElementById("btnAbrirFormulario");
-const modalFormulario = document.getElementById("modalFormulario");
-const btnCancelar = document.getElementById("btnCancelar");
-const formObservacion = document.getElementById("formObservacion");
-const tablaObservador = document.querySelector("#tablaObservador");
-const seccionObservador = document.getElementById("observador");
+// Inicializar modal
+const modalEl = document.getElementById("modalFormulario");
+const modal = new bootstrap.Modal(modalEl);
 
-// Mostrar el formulario modal
-btnAbrirFormulario.addEventListener("click", () => {
-  modalFormulario.classList.remove("oculto");
+// Abrir modal
+document.getElementById("btnAbrirFormulario").addEventListener("click", () => {
+    modal.show();
 });
 
-// Ocultar el formulario al hacer clic en "Cancelar"
-btnCancelar.addEventListener("click", () => {
-  modalFormulario.classList.add("oculto");
-});
+// Manejo del formulario
+document.getElementById("formObservacion").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
 
-// Manejar envío del formulario
-formObservacion.addEventListener("submit", (e) => {
-  e.preventDefault();
+    try {
+        const response = await fetch("/administrador/observador/registrar", {
+            method: "POST",
+            body: formData
+        });
 
-  // Obtener valores de los campos
-  const nombre = document.getElementById("nombre").value;
-  const comportamiento = document.getElementById("comportamiento").value;
-  const actitud = document.getElementById("actitud").value;
-  const avances = document.getElementById("avances").value;
-  const dificultades = document.getElementById("dificultades").value;
-  const seguimiento = document.getElementById("seguimiento").value;
+        const result = await response.json();
 
-  // Crear nueva fila con los datos
-  const fila = document.createElement("tr");
-  fila.innerHTML = `
-    <td>${nombre}</td>
-    <td>${comportamiento}</td>
-    <td>${actitud}</td>
-    <td>${avances}</td>
-    <td>${dificultades}</td>
-    <td>${seguimiento}</td>
-  `;
-
-  // Agregar fila a la tabla
-  tablaObservador.appendChild(fila);
-
-  // Mostrar sección del observador si está oculta
-  seccionObservador.classList.remove("oculto");
-
-  // Limpiar y cerrar formulario
-  formObservacion.reset();
-  modalFormulario.classList.add("oculto");
+        if (result.status === "ok") {
+            alert(result.message);
+            modal.hide(); // Cierra el modal correctamente
+            location.reload(); // Recarga la página si quieres actualizar la tabla
+        } else {
+            alert("Error al guardar la observación");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Error al conectar con el servidor");
+    }
 });

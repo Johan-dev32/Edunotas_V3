@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 from flask_login import login_required, current_user
 from flask_mail import Message
 from werkzeug.utils import secure_filename
-from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Notificacion, Programacion, Observacion)
+from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Curso, Notificacion, Programacion, Observacion)
 from datetime import date
 import os
 
@@ -54,92 +54,162 @@ def tareas_actividades1():
 
 @Docente_bp.route('/tareas_actividades2/<int:curso_id>')
 def tareas_actividades2(curso_id):
-    return render_template('Docentes/Registrar_Tareas_Actividades2.html',  # 👈 corregido
+    curso = Curso.query.get(curso_id)
+    actividades = (Actividad.query
+                   .join(Cronograma_Actividades)
+                   .filter(Cronograma_Actividades.ID_Curso == curso_id)
+                   .all())
+
+    return render_template('Docentes/Registrar_Tareas_Actividades2.html',
+                           curso=curso,
                            curso_id=curso_id,
                            actividades=actividades)
 
 
 @Docente_bp.route('/tareas_actividades3/<int:curso_id>/<int:actividad_id>')
 def tareas_actividades3(curso_id, actividad_id):
-    # Buscar la actividad correspondiente
-    actividad = next((a for a in actividades if a["id"] == actividad_id), None)
+    # Buscar la actividad en la base de datos
+    actividad = Actividad.query.get(actividad_id)
 
     if not actividad:
         flash("No se encontró la actividad seleccionada.", "warning")
         return redirect(url_for('Docente.tareas_actividades', curso_id=curso_id))
 
+    # Obtener datos del cronograma (si existen)
+    cronograma = actividad.cronograma
+
+    # Preparar variables para enviar al HTML
     pdf_url = None
-    if actividad.get("pdf_nombre"):
-        pdf_url = url_for('static', filename=f'uploads/{actividad["pdf_nombre"]}')
+    if hasattr(actividad, 'ArchivoPDF') and actividad.ArchivoPDF:  # Si luego agregas un campo para el archivo
+        pdf_url = url_for('static', filename=f'uploads/{actividad.ArchivoPDF}')
 
     return render_template('Docentes/Registrar_Tareas_Actividades3.html',
                            curso_id=curso_id,
-                           actividad_id=actividad_id,
-                           titulo_actividad=actividad["titulo"],
-                           descripcion_actividad=actividad["instrucciones"],
-                           fecha_entrega=actividad["fecha"],
-                           hora_entrega=actividad["hora"],
+                           actividad_id=actividad.ID_Actividad,
+                           titulo_actividad=actividad.Titulo,
+                           descripcion_actividad=getattr(actividad, 'Descripcion', None),  # si agregas ese campo
+                           fecha_entrega=actividad.Fecha.strftime('%Y-%m-%d') if actividad.Fecha else None,
+                           hora_entrega=getattr(actividad, 'Hora', None),
                            pdf_url=pdf_url)
 
 
-    
-actividades = []
 
-# -------------------------------
+
+# -------------------------------------------
 # Mostrar lista de actividades
-# -------------------------------
+# -------------------------------------------
 @Docente_bp.route('/tareas_actividades/<int:curso_id>')
+@login_required
 def tareas_actividades(curso_id):
-    return render_template('Docentes/Registrar_Tareas_Actividades2.html',  # 👈 corregido
-                           curso_id=curso_id,
-                           actividades=actividades)
+    curso = Curso.query.get(curso_id)
+    actividades = Actividad.query.filter_by(ID_Curso=curso_id).all()
+    return render_template(
+        'Docentes/Registrar_Tareas_Actividades2.html',
+        curso=curso,
+        actividades=actividades
+    )
 
 
-# -------------------------------
+# -------------------------------------------
 # Crear nueva actividad
-# -------------------------------
-from werkzeug.utils import secure_filename
-import os
-from flask import request, redirect, url_for, render_template, flash
-
+# -------------------------------------------
 @Docente_bp.route('/crear_actividad/<int:curso_id>', methods=['GET', 'POST'])
 @login_required
 def crear_actividad(curso_id):
+    curso = Curso.query.get_or_404(curso_id) # Buscar el curso por su ID
     if request.method == 'POST':
         titulo = request.form.get('titulo')
-        instrucciones = request.form.get('instrucciones')
+        tipo = request.form.get('tipo')  # 👈 coincide con Enum del modelo
         fecha = request.form.get('fecha')
-        hora = request.form.get('hora')
+        estado = request.form.get('estado') or 'Pendiente'  # valor por defecto
+        porcentaje = request.form.get('porcentaje')
+        instrucciones = request.form.get('instrucciones')  # opcional si lo agregas a la tabla
 
+        # Buscar el cronograma correspondiente
+        cronograma = Cronograma_Actividades.query.filter_by(ID_Curso=curso_id).first()
+        if not cronograma:
+            flash("No se encontró el cronograma para este curso.", "warning")
+            return redirect(url_for('Docente.tareas_actividades', curso_id=curso_id))
+
+        # Procesar archivo PDF
         pdf_file = request.files.get('pdfUpload')
         pdf_nombre = None
         if pdf_file and pdf_file.filename != '':
-            upload_folder = os.path.join(os.getcwd(), 'static', 'uploads')
+            upload_folder = os.path.join(os.getcwd(), 'app', 'static', 'uploads')
             os.makedirs(upload_folder, exist_ok=True)
             pdf_nombre = secure_filename(pdf_file.filename)
-            pdf_path = os.path.join(upload_folder, pdf_nombre)
-            pdf_file.save(pdf_path)
+            pdf_file.save(os.path.join(upload_folder, pdf_nombre))
 
-        # Guardar en la base de datos
+        # Crear objeto Actividad
         nueva_actividad = Actividad(
             Titulo=titulo,
-            Tipo=instrucciones,
+            Tipo=tipo,
             Fecha=fecha,
-            Estado='Pendiente',
-            ID_Curso=curso_id
+            ID_Cronograma_Actividades=cronograma.ID_Cronograma_Actividades,
+            Estado=estado,
+            Porcentaje=porcentaje
         )
+
+        # (Si luego agregas un campo para instrucciones o PDF, puedes guardarlos también)
+        if hasattr(Actividad, 'Descripcion'):
+            nueva_actividad.Descripcion = instrucciones
+        if hasattr(Actividad, 'ArchivoPDF'):
+            nueva_actividad.ArchivoPDF = pdf_nombre
+
+        # Guardar en BD
         db.session.add(nueva_actividad)
         db.session.commit()
 
-        flash('Actividad creada correctamente ✅', 'success')
+        flash("Actividad registrada correctamente.", "success")
         return redirect(url_for('Docente.tareas_actividades', curso_id=curso_id))
-
-    return render_template('Docentes/Crear_Actividad.html', curso_id=curso_id)
     
-@Docente_bp.route('/editar_actividad/<int:id_actividad>')
+    curso = Curso.query.get_or_404(curso_id)
+
+    # GET → Mostrar formulario vacío
+    return render_template('Docentes/Registrar_Tareas_Actividades2.html', curso=curso)
+    
+@Docente_bp.route('/editar_actividad/<int:id_actividad>', methods=['GET', 'POST'])
+@login_required
 def editar_actividad(id_actividad):
-    # Temporalmente solo muestra un mensaje o plantilla vacía
-    return f"Editar actividad {id_actividad} (en construcción)"
+    actividad = Actividad.query.get_or_404(id_actividad)
+
+    if request.method == 'POST':
+        try:
+            # Obtener valores del formulario
+            actividad.Titulo = request.form.get('titulo')
+            actividad.Tipo = request.form.get('tipo')
+            actividad.Fecha = request.form.get('fecha')
+            actividad.Estado = request.form.get('estado')
+            actividad.Porcentaje = request.form.get('porcentaje')
+            
+            # Procesar archivo PDF nuevo si se sube
+            pdf_file = request.files.get('pdfUpload')
+            if pdf_file and pdf_file.filename != '':
+                upload_folder = os.path.join(os.getcwd(), 'app', 'static', 'uploads')
+                os.makedirs(upload_folder, exist_ok=True)
+                pdf_nombre = secure_filename(pdf_file.filename)
+                pdf_path = os.path.join(upload_folder, pdf_nombre)
+                pdf_file.save(pdf_path)
+                # Si tu modelo tiene un campo de archivo:
+                if hasattr(actividad, 'ArchivoPDF'):
+                    actividad.ArchivoPDF = pdf_nombre
+
+            # Guardar cambios
+            db.session.commit()
+            flash("Actividad actualizada correctamente.", "success")
+
+            # Redirigir al listado del curso correspondiente
+            if actividad.cronograma and actividad.cronograma.curso:
+                return redirect(url_for('Docente.tareas_actividades', curso_id=actividad.cronograma.curso.ID_Curso))
+            else:
+                return redirect(url_for('Docente.tareas_actividades', curso_id=1))  # fallback
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error al actualizar la actividad: {e}", "danger")
+
+    # GET → Mostrar formulario con datos actuales
+    return render_template('Docentes/Editar_Actividad.html', actividad=actividad)
 
 
 
@@ -203,6 +273,8 @@ def observador():
             Observacion.Fecha,
             Observacion.Descripcion,
             Observacion.Recomendacion,
+            Observacion.Tipo,
+            Observacion.NivelImportancia,
             Usuario.Nombre,
             Usuario.Apellido
         )
@@ -368,39 +440,45 @@ def api_notas_por_materia(curso_id, asignatura_id):
 
 
 # --- ENDPOINT: crear nueva actividad + cronograma (opcional para cuando agregues columna nueva)
-@Docente_bp.route('/api/crear_actividad', methods=['POST'])
+@Docente_bp.route('/api/crear_actividad/<int:curso_id>', methods=['POST'], endpoint='api_crear_actividad')
 @login_required
-def api_crear_actividad():
-    try:
-        payload = request.get_json() or {}
-        titulo = payload.get('titulo', 'Actividad')
-        tipo = payload.get('tipo', 'Taller')
-        curso_id = payload.get('curso_id')
+def api_crear_actividad(curso_id):
+    if request.method == 'POST':
+        titulo = request.form['titulo']
+        instrucciones = request.form['instrucciones']
+        fecha = request.form['fecha']
+        hora = request.form['hora']
+        archivo = request.files.get('pdfUpload')
 
-        # crear actividad SIN ID_Cronograma_Actividades
-        nueva = Actividad(Titulo=titulo, Tipo=tipo, Fecha=None, Estado='Pendiente')
-        db.session.add(nueva)
-        db.session.flush()  # para obtener ID_Actividad antes del commit
+        # Guardar PDF (si se envía)
+        nombre_archivo = None
+        if archivo and archivo.filename.endswith('.pdf'):
+            nombre_archivo = secure_filename(archivo.filename)
+            ruta = os.path.join(current_app.config['UPLOAD_FOLDER'], nombre_archivo)
+            archivo.save(ruta)
 
-        # enlazar con cronograma
-        periodo = Periodo.query.filter_by(Anio=datetime.datetime.now().year).first()
-        if not periodo:
-            periodo = Periodo.query.first()
-        if curso_id and periodo:
-            cron = Cronograma_Actividades(
-                ID_Curso=curso_id,
-                ID_Periodo=periodo.ID_Periodo,
-                ID_Actividad=nueva.ID_Actividad,
-                FechaInicial=None,
-                FechaFinal=None
-            )
-            db.session.add(cron)
-
+        # Crear registro en la base de datos
+        nueva_actividad = Actividad(
+            Titulo=titulo,
+            Descripcion=instrucciones,
+            Fecha=fecha,
+            Hora=hora,
+            ArchivoPDF=nombre_archivo,
+            ID_Curso=curso_id
+        )
+        db.session.add(nueva_actividad)
         db.session.commit()
-        return jsonify({'ID_Actividad': nueva.ID_Actividad})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+
+        flash('Actividad creada correctamente ✅', 'success')
+        return redirect(url_for('Docente.tareas_actividades1'))
+
+    return render_template('Docente/Crear_Actividad.html', curso_id=curso_id)
+
+
+@Docente_bp.route('/crear_actividad/<int:curso_id>', methods=['GET', 'POST'], endpoint='form_crear_actividad')
+@login_required
+def form_crear_actividad(curso_id):
+    return render_template('Docentes/Crear_Actividad.html', curso_id=curso_id)
 
 # --- ENDPOINT: guardar (insert/update) calificaciones desde el frontend
 @Docente_bp.route('/api/guardar_notas', methods=['POST'])

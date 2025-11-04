@@ -184,6 +184,7 @@ def perfil_rol(rol):
         else:
             return "Rol no válido", 404
         
+        
 @app.route('/manual')
 def manual():
     return render_template('manual.html')

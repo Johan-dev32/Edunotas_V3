@@ -1,0 +1,220 @@
+body {
+  background-color: #f8f9fa; 
+  font-family: 'Trebuchet MS', sans-serif;
+  color: #212529;
+}
+
+/* ========== NAVBAR SUPERIOR GENERAL ========== */
+header {
+  background-color: white;
+  color: #050733ff;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  margin: 0;
+  margin-left: 60px;
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas {
+  background-color: #050733ff;
+  color: #fff;
+}
+
+.btn-usuario {
+  background-color: #050733ff;
+  color: #fff;
+  margin-left: 10px;
+}
+
+/* ========== MENU LATERAL ========== */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+.offcanvas {
+  font-size: 25px;
+}
+
+.offcanvas-title {
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+.nav-item {
+  font-weight: bold;
+  font-size: 22px;
+}
+
+#sidebar .nav-link {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* SOLO botones nav-pills */
+.nav-pills .nav-link {
+  font-size: 25px;   
+  color: #050733ff !important; 
+  font-weight: bold;
+}
+
+.container {
+  max-width: 1000px;
+  margin-top: -90px;
+  background: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+}
+
+h2, h3, h4 {
+  color: #222;
+  margin-bottom: 0.8rem;
+}
+
+p {
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.busqueda {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.busqueda input {
+  flex: 1;
+  padding: 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.busqueda button {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: 0.3s;
+}
+
+.busqueda button:hover {
+  background-color: #1e40af;
+}
+
+.datos-estudiante {
+  background-color: #f0f4ff;
+  padding: 1rem 1.5rem;
+  border-left: 5px solid #2563eb;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.filtros {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+select {
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+th {
+  background-color: #eff3ff;
+  padding: 1rem;
+  text-align: left;
+}
+
+td {
+  background-color: #fafafa;
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+}
+
+tr:hover td {
+  background-color: #f4f6ff;
+}
+
+.estado {
+  font-weight: 600;
+  border-radius: 5px;
+  padding: 4px 8px;
+  text-align: center;
+  display: inline-block;
+}
+
+.entregada {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.no-entregada {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.pendiente {
+  background-color: #fef9c3;
+  color: #854d0e;
+}
+
+.resumen {
+  background-color: #e0f2fe;
+  padding: 1rem;
+  border-left: 5px solid #0ea5e9;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.alerta {
+  background-color: #fff3cd;
+  color: #856404;
+  border-left: 5px solid #ffe08a;
+  padding: 1rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-top: 2rem;
+}
+
+.oculto {
+  display: none;
+}
+

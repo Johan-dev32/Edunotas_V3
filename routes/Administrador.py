@@ -3,11 +3,12 @@ from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
 from sqlalchemy import func
-from datetime import datetime, date
-from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion, Bloques
+from datetime import datetime
+from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion, Bloques, Reuniones, Tutorias
 from flask_mail import Message
 import sys
 import os
+
 
 
 from decimal import Decimal
@@ -442,15 +443,155 @@ def resumensemanal():
 def registrotutorias():
     return render_template('Administrador/RegistroTutorías.html')
 
+@Administrador_bp.route("/tutorias/historial", methods=["GET"])
+def historial_tutorias():
+    """
+    Ruta API para cargar todas las tutorías guardadas en la BD.
+    Esta es la ruta que llama el JavaScript al cargar la página.
+    """
+    try:
+        # Consulta las tutorías ordenadas por fecha de realización descendente (más recientes primero)
+        tutorias = Tutorias.query.order_by(Tutorias.FechaRealizacion.desc()).all()
+        
+        result = [
+            {
+                "id": t.ID_Tutoria,
+                "nombre": t.NombreCompleto,
+                "rol": t.Rol,
+                "tema": t.Tema,
+                "fecha": t.FechaRealizacion.strftime("%Y-%m-%d"), 
+                "curso": t.Curso, 
+                "estudiante": t.NombreEstudiante, 
+                "correo": t.Correo,
+                "motivo": t.Motivo,
+                "observaciones": t.Observaciones
+            }
+            for t in tutorias
+        ]
+        
+        # Devuelve el JSON que el frontend espera
+        return jsonify({"success": True, "tutorias": result})
+        
+    except Exception as e:
+        print(f"Error al cargar historial de tutorías: {e}")
+        return jsonify({"success": False, "error": "Error de servidor al cargar datos."}), 500
+    
+@Administrador_bp.route("/tutorias/registro", methods=["POST"])
+def guardar_tutoria():
+    """
+    Recibe los datos de la tutoría desde el modal y los guarda en la BD.
+    """
+    data = request.get_json()
+    
+    # 🚨 Validación de datos básicos
+    if not all(key in data for key in ["nombre", "rol", "tema", "fecha", "curso", "estudiante", "correo", "motivo", "observaciones"]):
+        return jsonify({"success": False, "error": "Faltan campos obligatorios."}), 400
 
+    try:
+        # Convertir la fecha de String ("YYYY-MM-DD") a objeto datetime
+        fecha_realizacion = datetime.strptime(data["fecha"], "%Y-%m-%d")
+        
+        # Crear el nuevo objeto Tutorias (Alineado con el modelo modificado)
+        nueva_tutoria = Tutorias(
+            NombreCompleto=data["nombre"],
+            Rol=data["rol"],
+            Tema=data["tema"],
+            FechaRealizacion=fecha_realizacion,
+            Curso=data["curso"],                  
+            NombreEstudiante=data["estudiante"],  
+            Correo=data["correo"],
+            Motivo=data["motivo"],
+            Observaciones=data["observaciones"]
+        )
+        
+        db.session.add(nueva_tutoria)
+        db.session.commit()
+        
+        # Devolver el objeto guardado para que el JS actualice la tabla
+        return jsonify({
+            "success": True,
+            "message": "Tutoría registrada con éxito.",
+            "tutoria": {
+                "id": nueva_tutoria.ID_Tutoria,
+                "nombre": nueva_tutoria.NombreCompleto,
+                "rol": nueva_tutoria.Rol,
+                "tema": nueva_tutoria.Tema,
+                "fecha": nueva_tutoria.FechaRealizacion.strftime("%Y-%m-%d"), 
+                "curso": nueva_tutoria.Curso,
+                "estudiante": nueva_tutoria.NombreEstudiante,
+                "correo": nueva_tutoria.Correo,
+                "motivo": nueva_tutoria.Motivo,
+                "observaciones": nueva_tutoria.Observaciones
+            }
+        }), 201 
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error crítico al guardar tutoría en BD: {e}") 
+        return jsonify({"success": False, "error": f"Error interno del servidor: {str(e)}", "trace": str(e)}), 500
+    
+    
 @Administrador_bp.route('/comunicacion')
 def comunicacion():
     return render_template('Administrador/Comunicación.html')
 
 
-@Administrador_bp.route('/reunion')
+@Administrador_bp.route("/reuniones", methods=["GET"])
 def reunion():
-    return render_template('Administrador/Reunion.html')
+    return render_template("Administrador/Reunion.html")
+
+# ---- Guardar reunión ----
+
+
+@Administrador_bp.route("/reuniones", methods=["POST"])
+def guardar_reunion():
+    data = request.get_json()
+    try:
+        nueva_reunion = Reuniones(
+            FechaReunion=datetime.strptime(data["fecha"], "%Y-%m-%d"),
+            TemaATratar=data["tema"],
+            NombreOrganizador=data["organizador"],
+            CargoOrganizador=data["cargo"],
+            NombresInvitados=data["invitados"],
+            LinkReunion=data["link"]
+        )
+        db.session.add(nueva_reunion)
+        db.session.commit()
+        
+        # 🚨 CAMBIO AQUÍ: Devolver los datos formateados
+        return jsonify({
+            "success": True,
+            "reunion": {
+                "fecha": nueva_reunion.FechaReunion.strftime("%Y-%m-%d"),
+                "tema": nueva_reunion.TemaATratar,
+                "organizador": nueva_reunion.NombreOrganizador,
+                "cargo": nueva_reunion.CargoOrganizador,
+                "invitados": nueva_reunion.NombresInvitados,
+                "link": nueva_reunion.LinkReunion
+            }
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)})
+
+# ---- Historial ----
+@Administrador_bp.route("/reuniones/historial", methods=["GET"])
+def historial_reuniones():
+    # 🚨 CAMBIO CLAVE: Añadir .limit(3) a la consulta
+    reuniones = Reuniones.query.order_by(Reuniones.FechaReunion.desc()).limit(3).all()
+    result = [
+        {
+            "fecha": r.FechaReunion.strftime("%Y-%m-%d"),
+            "tema": r.TemaATratar,
+            "organizador": r.NombreOrganizador,
+            "cargo": r.CargoOrganizador,
+            "invitados": r.NombresInvitados,
+            "link": r.LinkReunion
+        }
+        for r in reuniones
+    ]
+    return jsonify(result)
 
 
 @Administrador_bp.route('/noticias')
@@ -473,13 +614,65 @@ def usuarios():
     return render_template('Administrador/Usuarios.html')
 
 
-@Administrador_bp.route('/asignaturas')
+# CREAR ASIGNATURAS #
+
+@Administrador_bp.route('/asignaturas', methods=['GET'])
 def asignaturas():
-    return render_template('Administrador/Asignaturas.html')
+    # Obtener docentes activos
+    docentes = Usuario.query.filter_by(Rol='Docente', Estado='Activo').all()
+    
+    # Obtener asignaturas junto al docente asignado
+    asignaturas = db.session.query(
+        Asignatura,
+        Usuario
+    ).join(Docente_Asignatura, Docente_Asignatura.ID_Asignatura == Asignatura.ID_Asignatura)\
+     .join(Usuario, Usuario.ID_Usuario == Docente_Asignatura.ID_Docente)\
+     .all()
+    
+    return render_template('Administrador/Asignaturas.html', asignaturas=asignaturas, docentes=docentes)
+
+
+@Administrador_bp.route('/asignaturas/guardar', methods=['POST'])
+def guardar_asignatura():
+    nombre = request.form.get('nombre')
+    descripcion = request.form.get('descripcion')
+    ciclo = request.form.get('ciclo')
+    id_docente = request.form.get('id_docente')
+
+    if not all([nombre, id_docente]):
+        return jsonify({"error": "Faltan datos obligatorios"}), 400
+
+    try:
+        id_docente = int(id_docente)
+
+        docente = Usuario.query.get(id_docente)
+        if not docente:
+            return jsonify({"error": "Docente no encontrado"}), 404
+
+        asignatura = Asignatura(
+            Nombre=nombre,
+            Descripcion=descripcion,
+            Grado=ciclo,
+            Estado='Activa'
+        )
+
+        relacion = Docente_Asignatura(docente=docente, asignatura=asignatura)
+
+        db.session.add(asignatura)
+        db.session.add(relacion)
+        db.session.commit()
+
+        return jsonify({"success": "Asignatura registrada correctamente"})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
 
 
 #----------------------parte de horarios-------------------
 @Administrador_bp.route('/horarios', defaults={'curso_id': None})
+
 @Administrador_bp.route('/horarios/<int:curso_id>')
 def horarios(curso_id):
     if curso_id is None:
@@ -805,6 +998,7 @@ def notas_registro():
 def notas_consultar():
     return render_template('Administrador/Notas_Consultar.html')
 
+
 # GESTIÓN DE LA OBSERVACIÓN #
 
 @Administrador_bp.route('/observador')
@@ -839,23 +1033,24 @@ def registrar_observacion():
         return jsonify({"status": "error", "message": "El estudiante no tiene matrícula asignada"}), 400
 
     # Buscar horario según la matrícula
-    horario = Programacion.query.filter_by(ID_Curso=matricula.ID_Curso).first()
-    if not horario:
-        return jsonify({"status": "error", "message": "No hay horario asociado al estudiante"}), 400
-    
-    nueva_obs = Observacion(
-        Fecha=datetime.strptime(data.get('fecha'), "%Y-%m-%d").date(),
-        Descripcion=data.get('descripcion'),
-        Tipo=data.get('tipo'),
-        NivelImportancia=data.get('nivelImportancia'),
-        Recomendacion=data.get('recomendacion'),
-        Estado='Activa',
-        ID_Horario=horario.ID_Programacion,
-        ID_Matricula=matricula.ID_Matricula,
-        ID_Estudiante=id_estudiante
-    )
+    horario_obj = Programacion.query.filter_by(ID_Curso=matricula.ID_Curso).first()
+    horario_id = horario_obj.ID_Programacion if horario_obj else None
 
+    # Ahora no falla si horario es None
     try:
+        nueva_obs = Observacion(
+            Fecha=datetime.strptime(data.get('fecha'), "%Y-%m-%d").date(),
+            Descripcion=data.get('descripcion'),
+            Tipo=data.get('tipo'),
+            NivelImportancia=data.get('nivelImportancia'),
+            Recomendacion=data.get('recomendacion'),
+            Estado='Activa',
+            ID_Horario=horario_id,
+            ID_Matricula=matricula.ID_Matricula,
+            ID_Estudiante=id_estudiante
+        )
+
+
         db.session.add(nueva_obs)
         db.session.commit()
         return jsonify({"status": "ok", "message": "Observación registrada correctamente"})

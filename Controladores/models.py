@@ -1,5 +1,4 @@
 # models.py
-
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Integer, String, Date, Enum, Text, ForeignKey, Time
 from sqlalchemy import Numeric as DECIMAL
@@ -7,7 +6,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.mysql import YEAR
 from datetime import datetime
 from flask_login import UserMixin
-from flask_login import UserMixin
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -26,7 +26,7 @@ TipoObservacionEnum = ("Academica","Convivencial")
 NivelImportanciaEnum = ("Bajo","Medio","Alto")
 EstadoTutoriaEnum = ("Activo","Inactivo")  # not in SQL but keep generic
 
-class Usuario(db.Model):
+class Usuario(UserMixin, db.Model):
     __tablename__ = "Usuario"
     ID_Usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Nombre = db.Column(db.String(100), nullable=False)
@@ -54,6 +54,11 @@ class Usuario(db.Model):
     enviados_citaciones = relationship("Citaciones", back_populates="enviado_por", foreign_keys="Citaciones.EnviadoPor")
     recibidos_citaciones = relationship("Citaciones", back_populates="destinatario", foreign_keys="Citaciones.ID_Usuario")
     reportes_docente = relationship("Reporte_Notas", back_populates="docente", foreign_keys="Reporte_Notas.ID_Docente")
+
+    # 🔑 Método requerido por Flask-Login
+    def get_id(self):
+        return str(self.ID_Usuario)
+
 
 class Notificacion(db.Model):
     __tablename__ = "Notificacion"
@@ -91,7 +96,7 @@ class Curso(db.Model):
     matriculas = relationship("Matricula", back_populates="curso", cascade="all, delete-orphan")
     programaciones = relationship("Programacion", back_populates="curso", cascade="all, delete-orphan")
     cronogramas = relationship("Cronograma_Actividades", back_populates="curso", cascade="all, delete-orphan")
-    reuniones = relationship("Reuniones", back_populates="curso", foreign_keys="Reuniones.ID_Curso")
+   
 
 class Matricula(db.Model):
     __tablename__ = "Matricula"
@@ -253,27 +258,24 @@ class Tutorias(db.Model):
     Rol = db.Column(db.String(50))
     Tema = db.Column(db.String(255))
     FechaRealizacion = db.Column(db.DateTime)
-    ID_Curso = db.Column(db.Integer, db.ForeignKey("Curso.ID_Curso", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
-    ID_Estudiante = db.Column(db.Integer, db.ForeignKey("Usuario.ID_Usuario", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
+    Curso = db.Column(db.String(50))
+    NombreEstudiante = db.Column(db.String(200))
     Correo = db.Column(db.String(150))
     Motivo = db.Column(db.Text)
     Observaciones = db.Column(db.Text)
 
-    curso = relationship("Curso")
-    estudiante = relationship("Usuario")
-
 class Reuniones(db.Model):
-    __tablename__ = "Reuniones"
-    ID_Reunion = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    FechaReunion = db.Column(db.DateTime, nullable=False)
-    TemaATratar = db.Column(db.String(255))
-    NombreOrganizador = db.Column(db.String(200))
-    CargoOrganizador = db.Column(db.String(100))
-    NombresInvitados = db.Column(db.Text)
-    LinkReunion = db.Column(db.String(300))
-    ID_Curso = db.Column(db.Integer, db.ForeignKey("Curso.ID_Curso", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
+    __tablename__ = 'reuniones'
+    ID_Reunion = db.Column(db.Integer, primary_key=True)
+    FechaReunion = db.Column(db.Date, nullable=False)
+    TemaATratar = db.Column(db.String(100), nullable=False)
+    NombreOrganizador = db.Column(db.String(100), nullable=False)
+    CargoOrganizador = db.Column(db.String(100), nullable=False)
+    NombresInvitados = db.Column(db.String(255), nullable=False)
+    LinkReunion = db.Column(db.String(255), nullable=False)
 
-    curso = relationship("Curso", back_populates="reuniones")
+
+    
 
 class Encuesta(db.Model):
     __tablename__ = "Encuesta"

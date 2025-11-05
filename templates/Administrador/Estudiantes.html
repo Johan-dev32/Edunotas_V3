@@ -149,7 +149,7 @@
             <label for="Curso" class="form-label">Curso:</label>
             <select name="Curso" id="Curso" class="form-select" required>
               {% for curso in cursos %}
-                <option value="{{ curso.ID_Curso }}">{{ curso.Grado }} {{ curso.Grupo }}</option>
+                <option value="{{ curso.ID_Curso }}">{{ curso.Grupo }}</option>
               {% endfor %}
             </select>
           </div>

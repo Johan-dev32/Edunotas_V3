@@ -1,14 +1,14 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
 from sqlalchemy import func
-from flask import jsonify
 from datetime import datetime, date
-from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion
+from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion, Bloques
 from flask_mail import Message
 import sys
 import os
+
 
 from decimal import Decimal
 
@@ -478,11 +478,312 @@ def asignaturas():
     return render_template('Administrador/Asignaturas.html')
 
 
+#----------------------parte de horarios-------------------
 @Administrador_bp.route('/horarios', defaults={'curso_id': None})
 @Administrador_bp.route('/horarios/<int:curso_id>')
 def horarios(curso_id):
-    return render_template('Administrador/Horarios.html', curso_id=curso_id)
+    if curso_id is None:
+        return redirect(url_for('Administrador.ver_horarios'))
 
+    c = Curso.query.get(curso_id)
+    if not c:
+        return "Curso no encontrado", 404
+
+    asignaciones = Docente_Asignatura.query.filter_by(ID_Curso=curso_id).all()
+
+    return render_template(
+        'Administrador/Horarios.html',
+        curso=c,
+        asignaciones=asignaciones
+    )
+    
+@Administrador_bp.route('/ver_horarios')
+def ver_horarios():
+    # traer todos los cursos activos
+    cursos = Curso.query.filter_by(Estado='Activo').all()
+
+    # armar diccionario de ciclos
+    ciclos = {
+        1: [],
+        2: [],
+        3: []
+    }
+
+    for c in cursos:
+        g = int(c.Grado)
+        if g in (6,7):
+            ciclos[1].append(c)
+        elif g in (8,9):
+            ciclos[2].append(c)
+        elif g in (10,11):
+            ciclos[3].append(c)
+
+    return render_template("Administrador/VerHorarios.html", ciclos=ciclos)
+
+@Administrador_bp.route('/guardar_horario/<int:curso_id>', methods=['POST'])
+def guardar_horario(curso_id):
+    try:
+        payload = request.get_json()
+        if isinstance(payload, dict) and 'bloques' in payload:
+            bloques = payload['bloques']
+        elif isinstance(payload, list):
+            bloques = payload
+        else:
+            return jsonify({"ok": False, "error": "payload inválido"}), 400
+
+        from datetime import datetime, timedelta
+
+        dia_map = {
+            'lun': 'Lunes', 'mar': 'Martes', 'mie': 'Miércoles',
+            'jue': 'Jueves', 'vie': 'Viernes',
+            'Lunes': 'Lunes', 'Martes': 'Martes', 'Miércoles': 'Miércoles',
+            'Jueves': 'Jueves', 'Viernes': 'Viernes'
+        }
+
+        # Eliminar programaciones previas del curso
+        Programacion.query.filter_by(ID_Curso=curso_id).delete()
+        db.session.flush()
+
+        for b in bloques:
+            # normalizar día
+            raw_dia = b.get('dia')
+            dia = dia_map.get(str(raw_dia), str(raw_dia)).strip() if raw_dia else None
+
+            raw_hora = b.get('hora') or b.get('hora_inicio') or b.get('horaInicio')
+            if not raw_hora:
+                # si no hay hora, se salta
+                continue
+            hora_str = str(raw_hora).strip()
+
+            try:
+                hora_inicio = datetime.strptime(hora_str, "%H:%M").time()
+            except Exception:
+                # si no cumple formato, saltar
+                print("Formato hora inválido:", hora_str)
+                continue
+
+            raw_hora_fin = b.get('hora_fin') or b.get('horaFin')
+            if raw_hora_fin:
+                try:
+                    hora_fin = datetime.strptime(str(raw_hora_fin).strip(), "%H:%M").time()
+                except Exception:
+                    hora_fin = (datetime.combine(datetime.today(), hora_inicio) + timedelta(hours=1)).time()
+            else:
+                hora_fin = (datetime.combine(datetime.today(), hora_inicio) + timedelta(hours=1)).time()
+
+            # buscar asignación por id ó por materia+docente
+            asignacion = None
+            id_da = b.get('id') or b.get('id_da') or b.get('id_docente_asignatura') or b.get('ID_Docente_Asignatura')
+            if id_da:
+                asignacion = Docente_Asignatura.query.get(int(id_da))
+
+            if not asignacion:
+                materia = (b.get('materia') or '').strip()
+                docente = (b.get('docente') or '').strip()
+                if not materia or not docente:
+                    print("Falta materia o docente en bloque:", b)
+                    continue
+
+                asignacion = Docente_Asignatura.query.join(Docente_Asignatura.asignatura)\
+                    .join(Docente_Asignatura.docente)\
+                    .filter(
+                        Asignatura.Nombre == materia,
+                        Usuario.Nombre == docente,
+                        Docente_Asignatura.ID_Curso == curso_id
+                    ).first()
+
+            if not asignacion:
+                print(f"No se encontró asignación para {b.get('materia')} - {b.get('docente')} (curso {curso_id})")
+                continue
+
+            # validar ID_Bloque: si viene, comprobar que exista en la tabla Bloques
+            id_bloque = b.get('id_bloque') or b.get('ID_Bloque')
+            id_bloque_valid = None
+            if id_bloque:
+                try:
+                    # intenta convertir y buscar
+                    id_b = int(id_bloque)
+                    bloque_obj = Bloques.query.get(id_b)
+                    if bloque_obj:
+                        id_bloque_valid = id_b
+                except Exception:
+                    id_bloque_valid = None
+
+            # crear programacion
+            prog = Programacion(
+                ID_Curso=curso_id,
+                ID_Docente_Asignatura=asignacion.ID_Docente_Asignatura,
+                ID_Docente=asignacion.ID_Docente,
+                Dia=dia,
+                HoraInicio=hora_inicio,
+                HoraFin=hora_fin,
+                ID_Bloque=id_bloque_valid
+            )
+            db.session.add(prog)
+
+        db.session.commit()
+        print("✅ Horario guardado correctamente.")
+        return jsonify({"ok": True}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print("❌ ERROR guardar_horario:", e)
+        return jsonify({"ok": False, "error": str(e)}), 500    
+    
+@Administrador_bp.route('/api/curso/<int:id_curso>/programacion')
+def api_programacion(id_curso):
+    c = Curso.query.get(id_curso)
+    if not c:
+        return jsonify({"error": "Curso no existe"}), 404
+
+    programaciones = Programacion.query.filter_by(ID_Curso=id_curso).all()
+    data = []
+
+    for p in programaciones:
+        data.append({
+            "ID_Docente_Asignatura": p.ID_Docente_Asignatura,
+            "materia": p.docente_asignatura.asignatura.Nombre,
+            "docente": p.docente_asignatura.docente.Nombre,
+            "Dia": p.Dia,
+            "Hora": str(p.HoraInicio)  # o un índice de bloque
+        })
+
+    return jsonify({"programacion": data}), 200
+
+@Administrador_bp.route('/api/curso/<int:id_curso>/asignaciones')
+def api_asignaciones(id_curso):
+    asignaciones = Docente_Asignatura.query.filter_by(ID_Curso=id_curso).all()
+    data = []
+
+    for a in asignaciones:
+        data.append({
+            "id": a.ID_Docente_Asignatura,
+            "texto": f"{a.asignatura.Nombre} - {a.docente.Nombre}"
+        })
+
+    return jsonify(data), 200
+
+
+@Administrador_bp.route('/api/curso/<int:id_curso>/bloques_db')
+def api_bloques_db(id_curso):
+
+    def dia_to_short(dia):
+        mapa = {
+            "Lunes": "lun",
+            "Martes": "mar",
+            "Miércoles": "mie",
+            "Jueves": "jue",
+            "Viernes": "vie"
+        }
+        return mapa.get(dia, None)
+
+    def hora_to_bloque(hora):
+        mapa = {
+            "06:45": 0,
+            "07:30": 1,
+            "08:00": 1,
+            "08:30": 2,
+            "09:00": 2,
+            "09:50": 3,
+            "10:00": 3,
+            "10:40": 4,
+            "11:30": 5,
+            "13:30": 6,
+            "14:20": 7
+        }
+        return mapa.get(hora, None)
+
+    programaciones = Programacion.query.filter_by(ID_Curso=id_curso).all()
+    data = []
+
+    for p in programaciones:
+        inicio = p.HoraInicio.strftime('%H:%M') if p.HoraInicio else None
+
+        data.append({
+            "id": p.ID_Programacion,
+            "materia": p.docente_asignatura.asignatura.Nombre,
+            "docente": p.docente_asignatura.docente.Nombre,
+            "dia": dia_to_short(p.Dia),
+            "hora": hora_to_bloque(inicio),
+        })
+
+    return jsonify(data), 200
+
+
+@Administrador_bp.route('/api/curso/<int:id_curso>/bloques')
+def api_bloques(id_curso):
+    asignaciones = Docente_Asignatura.query.filter_by(ID_Curso=id_curso).all()
+
+    data = []
+    for a in asignaciones:
+        data.append({
+            "id_da": a.ID_Docente_Asignatura,
+            "materia": a.asignatura.Nombre,
+            "docente": a.docente.Nombre
+        })
+
+    return jsonify(data), 200
+
+@Administrador_bp.route('/api/curso/<int:id_curso>/num_bloques')
+def api_num_bloques(id_curso):
+    total = Programacion.query.filter_by(ID_Curso=id_curso).count()
+    return jsonify({"bloques": total}), 200
+
+@Administrador_bp.route('/obtener_programacion', methods=['GET'])
+def obtener_programacion():
+    try:
+        programaciones = Programacion.query.all()
+        data = []
+        for p in programaciones:
+            data.append({
+                "curso_id": p.ID_Curso,
+                "docente_asignatura_id": p.ID_Docente_Asignatura,
+                "dia": p.Dia,
+                "hora_inicio": p.HoraInicio.strftime('%H:%M') if p.HoraInicio else None,
+                "hora_fin": p.HoraFin.strftime('%H:%M') if p.HoraFin else None
+            })
+
+        return jsonify(data), 200
+
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({"status": "error", "msg": str(e)}), 500
+    
+@Administrador_bp.route('/api/curso/<int:curso_id>/bloques_db')
+def bloques_db(curso_id):
+    try:
+        programaciones = Programacion.query.join(Docente_Asignatura).join(Asignatura).join(Usuario).filter(
+            Programacion.ID_Curso == curso_id
+        ).all()
+
+        data = []
+        for p in programaciones:
+            # preferir hora desde la tabla Bloques si ID_Bloque está presente y tiene HoraInicio
+            hora_inicio = None
+            if p.ID_Bloque and getattr(p, 'bloques', None):
+                try:
+                    hora_inicio = p.bloques.HoraInicio.strftime("%H:%M")
+                except Exception:
+                    hora_inicio = p.HoraInicio.strftime("%H:%M") if p.HoraInicio else None
+            else:
+                hora_inicio = p.HoraInicio.strftime("%H:%M") if p.HoraInicio else None
+
+            data.append({
+                "id": p.ID_Programacion,
+                "id_bloque": p.ID_Bloque,
+                "dia": p.Dia,
+                "hora_inicio": hora_inicio,
+                "hora_fin": p.HoraFin.strftime("%H:%M") if p.HoraFin else None,
+                "materia": p.docente_asignatura.asignatura.Nombre if p.docente_asignatura.asignatura else "",
+                "docente": p.docente_asignatura.docente.Nombre if p.docente_asignatura.docente else ""
+            })
+
+        return jsonify(data), 200
+
+    except Exception as e:
+        print("Error al cargar bloques:", e)
+        return jsonify({"status": "error", "msg": str(e)}), 500
+#----------------------------------------------------------------------------
 
 @Administrador_bp.route('/registro_notas/<int:curso_id>')
 def registro_notas(curso_id):
@@ -494,9 +795,7 @@ def notas_curso(curso_id):
     return render_template("Administrador/notas_curso.html", curso_id=curso_id)
 
 
-@Administrador_bp.route('/ver_horarios')
-def ver_horarios():
-    return render_template("Administrador/VerHorarios.html")
+
 
 @Administrador_bp.route('/notas_registro')
 def notas_registro():
@@ -635,7 +934,7 @@ def historial_repitente(id_estudiante):
         Matricula.AnioLectivo,
         Curso.Grado.label("Curso"),
         db.func.avg(Actividad.Calificacion).label("Promedio")
-    ).join(Curso, Curso.ID_Matricula == Matricula.ID_Matricula) \
+    ).join(Curso, Curso.ID_Curso == Matricula.ID_Curso) \
      .join(Actividad, Actividad.ID_Matricula == Matricula.ID_Matricula) \
      .filter(Matricula.ID_Estudiante == id_estudiante) \
      .group_by(Matricula.AnioLectivo, Curso.Grado) \

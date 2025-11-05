@@ -50,6 +50,7 @@
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
         <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
         <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
       </ul>
     </div>
   </header>
@@ -84,9 +85,6 @@
 
             <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones </a></li>
 
-            <li class="nav-item"><a href="{{ url_for('Docente.historial_academico') }}" class="nav-link text-white"><i class="bi bi-clock"></i> Historial Académico </a></li>
-
-            <li class="nav-item"><a href="{{ url_for('Docente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
         </ul>
       </div>
     </div>

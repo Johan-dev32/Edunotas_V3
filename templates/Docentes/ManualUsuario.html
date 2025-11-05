@@ -50,6 +50,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
     <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
     <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+  <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
   </ul>
 </div>
 
@@ -86,9 +87,6 @@
 
             <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones </a></li>
 
-            <li class="nav-item"><a href="{{ url_for('Docente.historial_academico') }}" class="nav-link text-white"><i class="bi bi-clock"></i> Historial Académico </a></li>
-
-            <li class="nav-item"><a href="{{ url_for('Docente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
         </ul>
       </div>
     </div>
@@ -103,141 +101,21 @@
     
 </div>
 <div class="container my-4 text-center">
-  <button class="btn manual m-1" onclick="cambiarManual(1)">Manual Administrador</button>
-  <button class="btn manual m-1" onclick="cambiarManual(2)">Manual Docente</button>
-  <button class="btn manual m-1" onclick="cambiarManual(3)">Manual Estudiante</button>
-  <button class="btn manual m-1" onclick="cambiarManual(4)">Manual Acudiente</button>
-
-</div>
+    <button class="btn manual m-1" onclick="cambiarManual(2)">Manual Docente</button>
+  </div>
  
   <div class="container" id="contenidoManual"> 
     
     
 
  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
 <script>
-  function cambiarManual(tipo) {
+  function cambiarManual() {
     const cont = document.getElementById("contenidoManual");
 
-    if (tipo === 1) {
-      cont.innerHTML = `
-        <h2>Manual de Usuario – Administrador</h2>
-
-    <h3>1. Introducción</h3>
-    <p>El presente manual describe las funciones y responsabilidades del Administrador dentro del sistema EduNotas.
-    El rol de Administrador es responsable de la gestión centralizada del sistema, garantizando el correcto registro, control y mantenimiento de la información relacionada con docentes, estudiantes, cursos, calificaciones y reportes.</p>
-
-    <h3>2. Acceso al Sistema</h3>
-    <ul>
-      <li>Abra el navegador web y diríjase a la URL oficial del sistema EduNotas.</li>
-      <li>Ingrese su usuario y contraseña proporcionados por la institución.</li>
-      <li>Seleccione el rol de Administrador.</li>
-      <li>Presione el botón <b>Iniciar sesión</b>.</li>
-    </ul>
-    <p class="nota">Nota: Solo usuarios autorizados pueden ingresar con credenciales de administrador.</p>
-
-    <h3>3. Funciones del Administrador</h3>
-    <h4>3.1 Administración de Docentes</h4>
-    <ul>
-      <li><b>Registrar:</b> ingresar nombre, identificación, correo institucional y asignar cursos.</li>
-      <li><b>Actualizar:</b> modificar datos personales o asignaciones.</li>
-      <li><b>Eliminar:</b> dar de baja docentes que ya no estén activos.</li>
-      <li><b>Consultar:</b> buscar y filtrar docentes registrados.</li>
-    </ul>
-
-    <h4>3.2 Administración de Estudiantes</h4>
-    <ul>
-      <li>Registrar estudiantes con datos personales y académicos.</li>
-      <li>Actualizar información (cambio de curso, corrección de datos).</li>
-      <li>Eliminar registros en caso de retiro.</li>
-      <li>Consultar historial académico.</li>
-    </ul>
-
-    <h4>3.3 Gestión de Cursos y Materias</h4>
-    <ul>
-      <li>Crear nuevos cursos con nombre, código y descripción.</li>
-      <li>Asignar docentes y estudiantes a un curso.</li>
-      <li>Editar información de un curso.</li>
-      <li>Eliminar cursos obsoletos.</li>
-    </ul>
-
-    <h4>3.4 Administración de Calificaciones</h4>
-    <ul>
-      <li>Acceder a los registros de notas creados por los docentes.</li>
-      <li>Modificar calificaciones en casos excepcionales autorizados.</li>
-      <li>Generar reportes académicos por estudiante, curso o docente.</li>
-    </ul>
-
-    <h4>3.5 Reportes y Estadísticas</h4>
-    <ul>
-      <li>Generar reportes de asistencia, desempeño académico y gestión institucional.</li>
-      <li>Exportar reportes en PDF o Excel.</li>
-    </ul>
-
-    <h4>3.6 Control de Usuarios y Roles</h4>
-    <ul>
-      <li>Crear cuentas de acceso para docentes y estudiantes.</li>
-      <li>Asignar o revocar permisos según rol.</li>
-      <li>Mantener la seguridad de contraseñas y accesos.</li>
-    </ul>
-
-    <h3>4. Controles y Restricciones</h3>
-    <ul>
-      <li>Solo los administradores pueden crear, modificar o eliminar usuarios del sistema.</li>
-      <li>No se permite que los docentes o estudiantes accedan a funciones administrativas.</li>
-      <li>Los cambios realizados quedan registrados en el historial del sistema.</li>
-    </ul>
-
-    <h3>5. Procedimientos Básicos</h3>
-    <h4>5.1 Registrar un docente</h4>
-    <ul>
-      <li>Ingresar al menú Gestión de Docentes.</li>
-      <li>Seleccionar Registrar nuevo docente.</li>
-      <li>Completar el formulario con los datos obligatorios.</li>
-      <li>Guardar la información.</li>
-      <li>Confirmar que el docente aparezca en la lista.</li>
-    </ul>
-
-    <h4>5.2 Crear un curso</h4>
-    <ul>
-      <li>Ingresar al menú Gestión de Cursos.</li>
-      <li>Seleccionar Nuevo curso.</li>
-      <li>Ingresar código, nombre y descripción.</li>
-      <li>Asignar un docente responsable.</li>
-      <li>Guardar y verificar en la lista de cursos.</li>
-    </ul>
-
-    <h4>5.3 Generar un reporte</h4>
-    <ul>
-      <li>Ir a Reportes.</li>
-      <li>Seleccionar el tipo de reporte (académico, asistencia, general).</li>
-      <li>Elegir el rango de fechas o filtros.</li>
-      <li>Generar vista previa.</li>
-      <li>Exportar en PDF o Excel.</li>
-    </ul>
-
-    <h3>6. Recomendaciones (basadas en RNF)</h3>
-    <ul>
-      <li><b>Seguridad:</b> cambiar periódicamente las contraseñas y no compartir credenciales.</li>
-      <li><b>Escalabilidad:</b> mantener registros organizados para soportar el crecimiento del sistema.</li>
-      <li><b>Disponibilidad:</b> acceder desde navegadores actualizados para mejor rendimiento.</li>
-      <li><b>Confidencialidad:</b> garantizar que la información sensible no se comparta con terceros no autorizados.</li>
-    </ul>
-
-    <h3>7. Soporte Técnico</h3>
-    <p>En caso de problemas, contactar al área de soporte institucional con la siguiente información:</p>
-    <ul>
-      <li>Nombre del administrador.</li>
-      <li>Descripción del problema.</li>
-      <li>Fecha y hora en que ocurrió.</li>
-      <li>Capturas de pantalla.</li>
-    </ul>
-  </div>
-      `;
-    } 
-    else if (tipo === 2) {
-      cont.innerHTML = `
-        <h2>Manual de Usuario – Docente</h2>
+    cont.innerHTML = `
+      <h2>Manual de Usuario – Docente</h2>
 
 <h3>1. Introducción</h3>
 <p>
@@ -284,107 +162,7 @@ todas las herramientas relacionadas con sus cursos.
 En caso de dudas o inconvenientes técnicos, el docente debe contactar al administrador del sistema
 o al área de soporte institucional.
 </p>
-      `;
-    }
-    else if (tipo === 3) {
-      cont.innerHTML = `
-       <h2>Manual de Usuario – Estudiante</h2>
-
-<h3>1. Introducción</h3>
-<p>
-Este manual está diseñado para los estudiantes que usarán el sistema
-<strong>EduNotas</strong>. Su finalidad es explicar cómo consultar sus calificaciones,
-revisar su asistencia, comunicarse con los docentes y acceder a los reportes de su
-desempeño académico.
-</p>
-
-<h3>2. Acceso al sistema</h3>
-<p>
-El estudiante deberá ingresar con las credenciales asignadas (usuario y contraseña).
-Al entrar, verá un panel con acceso directo a sus cursos, notas y asistencia.
-</p>
-
-<h3>3. Funciones principales</h3>
-<ul>
-  <li><strong>Consultar calificaciones:</strong> Ver las notas obtenidas en cada asignatura, evaluaciones y trabajos.</li>
-  <li><strong>Revisar asistencia:</strong> Confirmar sus registros de asistencias, tardanzas e inasistencias.</li>
-  <li><strong>Ver reportes:</strong> Descargar reportes individuales de desempeño académico.</li>
-  <li><strong>Comunicación:</strong> Recibir notificaciones y mensajes de docentes o de la institución.</li>
-</ul>
-
-<h3>4. Pasos de uso</h3>
-<ol>
-  <li>Iniciar sesión en el sistema con su usuario y contraseña.</li>
-  <li>Seleccionar la opción deseada: <em>Notas, Asistencia, Reportes</em>.</li>
-  <li>Revisar la información actualizada sobre su desempeño académico.</li>
-  <li>Guardar o descargar reportes cuando sea necesario.</li>
-  <li>Cerrar sesión después de cada uso para proteger la cuenta.</li>
-</ol>
-
-<h3>5. Recomendaciones</h3>
-<ul>
-  <li>Revisar periódicamente las calificaciones para estar al día con su rendimiento.</li>
-  <li>Verificar los registros de asistencia y reportar inconsistencias al docente.</li>
-  <li>Leer siempre las notificaciones enviadas por la institución.</li>
-</ul>
-
-<h3>6. Soporte</h3>
-<p>
-En caso de problemas con el acceso o con la información mostrada, el estudiante debe
-comunicarse con su docente o con el área de soporte del sistema.
-</p>
-      `;
-    }
-    else if (tipo === 4) {
-      cont.innerHTML = `
-        <h2>Manual de Usuario – Acudiente</h2>
-
-<h3>1. Introducción</h3>
-<p>
-Este manual está dirigido a los acudientes o padres de familia que utilizan el sistema 
-<strong>EduNotas</strong>. Su objetivo es orientar en el seguimiento académico y disciplinario 
-de los estudiantes, permitiendo una comunicación directa con la institución educativa.
-</p>
-
-<h3>2. Acceso al sistema</h3>
-<p>
-El acudiente debe ingresar con las credenciales asignadas por la institución 
-(usuario y contraseña). Una vez dentro, podrá visualizar la información académica, 
-asistencia y notificaciones del estudiante a su cargo.
-</p>
-
-<h3>3. Funciones principales</h3>
-<ul>
-  <li><strong>Consultar calificaciones:</strong> Revisar las notas obtenidas por el estudiante en cada asignatura.</li>
-  <li><strong>Ver asistencia:</strong> Controlar las inasistencias y tardanzas registradas.</li>
-  <li><strong>Historial disciplinario:</strong> Acceder a observaciones o reportes de comportamiento.</li>
-  <li><strong>Notificaciones:</strong> Recibir avisos importantes de la institución.</li>
-  <li><strong>Comunicación:</strong> Enviar y recibir mensajes con docentes o coordinadores.</li>
-</ul>
-
-<h3>4. Pasos de uso</h3>
-<ol>
-  <li>Ingresar al sistema con su usuario y contraseña.</li>
-  <li>Seleccionar el menú correspondiente: <em>Notas, Asistencia, Observador</em>.</li>
-  <li>Consultar el estado académico y disciplinario del estudiante.</li>
-  <li>Descargar reportes si es necesario.</li>
-  <li>Cerrar sesión después de cada consulta para mantener la seguridad.</li>
-</ol>
-
-<h3>5. Recomendaciones</h3>
-<ul>
-  <li>Consultar regularmente las notas y asistencia para estar al tanto del progreso del estudiante.</li>
-  <li>Atender las notificaciones enviadas por la institución.</li>
-  <li>Usar el canal de comunicación para aclarar dudas o situaciones con los docentes.</li>
-</ul>
-
-<h3>6. Soporte</h3>
-<p>
-En caso de inconvenientes con el acceso o con la información, el acudiente debe 
-contactar al área de coordinación académica o soporte institucional.
-</p>
-      `;
-    }
+    `;
   }
 
   function generarPDF() {
@@ -393,7 +171,7 @@ contactar al área de coordinación académica o soporte institucional.
       .from(element)
       .set({
         margin: 0.5,
-        filename: 'Manual_EduNotas.pdf',
+        filename: 'Manual_Docente_EduNotas.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' }
@@ -401,6 +179,5 @@ contactar al área de coordinación académica o soporte institucional.
       .save();
   }
 </script>
-
 </body>
 </html>

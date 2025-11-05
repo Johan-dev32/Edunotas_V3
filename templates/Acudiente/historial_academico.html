@@ -1,24 +1,20 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Colegio Fe y Alegría</title>
-=======
 <DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
    <title>Colegio Fe y Alegría</title>
->>>>>>> b4b27bff86b08da1204f5e397cdde8f76390fde5
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <!-- CSS propio -->
-<<<<<<< HEAD
   <link rel="stylesheet" href="{{ url_for('static', filename='css/Acudiente/HistorialAcademico.css') }}">
 
 </head>
@@ -26,19 +22,15 @@
 
 
   <header class="d-flex align-items-center p-3 border-bottom w-100">
-=======
   <link rel="stylesheet" href="{{ url_for('static', filename='css/Acudiente/historial.css') }}">
 
 </head>
 <body>
 <header class="d-flex align-items-center p-3 border-bottom w-100">
->>>>>>> b4b27bff86b08da1204f5e397cdde8f76390fde5
     <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
       <i class="bi bi-list"></i>
     </button>
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
-
-<<<<<<< HEAD
 
     <div class="dropdown ms-auto">
       <button 
@@ -58,7 +50,6 @@
 
 
    <div class="dropdown">
-=======
     <div class="dropdown ms-auto me-2">
         <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
             <span class="bi bi-envelope-fill"></span>
@@ -74,42 +65,29 @@
     </div>
 
       <div class="dropdown">
->>>>>>> b4b27bff86b08da1204f5e397cdde8f76390fde5
     <button class="btn btn-usuario" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="bi bi-person-circle"></i>
     </button>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu" id="dropdownSTUDENT">
         <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
-<<<<<<< HEAD
         <li><a class="dropdown-item" href="{{ url_for('Acudiente.manual') }}">Manual de Usuario</a></li>
         <li><a class="dropdown-item" href="{{ url_for('Acudiente.historial_academico') }}">Historial Academico</a></li>
-=======
         <li><a class="dropdown-item" href="{{ url_for('Estudiante.manual') }}">Manual de Usuario</a></li>
->>>>>>> b4b27bff86b08da1204f5e397cdde8f76390fde5
         <li><hr class="dropdown-divider"></li>
         <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
     </ul>
 </div>
-<<<<<<< HEAD
   </header>
-
-
-
 <!--  MENU  -->
-
-=======
-
   </header>
 
   <!-- Menú lateral -->
   <section class="bg-light py-5 mt-5">
->>>>>>> b4b27bff86b08da1204f5e397cdde8f76390fde5
   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
   </div>
   <div class="offcanvas1-body">
-<<<<<<< HEAD
     <ul class="nav flex-column">
           <li class="nav-item"><a href="{{ url_for('Acudiente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
           
@@ -197,7 +175,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-=======
       <ul class="nav flex-column">
         
         <li class="nav-item"><a href="{{ url_for('Acudiente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
@@ -292,4 +269,3 @@
   <!-- JavaScript externo -->
   <script src="{{ url_for('static', filename='js/Acudiente/historial.js') }}"></script>
 </html>
->>>>>>> b4b27bff86b08da1204f5e397cdde8f76390fde5

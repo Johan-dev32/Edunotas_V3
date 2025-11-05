@@ -11,119 +11,45 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
+  <!-- HEADER -->
   <header class="d-flex align-items-center p-3 border-bottom w-100">
-<button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
-  <i class="bi bi-list"></i>
-</button>
-<h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
-<div class="dropdown">
-    
-  <button 
-    class="btn btn-edunotas position-relative dropdown-toggle" 
-    type="button" 
-    id="dropdownMenuButton" 
-    data-bs-toggle="dropdown" 
-    aria-expanded="false">
-    <span class="bi bi-envelope-fill"></span>
-  </button>
-  
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <li><a class="dropdown-item" href="#">Ajustes</a></li>
-    <li><a class="dropdown-item" href="#">Opción 2</a></li>
-    <li><a class="dropdown-item" href="#">Opción 3</a></li>
-  </ul>
-</div>
+    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRÍA</h2>
 
-<!--Botón menu de usuario-->
+    <!-- Notificaciones -->
+    <div class="dropdown ms-auto me-3">
+      <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="bi bi-envelope-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <li><a class="dropdown-item" href="#">Ajustes</a></li>
+        <li><a class="dropdown-item" href="#">Opción 2</a></li>
+        <li><a class="dropdown-item" href="#">Opción 3</a></li>
+      </ul>
+    </div>
 
-<div class="dropdown">
-  <button 
-    class="btn btn-usuario dropdown-toggle" 
-    type="button" 
-    id="dropdownMenuButton" 
-    data-bs-toggle="dropdown" 
-    aria-expanded="false">
-    <span class="bi bi-person-lines-fill"></span>
-  </button>
-
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-  </ul>
-</div>
-
-</a>
+    <!-- Menú de usuario -->
+    <div class="dropdown">
+      <button class="btn btn-usuario dropdown-toggle" type="button" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="bi bi-person-lines-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="userMenuButton">
+        <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+      </ul>
+    </div>
   </header>
 
-<!--  MENU  -->
-  <div class="offcanvas1-body">
-  <ul class="nav flex-column">
-
-    <!-- Inicio (visible para todos) -->
-    <li class="nav-item">
-      <a href="{{ url_for('perfil', rol=session['rol']) }}" class="nav-link text-white">
-        <i class="bi bi-house-fill"></i> Inicio
-      </a>
-    </li>
-
-    <!-- Opciones para Estudiante -->
-    {% if session['rol'] == 'Estudiante' %}
-      <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas">
-        <i class="bi bi-caret-down-fill"></i> Notas 
-      </a>
-      <div class="collapse" id="submenuNotas">
-        <ul class="nav flex-column ms-3">
-          <li><a href="{{ url_for('notas_consultar') }}" class="nav-link text-white">
-            <i class="bi bi-list-stars"></i> Consultar Notas</a>
-          </li>
-        </ul>
-      </div>
-      <li class="nav-item"><a href="{{ url_for('observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-
-    {% elif session['rol'] == 'Docente' %}
-      <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas">
-        <i class="bi bi-caret-down-fill"></i> Notas 
-      </a>
-      <div class="collapse" id="submenuNotas">
-        <ul class="nav flex-column ms-3">
-          <li><a href="{{ url_for('notas_registro') }}" class="nav-link text-white">
-            <i class="bi bi-pencil-square"></i> Registrar Notas</a>
-          </li>
-        </ul>
-      </div>
-
-    {% elif session['rol'] == 'Administrador' %}
-      <li class="nav-item">
-        <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
-          <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
-        </a>
-        <div class="collapse" id="submenuUsuarios">
-          <ul class="nav flex-column ms-3">
-            <li><a href="{{ url_for('profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
-            <li><a href="{{ url_for('acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
-            <li><a href="{{ url_for('estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
-          </ul>
-        </div>
-      </li>
-      <li class="nav-item"><a href="{{ url_for('asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignaturas</a></li>
-      <li class="nav-item"><a href="{{ url_for('horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-
-    {% elif session['rol'] == 'Acudiente' %}
-      <li class="nav-item"><a href="{{ url_for('hijos_notas') }}" class="nav-link text-white"><i class="bi bi-journal-text"></i> Notas de mis hijos</a></li>
-    {% endif %}
-    
-
-  </ul>
-</div>
-
-<!-- Botón flecha atrás -->
+  <!-- Botón flecha atrás -->
   <button class="back-btn" onclick="history.back()" aria-label="Volver atrás">
     <svg viewBox="0 0 24 24">
       <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
     </svg>
   </button>
 
-<!-- PERFIL -->
+  <!-- SECCIÓN PERFIL -->
   <section class="perfil-container">
     <div class="perfil-info">
       <h2>Perfil de Usuario ({{ usuario.Rol }})</h2>
@@ -134,29 +60,145 @@
       <p><strong>Número de contacto:</strong> {{ usuario.Telefono }}</p>
       <p><strong>Dirección de residencia:</strong> {{ usuario.Direccion }}</p>
       <p><strong>Género:</strong> {{ usuario.Genero }}</p>
+      <p><strong>Estado:</strong> {{ usuario.Estado }}</p>
 
-      <!-- Diferencias por rol -->
+      <!-- Información adicional según rol -->
       {% if usuario.Rol == "Estudiante" %}
-        <p><strong>Curso:</strong> {{ usuario.Curso }}</p>
-      {% elif usuario.Rol == "Docente" %}
-        <p><strong>Asignaturas:</strong> {{ usuario.Asignaturas }}</p>
-      {% elif usuario.Rol == "Administrador" %}
-        <p><strong>Área de trabajo:</strong> {{ usuario.Area }}</p>
-        <p><strong>Estado:</strong> {{ usuario.Estado }}</p>
-      {% elif usuario.Rol == "Acudiente" %}
-        <p><strong>Hijos:</strong> {{ usuario.Hijos }}</p>
-        <p><strong>Cursos de hijos:</strong> {{ usuario.CursosHijos }}</p>
-      {% endif %}
-    </div>
+        <p><strong>Curso:</strong> {{ usuario.Matricula.Curso.Nombre if usuario.Matricula and usuario.Matricula.Curso else 'No asignado' }}</p>
 
-    <!-- Botón de edición -->
-    <div class="text-center pb-4">
-      {% if usuario.Rol == "Administrador" %}
-        <button class="btn btn-primary">Editar información</button>
-      {% else %}
-        <button class="btn btn-secondary">Solicitar actualización</button>
+      {% elif usuario.Rol == "Docente" %}
+        <p><strong>Asignaturas:</strong> 
+          {% if usuario.Asignaturas %}
+            {{ usuario.Asignaturas|join(', ') }}
+          {% else %}
+            No tiene asignaturas asignadas
+          {% endif %}
+        </p>
+
+      {% elif usuario.Rol == "Administrador" %}
+        <p><strong>Área de trabajo:</strong> {{ usuario.Area if usuario.Area else 'Administración general' }}</p>
+
+      {% elif usuario.Rol == "Acudiente" %}
+        <p><strong>Hijos:</strong> 
+          {% if usuario.Hijos %}
+            {{ usuario.Hijos|join(', ') }}
+          {% else %}
+            No se han registrado hijos
+          {% endif %}
+        </p>
       {% endif %}
     </div>
   </section>
+  <!-- Botón de edición -->
+<div class="text-center pb-4">
+  <button class="btn btn-primary" id="editarPerfil">Editar información</button>
+</div>
+
+<!-- Modal de edición -->
+<div class="modal fade" id="modalEditarPerfil" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Editar información del perfil</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formEditarPerfil">
+          <div class="mb-3">
+            <label>Nombre</label>
+            <input type="text" class="form-control" id="nombre" value="{{ usuario.Nombre }}">
+          </div>
+          <div class="mb-3">
+            <label>Apellido</label>
+            <input type="text" class="form-control" id="apellido" value="{{ usuario.Apellido }}">
+          </div>
+          <div class="mb-3">
+            <label>Correo electrónico</label>
+            <input type="email" class="form-control" id="correo" value="{{ usuario.Correo }}">
+          </div>
+          <div class="mb-3">
+            <label>Dirección</label>
+            <input type="text" class="form-control" id="direccion" value="{{ usuario.Direccion }}">
+          </div>
+          <div class="mb-3">
+            <label>Teléfono</label>
+            <input type="text" class="form-control" id="telefono" value="{{ usuario.Telefono }}">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-success" id="guardarCambios">Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+// Mostrar el modal al hacer clic en "Editar información"
+document.getElementById("editarPerfil").addEventListener("click", () => {
+  const modal = new bootstrap.Modal(document.getElementById("modalEditarPerfil"));
+  modal.show();
+});
+
+// Guardar cambios al hacer clic en "Guardar cambios"
+document.getElementById("guardarCambios").addEventListener("click", async () => {
+  const formData = new FormData();
+  formData.append("nombre", document.getElementById("nombre").value.trim());
+  formData.append("apellido", document.getElementById("apellido").value.trim());
+  formData.append("correo", document.getElementById("correo").value.trim());
+  formData.append("direccion", document.getElementById("direccion").value.trim());
+  formData.append("telefono", document.getElementById("telefono").value.trim());
+
+  try {
+    const response = await fetch("/actualizar_perfil", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (data.status === "success") {
+      // Mostrar alerta de éxito
+      Swal.fire({
+        icon: "success",
+        title: "Perfil actualizado",
+        text: data.message,
+        timer: 2000,
+        showConfirmButton: false
+      });
+
+      // Cerrar el modal automáticamente
+      const modal = bootstrap.Modal.getInstance(document.getElementById("modalEditarPerfil"));
+      modal.hide();
+
+      // Actualizar los datos en pantalla sin recargar la página
+      document.querySelector("p:nth-of-type(1)").innerHTML = `<strong>Nombre completo:</strong> ${document.getElementById("nombre").value} ${document.getElementById("apellido").value}`;
+      document.querySelector("p:nth-of-type(4)").innerHTML = `<strong>Correo electrónico:</strong> ${document.getElementById("correo").value}`;
+      document.querySelector("p:nth-of-type(5)").innerHTML = `<strong>Número de contacto:</strong> ${document.getElementById("telefono").value}`;
+      document.querySelector("p:nth-of-type(6)").innerHTML = `<strong>Dirección de residencia:</strong> ${document.getElementById("direccion").value}`;
+
+    } else {
+      // Mostrar error si el backend devuelve fallo
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: data.message
+      });
+    }
+
+  } catch (error) {
+    // Error de conexión o red
+    Swal.fire({
+      icon: "error",
+      title: "Error de red",
+      text: error.message
+    });
+  }
+});
+</script>
 </body>
 </html>

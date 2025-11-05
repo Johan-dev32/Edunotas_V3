@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from Controladores.models import db, Matricula, Actividad, Curso, Periodo, Asignatura, Programacion, Actividad_Estudiante, Notificacion
+from Controladores.models import db, Matricula, Actividad, Curso, Periodo, Asignatura, Programacion, Actividad_Estudiante, Notificacion, Bloques, Usuario
 import os
 
 from decimal import Decimal
@@ -14,7 +14,31 @@ def paginainicio():
 
 @Estudiante_bp.route('/verhorario')
 def verhorario():
-    return render_template('Estudiante/VerHorario.html')
+    id_usuario = session.get('usuario_id')  # <- obtenemos el usuario logueado
+    if not id_usuario:
+        return redirect(url_for('login'))  # si no está logueado, redirige
+    estudiante = Usuario.query.filter_by(ID_Usuario=id_usuario, Rol='Estudiante').first()
+
+    if not estudiante:
+        return "Estudiante no encontrado", 404
+    
+    curso = Curso.query.filter_by(ID_Curso=estudiante.ID_Curso).first()
+
+    return render_template('Estudiante/VerHorario.html', estudiante=estudiante, curso=curso)
+
+@Estudiante_bp.route('/api/curso/<int:curso_id>/horario')
+def horario_estudiante(curso_id):
+    bloques = Bloques.query.filter_by(curso_id=curso_id).all()
+    resultado = []
+    for b in bloques:
+        resultado.append({
+            "dia": b.dia,
+            "hora_inicio": b.hora_inicio,
+            "materia": b.materia,
+            "docente": b.docente
+        })
+    return jsonify(resultado)
+
 
 @Estudiante_bp.route('/vernotas')
 def vernotas():

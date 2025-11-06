@@ -263,36 +263,53 @@ def notas_consultar():
 def calculo_promedio():
     return render_template('Docentes/CalculoPromedio.html')
 
+
+# GESTIÓN DE LA OBSERVACIÓN
+
 @Docente_bp.route('/observador')
 def observador():
+    # Traer observaciones con sus estudiantes y cursos
     observaciones = (
-        db.session.query(Observacion, Usuario)
+        db.session.query(Observacion, Usuario, Curso)
         .join(Matricula, Observacion.ID_Matricula == Matricula.ID_Matricula)
         .join(Usuario, Matricula.ID_Estudiante == Usuario.ID_Usuario)
-        .add_columns(
-            Observacion.Fecha,
-            Observacion.Descripcion,
-            Observacion.Recomendacion,
-            Observacion.Tipo,
-            Observacion.NivelImportancia,
-            Usuario.Nombre,
-            Usuario.Apellido
-        )
+        .join(Curso, Matricula.ID_Curso == Curso.ID_Curso)
         .all()
     )
 
+    # Traer todos los estudiantes
+    estudiantes = Usuario.query.filter_by(Rol='Estudiante').all()
+
+    # Traer todos los cursos
+    cursos = Curso.query.all()
+
+    # Traer todas las matrículas (por si se usan más adelante)
     matriculas = Matricula.query.all()
-    return render_template('docentes/observador.html', observaciones=observaciones, matriculas=matriculas)
+
+    return render_template(
+        'docentes/observador.html',
+        observaciones=observaciones,
+        estudiantes=estudiantes,
+        cursos=cursos,
+        matriculas=matriculas
+    )
 
 
 @Docente_bp.route('/agregar_observacion', methods=['POST'])
 def agregar_observacion():
     try:
-        id_matricula = request.form['id_matricula']
+        id_estudiante = request.form['id_estudiante']
+        id_curso = request.form['id_curso']
         descripcion = request.form['descripcion']
         tipo = request.form['tipo']
-        nivel_importancia = request.form['nivel_importancia']
+        nivel_importancia = request.form['nivelImportancia']
         recomendacion = request.form['recomendacion']
+
+        # Buscar la matrícula correspondiente al estudiante y curso
+        matricula = Matricula.query.filter_by(ID_Estudiante=id_estudiante, ID_Curso=id_curso).first()
+        if not matricula:
+            flash('❌ No se encontró la matrícula para el estudiante en ese curso.', 'danger')
+            return redirect(url_for('Docente.observador'))
 
         nueva_observacion = Observacion(
             Fecha=date.today(),
@@ -302,17 +319,20 @@ def agregar_observacion():
             Recomendacion=recomendacion,
             Estado='Activa',
             ID_Horario=None,
-            ID_Matricula=id_matricula
+            ID_Matricula=matricula.ID_Matricula
         )
 
         db.session.add(nueva_observacion)
         db.session.commit()
         flash('✅ Observación agregada correctamente', 'success')
+
     except Exception as e:
         db.session.rollback()
         flash(f'❌ Error al agregar observación: {e}', 'danger')
 
-    return redirect(url_for('docentes.observador'))
+    return redirect(url_for('Docente.observador'))
+
+
 
 @Docente_bp.route('/horarios')
 def horarios():

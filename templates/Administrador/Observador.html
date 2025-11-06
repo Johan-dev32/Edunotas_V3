@@ -229,7 +229,7 @@
       <div class="text-center mb-4">
         <h1 class="titulo-principal fw-bold">OBSERVADOR DE ESTUDIANTES</h1>
         <p class="descripcion text-muted">
-          Gestiona las observaciones y control de cupos por grupo
+          Gestiona las observaciones de los estudiantes
         </p>
       </div>
 
@@ -255,32 +255,23 @@
             </tr>
           </thead>
           <tbody>
-            {% for obs, est in observaciones %}
-            <tr>
-              <td>{{ est.Nombre }} {{ est.Apellido }}</td>
-              <td>
-                {{ obs.matricula.curso.NombreCurso if obs.matricula and
-                obs.matricula.curso else '' }}
-              </td>
-              <td>{{ obs.Tipo }}</td>
-              <td>{{ obs.NivelImportancia }}</td>
-              <td>{{ obs.Fecha.strftime('%d/%m/%Y') if obs.Fecha else '' }}</td>
-              <td class="text-start">
-                <pre class="mb-0">{{ obs.Descripcion }}</pre>
-              </td>
-              <td class="text-start">
-                <pre class="mb-0">{{ obs.Recomendacion }}</pre>
-              </td>
-              <td>{{ obs.Estado }}</td>
-            </tr>
-            {% else %}
-            <tr>
-              <td colspan="8" class="text-muted">
-                No hay observaciones registradas
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
+              {% for obs, est, curso in observaciones %}
+                <tr>
+                  <td>{{ est.Nombre }} {{ est.Apellido }}</td>
+                  <td>{{ curso.NombreCurso }}</td>
+                  <td>{{ obs.Tipo }}</td>
+                  <td>{{ obs.NivelImportancia }}</td>
+                  <td>{{ obs.Fecha.strftime('%d/%m/%Y') if obs.Fecha else '' }}</td>
+                  <td class="text-start">{{ obs.Descripcion }}</td>
+                  <td class="text-start">{{ obs.Recomendacion }}</td>
+                  <td>{{ obs.Estado }}</td>
+                </tr>
+              {% else %}
+          <tr>
+    <td colspan="8" class="text-muted">No hay observaciones registradas</td>
+  </tr>
+  {% endfor %}
+</tbody>
         </table>
       </div>
     </main>
@@ -295,21 +286,42 @@
       </div>
       <div class="modal-body">
         <form id="formObservacion">
-          <select name="id_estudiante" class="form-control mb-2" required>
-            <option value="" selected disabled>Seleccione un estudiante</option>
-            {% for est in estudiantes %}
-            <option value="{{ est.ID_Usuario }}">{{ est.Nombre }} {{ est.Apellido }}</option>
-            {% endfor %}
-          </select>
+  <!-- Selección de curso -->
+  <select name="id_curso" class="form-control mb-2" required>
+    <option value="" selected disabled>Seleccione un curso</option>
+    {% for curso in cursos %}
+      <option value="{{ curso.ID_Curso }}">{{ curso.NombreCurso }}</option>
+    {% endfor %}
+  </select>
 
-          <input type="text" name="tipo" placeholder="Tipo" required class="form-control mb-2" />
-          <input type="text" name="nivelImportancia" placeholder="Nivel de Importancia" required class="form-control mb-2" />
-          <input type="date" name="fecha" required class="form-control mb-2" />
-          <textarea name="descripcion" placeholder="Descripción" required class="form-control mb-2"></textarea>
-          <textarea name="recomendacion" placeholder="Recomendación" required class="form-control mb-2"></textarea>
+  <!-- Selección de estudiante -->
+  <select name="id_estudiante" class="form-control mb-2" required>
+    <option value="" selected disabled>Seleccione un estudiante</option>
+    {% for est in estudiantes %}
+      <option value="{{ est.ID_Usuario }}">{{ est.Nombre }} {{ est.Apellido }}</option>
+    {% endfor %}
+  </select>
 
-          <button type="submit" class="btn btn-success mt-2">Agregar</button>
-        </form>
+  <!-- Tipo, nivel, fecha, descripción, recomendación -->
+  <select name="tipo" class="form-control mb-2" required>
+    <option value="" selected disabled>Seleccione el tipo de observación</option>
+    <option value="Academica">Académica</option>
+    <option value="Convivencial">Convivencial</option>
+  </select>
+
+  <select name="nivelImportancia" class="form-control mb-2" required>
+    <option value="" selected disabled>Seleccione el nivel de importancia</option>
+    <option value="Bajo">Bajo</option>
+    <option value="Medio">Medio</option>
+    <option value="Alto">Alto</option>
+  </select>
+
+  <input type="date" name="fecha" required class="form-control mb-2" />
+  <textarea name="descripcion" placeholder="Descripción" required class="form-control mb-2"></textarea>
+  <textarea name="recomendacion" placeholder="Recomendación" required class="form-control mb-2"></textarea>
+
+  <button type="submit" class="btn btn-success mt-2">Agregar</button>
+</form>
       </div>
     </div>
   </div>

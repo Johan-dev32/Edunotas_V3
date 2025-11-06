@@ -472,12 +472,102 @@ def noticias_vistas():
 def usuarios():
     return render_template('Administrador/Usuarios.html')
 
-
+#-------------------parte de asignaturas---------------------#
 @Administrador_bp.route('/asignaturas')
 def asignaturas():
     return render_template('Administrador/Asignaturas.html')
 
 
+# 📌 Endpoint para obtener todas las asignaturas (API JSON)
+@Administrador_bp.route('/api/asignaturas', methods=['GET'])
+def api_get_asignaturas():
+    asignaturas = Asignatura.query.all()
+    data = []
+    for a in asignaturas:
+        data.append({
+            "id": a.ID_Asignatura,
+            "nombre": a.Nombre,
+            "descripcion": a.Descripcion,
+            "grado": a.Grado,
+            "area": a.Area,
+            "codigo": a.CodigoAsignatura,
+            "estado": a.Estado
+        })
+    return jsonify(data)
+
+
+# 📌 Endpoint para agregar una nueva asignatura
+@Administrador_bp.route('/api/asignaturas', methods=['POST'])
+def crear_asignatura():
+    data = request.get_json()
+
+    nombre = data.get('nombre')
+    descripcion = data.get('descripcion')
+    grado = data.get('grado')
+    area = data.get('area', '')
+    codigo = data.get('codigo')
+    id_docente = data.get('id_docente')
+
+    # Crear la asignatura
+    nueva = Asignatura(
+        Nombre=nombre,
+        Descripcion=descripcion,
+        Grado=grado,
+        Area=area,
+        CodigoAsignatura=codigo,
+        Estado='Activa'
+    )
+    db.session.add(nueva)
+    db.session.flush()  # Para obtener ID antes del commit
+
+    # Crear relación docente-asignatura
+    if id_docente:
+        relacion = Docente_Asignatura(
+            ID_Docente=id_docente,
+            ID_Asignatura=nueva.ID_Asignatura
+        )
+        db.session.add(relacion)
+
+    db.session.commit()
+
+    return jsonify({"success": True, "id": nueva.ID_Asignatura})
+
+
+@Administrador_bp.route('/api/docentes', methods=['GET'])
+def obtener_docentes():
+    docentes = Usuario.query.filter_by(Rol='Docente', Estado='Activo').all()
+    data = [
+        {
+            "id": d.ID_Usuario,
+            "nombre": f"{d.Nombre} {d.Apellido}"
+        }
+        for d in docentes
+    ]
+    return jsonify(data)
+
+
+@Administrador_bp.route('/api/asignaturas', methods=['GET'])
+def listar_asignaturas():
+    asignaturas = Asignatura.query.all()
+    data = []
+    for a in asignaturas:
+        relacion = Docente_Asignatura.query.filter_by(ID_Asignatura=a.ID_Asignatura).first()
+        docente_nombre = None
+        if relacion and relacion.docente:
+            docente_nombre = f"{relacion.docente.Nombre} {relacion.docente.Apellido}"
+        data.append({
+            "id": a.ID_Asignatura,
+            "nombre": a.Nombre,
+            "descripcion": a.Descripcion,
+            "grado": a.Grado,
+            "area": a.Area,
+            "codigo": a.CodigoAsignatura,
+            "estado": a.Estado,
+            "profesor": docente_nombre
+        })
+    return jsonify(data)
+
+#----------------------------------------------------------------------
 #----------------------parte de horarios-------------------
 @Administrador_bp.route('/horarios', defaults={'curso_id': None})
 @Administrador_bp.route('/horarios/<int:curso_id>')

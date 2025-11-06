@@ -12,19 +12,36 @@ Estudiante_bp = Blueprint('Estudiante', __name__, url_prefix='/estudiante')
 def paginainicio():
     return render_template('Estudiante/Paginainicio_Estudiante.html')
 
+
 @Estudiante_bp.route('/verhorario')
+@login_required  # 👈 asegura que el usuario esté logueado
 def verhorario():
-    id_usuario = session.get('usuario_id')  # <- obtenemos el usuario logueado
-    if not id_usuario:
-        return redirect(url_for('login'))  # si no está logueado, redirige
-    estudiante = Usuario.query.filter_by(ID_Usuario=id_usuario, Rol='Estudiante').first()
+    if current_user.Rol != 'Estudiante':
+        return "Acceso no autorizado", 403
 
-    if not estudiante:
-        return "Estudiante no encontrado", 404
-    
-    curso = Curso.query.filter_by(ID_Curso=estudiante.ID_Curso).first()
+    estudiante = current_user  # ya es el usuario logueado
 
-    return render_template('Estudiante/VerHorario.html', estudiante=estudiante, curso=curso)
+    # Obtener la matrícula más reciente del estudiante
+    matricula = (
+        Matricula.query
+        .filter_by(ID_Estudiante=estudiante.ID_Usuario)
+        .order_by(Matricula.AnioLectivo.desc())
+        .first()
+    )
+
+    if not matricula:
+        return "El estudiante no tiene una matrícula registrada", 404
+
+    # Obtener el curso y las programaciones
+    curso = matricula.curso
+    programaciones = curso.programaciones.all() if curso else []
+
+    return render_template(
+        'Estudiante/VerHorario.html',
+        estudiante=estudiante,
+        curso=curso,
+        programaciones=programaciones
+    )
 
 @Estudiante_bp.route('/api/curso/<int:curso_id>/horario')
 def horario_estudiante(curso_id):

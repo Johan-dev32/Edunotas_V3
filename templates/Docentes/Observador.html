@@ -115,29 +115,42 @@
           <table class="table table-striped align-middle">
             <thead class="table-secondary text-center">
               <tr>
+                <th>Nombre</th>
+                <th>Curso</th>
+                <th>Tipo</th>
+                <th>Nivel de Importancia</th>
                 <th>Fecha</th>
-                <th>Estudiante</th>
-                <th>tipo</th>
-                <th>NivelImportancia</th>
                 <th>Descripción</th>
                 <th>Recomendación</th>
+                <th>Estado</th>
               </tr>
             </thead>
             <tbody>
-              {% for obs in observaciones %}
-              <tr>
-                <td>{{ obs.Fecha.strftime('%Y-%m-%d') }}</td>
-                <td>{{ obs.Nombre }} {{ obs.Apellido }}</td>
-                <td>{{ obs.tipo }}</td>
-                <td>{{ obs.nivel_importancia }}</td>
-                <td>{{ obs.Descripcion }}</td>
-                <td>{{ obs.Recomendacion }}</td>
-              </tr>
-              {% else %}
-              <tr>
-                <td colspan="4" class="text-center text-muted">No hay observaciones registradas</td>
-              </tr>
-              {% endfor %}
+              {% for obs, est in observaciones %}
+            <tr>
+              <td>{{ est.Nombre }} {{ est.Apellido }}</td>
+              <td>
+                {{ obs.matricula.curso.NombreCurso if obs.matricula and
+                obs.matricula.curso else '' }}
+              </td>
+              <td>{{ obs.Tipo }}</td>
+              <td>{{ obs.NivelImportancia }}</td>
+              <td>{{ obs.Fecha.strftime('%d/%m/%Y') if obs.Fecha else '' }}</td>
+              <td class="text-start">
+                <pre class="mb-0">{{ obs.Descripcion }}</pre>
+              </td>
+              <td class="text-start">
+                <pre class="mb-0">{{ obs.Recomendacion }}</pre>
+              </td>
+              <td>{{ obs.Estado }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="8" class="text-muted">
+                No hay observaciones registradas
+              </td>
+            </tr>
+            {% endfor %}
             </tbody>
           </table>
         </div>
@@ -159,48 +172,68 @@
               <label class="form-label fw-semibold">Estudiante</label>
               <select name="id_matricula" class="form-select" required>
                 <option value="">Seleccione...</option>
-                {% for matricula in matriculas %}
-                <option value="{{ matricula.ID_Matricula }}">{{ matricula.estudiante.Nombre }} {{ matricula.estudiante.Apellido }}</option>
+                {% for est in estudiantes %}
+                <option value="{{ est.ID_Usuario }}">{{ est.Nombre }} {{ est.Apellido }}</option>
                 {% endfor %}
               </select>
             </div>
 
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Descripción</label>
-              <textarea name="descripcion" class="form-control" rows="3" required></textarea>
-            </div>
+            <select name="tipo" class="form-control mb-2" required>
+            <option value="" selected disabled>Seleccione el tipo de observación</option>
+            <option value="Academica">Académica</option>
+            <option value="Convivencial">Convivencial</option>
+          </select>
+          <select name="nivelImportancia" class="form-control mb-2" required>
+            <option value="" selected disabled>Seleccione el nivel de importancia</option>
+            <option value="Bajo">Bajo</option>
+            <option value="Medio">Medio</option>
+            <option value="Alto">Alto</option>
+          </select>
+          <input type="date" name="fecha" required class="form-control mb-2" />
+          <textarea name="descripcion" placeholder="Descripción" required class="form-control mb-2"></textarea>
+          <textarea name="recomendacion" placeholder="Recomendación" required class="form-control mb-2"></textarea>
 
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Tipo</label>
-              <select name="tipo" class="form-select" required>
-                <option value="Academica">Académica</option>
-                <option value="Convivencial">Convivencial</option>
-              </select>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Nivel de Importancia</label>
-              <select name="nivel_importancia" class="form-select" required>
-                <option value="Bajo">Bajo</option>
-                <option value="Medio">Medio</option>
-                <option value="Alto">Alto</option>
-              </select>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Recomendación</label>
-              <textarea name="recomendacion" class="form-control" rows="2"></textarea>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-success">Guardar</button>
-          </div>
+          <button type="submit" class="btn btn-success mt-2">Agregar</button>
         </form>
       </div>
     </div>
   </div>
 
-  <script src="{{ url_for('static', filename='js/Docente/observadorDocente.js') }}"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- JS para manejo del modal y formulario -->
+<script>
+document.getElementById("btnAbrirFormulario").addEventListener("click", function() {
+  const modal = new bootstrap.Modal(document.getElementById("modalFormulario"));
+  modal.show();
+});
+
+document.getElementById("formObservacion").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+
+  try {
+    const response = await fetch("/administrador/observador/registrar", {
+      method: "POST",
+      body: formData
+    });
+
+    const result = await response.json();
+    console.log(result); // Para ver el mensaje completo del servidor
+
+    if(result.status === "ok") {
+      alert(result.message);
+      location.reload(); // Recarga la tabla
+    } else {
+      alert("Error: " + result.message);
+    }
+
+  } catch (error) {
+    console.error(error);
+    alert("Error al conectar con el servidor");
+  }
+});
+</script>
 </body>
 </html>

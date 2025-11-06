@@ -233,6 +233,11 @@ class Actividad_Estudiante(db.Model):
 
     actividad = relationship("Actividad", back_populates="participaciones")
     matricula = relationship("Matricula", back_populates="actividades_estudiante")
+    
+TipoObservacionEnum = ("Academica", "Convivencial")
+NivelImportanciaEnum = ("Bajo", "Medio", "Alto")
+EstadoObservacionEnum = ("Activa", "Inactiva")
+
 
 class Observacion(db.Model):
     __tablename__ = "Observacion"
@@ -242,7 +247,7 @@ class Observacion(db.Model):
     Tipo = db.Column(db.Enum(*TipoObservacionEnum, name="tipo_observacion_enum"))
     NivelImportancia = db.Column(db.Enum(*NivelImportanciaEnum, name="nivel_importancia_enum"))
     Recomendacion = db.Column(db.Text)
-    Estado = db.Column(db.Enum(*EstadoEnum, name="estado_observacion_enum"), default="Activa")
+    Estado = db.Column(db.Enum(*EstadoObservacionEnum, name="estado_observacion_enum"), default="Activa")
     ID_Programacion = db.Column(db.Integer, db.ForeignKey("Programacion.ID_Programacion", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
     ID_Matricula = db.Column(db.Integer, db.ForeignKey("Matricula.ID_Matricula", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
     ID_Estudiante = db.Column(db.Integer, db.ForeignKey("Usuario.ID_Usuario", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)

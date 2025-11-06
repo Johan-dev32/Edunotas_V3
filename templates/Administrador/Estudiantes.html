@@ -96,69 +96,97 @@
 
       <!-- FORMULARIO ESTUDIANTE -->
       <form id="formEstudiante" method="POST" action="{{ url_for('Administrador.agregar_estudiante') }}">
-        <h5 class="mt-4 mb-3 fw-bold">Datos Básicos</h5>
+  <h5 class="mt-4 mb-3 fw-bold">Datos Básicos</h5>
 
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">Nombres:</label>
-            <input type="text" class="form-control" name="Nombre" required>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Apellidos:</label>
-            <input type="text" class="form-control" name="Apellido" required>
-          </div>
-        </div>
+  <!-- FILA 1: Nombre y Apellido -->
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">Nombres:</label>
+      <input type="text" class="form-control" name="Nombre" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Apellidos:</label>
+      <input type="text" class="form-control" name="Apellido" required>
+    </div>
+  </div>
 
-        <div class="row g-3 mt-2">
-          <div class="col-md-6">
-            <label class="form-label">Tipo de Documento:</label>
-            <select class="form-select" name="TipoDocumento" required>
-              <option value="">Seleccione...</option>
-              <option value="TI">TI</option>
-              <option value="CC">CC</option>
-              <option value="CE">CE</option>
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Número de Documento:</label>
-            <input type="text" class="form-control" name="NumeroDocumento" required>
-          </div>
-        </div>
+  <!-- FILA 2: Tipo y Número de Documento -->
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <label class="form-label">Tipo de Documento:</label>
+      <select class="form-select" name="TipoDocumento" required>
+        <option value="">Seleccione...</option>
+        <option value="TI">T.I.</option>
+        <option value="CC">C.C.</option>
+        <option value="CE">C.E.</option>
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Número de Documento:</label>
+      <input type="text" class="form-control" name="NumeroDocumento" required>
+    </div>
+  </div>
 
-        <div class="row g-3 mt-2">
-          <div class="col-md-6">
-            <label class="form-label">Fecha de Nacimiento:</label>
-            <input type="date" class="form-control" name="FechaNacimiento" required>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Correo:</label>
-            <input type="email" class="form-control" name="Correo" required>
-          </div>
-        </div>
+  <!-- FILA 3: Fecha de Nacimiento, Género y Correo -->
+  <div class="row g-3 mt-2">
+    <div class="col-md-4">
+      <label class="form-label">Fecha de Nacimiento:</label>
+      <input type="date" class="form-control" name="FechaNacimiento" required>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Género:</label>
+      <select class="form-select" name="Genero" required>
+        <option value="">Seleccione...</option>
+        <option value="M">Masculino</option>
+        <option value="F">Femenino</option>
+        <option value="Otro">Otro</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Correo:</label>
+      <input type="email" class="form-control" name="Correo" required>
+    </div>
+  </div>
 
-        <div class="row g-3 mt-2">
-          <div class="col-md-4">
-            <label class="form-label">Teléfono:</label>
-            <input type="tel" class="form-control" name="Telefono" required>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">Dirección:</label>
-            <input type="text" class="form-control" name="Direccion">
-          </div>
-          <div class="col-md-4">
-            <label for="Curso" class="form-label">Curso:</label>
-            <select name="Curso" id="Curso" class="form-select" required>
-              {% for curso in cursos %}
-                <option value="{{ curso.ID_Curso }}">{{ curso.Grupo }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
+  <!-- FILA 4: Contraseña y Confirmar -->
+  <div class="row g-3 mt-2">
+    <div class="col-md-6">
+      <label for="Contrasena" class="form-label">Contraseña:</label>
+      <input type="password" id="Contrasena" name="Contrasena" class="form-control" required>
+    </div>
+    <div class="col-md-6">
+      <label for="ConfirmarContrasena" class="form-label">Confirmar Contraseña:</label>
+      <input type="password" id="ConfirmarContrasena" name="ConfirmarContrasena" class="form-control" required>
+    </div>
+  </div>
 
-        <div class="text-center mt-4">
-          <button type="submit" class="btn btn-primary px-4">Registrar Estudiante</button>
-        </div>
-      </form>
+  <!-- FILA 5: Teléfono, Dirección y Curso -->
+  <div class="row g-3 mt-2">
+    <div class="col-md-4">
+      <label class="form-label">Teléfono:</label>
+      <input type="tel" class="form-control" name="Telefono" required>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Dirección:</label>
+      <input type="text" class="form-control" name="Direccion">
+    </div>
+    <div class="col-md-4">
+      <label for="Curso" class="form-label">Curso:</label>
+      <select name="Curso" id="Curso" class="form-select" required>
+        {% for curso in cursos %}
+          <option value="{{ curso.ID_Curso }}">{{ curso.Grupo }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <!-- BOTÓN -->
+  <div class="text-center mt-4">
+    <button type="submit" class="btn btn-primary px-4">
+      <i class="bi bi-person-plus"></i> Registrar Estudiante
+    </button>
+  </div>
+</form>
     </div>
   </main>
 
@@ -229,25 +257,40 @@
 
   <!-- SCRIPT FUNCIONAL -->
   <script>
-  document.getElementById("formEstudiante").addEventListener("submit", async function(event) {
-    event.preventDefault();
+document.getElementById("formEstudiante").addEventListener("submit", async function(event) {
+  event.preventDefault();
 
-    const form = event.target;
-    const formData = new FormData(form);
+  const form = event.target;
+  const pass = document.getElementById("Contrasena").value;
+  const confirm = document.getElementById("ConfirmarContrasena").value;
 
+  // 🔒 Validación previa
+  if (pass !== confirm) {
+    alert("❌ Las contraseñas no coinciden");
+    return;
+  }
+
+  const formData = new FormData(form);
+
+  try {
     const response = await fetch(form.action, { method: "POST", body: formData });
-    const data = await response.json().catch(() => null);
+    const data = await response.json();
 
-    if (data && data.success) {
+    if (data.success) {
       alert("✅ Estudiante registrado correctamente");
       document.getElementById("ID_Estudiante").value = data.id_estudiante;
       const modal = new bootstrap.Modal(document.getElementById("modalMatricula"));
       modal.show();
+      form.reset(); // Limpia el formulario
     } else {
-      alert("❌ Error al registrar estudiante");
+      alert("❌ Error al registrar estudiante: " + (data.error || "Intente nuevamente"));
     }
-  });
-  </script>
+  } catch (err) {
+    console.error("Error en la petición:", err);
+    alert("⚠️ Error de conexión con el servidor");
+  }
+});
+</script>
 
 </body>
 </html>

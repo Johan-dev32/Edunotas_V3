@@ -229,7 +229,7 @@
       <div class="text-center mb-4">
         <h1 class="titulo-principal fw-bold">OBSERVADOR DE ESTUDIANTES</h1>
         <p class="descripcion text-muted">
-          Gestiona las observaciones y control de cupos por grupo
+          Gestiona las observaciones de los estudiantes
         </p>
       </div>
 
@@ -302,8 +302,17 @@
             {% endfor %}
           </select>
 
-          <input type="text" name="tipo" placeholder="Tipo" required class="form-control mb-2" />
-          <input type="text" name="nivelImportancia" placeholder="Nivel de Importancia" required class="form-control mb-2" />
+          <select name="tipo" class="form-control mb-2" required>
+            <option value="" selected disabled>Seleccione el tipo de observación</option>
+            <option value="Academica">Académica</option>
+            <option value="Convivencial">Convivencial</option>
+          </select>
+          <select name="nivelImportancia" class="form-control mb-2" required>
+            <option value="" selected disabled>Seleccione el nivel de importancia</option>
+            <option value="Bajo">Bajo</option>
+            <option value="Medio">Medio</option>
+            <option value="Alto">Alto</option>
+          </select>
           <input type="date" name="fecha" required class="form-control mb-2" />
           <textarea name="descripcion" placeholder="Descripción" required class="form-control mb-2"></textarea>
           <textarea name="recomendacion" placeholder="Recomendación" required class="form-control mb-2"></textarea>

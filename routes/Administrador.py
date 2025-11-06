@@ -133,21 +133,28 @@ def agregar_estudiante():
         apellido = request.form['Apellido']
         tipo_documento = request.form['TipoDocumento']
         numero_documento = request.form['NumeroDocumento']
+        genero = request.form['Genero']
         correo = request.form['Correo']
         telefono = request.form['Telefono']
         direccion = request.form['Direccion']
+        contrasena = request.form['Contrasena']
+        confirmar = request.form['ConfirmarContrasena']
 
-        # 🔒 Generar una contraseña por defecto (puedes cambiar la lógica si quieres)
-        contrasena_plana = numero_documento  # o podrías usar una aleatoria
-        contrasena_hash = generate_password_hash(contrasena_plana, method='pbkdf2:sha256')
+        # Validación de contraseñas
+        if contrasena != confirmar:
+            return jsonify({'success': False, 'error': 'Las contraseñas no coinciden'})
 
-        # Crear el nuevo usuario
+        # Encriptar contraseña
+        contrasena_hash = generate_password_hash(contrasena, method='pbkdf2:sha256')
+
+        # Crear nuevo usuario estudiante
         nuevo_estudiante = Usuario(
             Rol='Estudiante',
             Nombre=nombre,
             Apellido=apellido,
             TipoDocumento=tipo_documento,
             NumeroDocumento=numero_documento,
+            Genero=genero,
             Correo=correo,
             Telefono=telefono,
             Direccion=direccion,
@@ -161,9 +168,9 @@ def agregar_estudiante():
         return jsonify({'success': True, 'id_estudiante': nuevo_estudiante.ID_Usuario})
 
     except Exception as e:
-            print("❌ Error al registrar estudiante:", e)
-            db.session.rollback()
-            return jsonify({'success': False, 'error': str(e)})
+        print("❌ Error al registrar estudiante:", e)
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)})
     
 @Administrador_bp.route('/agregar_matricula', methods=['POST'])
 def agregar_matricula():
@@ -1033,19 +1040,19 @@ def registrar_observacion():
         return jsonify({"status": "error", "message": "El estudiante no tiene matrícula asignada"}), 400
 
     # Buscar horario según la matrícula
-    horario_obj = Programacion.query.filter_by(ID_Curso=matricula.ID_Curso).first()
-    horario_id = horario_obj.ID_Programacion if horario_obj else None
+    programacion = Programacion.query.filter_by(ID_Curso=matricula.ID_Curso).first()
+    id_programacion = programacion.ID_Programacion if programacion else None
 
     # Ahora no falla si horario es None
     try:
         nueva_obs = Observacion(
             Fecha=datetime.strptime(data.get('fecha'), "%Y-%m-%d").date(),
             Descripcion=data.get('descripcion'),
-            Tipo=data.get('tipo'),
+            Tipo=data.get("Academica", "Convivencial"),
             NivelImportancia=data.get('nivelImportancia'),
             Recomendacion=data.get('recomendacion'),
-            Estado='Activa',
-            ID_Horario=horario_id,
+            Estado=data.get("Activa", "Inactiva"),
+            ID_Programacion=id_programacion,
             ID_Matricula=matricula.ID_Matricula,
             ID_Estudiante=id_estudiante
         )

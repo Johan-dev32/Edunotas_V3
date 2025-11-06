@@ -118,6 +118,12 @@
       <!-- Sidebar -->
       <div class="col-md-3 sidebar">
         <h4 class="texto-citaciones mb-4">CITACIONES</h4>
+        
+        <div class="mb-3">
+          <label for="asunto" class="form-label">Enviado Por</label>
+           <input type="text" id="enviadoPorNombre" name="enviadoPorNombre" class="form-control" placeholder="Profesor/Admin">
+        </div>
+      
 
         <div class="mb-3">
           <label for="curso" class="form-label">Cursos</label>
@@ -150,13 +156,23 @@
         </div>
 
         <div class="mb-3">
+          <label for="asunto" class="form-label">Destinatario</label>
+          <input type="text" id="destinatario" name="destinatario" class="form-control" placeholder="Acudiente/Estudiante">
+        </div>
+
+        <div class="mb-3">
           <label for="correo" class="form-label">Correo</label>
           <input type="email" id="correo" name="email" class="form-control" placeholder="ejemplo@gmail.com">
         </div>
 
         <div class="mb-3">
           <label for="asunto" class="form-label">Asunto</label>
-          <input type="text" id="asunto" name="affair" class="form-control" placeholder="Convivencia">
+          <input type="text" id="asuntoTexto" name="Asunto" class="form-control" placeholder="Asunto de la citación" required>
+        </div>
+
+          <div class="mb-3">
+          <label for="asunto" class="form-label">Estado</label>
+          <select id="estado" name="Estado" class="form-select"><option value="Pendiente" selected>Pendiente</option><option value="Enviada">Enviada</option><option value="Atendida">Atendida</option></select>
         </div>
       </div>
 

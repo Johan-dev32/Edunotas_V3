@@ -402,3 +402,21 @@ class Citaciones(db.Model):
 
     destinatario = relationship("Usuario", back_populates="recibidos_citaciones", foreign_keys=[ID_Usuario])
     enviado_por = relationship("Usuario", back_populates="enviados_citaciones", foreign_keys=[EnviadoPor])
+    
+
+class ResumenSemanal(db.Model):
+    __tablename__ = 'Resumen_Semanal'
+    ID_Resumen_Semanal = db.Column(db.Integer, primary_key=True)
+    Fecha = db.Column(db.DateTime, default=db.func.current_timestamp()) 
+    CreadoPor = db.Column(
+        db.Integer, 
+        db.ForeignKey('Usuario.ID_Usuario', ondelete='SET NULL'), 
+        nullable=True)
+    Titulo = db.Column(db.String(255), nullable=False)
+    ActividadesRealizadas = db.Column(db.Text) 
+    usuario_creador = db.relationship(
+        'Usuario', 
+        backref='resumenes_creados',
+        foreign_keys=[CreadoPor])
+    def __repr__(self):
+        return f"ResumenSemanal(ID={self.ID_Resumen_Semanal}, Título='{self.Titulo}')"

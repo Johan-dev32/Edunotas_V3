@@ -1,13 +1,14 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
 from sqlalchemy import func
 from datetime import datetime
-from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion, Bloques, Reuniones, Tutorias
+from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones
 from flask_mail import Message
 import sys
 import os
+from werkzeug.utils import secure_filename
 
 
 
@@ -438,6 +439,47 @@ def manual():
 def resumensemanal():
     return render_template('Administrador/ResumenSemanal.html')
 
+@Administrador_bp.route('/resumensemanal/registro', methods=['POST'])
+def registrar_resumen_semanal():
+    try:
+        # 1. Obtener datos del formulario
+        # Nota: Los nombres deben coincidir con los atributos 'name' del HTML
+        fecha_str = request.form.get('fecha')
+        titulo = request.form.get('titulo')
+        actividades = request.form.get('redaccion')
+        
+        # 2. Obtener el ID del usuario logueado (CRÍTICO)
+        # DEBES ASEGURARTE DE QUE ESTA VARIABLE FUNCIONE EN TU APLICACIÓN
+        # Si no usas session, usa el método que tengas para obtener el ID del usuario logueado.
+        creado_por_id = session.get('user_id', 1) # Usamos 1 como fallback si la sesión no está lista
+
+        if not fecha_str or not titulo or not actividades:
+            return jsonify({'success': False, 'error': 'Faltan campos obligatorios.'}), 400
+
+        # Convertir fecha de string a datetime si es necesario, o solo usar el string si la DB lo acepta
+        # Lo mejor es convertirlo:
+        from datetime import datetime
+        fecha_dt = datetime.strptime(fecha_str, '%Y-%m-%d')
+        
+        # 3. Crear y guardar el nuevo objeto ResumenSemanal
+        nuevo_resumen = ResumenSemanal(
+            Fecha=fecha_dt,
+            CreadoPor=creado_por_id,
+            Titulo=titulo,
+            ActividadesRealizadas=actividades
+        )
+        
+        db.session.add(nuevo_resumen)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Resumen guardado exitosamente.'})
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error al registrar resumen: {e}")
+        # Retornamos 500 para indicar un fallo interno del servidor
+        return jsonify({'success': False, 'error': f'Error interno del servidor: {str(e)}'}), 500
+
 
 @Administrador_bp.route('/registrotutorias')
 def registrotutorias():
@@ -594,9 +636,97 @@ def historial_reuniones():
     return jsonify(result)
 
 
+UPLOAD_FOLDER = os.path.join('static', 'uploads', 'noticias')
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
 @Administrador_bp.route('/noticias')
 def noticias():
     return render_template('Administrador/Noticias.html')
+
+# En administradores.py
+
+# En administradores.py, en historial_noticias()
+
+@Administrador_bp.route("/noticias/historial", methods=["GET"])
+def historial_noticias():
+    """
+    Ruta API para cargar todas las noticias guardadas, ordenadas por fecha.
+    """
+    try:
+        # CORRECCIÓN: Ordenar por Fecha descendente, Y si hay empate, por ID_Noticia descendente.
+        # Esto garantiza que la última noticia registrada (mayor ID) vaya primero.
+        noticias = Noticias.query.order_by(Noticias.Fecha.desc(), Noticias.ID_Noticia.desc()).all()
+        
+        result = []
+        for n in noticias:
+            # ... el resto del código es correcto y usa el rol de texto ...
+            nombre_rol = n.CreadoPor if n.CreadoPor else "Rol no especificado"
+            
+            result.append({
+                "id": n.ID_Noticia,
+                "titulo": n.Titulo,
+                "redaccion": n.Redaccion,
+                "archivo_url": url_for('static', filename=n.Archivo) if n.Archivo else None, 
+                "fecha": n.Fecha.strftime("%Y-%m-%d"), 
+                "creado_por": nombre_rol, 
+            })
+        
+        return jsonify({"success": True, "noticias": result})
+        
+    except Exception as e:
+        # ... (código de manejo de errores) ...
+        print(f"Error al cargar historial de noticias: {e}")
+        return jsonify({"success": False, "error": f"Error de servidor al cargar datos: {e}"}), 500
+    
+    
+    
+@Administrador_bp.route("/noticias/registro", methods=["POST"])
+def registrar_noticia():
+    try:
+        # 1. Obtener datos (incluyendo el rol como texto)
+        titulo = request.form.get('titulo')
+        contenido = request.form.get('contenido')
+        fecha_str = request.form.get('fecha')
+        
+        # OBTENEMOS EL TEXTO DEL ROL DIRECTAMENTE DEL FORMULARIO
+        creado_por_rol = request.form.get('creadoPor') 
+        
+        archivo_obj = request.files.get('archivo')
+        
+        # Validación básica de datos
+        if not titulo or not contenido or not fecha_str or not creado_por_rol:
+            return jsonify({"success": False, "error": "Faltan campos obligatorios (título, contenido, fecha, rol)."}), 400
+
+        fecha = datetime.strptime(fecha_str, "%Y-%m-%d").date()
+
+        ruta_archivo = None
+        
+        # 2. Procesar y guardar el archivo si existe (mismo código)
+        if archivo_obj and archivo_obj.filename:
+            filename = secure_filename(archivo_obj.filename)
+            ruta_guardado_completa = os.path.join(UPLOAD_FOLDER, filename) 
+            archivo_obj.save(ruta_guardado_completa)
+            ruta_archivo = os.path.join('uploads', 'noticias', filename).replace('\\', '/')
+
+        # 3. Guardar en la Base de Datos (usando el texto del rol)
+        nueva_noticia = Noticias(
+            Titulo=titulo,
+            Redaccion=contenido,
+            Fecha=fecha,
+            CreadoPor=creado_por_rol, # <-- ¡Guardamos el TEXTO del rol!
+            Archivo=ruta_archivo
+        )
+        
+        db.session.add(nueva_noticia)
+        db.session.commit()
+
+        return jsonify({"success": True, "message": "Noticia registrada exitosamente."})
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error al registrar noticia: {e}")
+        return jsonify({"success": False, "error": f"Error interno del servidor: {e}"}), 500
 
 
 @Administrador_bp.route('/circulares')
@@ -1222,6 +1352,55 @@ def agregar_curso():
 def citacion():
     return render_template('Administrador/Citacion.html')
 
+@Administrador_bp.route('/citacion/registro', methods=['POST'])
+@login_required  # <--- Solo permite acceso a usuarios logueados (Docente/Admin)
+def registrar_citacion():
+    try:
+        # El ID del usuario que ENVÍA la citación se obtiene directamente
+        enviado_por_id = current_user.ID_Usuario 
+
+        # 1. Obtener datos del formulario con los nombres CORRECTOS del HTML:
+        fecha_str = request.form.get('date')          # 👈 CORREGIDO: antes era 'Fecha'
+        correo = request.form.get('email')            # 👈 CORREGIDO: antes era 'Correo'
+        asunto = request.form.get('Asunto')           # ESTE ESTABA CORRECTO
+        redaccion = request.form.get('message')       # 👈 CORREGIDO: antes era 'RedaccionCitacion'
+        estado = request.form.get('Estado', 'Pendiente')
+        
+        # Validación de campos mínimos
+        if not fecha_str or not correo or not asunto or not redaccion:
+            return jsonify({'success': False, 'error': 'Faltan campos obligatorios (Fecha, Correo, Asunto o Redacción).'}), 400
+
+        # 2. Búsqueda del ID del Destinatario (ID_Usuario) por Correo
+        usuario_citado_obj = Usuario.query.filter_by(Correo=correo).first()
+        
+        if not usuario_citado_obj:
+            return jsonify({'success': False, 'error': f'No se encontró un usuario registrado con el correo: {correo}'}), 400
+        
+        id_usuario_citado = usuario_citado_obj.ID_Usuario
+        fecha_dt = datetime.strptime(fecha_str, '%Y-%m-%d')
+        
+        # 3. Crear y guardar la citación (Los nombres de las columnas sí deben ser los del modelo)
+        nueva_citacion = Citaciones(
+            Fecha=fecha_dt,
+            Correo=correo,
+            Asunto=asunto,
+            RedaccionCitacion=redaccion, # El valor de 'redaccion' (que viene de name="message") se asigna aquí
+            ID_Usuario=id_usuario_citado, 
+            EnviadoPor=enviado_por_id,    
+            Estado=estado
+        )
+        
+        db.session.add(nueva_citacion)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Citación guardada exitosamente.'})
+
+    except Exception as e:
+        db.session.rollback()
+        # Puedes imprimir el error en la consola del servidor para depuración
+        print(f"Error al registrar citación: {e}") 
+        return jsonify({'success': False, 'error': f'Error interno del servidor: {str(e)}'}), 500
+    
 @Administrador_bp.route('/materias')
 def materias():
     return render_template('Administrador/Materias.html')

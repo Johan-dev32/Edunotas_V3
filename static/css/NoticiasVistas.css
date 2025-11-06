@@ -210,3 +210,44 @@ header .btn-dark {
   font-weight: bolder;
   font-size: 30px;
 }
+/* En tu archivo Noticias.css */
+
+/* Efecto hover sutil para indicar clic */
+.noticia-card:hover {
+    transform: translateY(-3px); /* Pequeño movimiento hacia arriba */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important; /* Sombra más fuerte */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Estilo para la imagen dentro del modal */
+#modalImagen {
+    border-radius: 8px;
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Opcional: Si quieres que el modal aparezca con un pequeño rebote */
+/* Esto puede requerir sobrescribir estilos de Bootstrap */
+.modal.fade .modal-dialog {
+    transform: translate(0, -50px); /* Comienza un poco más arriba */
+    opacity: 0;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: none; /* Vuelve a la posición normal */
+    opacity: 1;
+}
+.row.g-3.align-items-stretch {
+    display: flex; /* Ya lo tienes, pero es bueno confirmarlo */
+}
+.noticia-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%; 
+    overflow: hidden; /* Evita desbordamiento si el texto es excesivo */
+}
+
+/* 3. Permite que el cuerpo de la tarjeta crezca y empuje el pie hacia abajo */
+.noticia-card .card-body {
+    flex-grow: 1; /* Permite que el cuerpo use todo el espacio vertical */
+}

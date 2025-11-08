@@ -114,6 +114,7 @@ class Matricula(db.Model):
     curso = relationship("Curso", back_populates="matriculas")
     actividades_estudiante = relationship("Actividad_Estudiante", back_populates="matricula", cascade="all, delete-orphan")
     reportes = relationship("Reporte_Notas", back_populates="matricula", foreign_keys="Reporte_Notas.ID_Matricula")
+    
 
 class Periodo(db.Model):
     __tablename__ = "Periodo"
@@ -375,6 +376,7 @@ class Estudiantes_Repitentes(db.Model):
     TipoDocumento = db.Column(db.String(50))
     NumeroDocumento = db.Column(db.String(50))
     NombreCompleto = db.Column(db.String(200))
+    Curso = db.Column(db.String(50))
     Veces = db.Column(db.Integer, default=1)
     ID_Matricula = db.Column(db.Integer, db.ForeignKey("Matricula.ID_Matricula", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
     Matriculado = db.Column(db.Boolean, default=False)

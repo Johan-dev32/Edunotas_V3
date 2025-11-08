@@ -290,7 +290,7 @@
   <select name="id_curso" class="form-control mb-2" required>
     <option value="" selected disabled>Seleccione un curso</option>
     {% for curso in cursos %}
-      <option value="{{ curso.ID_Curso }}">{{ curso.NombreCurso }}</option>
+      <option value="{{ curso.Grado }}">{{ curso.Grado }} {{ curso.Grupo or '' }}</option>
     {% endfor %}
   </select>
 

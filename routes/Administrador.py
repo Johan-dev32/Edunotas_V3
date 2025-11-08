@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
 from datetime import datetime
-from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes
+from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes, Detalle_Asistencia, Asistencia
 from flask_mail import Message
 import sys
 import os
@@ -1571,8 +1571,10 @@ def historialacademico():
 def registrotutorias2():
     return render_template('Administrador/RegistroTutorías2.html')
 
-@Administrador_bp.route('/cursos2', methods=['GET', 'POST'])
-def cursos2():
+
+
+@Administrador_bp.route('/gestion_cursos', methods=['GET', 'POST']) 
+def gestion_cursos(): # <--- NOMBRE DE LA FUNCIÓN CAMBIADO
     if request.method == 'POST':
         grado = request.form['Grado']
         grupo = request.form['Grupo']
@@ -1586,17 +1588,132 @@ def cursos2():
             Estado="Activo",
             DirectorGrupo=director if director else None
         )
-        db.session.add(nuevo_curso)
-        db.session.commit()
-        flash("✅ Curso agregado correctamente", "success")
+        try:
+            db.session.add(nuevo_curso)
+            db.session.commit()
+            # OJO: Cambiamos el redirect al nuevo nombre de la ruta
+            flash("✅ Curso agregado correctamente", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"❌ Error al agregar curso: {str(e)}", "danger")
 
-        return redirect(url_for('Administrador.cursos2'))
+        # Redirige a la nueva función
+        return redirect(url_for('Administrador.gestion_cursos')) 
 
-    # para GET (mostrar cursos)
+    # Para GET (mostrar cursos)
     cursos = Curso.query.all()
     usuarios = Usuario.query.all()
-    return render_template('Administrador/Cursos2.html', cursos=cursos, usuarios=usuarios)
+    # Tu template Cursos2.html (la tabla con el formulario) deberá ser llamado aquí.
+    return render_template('Administrador/ver_estudiante_curso.html', cursos=cursos, usuarios=usuarios)
 
+@Administrador_bp.route('/cursos/<int:curso_id>/estudiantes') 
+def _estudiantes_curso(curso_id):
+    try:
+        # 1. Decodificar el ID del curso (Ej: 901 -> Grado 9, Grupo 01)
+        grado = curso_id // 100
+        # zfill(2) asegura que grupos de un dígito (ej: 1) se conviertan en '01'
+        grupo = str(curso_id % 100).zfill(2) 
+        
+        # 2. Buscar el objeto Curso en la DB
+        curso_obj = Curso.query.filter_by(Grado=grado, Grupo=grupo).first()
+
+        if not curso_obj:
+            flash(f"❌ Curso {curso_id} no encontrado. Asegúrese de que el curso esté registrado.", "danger")
+            # Redirige a la ruta principal de gestión de cursos
+            return redirect(url_for('Administrador.gestion_cursos'))
+
+        id_curso = curso_obj.ID_Curso
+
+        # 3. Consultar estudiantes matriculados en ese curso
+        # ✅ CORRECCIÓN CLAVE: El join usa Matricula.ID_Estudiante como el vínculo al Usuario.
+        estudiantes_data = db.session.query(Usuario).join(Matricula).filter(
+            Matricula.ID_Curso == id_curso,
+            Usuario.Rol == 'Estudiante',
+            Usuario.ID_Usuario == Matricula.ID_Estudiante 
+        ).all()
+        
+        # 4. Renderizar la plantilla
+        return render_template(
+            'Administrador/ver_estudiante_curso.html', 
+            curso_id=curso_id, 
+            curso_obj=curso_obj, # Enviamos el objeto Curso
+            estudiantes=estudiantes_data # Enviamos la lista de estudiantes
+        )
+
+    except Exception as e:
+        # Esto captura cualquier error de DB o de lógica antes del renderizado
+        print(f"Error al obtener estudiantes del curso {curso_id}: {e}")
+        db.session.rollback()
+        flash(f"❌ Error interno al cargar estudiantes: {str(e)}", "danger")
+        return redirect(url_for('Administrador.gestion_cursos'))
+    
+
+# Función que procesa el formulario de asistencia
+@Administrador_bp.route('/tomar_asistencia/<int:curso_id>', methods=['POST'])
+def registrar_asistencia(curso_id): # Dejamos el nombre 'guardar_asistencia'
+    try:
+        # 1. Obtener y convertir datos
+        fecha_asistencia = request.form.get('fecha_asistencia')
+        id_programacion = int(request.form.get('id_programacion'))
+
+        # 2. Verificar duplicados
+        asistencia_existente = Asistencia.query.filter_by(
+            Fecha=fecha_asistencia,
+            ID_Programacion=id_programacion
+        ).first()
+
+        if asistencia_existente:
+            # Para AJAX, devolvemos JSON con error
+            return jsonify({
+                'status': 'success',
+    'message': 'Asistencia registrada correctamente.',
+    'curso_id': curso_id,
+    'fecha': fecha_asistencia
+            }), 409 # Código 409 Conflict
+
+        # 3. Crear registro en Asistencia y hacer commit
+        nueva_asistencia = Asistencia(Fecha=fecha_asistencia, ID_Programacion=id_programacion)
+        db.session.add(nueva_asistencia)
+        db.session.commit()
+        id_asistencia = nueva_asistencia.ID_Asistencia
+
+        # 4. Procesar el estado de cada estudiante
+        for key, value in request.form.items():
+            if key.startswith('asistencia_'):
+                id_estudiante = int(key.split('_')[1])
+                estado = value
+                
+                detalle = Detalle_Asistencia(
+                    ID_Asistencia=id_asistencia,
+                    ID_Estudiante=id_estudiante,
+                    Estado_Asistencia=estado
+                )
+                db.session.add(detalle)
+        
+        # 5. Commit final de los detalles
+        db.session.commit()
+        
+        # 🟢 ¡RESPUESTA AJAX DE ÉXITO!
+        return jsonify({
+            'status': 'error',
+        'message': "Asistencia para esta sesión ya fue tomada."
+            
+        })
+
+    except Exception as e:
+        # 🛑 Bloque que protege la aplicación de errores de DB 🛑
+        db.session.rollback() 
+        print(f"\n--- ERROR DE DB AL GUARDAR ASISTENCIA ---\n{e}\n----------------------------------\n")
+        
+        # Para AJAX, devolvemos JSON con error
+        return jsonify({
+            'status': 'error',
+            'message': "Error en la base de datos. Verifique los datos de Programación."
+        }), 500
+
+    
+
+    
 @Administrador_bp.route('/agregar_curso', methods=['POST'])
 def agregar_curso():
     try:
@@ -1622,7 +1739,7 @@ def agregar_curso():
         db.session.rollback()
         flash(f'Error al agregar el curso: {e}', 'danger')
 
-    return redirect(url_for('Administrador.cursos2'))
+    return redirect(url_for('Administrador.ver_estudiantes_curso'))
 
 
 @Administrador_bp.route('/citacion')

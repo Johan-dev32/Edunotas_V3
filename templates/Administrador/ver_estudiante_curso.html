@@ -94,8 +94,12 @@
   </div>
 </section>
 
+
+
   <section class="container py-5 mt-5">
-  <h1 class="text-center mb-4 titulo-principal">LISTA DE CURSOS</h1>
+    <h1 class="text-center mb-4 titulo-principal">
+        LISTA DEL CURSO {{ curso_obj.Grado }}{{ curso_obj.Grupo }}
+    </h1>
 
   <!-- 🔹 Botones de redirección arriba del formulario -->
   <div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
@@ -117,80 +121,83 @@
   </div>
 
   <!-- 🔹 Formulario -->
-  <form id="formCurso" method="POST" action="{{ url_for('Administrador.agregar_curso') }}" class="mb-4">
-  <div class="row g-3 align-items-center">
-    <div class="col-md-2">
-      <input type="text" name="Grado" class="form-control" placeholder="Grado" required>
-    </div>
-    <div class="col-md-1">
-      <input type="text" name="Grupo" class="form-control" placeholder="Grupo" required>
-    </div>
-    <div class="col-md-2">
-      <input type="number" name="Anio" class="form-control" placeholder="Año" required>
-    </div>
-    <div class="col-md-2">
-      <select name="Estado" class="form-select" required>
-        <option value="Activo">Activo</option>
-        <option value="Inactivo">Inactivo</option>
-      </select>
-    </div>
-    <div class="col-md-3">
-      <input type="number" name="DirectorGrupo" class="form-control" placeholder="ID del Director" required>
-    </div>
-    <div class="col-md-2 d-grid">
-      <button type="submit" class="btn btn-success">
-        <i class="bi bi-person-plus-fill"></i> Agregar
-      </button>
-    </div>
-  </div>
-</form>
+  
 
   <!-- 🔹 Tabla -->
-  <div class="table-responsive">
-    <table class="table table-bordered text-center align-middle" id="tablaPromedios">
-      <thead>
-        <tr style="background-color: #050733ff; color: white;">
-          <th>Grado</th>
-          <th>Grupo</th>
-          <th>Año</th>
-          <th>Estado</th>
-          <th>DirectorGrupo</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-  {% for curso in cursos %}
-  <tr>
-    <td>{{ curso.Grado }}</td>
-    <td>{{ curso.Grupo }}</td>
-    <td>{{ curso.Anio }}</td>
-    <td>{{ curso.Estado }}</td>
-    <td>
-      {% if curso.director %}
-        {{ curso.director.Nombre }} {{ curso.director.Apellido }}
-      {% else %}
-        Sin asignar
-      {% endif %}
-    </td>
-    <td>
-      <button class="btn btn-sm btn-primary">Editar</button>
-      <button class="btn btn-sm btn-danger">Eliminar</button>
-    </td>
-  </tr>
-  {% else %}
-  <tr>
-    <td colspan="6">No hay cursos registrados.</td>
-  </tr>
-  {% endfor %}
-</tbody>
-    </table>
-  </div>
-</section>
+ <form method="POST" id="formAsistencia">
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <label for="fecha_asistencia" class="form-label">Fecha de la Clase</label>
+            <input type="date" class="form-control" id="fecha_asistencia" name="fecha_asistencia" required>
+        </div>
+        <div class="col-md-6">
+            <label for="id_programacion" class="form-label">ID Programación / Sesión</label>
+            <input type="number" class="form-control" id="id_programacion" name="id_programacion" required placeholder="Ej: 1 (ID de tu tabla Programacion)">
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle" id="tablaEstudiantes">
+            <thead>
+                <tr style="background-color: #050733ff; color: white;">
+                    <th>#</th>
+                    <th>Nombre Completo</th>
+                    <th colspan="3">Estado de Asistencia</th>
+                </tr>
+                <tr style="background-color: #c4c4c4; color: black;">
+                    <th>ID</th>
+                    <th></th>
+                    <th>Presente</th>
+                    <th>Ausente</th>
+                    <th>Justificado</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for estudiante in estudiantes %}
+                <tr>
+                    <td>{{ estudiante.ID_Usuario }}</td>
+                    <td class="text-start">{{ estudiante.Nombre }} {{ estudiante.Apellido }}</td>
+                    
+                    <td>
+                        <input type="radio" name="asistencia_{{ estudiante.ID_Usuario }}" value="Presente" required>
+                    </td>
+                    <td>
+                        <input type="radio" name="asistencia_{{ estudiante.ID_Usuario }}" value="Ausente" required>
+                    </td>
+                    <td>
+                        <input type="radio" name="asistencia_{{ estudiante.ID_Usuario }}" value="Justificado" required>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5">No hay estudiantes matriculados en este curso.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-  <script>
-    const urlCitacion = "{{ url_for('Administrador.citacion') }}";
-  </script>
-  <script src="{{ url_for('static', filename='js/Administrador/Cursos2.js') }}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="d-flex justify-content-center mt-4">
+        <button type="submit" class="btn btn-success btn-lg">
+            <i class="bi bi-save-fill"></i> Guardar Asistencia
+        </button>
+    </div>
+</form>
+<script>
+    // URL que apunta a @Administrador_bp.route('/tomar_asistencia/<int:curso_id>')
+    // Aseguramos que el valor esté entre comillas de JavaScript
+    const URL_GUARDAR_ASISTENCIA = "{{ url_for('Administrador.registrar_asistencia', curso_id=curso_obj.ID_Curso) }}";
+    
+    // Variable para el PDF (Aseguramos que el valor esté entre comillas de JavaScript)
+    const GRADO_GRUPO = "{{ curso_obj.Grado ~ ' ' ~ curso_obj.Grupo }}";
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.21/jspdf.plugin.autotable.min.js"></script> 
+
+<script src="{{ url_for('static', filename='js/Administrador/Cursos2.js') }}"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

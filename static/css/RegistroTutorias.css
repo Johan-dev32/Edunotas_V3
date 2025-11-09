@@ -104,6 +104,8 @@ header .btn-dark {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-family:'Trebuchet MS', sans-serif;
+  font-weight: bolder;
 }
 
 .btn-tutoria:hover {
@@ -162,3 +164,98 @@ header .btn-dark {
   align-items: center;
 }
 
+.titulo-principal {
+  
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #050733ff;
+  text-align: center;   /* centrado */
+}
+.modal-content {
+    font-family: 'Trebuchet MS', sans-serif;
+}
+
+/* ========================================= */
+/* ESTILOS DEL MODAL (Ventana Emergente)     */
+/* ========================================= */
+
+/* Fondo del encabezado del modal */
+.modal-header {
+    background-color: #050733ff; /* Color principal */
+    color: white; /* Texto blanco para el título */
+    border-bottom: 1px solid #050733ff;
+}
+
+/* Título del modal */
+.modal-title {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Botón de cerrar (x) */
+.modal-header .btn-close {
+    filter: invert(1); /* Hace que la X se vea blanca */
+}
+
+/* Estilos del cuerpo del modal */
+.modal-body {
+    padding: 20px 30px;
+    background-color: #f8f9fa; /* Fondo ligero para el cuerpo */
+}
+
+/* Estilos para el pie de página */
+.modal-footer {
+    border-top: none;
+    background-color: #f8f9fa;
+}
+
+/* ========================================= */
+/* ESTILOS DEL FORMULARIO DENTRO DEL MODAL   */
+/* ========================================= */
+
+/* Etiquetas (Labels) */
+.modal-body label {
+    font-family: 'Trebuchet MS', sans-serif;
+    color: #343a40; /* Color oscuro para el texto */
+    font-weight: 600;
+}
+
+/* Campos de entrada y selects */
+#formRegistroTutoria .input-field,
+#formRegistroTutoria .form-select {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    transition: border-color 0.2s;
+}
+
+/* Estilo al enfocar (focus) */
+#formRegistroTutoria .input-field:focus,
+#formRegistroTutoria .form-select:focus {
+    border-color: #050733ff;
+    box-shadow: 0 0 0 0.25rem rgba(5, 7, 51, 0.25); /* Sombra con el color principal */
+    outline: none;
+}
+
+/* Botón de Registrar Tutoria */
+#btnGuardarTutoria {
+    background-color: #050733ff;
+    border-color: #050733ff;
+    font-weight: bold;
+    padding: 0.5rem 2rem;
+    transition: background-color 0.3s;
+}
+
+#btnGuardarTutoria:hover {
+    background-color: #1a1c4b; /* Un poco más oscuro al pasar el mouse */
+    border-color: #1a1c4b;
+}
+
+/* Estilo para la grilla de columnas (si usas Tailwind o solo un grid personalizado) */
+/* Asegúrate de que las clases 'grid' y 'gap-4' estén definidas o usa las de Bootstrap */
+.modal-body .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}

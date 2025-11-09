@@ -1,6 +1,6 @@
 import os
 import re
-from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file, jsonify  # <-- añadí send_file, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
@@ -12,8 +12,21 @@ from routes.Acudiente import Acudiente_bp
 from routes.Estudiante import Estudiante_bp
 from routes.notificaciones_routes import notificaciones_bp
 from flask_mail import Mail, Message
+from Controladores.models import db
+
+
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired,BadSignature
 
+
+# Diccionario temporal para guardar notificaciones por usuario/rol
+notificaciones_globales = {
+    "Administrador": [],
+    "Docente": [],
+    "Estudiante": [],
+    "Acudiente": []
+}
+
+notificaciones_temporales = {}
 mail = Mail()
 
 s = URLSafeTimedSerializer("clave_super_secreta")
@@ -48,6 +61,9 @@ mail.init_app(app)
 
 # Inicializa la instancia de SQLAlchemy con la aplicación
 db.init_app(app)
+
+# habilita WebSocket
+
 
 # Inicialización de Flask-Login
 login_manager = LoginManager()
@@ -121,6 +137,73 @@ def indexacudiente():
     return render_template("Acudiente/Paginainicio_Acudiente.html", usuario=current_user)
 
 
+# ---------------- NOTIFICACIONES ----------------
+
+@app.route('/notificaciones')
+@login_required
+def notificaciones():
+    rol = current_user.Rol
+    mensajes = notificaciones_globales.get(rol, [])
+    return jsonify({"notificaciones": mensajes})
+
+
+@app.route('/enviar_notificacion', methods=['POST'])
+@login_required
+def enviar_notificacion():
+    if current_user.Rol != "Administrador":
+        return jsonify({"status": "error", "message": "Solo el Administrador puede enviar notificaciones."})
+
+    try:
+        destino = request.form.get("destino")
+        asunto = request.form.get("asunto")
+        mensaje = request.form.get("mensaje")
+
+        texto_final = f"{asunto}: {mensaje}"
+
+        # Enviar a todos los roles
+        if destino == "Todos los roles":
+            for rol in notificaciones_globales.keys():
+                notificaciones_globales[rol].append(texto_final)
+
+        # Enviar a un rol específico
+        elif destino in notificaciones_globales:
+            notificaciones_globales[destino].append(texto_final)
+
+        else:
+            return jsonify({"status": "error", "message": "Destino no válido."})
+
+        return jsonify({"status": "success", "message": "Notificación enviada correctamente."})
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
+@app.route('/notificaciones/enviar_todos', methods=['POST'])
+@login_required
+def enviar_notificacion_todos():
+    data = request.get_json()
+    titulo = data.get('titulo')
+    contenido = data.get('contenido')
+
+    if not titulo or not contenido:
+        return jsonify({"error": "Faltan datos"}), 400
+
+    # Enviar a todos los usuarios conectados
+    for user_id in notificaciones_temporales.keys():
+        notificaciones_temporales[user_id].append({
+            "titulo": titulo,
+            "contenido": contenido
+        })
+
+    return jsonify({"status": "ok"})
+
+@app.route('/notificaciones/obtener')
+@login_required
+def obtener_notificaciones():
+    mensajes = notificaciones_temporales.get(current_user.ID_Usuario, [])
+    notificaciones_temporales[current_user.ID_Usuario] = []
+    return jsonify(mensajes)
+
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -181,11 +264,53 @@ def perfil_rol(rol):
             return render_template("inicio_acudiente.html")
         else:
             return "Rol no válido", 404
+
         
-        
-@app.route('/manual')
-def manual():
-    return render_template('manual.html')
+@app.route('/actualizar_perfil', methods=['POST'])
+@login_required
+def actualizar_perfil():
+    try:
+        usuario = Usuario.query.get(current_user.ID_Usuario)
+
+        # Datos del formulario
+        nombre = request.form.get('nombre')
+        apellido = request.form.get('apellido')
+        correo = request.form.get('correo')
+        direccion = request.form.get('direccion')
+        telefono = request.form.get('telefono')
+
+        # Verificar si el nuevo correo pertenece a otro usuario
+        correo_existente = Usuario.query.filter(
+            Usuario.Correo == correo,
+            Usuario.ID_Usuario != usuario.ID_Usuario
+        ).first()
+
+        if correo_existente:
+            return jsonify({
+                'status': 'error',
+                'message': 'El correo ya está registrado por otro usuario.'
+            })
+
+        # Actualizar solo si hay cambios
+        usuario.Nombre = nombre
+        usuario.Apellido = apellido
+        usuario.Correo = correo
+        usuario.Direccion = direccion
+        usuario.Telefono = telefono
+
+        db.session.commit()
+
+        return jsonify({
+            'status': 'success',
+            'message': 'Datos actualizados correctamente.'
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'status': 'error',
+            'message': f'Ocurrió un error: {str(e)}'
+        })
 
 
 @app.route('/logout')
@@ -250,7 +375,7 @@ def reset_password(token):
             return redirect(url_for('forgot_password'))
 
         # Actualizar contraseña
-        user.Contraseña = generate_password_hash(new_password)
+        user.Contrasena = generate_password_hash(new_password)
         db.session.commit()
 
         flash('Contraseña restablecida correctamente.', 'success')

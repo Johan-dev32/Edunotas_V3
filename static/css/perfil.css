@@ -267,6 +267,24 @@ header .btn-outline-primary:hover {
   transition: background 0.2s, transform 0.2s;
 }
 
+.modal-content {
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.btn-primary, .btn-success {
+  border-radius: 10px;
+}
+
+.swal2-popup {
+  border-radius: 20px !important;
+}
+
 /* --- RESPONSIVE --- */
 @media (max-width: 768px) {
   .perfil-container {

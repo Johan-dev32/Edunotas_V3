@@ -18,9 +18,127 @@
   <main>
     {% block content %}{% endblock %}
   </main>
+<script>
+async function obtenerNotificaciones() {
+  try {
+    const respuesta = await fetch("/notificaciones/recibir");
+    if (respuesta.ok) {
+      const notificaciones = await respuesta.json();
+      const contenedor = document.getElementById("notificacionesRecientes");
 
+      if (!contenedor) return;
+
+      contenedor.innerHTML = "";
+
+      if (notificaciones.length === 0) {
+        contenedor.innerHTML = `<p class="text-center small text-secondary">Sin notificaciones recientes</p>`;
+        return;
+      }
+
+      // Mostrar cada notificación
+      notificaciones.forEach(noti => {
+        const elemento = document.createElement("div");
+        elemento.classList.add("border-bottom", "p-2", "text-start");
+        elemento.innerHTML = `<strong>${noti.titulo}</strong><br>${noti.contenido}`;
+        contenedor.appendChild(elemento);
+      });
+
+      // Mostrar alerta con la última notificación
+      const ultima = notificaciones[notificaciones.length - 1];
+      if (ultima && !ultima.mostrada) {
+        Swal.fire({
+          icon: "info",
+          title: ultima.titulo,
+          text: ultima.contenido,
+          timer: 4000,
+          showConfirmButton: false
+        });
+        ultima.mostrada = true;
+      }
+    }
+  } catch (error) {
+    console.error("Error al obtener notificaciones:", error);
+  }
+}
+
+// Revisar cada 15 segundos
+setInterval(obtenerNotificaciones, 15000);
+document.addEventListener("DOMContentLoaded", obtenerNotificaciones);
+</script>
 
   </body>
+  <script>
+async function cargarNotificaciones() {
+  try {
+    const response = await fetch("/notificaciones");
+    const data = await response.json();
+
+    const lista = document.getElementById("listaMensajes");
+    const contador = document.getElementById("contadorMensajes");
+
+    lista.innerHTML = "";
+
+    if (data.notificaciones && data.notificaciones.length > 0) {
+      contador.style.display = "inline-block";
+      contador.textContent = data.notificaciones.length;
+
+      data.notificaciones.forEach(n => {
+        const item = document.createElement("li");
+        item.classList.add("dropdown-item");
+        item.textContent = n;
+        lista.appendChild(item);
+      });
+    } else {
+      contador.style.display = "none";
+      lista.innerHTML = "<p class='text-center text-muted mb-0'>Sin notificaciones</p>";
+    }
+  } catch (error) {
+    console.error("Error al cargar notificaciones:", error);
+  }
+}
+
+// Enviar notificación (solo admin)
+document.getElementById("btnEnviarNotificacion")?.addEventListener("click", async () => {
+  const destino = document.getElementById("destino").value;
+  const asunto = document.getElementById("asunto").value;
+  const mensaje = document.getElementById("mensaje").value;
+
+  const formData = new FormData();
+  formData.append("destino", destino);
+  formData.append("asunto", asunto);
+  formData.append("mensaje", mensaje);
+
+  try {
+    const res = await fetch("/enviar_notificacion", { method: "POST", body: formData });
+    const data = await res.json();
+
+    if (data.status === "success") {
+      Swal.fire({
+        icon: "success",
+        title: "Notificación enviada",
+        text: data.message,
+        timer: 2000,
+        showConfirmButton: false
+      });
+      document.getElementById("formNotificacion").reset();
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: data.message,
+      });
+    }
+  } catch (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Error de red",
+      text: error.message,
+    });
+  }
+});
+
+document.addEventListener("DOMContentLoaded", cargarNotificaciones);
+</script>
   {% block extra_js %}{% endblock %}
 
 </html>

@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
 from sqlalchemy import or_, text
 from datetime import datetime
-from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes, Detalle_Asistencia, Asistencia, Encuesta, Encuesta_Pregunta, Encuesta_Respuesta
+from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes, Detalle_Asistencia, Asistencia, Encuesta, Encuesta_Pregunta, Encuesta_Respuesta, Historial_Academico
 from flask_mail import Message
 import sys
 import os
@@ -1612,45 +1612,29 @@ def agregar_repitente():
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@Administrador_bp.route('/repitentes2/<int:id_estudiante>')
-@login_required
-def historial_repitente(id_estudiante):
-    estudiante = Usuario.query.get_or_404(id_estudiante)
 
-    # buscamos todas sus matrículas
-    historial = db.session.query(
-        Matricula.AnioLectivo,
-        Curso.Grado.label("Curso"),
-        db.func.avg(Actividad.Calificacion).label("Promedio")
-    ).join(Curso, Curso.ID_Curso == Matricula.ID_Curso) \
-     .join(Actividad, Actividad.ID_Matricula == Matricula.ID_Matricula) \
-     .filter(Matricula.ID_Estudiante == id_estudiante) \
-     .group_by(Matricula.AnioLectivo, Curso.Grado) \
-     .order_by(Matricula.AnioLectivo.asc()) \
-     .all()
-
-    # contar cuántas veces se matriculó
-    veces = Matricula.query.filter_by(ID_Estudiante=id_estudiante).count()
-
-    # último curso (curso actual)
-    curso_actual = historial[-1].Curso if historial else "N/A"
-
-    return render_template(
-        'Administrador/historial_repitente.html',
-        estudiante=estudiante,
-        historial=historial,
-        curso_actual=curso_actual,
-        veces=veces
-    )
 
 @Administrador_bp.route('/cursos')
 def cursos():
     cursos = Curso.query.all()
     return render_template('Administrador/Cursos.html', cursos=cursos)
 
+
+# ---------------------- Historial Académico ----------------------
+
+
 @Administrador_bp.route('/historialacademico')
 def historialacademico():
     return render_template('Administrador/HistorialAcademico.html')
+
+@Administrador_bp.route('/historialacademico2')
+def historialacademico2():
+    return render_template('Administrador/HistorialAcademico2.html')
+
+@Administrador_bp.route('/historialacademico3')
+def historialacademico3():
+    periodo = request.args.get('periodo')
+    return render_template('Administrador/HistorialAcademico3.html', periodo=periodo)
 
 # ----------------- SUB-PÁGINAS -----------------
 @Administrador_bp.route('/registrotutorias2')
@@ -1992,10 +1976,6 @@ def enviar_correo():
 def asistencia():
     return render_template('Administrador/Asistencia.html')
 
-@Administrador_bp.route('/historialacademico2')
-def historialacademico2():
-    return render_template('Administrador/HistorialAcademico2.html')
-
 @Administrador_bp.route('/evaluaciones')
 def evaluaciones():
     return render_template('Administrador/evaluaciones.html')
@@ -2003,11 +1983,6 @@ def evaluaciones():
 @Administrador_bp.route('/informe')
 def informe():
     return render_template('Administrador/informe.html')
-
-@Administrador_bp.route('/historialacademico3')
-def historialacademico3():
-    periodo = request.args.get('periodo')
-    return render_template('Administrador/HistorialAcademico3.html', periodo=periodo)
 
 @Administrador_bp.route('/comunicacion2')
 def comunicacion2():

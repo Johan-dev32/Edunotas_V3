@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app
 from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
+from sqlalchemy import or_, text
 from datetime import datetime
-from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes, Detalle_Asistencia, Asistencia
+from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes, Detalle_Asistencia, Asistencia, Encuesta, Encuesta_Pregunta, Encuesta_Respuesta
 from flask_mail import Message
 import sys
 import os
@@ -1370,21 +1371,139 @@ def registrar_observacion():
 def calculo_promedio():
     return render_template('Administrador/CalculoPromedio.html')
 
-@Administrador_bp.route('/encuesta')
-def encuesta():
-    return render_template('Administrador/Encuestas.html')
+# ------------------- ENCUESTAS -------------------
 
-@Administrador_bp.route('/crear_encuesta')
+
+@Administrador_bp.route('/encuestas')
+def encuesta():
+    encuestas = Encuesta.query.all()
+    return render_template('Administrador/Encuestas.html', encuestas=encuestas)
+
+# Crear encuesta
+@Administrador_bp.route('/encuestas/crear', methods=['GET', 'POST'])
 def crear_encuesta():
+    if request.method == 'POST':
+        # Datos principales
+        titulo = request.form.get('Titulo')
+        descripcion = request.form.get('Descripcion')
+        fecha_cierre = request.form.get('FechaCierre')
+        dirigido_a = request.form.get('DirigidoA')
+        creado_por = session.get('user_id')  # ID del admin logueado
+
+        # Archivo opcional
+        archivo = request.files.get("Archivo")
+        archivo_nombre = None
+        if archivo and archivo.filename != '':
+            archivo_nombre = secure_filename(archivo.filename)
+            archivo.save(os.path.join(current_app.config['UPLOAD_FOLDER'], archivo_nombre))
+
+        # Crear encuesta
+        nueva_encuesta = Encuesta(
+            Titulo=titulo,
+            Descripcion=descripcion,
+            FechaCierre=datetime.strptime(fecha_cierre, "%Y-%m-%d") if fecha_cierre else None,
+            DirigidoA=dirigido_a,
+            CreadoPor=creado_por
+        )
+        db.session.add(nueva_encuesta)
+        db.session.flush()  # Para obtener ID_Encuesta antes de commit
+
+        # Guardar preguntas dinámicas
+        textos = request.form.getlist('TextoPregunta[]')
+        tipos = request.form.getlist('TipoRespuesta[]')
+
+        for texto, tipo in zip(textos, tipos):
+            if texto.strip():  # Evitar preguntas vacías
+                pregunta = Encuesta_Pregunta(
+                    ID_Encuesta=nueva_encuesta.ID_Encuesta,
+                    TextoPregunta=texto,
+                    TipoRespuesta=tipo
+                )
+                db.session.add(pregunta)
+
+        db.session.commit()
+        flash('✅ Encuesta creada correctamente', 'success')
+        return redirect(url_for('Administrador.encuesta'))
+
     return render_template('Administrador/CrearEncuesta.html')
 
-@Administrador_bp.route('/editar_eliminar_encuesta')
-def editar_eliminar_encuesta():
-    return render_template('Administrador/EditarEliminarEncuesta.html')
 
-@Administrador_bp.route('/resultados_encuesta')
-def resultados_encuesta():
-    return render_template('Administrador/ResultadosEncuesta.html')
+
+@Administrador_bp.route('/encuestas/<int:id_encuesta>/editar', methods=['GET','POST'])
+def editar_encuesta(id_encuesta):
+    encuesta = Encuesta.query.get_or_404(id_encuesta)
+    if request.method == 'POST':
+        encuesta.Titulo = request.form.get('titulo')
+        encuesta.Descripcion = request.form.get('descripcion')
+        fecha_cierre = request.form.get('fecha_cierre')
+        encuesta.FechaCierre = datetime.strptime(fecha_cierre, "%Y-%m-%d") if fecha_cierre else None
+        encuesta.DirigidoA = request.form.get('dirigido_a')
+
+        # Actualizar preguntas existentes o agregar nuevas
+        preguntas_texto = request.form.getlist('pregunta[]')
+        tipos_respuesta = request.form.getlist('tipo_respuesta[]')
+        
+        # Limpiar preguntas antiguas
+        encuesta.preguntas.clear()
+        for texto, tipo in zip(preguntas_texto, tipos_respuesta):
+            if texto.strip():
+                db.session.add(Encuesta_Pregunta(
+                    ID_Encuesta=encuesta.ID_Encuesta,
+                    TextoPregunta=texto,
+                    TipoRespuesta=tipo
+                ))
+
+        db.session.commit()
+        flash('✅ Encuesta actualizada', 'success')
+        return redirect(url_for('Administrador.encuesta'))
+
+    return render_template('Administrador/EditarEliminarEncuesta.html', encuesta=encuesta)
+
+
+
+
+# Desactivar / Activar encuesta
+@Administrador_bp.route('/encuestas/<int:id_encuesta>/toggle', methods=['POST'])
+def toggle_encuesta(id_encuesta):
+    encuesta = Encuesta.query.get_or_404(id_encuesta)
+    encuesta.Activa = not encuesta.Activa
+    db.session.commit()
+    estado = 'activada' if encuesta.Activa else 'desactivada'
+    flash(f'✅ Encuesta {estado}', 'success')
+    return redirect(url_for('Administrador.encuesta'))
+
+# Ver respuestas de la encuesta
+@Administrador_bp.route('/encuestas/<int:id_encuesta>/respuestas')
+def ver_respuestas_encuesta(id_encuesta):
+    encuesta = Encuesta.query.get_or_404(id_encuesta)
+    respuestas = Encuesta_Respuesta.query.filter_by(ID_Encuesta=id_encuesta).all()
+    return render_template('Administrador/ResultadosEncuesta.html', encuesta=encuesta, respuestas=respuestas)
+
+# API para listar todas las encuestas con sus preguntas
+@Administrador_bp.route('/api/encuestas', methods=['GET'])
+def api_encuestas():
+    encuestas = Encuesta.query.all()
+    data = []
+
+    for e in encuestas:
+        preguntas = []
+        for p in e.preguntas:  # Usa la relación definida en tu modelo
+            preguntas.append({
+                "id": p.ID_Pregunta,
+                "texto": p.TextoPregunta,
+                "tipo": p.TipoRespuesta
+            })
+
+        data.append({
+            "id": e.ID_Encuesta,
+            "titulo": e.Titulo,
+            "descripcion": e.Descripcion,
+            "activa": e.Activa,
+            "preguntas": preguntas
+        })
+
+    return jsonify(data)
+
 
 @Administrador_bp.route('/ver_promedio')
 def ver_promedio():
@@ -1443,88 +1562,55 @@ def configuracion_academica3():
     return render_template('Administrador/ConfiguracionAcademica3.html')
 
 
-@Administrador_bp.route('/repitentes', methods=['GET', 'POST'])
+@Administrador_bp.route('/repitentes')
 def repitentes():
-    if request.method == 'POST':
-        tipo_documento = request.form['tipo_documento']
-        numero_documento = request.form['numero_documento']
-        nombre = request.form['nombre']
-        curso = request.form['curso']
-        form_correo = request.form.get("correo")  # o email del usuario
-        id_matricula = request.form.get("id_matricula")  # si lo tienes en el formulario
-        veces_matriculado = request.form.get("veces_matriculado")  # si lo tienes en el formulario
-        Estudiantes = Estudiantes.query.filter_by(NumeroDocumento=numero_documento).first()
-
-        # Verificar si ya existe en estudiantes
-        estudiante = Estudiantes.query.filter_by(NumeroDocumento=numero_documento, Curso=curso).first()
-        if estudiante:
-            estudiante.Veces += 1
-            db.session.commit()
-
-        # Verificar si ya existe en repitentes
-        repitente = Estudiantes_Repitentes.query.filter_by(NumeroDocumento=numero_documento, Curso=curso).first()
-        if repitente:
-            repitente.Veces += 1
-            db.session.commit()
-            flash("Registro actualizado: aumentó la cantidad de veces matriculado.", "success")
-            
-        usuario = Usuario.query.filter_by(Correo=form_correo).first()
-        if usuario:
-            nueva_repitencia = Estudiantes_Repitentes(
-                TipoDocumento=usuario.TipoDocumento,
-                NumeroDocumento=usuario.NumeroDocumento,
-                NombreCompleto=f"{usuario.Nombre} {usuario.Apellido}",
-                Veces=veces_matriculado,  # contar cuántas veces se ha matriculado
-                ID_Matricula=id_matricula,
-                Curso=curso
-        )
-            db.session.add(nueva_repitencia)
-            db.session.commit()
-        else:
-            nuevo_repitente = Estudiantes_Repitentes(
-                TipoDocumento=tipo_documento,
-                NumeroDocumento=numero_documento,
-                NombreCompleto=nombre,
-                Curso=curso,
-                Veces=1
-            )
-            db.session.add(nuevo_repitente)
-            db.session.commit()
-            flash("Estudiante repitente agregado correctamente.", "success")
-        
-        return redirect(url_for('Administrador.repitentes'))
-
-    # GET: mostrar todos los repitentes
-    repitentes = Estudiantes_Repitentes.query.order_by(Estudiantes_Repitentes.FechaRegistro.desc()).all()
-    return render_template('repitentes.html', repitentes=repitentes)
+    repitentes = Estudiantes_Repitentes.query.all()
+    return render_template('Administrador/repitentes.html', repitentes=repitentes)
 
 
-# Agregar repitente desde modal (POST)
 @Administrador_bp.route('/repitentes/agregar', methods=['POST'])
 def agregar_repitente():
-    tipo_documento = request.form.get('tipo_documento')
-    numero_documento = request.form.get('numero_documento')
-    nombre = request.form.get('nombre')
-    curso = request.form.get('curso')  # opcional para registrar curso repetido
+    try:
+        tipo = request.form.get('tipo_documento')
+        doc = request.form.get('numero_documento')
+        nombre = request.form.get('nombre')
+        curso = request.form.get('curso')
 
-    if not (tipo_documento and numero_documento and nombre):
-        flash("Todos los campos son obligatorios.", "danger")
-        return redirect(url_for('Administrador.repitentes'))
+        # Buscar matrícula actual del estudiante
+        matricula = Matricula.query.filter_by(NumeroDocumento=doc).first()
+        id_matricula = matricula.ID_Matricula if matricula else None
+        esta_matriculado = matricula is not None 
 
-    # Crear nuevo registro
-    nuevo_repitente = Estudiantes_Repitentes(
-        TipoDocumento=tipo_documento,
-        NumeroDocumento=numero_documento,
-        NombreCompleto=nombre,
-        curso=curso,
-        Veces=1,
-        Matriculado=True
-    )
+        # Buscar si ya existe en la tabla de repitentes
+        existente = Estudiantes_Repitentes.query.filter_by(NumeroDocumento=doc).first()
 
-    db.session.add(nuevo_repitente)
-    db.session.commit()
-    flash("Estudiante repitente agregado correctamente.", "success")
-    return redirect(url_for('Administrador.repitentes'))
+        if existente:
+            existente.Veces += 1
+            existente.FechaRegistro = datetime.utcnow()  # 🔹 Actualiza la fecha
+            if not existente.ID_Matricula and id_matricula:
+                existente.ID_Matricula = id_matricula
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Veces y fecha actualizadas correctamente'})
+        else:
+            # Crear nuevo registro
+            nuevo = Estudiantes_Repitentes(
+                TipoDocumento=tipo,
+                NumeroDocumento=doc,
+                NombreCompleto=nombre,
+                Curso=curso,
+                FechaRegistro=datetime.utcnow(),
+                Veces=1,
+                ID_Matricula=id_matricula,
+                Matriculado=esta_matriculado
+            )
+            db.session.add(nuevo)
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Estudiante repitente registrado correctamente'})
+
+    except Exception as e:
+        print("❌ Error:", e)
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @Administrador_bp.route('/repitentes2/<int:id_estudiante>')
 @login_required

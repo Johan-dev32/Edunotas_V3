@@ -377,6 +377,7 @@ class Estudiantes_Repitentes(db.Model):
     NumeroDocumento = db.Column(db.String(50))
     NombreCompleto = db.Column(db.String(200))
     Curso = db.Column(db.String(50))
+    FechaRegistro = db.Column(db.DateTime, default=datetime.utcnow) 
     Veces = db.Column(db.Integer, default=1)
     ID_Matricula = db.Column(db.Integer, db.ForeignKey("Matricula.ID_Matricula", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
     Matriculado = db.Column(db.Boolean, default=False)

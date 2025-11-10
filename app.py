@@ -37,12 +37,19 @@ from Controladores.models import db, Usuario
 # Configuración de la aplicación
 app = Flask(__name__)
 
+# Carpeta donde se guardarán los archivos subidos
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+
+# Crear la carpeta si no existe
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 # Configuración de la base de datos
 DB_URL = 'mysql+pymysql://root:@127.0.0.1:3306/edunotas'
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'clave_super_secreta'
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_pre_ping': True}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 app.config.update(
     MAIL_SERVER="smtp.gmail.com",

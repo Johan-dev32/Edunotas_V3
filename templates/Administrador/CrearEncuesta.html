@@ -113,104 +113,145 @@
 <div class="container mt-4">
   <div class="row">
 
-  <!-- CONTENIDO ENCUESTA -->
+   <!-- CONTENIDO ENCUESTA -->
   <section class="container mt-5">
-    <h1 class="text-center titulo-principal" id="formTitle">Crear Encuesta</h1>
-    <p class="text-center descripcion" id="formDescription">Es hora de crear una encuesta</p>
-    <form id="encuestaForm" class="p-4 bg-light border rounded">
-  <div class="row mb-3">
-    <!-- Fecha -->
-    <div class="col-md-3">
-      <label class="form-label">Fecha de cierre</label>
-      <input type="date" class="form-control" id="fechaCierre">
-    </div>
+    <h1 class="text-center titulo-principal">Crear Encuesta</h1>
+    <p class="text-center descripcion">Complete los datos para crear una nueva encuesta</p>
 
-    <!-- Título + Imagen -->
-    <div class="col-md-6">
-      <label class="form-label">Título</label>
-      <input type="text" class="form-control mb-2" id="tituloEncuesta" placeholder="Ingrese un título">
+    <form id="formEncuesta" class="p-4 bg-light border rounded" enctype="multipart/form-data" method="POST" action="{{ url_for('Administrador.crear_encuesta') }}">
+      <div class="row mb-3">
 
-      <label class="form-label">Imagen (opcional)</label>
-      <input type="file" class="form-control" id="imgInput" accept="image/*">
-      <div id="imgPreview" class="border rounded mt-2 text-center p-2" style="height:120px; color:#777;">
-        Sin imagen
+        <!-- Título -->
+        <div class="col-md-6">
+          <label for="Titulo" class="form-label">Título</label>
+          <input type="text" class="form-control" id="Titulo" name="Titulo" placeholder="Ingrese el título de la encuesta" required>
+        </div>
+
+        <!-- Descripción -->
+        <div class="col-md-6">
+          <label for="Descripcion" class="form-label">Descripción</label>
+          <textarea class="form-control" id="Descripcion" name="Descripcion" rows="2" placeholder="Descripción breve de la encuesta"></textarea>
+        </div>
       </div>
-    </div>
 
-    <!-- Dirigido a -->
-<div class="col-md-3">
-  <label class="form-label">Dirigido a:</label><br>
+      <div class="row mb-3">
+        <!-- Fecha Cierre -->
+        <div class="col-md-4">
+          <label for="FechaCierre" class="form-label">Fecha de Cierre</label>
+          <input type="date" class="form-control" id="FechaCierre" name="FechaCierre">
+        </div>
 
-  <!-- Administradores -->
-  <div class="form-check mb-2">
-    <input class="form-check-input targetChk" type="checkbox" value="Administradores" id="chkAdmins">
-    <label class="form-check-label" for="chkAdmins">Administradores</label>
-  </div>
+        <!-- Dirigido A -->
+        <div class="col-md-4">
+          <label for="DirigidoA" class="form-label">Dirigido A</label>
+          <select class="form-select" id="DirigidoA" name="DirigidoA" required>
+            <option value="">Seleccione...</option>
+            <option value="Docente">Docentes</option>
+            <option value="Estudiante">Estudiantes</option>
+            <option value="Acudiente">Acudientes</option>
+          </select>
+        </div>
 
-  <!-- Docentes -->
-  <div class="form-check mb-2">
-    <input class="form-check-input targetChk" type="checkbox" value="Docentes" id="chkDoc">
-    <label class="form-check-label" for="chkDoc">Docentes</label>
-    <select class="form-select mt-1 d-none" id="materiaSelect">
-      <option value="">Seleccione materia</option>
-    </select>
-  </div>
+        <!-- Archivo (opcional) -->
+        <div class="col-md-4">
+          <label for="Archivo" class="form-label">Archivo (opcional)</label>
+          <input type="file" class="form-control" id="Archivo" name="Archivo" accept="image/*,.pdf,.docx">
+        </div>
+      </div>
 
-  <!-- Estudiantes -->
-  <div class="form-check mb-2">
-    <input class="form-check-input targetChk" type="checkbox" value="Estudiantes" id="chkEst">
-    <label class="form-check-label" for="chkEst">Estudiantes</label>
-    <select class="form-select mt-1 d-none" id="gradoSelectEst">
-      <option value="">Seleccione grado</option>
-      <option value="6">6</option>
-      <option value="7">7</option>
-      <option value="8">8</option>
-      <option value="9">9</option>
-      <option value="10">10</option>
-      <option value="11">11</option>
-    </select>
-    <select class="form-select mt-1 d-none" id="cursoSelectEst">
-      <option value="">Seleccione curso</option>
-    </select>
-  </div>
+      <!-- Preguntas dinámicas -->
+      <div id="preguntasContainer" class="mb-3"></div>
 
-  <!-- Acudientes -->
-  <div class="form-check mb-2">
-    <input class="form-check-input targetChk" type="checkbox" value="Acudientes" id="chkAcu">
-    <label class="form-check-label" for="chkAcu">Acudientes</label>
-    <select class="form-select mt-1 d-none" id="gradoSelectAcu">
-      <option value="">Seleccione grado</option>
-      <option value="6">6</option>
-      <option value="7">7</option>
-      <option value="8">8</option>
-      <option value="9">9</option>
-      <option value="10">10</option>
-      <option value="11">11</option>
-    </select>
-    <select class="form-select mt-1 d-none" id="cursoSelectAcu">
-      <option value="">Seleccione curso</option>
-    </select>
-  </div>
-</div>
-  <!-- Contenedor preguntas dinámicas -->
-  <div id="preguntasContainer"></div>
-
-  <button type="button" class="btn btn-primary mb-3" id="agregarPregunta">+ Agregar Pregunta</button>
-  <br>
-  <button type="submit" class="btn btn-success">Enviar Encuesta</button>
-</form>
+      <button type="button" class="btn btn-primary mb-3" id="agregarPregunta">+ Agregar Pregunta</button>
+      <br>
+      <button type="submit" class="btn btn-success">Guardar Encuesta</button>
+    </form>
   </section>
 
+  <script>
+const contenedorPreguntas = document.getElementById('preguntasContainer');
+const btnAgregar = document.getElementById('agregarPregunta');
 
-      <script>
-        
-        const LISTA_ENCUESTAS_URL = "{{ url_for('Administrador.editar_eliminar_encuesta') }}";
-        console.log("DEBUG: LISTA_ENCUESTAS_URL seteada en HTML:", LISTA_ENCUESTAS_URL);
-    </script>
+let contadorPreguntas = 0;
+
+function agregarOpcion(tipo, contenedor) {
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('input-group', 'mb-2');
+    wrapper.innerHTML = `
+      <div class="input-group-text">
+        <input type="${tipo}" disabled>
+      </div>
+      <input type="text" class="form-control opcionInput" placeholder="Ingrese respuesta">
+      <button type="button" class="btn btn-outline-danger btn-sm btnEliminarOpcion">
+        <i class="bi bi-trash-fill"></i>
+      </button>
+    `;
+    wrapper.querySelector('.btnEliminarOpcion').addEventListener('click', () => wrapper.remove());
+    contenedor.appendChild(wrapper);
+}
+
+function renderOpciones(tipo, contenedor) {
+    contenedor.innerHTML = "";
+    if (tipo === "OpcionSimple") {
+        agregarOpcion("radio", contenedor);
+        agregarOpcion("radio", contenedor);
+    } else if (tipo === "OpcionMultiple") {
+        agregarOpcion("checkbox", contenedor);
+        agregarOpcion("checkbox", contenedor);
+    } else if (tipo === "Texto" || tipo === "Escala") {
+        contenedor.innerHTML = `<input type="text" class="form-control" placeholder="Respuesta de texto libre" disabled>`;
+    }
+}
+
+function crearPregunta() {
+    contadorPreguntas++;
+    const div = document.createElement('div');
+    div.classList.add('card', 'p-3', 'mb-2');
+    div.innerHTML = `
+      <div class="d-flex justify-content-between mb-2">
+        <label class="fw-bold">Pregunta ${contadorPreguntas}</label>
+        <button type="button" class="btn btn-sm btn-danger btnEliminarPregunta"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <input type="text" class="form-control mb-2" name="TextoPregunta[]" placeholder="Ingrese la pregunta" required>
+      <select class="form-select mb-2 tipoRespuesta" name="TipoRespuesta[]">
+        <option value="Texto">Texto</option>
+        <option value="OpcionSimple">Opción Simple</option>
+        <option value="OpcionMultiple">Opción Múltiple</option>
+        <option value="Escala">Escala</option>
+      </select>
+      <div class="respuestasContainer mb-2"></div>
+      <button type="button" class="btn btn-sm btn-secondary btnAgregarOpcion mb-2">+ Agregar Opción</button>
+    `;
+
+    const tipoSelect = div.querySelector('.tipoRespuesta');
+    const respuestasContainer = div.querySelector('.respuestasContainer');
+    const btnAgregarOpcion = div.querySelector('.btnAgregarOpcion');
+    const btnEliminarPregunta = div.querySelector('.btnEliminarPregunta');
+
+    // Renderizar opciones al cambiar el tipo
+    tipoSelect.addEventListener('change', () => renderOpciones(tipoSelect.value, respuestasContainer));
+
+    // Agregar opción
+    btnAgregarOpcion.addEventListener('click', () => {
+        if (tipoSelect.value === "Texto" || tipoSelect.value === "Escala") return alert("No se pueden agregar opciones a este tipo");
+        agregarOpcion(tipoSelect.value === "OpcionSimple" ? "radio" : "checkbox", respuestasContainer);
+    });
+
+    // Eliminar pregunta
+    btnEliminarPregunta.addEventListener('click', () => div.remove());
+
+    // Render inicial
+    renderOpciones(tipoSelect.value, respuestasContainer);
+
+    contenedorPreguntas.appendChild(div);
+}
+
+btnAgregar.addEventListener('click', crearPregunta);
+</script>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/static/js/Administrador/encuesta.js"></script>
-
 </body>
 </html>

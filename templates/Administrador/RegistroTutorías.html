@@ -11,109 +11,179 @@
 
 </head>
 <body>
-  <header class="d-flex align-items-center p-3 border-bottom w-100">
-    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
-      <i class="bi bi-list"></i>
-    </button>
-    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+ <header class="d-flex align-items-center p-3 border-bottom w-100">
+<button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+  <i class="bi bi-list"></i>
+</button>
+<h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+<div class="dropdown">
+    
+  <button 
+    class="btn btn-edunotas position-relative dropdown-toggle" 
+    type="button" 
+    id="dropdownMenuButton" 
+    data-bs-toggle="dropdown" 
+    aria-expanded="false">
+    <span class="bi bi-envelope-fill"></span>
+  </button>
+  
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <li><a class="dropdown-item" href="#">Ajustes</a></li>
+    <li><a class="dropdown-item" href="#">Opción 2</a></li>
+    <li><a class="dropdown-item" href="#">Opción 3</a></li>
+  </ul>
+</div>
 
-    <div class="dropdown">
-      <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-        <span class="bi bi-envelope-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <li><a class="dropdown-item" href="#">Ajustes</a></li>
-        <li><a class="dropdown-item" href="#">Opción 2</a></li>
-        <li><a class="dropdown-item" href="#">Opción 3</a></li>
-      </ul>
-    </div>
+<!--Botón menu de usuario-->
 
-    <div class="dropdown">
-      <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-        <span class="bi bi-person-lines-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
-        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
-      </ul>
-    </div>
+<div class="dropdown">
+  <button 
+    class="btn btn-usuario dropdown-toggle" 
+    type="button" 
+    id="dropdownMenuButton" 
+    data-bs-toggle="dropdown" 
+    aria-expanded="false">
+    <span class="bi bi-person-lines-fill"></span>
+  </button>
 
-<!--  MENU  -->
- <section class="bg-light py-5 mt-5">
-  <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title">MENÚ</h5>
-  </div>
-  <div class="offcanvas1-body">
-    <ul class="nav flex-column">
-          <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
-          
-          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
-          <div class="collapse" id="submenuNotas">
-            <ul class="nav flex-column ms-3">
-              <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
-             <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+    <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
+  </ul>
+</div>
 
-
-
-            </ul>
-          </div>
-
-          <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
-
-          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
-            <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
-          </a>
-          <div class="collapse" id="submenuUsuarios">
-            <ul class="nav flex-column ms-3">
-              <li><a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
-              <li><a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
-              <li><a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
-              <li><a href="{{ url_for('Administrador.repitentes') }}" class="nav-link text-white"><i class="bi bi-person-dash"></i> Lista Estudiantes Repitentes</a></li>
-              <li><a href="{{ url_for('Administrador.registro') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Registro Usuarios</a></li>
-            </ul>
-          </div>
-
-
-
-
-
-          <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-          
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-</header>
+</a>
+  </header>
 
   <!-- tabla -->
   <section class="registro-tutorias container mt-5">
-    <h2 class="text-center">REGISTRO DE TUTORIAS</h2>
+    <h2 class="titulo-principal">REGISTRO DE TUTORIAS</h2>
 
-    <button class="btn-tutoria mt-5"><a  href="{{ url_for('Administrador.registrotutorias2') }}" class="nav-link text-white fw-bolder"><i class="bi bi-clipboard2-plus-fill"></i>  AGREGAR TUTORIAS</a></button>
-  <div class="contenedor-tutorias">
-  <table class="tabla-tutorias mt-3">
-    <tr>
-      <th>Nombre Completo</th>
-      <th>Rol</th>
-      <th>Tema</th>
-      <th>Fecha de Realización</th>
-      <th>Curso</th>
-      <th>Nombre del Estudiante</th>
-      <th>Correo</th>
-      <th>Motivo</th>
-      <th>Observaciones</th>
-    </tr>
-  </table>
+   <button 
+    class="btn-tutoria mt-5" 
+    id="btnAbrirFormulario" 
+    data-bs-toggle="modal" 
+    data-bs-target="#modalTutoria">
+    <i class="bi bi-clipboard2-plus-fill"></i> AGREGAR TUTORIAS
+</button>
 
-  <!-- Contenedor de botones -->
-  <div id="accionesTutorias"></div>
+ <div class="contenedor-tutorias">
+    <table class="tabla-tutorias mt-3">
+        <thead>
+            <tr>
+              <th>Nombre Completo</th>
+              <th>Rol</th>
+              <th>Tema</th>
+              <th>Fecha de Realización</th>
+              <th>Curso</th>
+              <th>Nombre del Estudiante</th>
+              <th>Correo</th>
+              <th>Motivo</th>
+              <th>Observaciones</th>
+              <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tablaCuerpoTutorias"> 
+            </tbody>
+    </table>
+</div>
+</section>
+
+
+<div class="modal fade" id="modalTutoria" tabindex="-1" aria-labelledby="modalTutoriaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTutoriaLabel">Registro de Nueva Tutoría</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+                <form id="formRegistroTutoria" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-1 mt-2" for="nombre">Nombre Completo</label>
+                            <input class="input-field" type="text" id="nombre" name="Nombre" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-1 mt-3" for="rol">Rol</label>
+                            <select class="input-field" id="rol" name="Rol" required>
+                                <option value="" disabled selected>Selecciona un rol</option>
+                                <option value="Administrador">Administrador</option>
+                                <option value="Docente">Docente</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-1 mt-3" for="Tema">Tema</label>
+                            <input class="input-field" id="Tema" name="Temas" placeholder="Asignatura y Tema" required >
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-1 mt-3" for="fecha">Fecha de Realización</label>
+                            <input class="input-field" type="date" id="fecha"  name="fecha"  required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-1 mt-3" for="curso-select">Curso</label>
+                            <select class="form-select" id="curso-select" name="Curso" aria-label="Cursos" required>
+                                <option value="" selected disabled>Selecciona un curso</option>
+                                <option value="601">601</option>
+                                <option value="602">602</option>
+                                <option value="603">603</option>
+                                <option value="701">701</option> 
+                                <option value="702">702</option>
+                                <option value="703">703</option>
+                                <option value="801">801</option>
+                                <option value="802">802</option>
+                                <option value="803">803</option>
+                                <option value="901">901</option>
+                                <option value="902">902</option>
+                                <option value="903">903</option>
+                                <option value="1001">1001</option>
+                                <option value="1002">1002</option>
+                                <option value="1003">1003</option>
+                                <option value="1101">1101</option>
+                                <option value="1102">1102</option>
+                                <option value="1103">1103</option>
+                            </select>
+                        </div>
+
+                        <div>
+                          <label class="block text-gray-700 font-medium mb-1 mt-3" for="nombre_estudiante">Nombre del Estudiante</label>
+                          <input class="input-field" type="text" id="nombre_estudiante" name="Nombreestudiante" required>
+                        </div>
+
+                        <div>
+                          <label class="block text-gray-700 font-medium mb-1 mt-3" for="correo">Correo Electrónico del Estudiante</label>
+                          <input class="input-field" type="email" id="correo" name="Correo" required>
+                        </div>
+
+                        <div>
+                          <label class="block text-gray-700 font-medium mb-1 mt-3" for="motivo">Motivo</label>
+                          <input class="input-field" type="text" id="motivo" name="motivo" required>
+                        </div>
+
+                        <div>
+                          <label class="block text-gray-700 font-medium mb-1 mt-3" for="observaciones">Observaciones</label>
+                          <input class="input-field" type="text" id="observaciones" name="observaciones" required>
+                        </div>
+                        
+                    </div>
+                </form>
+                
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn btn-primary fw-bold px-5" id="btnGuardarTutoria">
+                    Registrar Tutoria
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="{{ url_for('static', filename='js/Administrador//registroTutorias.js') }}"></script>
 </body>

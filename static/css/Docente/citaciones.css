@@ -1,0 +1,276 @@
+:root {
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --accent: #050733ff;
+    --muted: #6b7280
+}
+
+body {
+  background-color: #f8f9fa; 
+  font-family: 'Trebuchet MS', sans-serif;
+  color: #212529;
+}
+
+/* navbar */
+header {
+  background-color: white;
+  color: #050733ff;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas {
+  background-color: #050733ff;
+  color: #fff;
+}
+
+.btn-usuario {
+  background-color: #050733ff;
+  color: #fff;
+  margin-left: 10px;
+}
+
+/*  menu_des  */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+.offcanvas {
+  font-size: 25px;
+}
+
+.offcanvas-title {
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+.nav-item {
+  font-weight: bold;
+  font-size: 22px;
+}
+#sidebar .nav-link {
+  font-size: 18px;   /* tamaño menú hamburguesa */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
+.nav-pills .nav-link {
+  font-size: 25px;   /* tamaño botones nav */
+  color: #050733ff !important; 
+  font-weight: bold;
+
+}
+
+.app {
+    display: flex;
+    min-height: 100vh
+}
+
+.sidebar {
+    width: 220px;
+    background: linear-gradient(180deg, #2b6cb0, #1e4e8a);
+    color: white;
+    padding: 20px
+}
+
+.sidebar h2 {
+    margin: 0 0 12px
+}
+
+.sidebar nav ul {
+    list-style: none;
+    padding: 0
+}
+
+.sidebar nav li {
+    padding: 8px 6px;
+    border-radius: 6px;
+    margin-bottom: 6px
+}
+
+.sidebar nav li.active {
+    background: rgba(255, 255, 255, 0.12)
+}
+
+.main {
+    flex: 1;
+    padding: 18px
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px
+}
+
+.panel {
+    background: var(--card);
+    padding: 14px;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(8, 10, 15, 0.06)
+}
+
+.panel h3 {
+    margin-top: 0
+}
+
+.row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 10px
+}
+
+label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    color: var(--muted);
+    flex: 1
+}
+
+input,
+select,
+textarea,
+button {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb
+}
+
+button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    cursor: pointer
+}
+
+button:disabled {
+    opacity: 0.6
+}
+
+.filters {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse
+}
+
+thead th {
+    background: #f3f4f6;
+    text-align: left;
+    padding: 8px;
+    font-size: 13px
+}
+
+tbody td {
+    padding: 8px;
+    border-top: 1px solid #f1f5f9
+}
+
+.status {
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 13px
+}
+
+.status.pendiente {
+    background: #fff4e5;
+    color: #7a4a00
+}
+
+.status.confirmada {
+    background: #e8f8ef;
+    color: #0f5132
+}
+
+.status.reprogramada {
+    background: #efe9ff;
+    color: #4b2d8a
+}
+
+.status.atendida {
+    background: #e6f7ff;
+    color: #075985
+}
+
+.actions {
+  display: flex;
+  gap: 10px;          
+  justify-content: center; 
+  flex-wrap: wrap;    
+}
+
+.actions button {
+  margin: 0;           
+  padding: 6px 10px;  
+  font-size: 13px;     
+}
+
+
+.modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45)
+}
+
+.modal.hidden {
+    display: none
+}
+
+.modal-content {
+    background: var(--card);
+    padding: 16px;
+    border-radius: 8px;
+    width: 520px
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px
+}

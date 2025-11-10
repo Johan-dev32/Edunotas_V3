@@ -37,6 +37,7 @@
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
       <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
       <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+     <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
     </ul>
   </div>
 </header>
@@ -61,8 +62,6 @@
       <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador </a></li>
       <li class="nav-item"><a href="{{ url_for('Docente.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Aprobación Académica </a></li>
       <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones </a></li>
-      <li class="nav-item"><a href="{{ url_for('Docente.historial_academico') }}" class="nav-link text-white"><i class="bi bi-clock"></i> Historial Académico </a></li>
-      <li class="nav-item"><a href="{{ url_for('Docente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
     </ul>
   </div>
 </div>
@@ -80,7 +79,7 @@
     {{ curso_id }}
   </div>
 
-  <a href="{{ url_for('Docente.crear_actividad', curso_id=curso_id) }}" class="btn-primary">Crear Actividad</a>
+  <a href="{{ url_for('Docente.crear_actividad', curso_id=curso.ID_Curso) }}" class="btn-primary">Crear Actividad</a>
 </header>
 
 <!-- Título -->
@@ -93,7 +92,7 @@
     {% for actividad in actividades %}
       <div class="actividad">
         <span>ACT {{ actividad.id }}</span>
-        <a href="{{ url_for('Docente.tareas_actividades3', actividad_id=actividad.id, curso_id=curso_id) }}" class="btn">
+        <a href="{{ url_for('Docente.tareas_actividades3', actividad_id=actividad.ID_Actividad, curso_id=curso_id) }}" class="btn">
           Enviar Tareas - Actividades
         </a>
       </div>

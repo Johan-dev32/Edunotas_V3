@@ -37,6 +37,7 @@
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
       <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
       <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+      <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
     </ul>
   </div>
 </header>
@@ -61,8 +62,6 @@
       <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador </a></li>
       <li class="nav-item"><a href="{{ url_for('Docente.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Aprobación Académica </a></li>
       <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones </a></li>
-      <li class="nav-item"><a href="{{ url_for('Docente.historial_academico') }}" class="nav-link text-white"><i class="bi bi-clock"></i> Historial Académico </a></li>
-      <li class="nav-item"><a href="{{ url_for('Docente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
     </ul>
   </div>
 </div>
@@ -107,12 +106,17 @@
           </div>
 
           <!-- Archivo PDF -->
-          <div class="border rounded bg-light-subtle p-4 text-center mb-4">
- {% if pdf_url %}
-  <iframe src="{{ pdf_url }}" width="100%" height="400px"></iframe>
-{% else %}
-  <p>No hay archivo adjunto</p>
-{% endif %}
+        <div class="border rounded bg-light-subtle p-4 text-center mb-4">
+          {% if pdf_url %}
+            <iframe src="{{ pdf_url }}" width="100%" height="400px"></iframe>
+            <br>
+            <a href="{{ pdf_url }}" target="_blank" class="btn btn-primary mt-3">
+              📄 Abrir PDF en nueva pestaña
+            </a>
+          {% else %}
+            <p>No hay archivo adjunto</p>
+          {% endif %}
+</div>
 </div>
 
 

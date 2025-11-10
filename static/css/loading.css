@@ -1,6 +1,7 @@
 body {
-  background-color: #f5f7fb;
+  background-color: #ffffff;
   display: flex;
+  flex-direction: column; /* Permite alinear elementos verticalmente */
   justify-content: center;
   align-items: center;
   height: 100vh;
@@ -9,7 +10,10 @@ body {
 }
 
 .loading-container {
-  text-align: center;
+  flex-grow: 1; /* Ocupa todo el espacio vertical disponible */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .notebook {
@@ -17,9 +21,8 @@ body {
   width: 180px;
   height: 180px;
   perspective: 800px;
-  margin: 0 auto;
-  margin-top: -100px;
-  margin-left: 155px;
+  margin-left: 180px;
+  margin-top: -70px;
 }
 
 .cover {
@@ -31,6 +34,7 @@ body {
   transform-origin: left;
   animation: openCover 3s ease-in-out forwards;
   z-index: 3;
+  
 }
 
 .pages {
@@ -41,7 +45,7 @@ body {
   overflow: hidden;
   background-color: #e7e4e4;
   z-index: 2;
-  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  box-shadow: 0 0 5px rgb(0, 0, 0);
 }
 
 .page {
@@ -52,21 +56,16 @@ body {
   border-left: 2px solid #ccc;
   transform-origin: left;
   opacity: 0.8;
+  box-shadow: 0 0 5px rgb(0, 0, 0);
 }
 
-.page1 {
-  animation: turnPage 1.2s 0.4s forwards;
-}
-.page2 {
-  animation: turnPage 1.2s 0.9s forwards;
-}
-.page3 {
-  animation: turnPage 1.2s 1.4s forwards;
-}
+.page1 { animation: turnPage 1.2s 0.4s forwards; }
+.page2 { animation: turnPage 1.2s 0.9s forwards; }
+.page3 { animation: turnPage 1.2s 1.4s forwards; }
 
 .rings {
   position: absolute;
-  left: -10px;
+  left: -15px;
   top: 20px;
   height: 110px;
   width: 10px;
@@ -82,15 +81,31 @@ body {
   height: 10px;
   background-color: rgb(255, 255, 255);
   border-radius: 50%;
-
 }
 
-.text {
-  margin-top: 50px;
-  color: #333;
-  font-size: 18px;
-  font-weight: 500;
-  animation: fadeIn 2s ease-in-out;
+/* ✅ Logo y texto al fondo */
+.logo-titulo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: absolute;
+  bottom: 30px; /* Controla qué tan cerca del borde inferior está */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.logo-img {
+  width: 130px;  /* más pequeño */
+  height: auto;
+  border-radius: 6px;
+}
+
+.texto-abajo {
+  font-size: 25px;
+  font-weight: bold;
+  color: #9c9d9d;
+  margin: 0;
 }
 
 /* Animaciones */
@@ -104,13 +119,4 @@ body {
   0% { transform: rotateY(0deg); }
   50% { transform: rotateY(-90deg); }
   100% { transform: rotateY(-180deg); opacity: 0; }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-.texto-abajo{
-    margin-top: 700px;
-    margin-left: -240px;
 }

@@ -105,6 +105,7 @@ window.onclick = function(e) {
   if (e.target.id === "modal") {
     cerrarModal();
   }
+<<<<<<< HEAD
 }
 
 // 🔹 Cargar asignaturas desde el backend
@@ -153,3 +154,6 @@ async function guardarAsignatura() {
 // Cargar al iniciar
 document.addEventListener("DOMContentLoaded", cargarAsignaturas);
 
+=======
+}
+>>>>>>> 3585df233ed24a5fd37bc5c408466eda7f6d949b

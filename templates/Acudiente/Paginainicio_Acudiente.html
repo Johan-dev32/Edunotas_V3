@@ -1,158 +1,157 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}Inicio - Acudiente{% endblock %}
+{% block title %}
+  Inicio - Acudiente
+{% endblock %}
 
 {% block header %}
-<header class="finisher-header d-flex align-items-center p-3 border-bottom w-100">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/Acudiente/Inicio.css') }}">
+  <header class="finisher-header d-flex align-items-center p-3 border-bottom w-100">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Acudiente/Inicio.css') }}" />
 
-    
-    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRÍA</h2> 
+    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRÍA</h2>
 
     <div class="dropdown ms-auto me-2">
-        <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-            <span class="bi bi-envelope-fill"></span>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none;">
-                0
-            </span>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="dropdownMenuButton" style="min-width: 300px;">
-            <li id="listaMensajes">
-                <p class="text-center text-muted mb-0">No tienes mensajes nuevos.</p>
-            </li>
-        </ul>
+      <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="bi bi-envelope-fill"></span>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none;">0</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="dropdownMenuButton" style="min-width: 300px;">
+        <li id="listaMensajes">
+          <p class="text-center text-muted mb-0">No tienes mensajes nuevos.</p>
+        </li>
+      </ul>
     </div>
 
-  <div class="dropdown">
-    <button class="btn btn-usuario" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="bi bi-person-circle"></i>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu" id="dropdownSTUDENT">
-        <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('Acudiente.manual') }}">Manual de Usuario</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('Acudiente.historial_academico') }}">Historial Academico</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
-    </ul>
-</div>
-
-</header>
+    <div class="dropdown">
+      <button class="btn btn-usuario" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-person-circle"></i></button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu" id="dropdownSTUDENT">
+        <li>
+          <a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a>
+        </li>
+        <li>
+          <a class="dropdown-item" href="{{ url_for('Acudiente.manual') }}">Manual de Usuario</a>
+        </li>
+        <li>
+          <a class="dropdown-item" href="{{ url_for('Acudiente.historial_academico') }}">Historial Academico</a>
+        </li>
+        <li>
+          <hr class="dropdown-divider" />
+        </li>
+        <li>
+          <a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a>
+        </li>
+      </ul>
+    </div>
+  </header>
 {% endblock %}
 
 {% block content %}
+  <div>
+    <h3 class="text-center titulo-2">¡BIENVENIDO A TU PANEL!</h3>
+  </div>
 
-<div><h3 class="text-center titulo-2">¡BIENVENIDO A TU PANEL!</h3></div>
-
-<!-- 🔹 CONTENIDO PRINCIPAL -->
-<div class="container my-5">
+  <!-- 🔹 CONTENIDO PRINCIPAL -->
+  <div class="container my-5">
     <div class="row g-4 justify-content-center">
-        <!--  TARJETAS NUEVAS DEL ESTUDIANTE -->
+      <!-- TARJETAS NUEVAS DEL ESTUDIANTE -->
       <!-- 🔷 MENÚ ACUDIENTE CON ESTILO DE TARJETAS -->
-<div class="row g-3 justify-content-center">
-
-   
-
-    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-        <a href="{{ url_for('Acudiente.ver_notas') }}" class="menu-card text-decoration-none">
+      <div class="row g-3 justify-content-center">
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+          <a href="{{ url_for('Acudiente.ver_notas') }}" class="menu-card text-decoration-none">
             <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <i class="bi bi-list-stars menu-icon"></i>
-                    <p class="card-text menu-text">Notas del Estudiante</p>
-                </div>
+              <div class="card-body">
+                <i class="bi bi-list-stars menu-icon"></i>
+                <p class="card-text menu-text">Notas del Estudiante</p>
+              </div>
             </div>
-        </a>
-    </div>
+          </a>
+        </div>
 
-    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-        <a href="{{ url_for('Acudiente.ver_citaciones') }}" class="menu-card text-decoration-none">
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+          <a href="{{ url_for('Acudiente.ver_citaciones') }}" class="menu-card text-decoration-none">
             <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <i class="bi bi-person-rolodex menu-icon"></i>
-                    <p class="card-text menu-text">Ver Citaciones del Estudiante</p>
-                </div>
+              <div class="card-body">
+                <i class="bi bi-person-rolodex menu-icon"></i>
+                <p class="card-text menu-text">Ver Citaciones del Estudiante</p>
+              </div>
             </div>
-        </a>
-    </div>
+          </a>
+        </div>
 
-    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-        <a href="{{ url_for('Acudiente.inasistencias_justificadas') }}" class="menu-card text-decoration-none">
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+          <a href="{{ url_for('Acudiente.inasistencias_justificadas') }}" class="menu-card text-decoration-none">
             <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <i class="bi bi-journal-text menu-icon"></i>
-                    <p class="card-text menu-text">Inasistencias Justificadas</p>
-                </div>
+              <div class="card-body">
+                <i class="bi bi-journal-text menu-icon"></i>
+                <p class="card-text menu-text">Inasistencias Justificadas</p>
+              </div>
             </div>
-        </a>
-    </div>
+          </a>
+        </div>
 
-    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-        <a href="{{ url_for('Acudiente.informes_academicos') }}" class="menu-card text-decoration-none">
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+          <a href="{{ url_for('Acudiente.informes_academicos') }}" class="menu-card text-decoration-none">
             <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <i class="bi bi-folder2-open menu-icon"></i>
-                    <p class="card-text menu-text">Informe de Tareas</p>
-                </div>
+              <div class="card-body">
+                <i class="bi bi-folder2-open menu-icon"></i>
+                <p class="card-text menu-text">Informe de Tareas</p>
+              </div>
             </div>
-        </a>
-    
-    </div>
-    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-        <a href="{{ url_for('Acudiente.comunicados') }}" class="menu-card text-decoration-none">
+          </a>
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+          <a href="{{ url_for('Acudiente.comunicados') }}" class="menu-card text-decoration-none">
             <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <i class="bi bi-pencil-square menu-icon"></i>
-                    <p class="card-text menu-text">Comunicados</p>
-                </div>
+              <div class="card-body">
+                <i class="bi bi-pencil-square menu-icon"></i>
+                <p class="card-text menu-text">Comunicados</p>
+              </div>
             </div>
-        </a>
-    </div>
-   </div>
-    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+          </a>
+        </div>
+      </div>
+      <div class="col-6 col-sm-4 col-md-3 col-lg-2">
         <a href="{{ url_for('Acudiente.ver_observador_estudiante') }}" class="menu-card text-decoration-none">
-            <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <i class="bi bi-person-workspace menu-icon"></i>
-                    <p class="card-text menu-text">Observador Estudiante</p>
-                </div>
+          <div class="card shadow-sm text-center">
+            <div class="card-body">
+              <i class="bi bi-person-workspace menu-icon"></i>
+              <p class="card-text menu-text">Observador Estudiante</p>
             </div>
+          </div>
         </a>
-    </div>
+      </div>
 
-    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+      <div class="col-6 col-sm-4 col-md-3 col-lg-2">
         <a href="{{ url_for('Acudiente.comunicacion') }}" class="menu-card text-decoration-none">
-            <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <i class="bi bi-chat-dots menu-icon manu-icon"></i>
-                    <p class="card-text menu-text">Comunicación</p>
-                </div>
+          <div class="card shadow-sm text-center">
+            <div class="card-body">
+              <i class="bi bi-chat-dots menu-icon manu-icon"></i>
+              <p class="card-text menu-text">Comunicación</p>
             </div>
+          </div>
         </a>
-    </div>
+      </div>
 
-    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+      <div class="col-6 col-sm-4 col-md-3 col-lg-2">
         <a href="{{ url_for('Acudiente.horarios') }}" class="menu-card text-decoration-none">
-            <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <i class="bi bi-calendar4-week menu-icon"></i>
-                    <p class="card-text menu-text">Horarios</p>
-                </div>
+          <div class="card shadow-sm text-center">
+            <div class="card-body">
+              <i class="bi bi-calendar4-week menu-icon"></i>
+              <p class="card-text menu-text">Horarios</p>
             </div>
+          </div>
         </a>
+      </div>
     </div>
 
-</div>
-
-
-
-    <hr class="my-5">
-<h1 class="text-center txt-ultimo">Edunotas te acompaña en tu proceso educativo con herramientas simples, seguras y efectivas.
-Creado con compromiso y tecnología por el equipo del Colegio Fe y Alegría © 2025.</h1>
+    <hr class="my-5" />
+    <h1 class="text-center txt-ultimo">Edunotas te acompaña en tu proceso educativo con herramientas simples, seguras y efectivas. Creado con compromiso y tecnología por el equipo del Colegio Fe y Alegría © 2025.</h1>
     <!-- 🔸 Secciones de noticias y circulares (sin cambios) -->
     {{ super() }}
-</div>
+  </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ url_for('static', filename='js/Estudiante/Inicio.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/Estudiante/Inicio.js') }}"></script>
 {% endblock %}

@@ -35,50 +35,19 @@
     </script>
 
   <!-- Dropdown mensajes -->
-  <div class="dropdown">
-  <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
+  <div class="dropdown ms-auto me-2">
+  <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="bi bi-envelope-fill"></span>
     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none;">0</span>
   </button>
-  <ul class="dropdown-menu p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
-    <li class="text-center text-muted small">Notificaciones recibidas</li>
-    <div id="notificacionesRecientes" class="mt-2" style="max-height: 150px; overflow-y: auto;">
-      <p class="text-center small text-secondary">Sin notificaciones</p>
-    </div>
+  <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="dropdownMenuButton" style="min-width: 300px;">
+    <li id="listaMensajes">
+      <p class="text-center text-muted mb-0">No tienes mensajes nuevos.</p>
+    </li>
   </ul>
 </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    const res = await fetch("/notificaciones/mis_notificaciones");
-    const data = await res.json();
 
-    const lista = document.getElementById("notificacionesRecientes");
-    const contador = document.getElementById("contadorMensajes");
-
-    if (data.length === 0) {
-      lista.innerHTML = "<p class='text-center small text-secondary'>Sin notificaciones</p>";
-      contador.style.display = "none";
-    } else {
-      lista.innerHTML = "";
-      data.forEach(n => {
-        lista.innerHTML += `
-          <div class="alert alert-light border mb-1">
-            <strong>${n.titulo}</strong><br>
-            <small>${n.contenido}</small><br>
-            <small class="text-muted">${n.fecha}</small>
-          </div>`;
-      });
-
-      contador.textContent = data.length;
-      contador.style.display = "inline";
-    }
-  } catch (error) {
-    console.error("Error al cargar notificaciones:", error);
-  }
-});
-</script>
 
   <!-- Dropdown usuario -->
   <div class="dropdown">
@@ -88,6 +57,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
       <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
       <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+      <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
     </ul>
   </div>
 </header>
@@ -166,10 +136,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             <li class="nav-item"><a href="{{ url_for('Docente.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Aprobación Académica </a></li>
 
             <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones </a></li>
-
-            <li class="nav-item"><a href="{{ url_for('Docente.historial_academico') }}" class="nav-link text-white"><i class="bi bi-clock"></i> Historial Académico </a></li>
-
-            <li class="nav-item"><a href="{{ url_for('Docente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-medical"></i> Manual del Usuario</a></li>
         </ul>
       </div>
     </div>

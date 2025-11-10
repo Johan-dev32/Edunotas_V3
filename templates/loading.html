@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cargando...</title>
+  <title>EduNotas</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/loading.css') }}">
 </head>
 <body>
@@ -23,12 +23,16 @@
     </div>
   </div>
 
+  <!-- Logo y texto abajo -->
+  <div class="logo-titulo">
+    <img src="{{ url_for('static', filename='uploads/FE Y ALEGRIA.jpg') }}" alt="Logo EduNotas" class="logo-img">
+    <h1 class="texto-abajo">EduNotas</h1>
+  </div>
+
   <script>
     setTimeout(() => {
       window.location.href = "{{ url_for(destino) }}";
-    }, 3500); // 3.5 segundos
+    }, 3500);
   </script>
-
- <div> <h1 class="texto-abajo">EduNotas</h1> </div>
 </body>
 </html>

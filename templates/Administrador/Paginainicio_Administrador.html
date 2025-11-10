@@ -43,33 +43,27 @@
   <ul class="dropdown-menu p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
     <li class="mb-2"><h6 class="dropdown-header text-center">Enviar Notificación</h6></li>
 
-    <form id="formNotificacionDropdown">
-      <div class="mb-2">
-          <label for="destinoNoti" class="form-label small">Destino:</label>
-          <select id="destinoNoti" class="form-select form-select-sm">
-          <option value="todos">Todos los roles</option>
-          <option value="usuario">Usuario específico</option>
-          </select>
-      </div>
-        <div class="mb-2">
-          <label for="idDestinatario" class="form-label small">ID Destinatario:</label>
-          <input type="number" id="idDestinatario" class="form-control form-control-sm" placeholder="Ej: 1">
-        </div>
-
-      <div class="mb-2">
-        <label for="tituloNoti" class="form-label small">Asunto</label>
-        <input type="text" id="tituloNoti" class="form-control form-control-sm" placeholder="Asunto del mensaje" required>
-      </div>
-
-      <div class="mb-2">
-        <label for="mensajeNoti" class="form-label small">Mensaje</label>
-        <textarea id="mensajeNoti" class="form-control form-control-sm" rows="3" placeholder="Escribe tu mensaje..." required></textarea>
-      </div>
-
-      <div class="d-grid">
-        <button type="submit" class="btn btn-primary btn-sm">Enviar</button>
-      </div>
-    </form>
+    <form id="formNotificacion">
+  <div class="mb-3">
+    <label>Destino:</label>
+    <select id="destino" class="form-select">
+      <option>Todos los roles</option>
+      <option>Administrador</option>
+      <option>Docente</option>
+      <option>Estudiante</option>
+      <option>Acudiente</option>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label>Asunto</label>
+    <input type="text" id="asunto" class="form-control" placeholder="Asunto del mensaje">
+  </div>
+  <div class="mb-3">
+    <label>Mensaje</label>
+    <textarea id="mensaje" class="form-control" rows="3" placeholder="Escribe tu mensaje..."></textarea>
+  </div>
+  <button type="button" id="btnEnviarNotificacion" class="btn btn-primary w-100">Enviar</button>
+</form>
 
     <li><hr class="dropdown-divider"></li>
     <li class="text-center text-muted small">Últimas notificaciones</li>
@@ -309,6 +303,50 @@ document.getElementById("formNotificacionDropdown").addEventListener("submit", a
 <a href="{{ url_for('Administrador.circulares') }}" class="text-decoration-none"><div class="editar"><i class="bi bi-pencil-square"></i></div></a>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<script>
+
+async function obtenerNotificaciones() {
+  try {
+    const respuesta = await fetch("/notificaciones/recibir");
+    if (respuesta.ok) {
+      const notificaciones = await respuesta.json();
+
+      const contenedor = document.getElementById("notificacionesRecientes");
+      contenedor.innerHTML = "";
+
+      if (notificaciones.length === 0) {
+        contenedor.innerHTML = `<p class="text-center small text-secondary">Sin notificaciones recientes</p>`;
+        return;
+      }
+
+      notificaciones.forEach(noti => {
+        const elemento = document.createElement("div");
+        elemento.classList.add("border", "rounded", "p-2", "mb-1", "bg-light", "small");
+        elemento.innerHTML = `<strong>${noti.titulo}</strong><br>${noti.contenido}`;
+        contenedor.appendChild(elemento);
+      });
+
+      const ultima = notificaciones[notificaciones.length - 1];
+      if (ultima && !ultima.mostrada) {
+        Swal.fire({
+          icon: "info",
+          title: ultima.titulo,
+          text: ultima.contenido,
+          confirmButtonColor: "#5A4AE3",
+          timer: 4000
+        });
+        ultima.mostrada = true;
+      }
+    }
+  } catch (error) {
+    console.error("Error al obtener notificaciones:", error);
+  }
+}
+
+setInterval(obtenerNotificaciones, 15000);
+
+document.addEventListener("DOMContentLoaded", obtenerNotificaciones);
+</script>
 {% endblock %}
 
 

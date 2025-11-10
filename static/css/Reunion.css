@@ -145,3 +145,7 @@ input.form-control:focus {
   font-family: 'Trebuchet MS', sans-serif;
   font-weight: bolder;
 }
+.text-center{
+  color: #050733ff;
+  font-weight: bold;
+}

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Colegio Fe y Alegría</title>
+
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Iconos -->
@@ -12,53 +13,36 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/Asignaturas.css') }}">
 </head>
 <body>
-
-
   <header class="d-flex align-items-center p-3 border-bottom w-100">
     <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
       <i class="bi bi-list"></i>
     </button>
-    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
-
+    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRÍA</h2>
 
     <div class="dropdown ms-auto">
-      <button 
-        class="btn btn-edunotas position-relative dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton1" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
-        <span class="bi bi-envelope-fill"></span>
+      <button class="btn btn-edunotas dropdown-toggle" type="button" id="notifDropdown" data-bs-toggle="dropdown">
+        <i class="bi bi-envelope-fill"></i>
       </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+      <ul class="dropdown-menu" aria-labelledby="notifDropdown">
         <li><a class="dropdown-item" href="#">Ajustes</a></li>
         <li><a class="dropdown-item" href="#">Opción 2</a></li>
-        <li><a class="dropdown-item" href="#">Opción 3</a></li>
       </ul>
     </div>
 
-
     <div class="dropdown">
-      <button 
-        class="btn btn-usuario dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton2" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
-        <span class="bi bi-person-lines-fill"></span>
+      <button class="btn btn-usuario dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+        <i class="bi bi-person-lines-fill"></i>
       </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-
+      <ul class="dropdown-menu" aria-labelledby="userDropdown">
         <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
+        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuración Académica</a></li>
         <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
-
       </ul>
     </div>
   </header>
-<!--  MENU  -->
-  <section class="bg-light py-5 mt-5">
+
+<!-- Offcanvas menú lateral -->
+<section class="bg-light py-5 mt-5">
   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
@@ -81,6 +65,7 @@
 
           <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
           <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
+          <li class="nav-item"><a href="{{ url_for('Administrador.reporte') }}" class="nav-link text-white"><i class="bi bi-calendar2"></i></i> Generar reporte</a></li>
 
           <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
             <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
@@ -108,58 +93,93 @@
   </div>
 </section>
 
-<main class="container my-4">
-
-  <!-- Título y descripción FUERA del contenedor -->
-  <div class="text-center mb-4">
-    <h1 class="titulo-principal fw-bold">GESTIÓN DE ASIGNATURAS</h1>
-    <p class="descripcion text-muted">Gestiona las asignaturas del colegio</p>
-  </div>
-
-  <!-- Contenedor principal -->
-  <div class="card shadow-lg p-4 rounded-4">
-
-    <!-- Botones de acción -->
-    <div id="acciones" class="d-flex justify-content-center gap-3 flex-wrap mb-4">
-      <button class="btn btn-success" onclick="mostrarFormulario()">Agregar Asignatura</button>
-      <button class="btn btn-primary" onclick="editarAsignatura()">Editar Asignatura</button>
-      <button class="btn btn-danger" onclick="desactivarAsignatura()">Desactivar Asignatura</button>
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="container my-4">
+    <div class="text-center mb-4">
+      <h1 class="titulo-header">GESTIÓN DE ASIGNATURAS</h1>
+      <p class="text-muted">Administra las asignaturas registradas en el sistema</p>
     </div>
 
-    <!-- Tabla -->
-    <div class="table-responsive">
-      <table id="tablaAsignaturas" class="table table-hover align-middle text-center">
-        <thead class="table-azul">
-          <tr>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Ciclo</th>
-            <th>Cursos</th>
-            <th>Profesor</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+    <div class="card shadow-lg p-4 rounded-4">
+      <div class="d-flex justify-content-center gap-3 mb-4">
+        <button class="btn btn-success" onclick="mostrarFormulario()">Agregar Asignatura</button>
+      </div>
+
+      <div class="table-responsive">
+        <table id="tablaAsignaturas" class="table table-hover align-middle text-center">
+          <thead class="table-primary">
+            <tr>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Ciclo</th>
+              <th>Área</th>
+              <th>Docente</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for asig in asignaturas %}
+            <tr data-id="{{ asig.ID_Asignatura }}">
+              <td>{{ asig.Nombre }}</td>
+              <td>{{ asig.Descripcion or 'Sin descripción' }}</td>
+              <td>{{ asig.Grado }}</td>
+              <td>{{ asig.Area }}</td>
+              <td>{{ asig.DocenteNombre }} {{ asig.DocenteApellido }}</td>
+              <td>{{ asig.Estado }}</td>
+              <td>
+                  <button class="btn btn-warning btn-sm" onclick="editarAsignatura({{ asig.ID_Asignatura }})">Editar</button>
+                  {% if asig.Estado == 'Activa' %}
+                  <button class="btn btn-danger btn-sm" onclick="desactivarAsignatura({{ asig.ID_Asignatura }})">Desactivar</button>
+                  {% else %}
+                  <button class="btn btn-success btn-sm" onclick="reactivarAsignatura({{ asig.ID_Asignatura }})">Reactivar</button>
+                  {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
+  </main>
 
-  </div>
-</main>
+  <!-- MODAL -->
+  <div id="modal" class="modal" style="display:none;">
+    <div class="modal-dialog">
+      <div class="modal-content p-4">
+        <h4 id="tituloForm" class="text-center mb-3 text-primary fw-bold">Registrar Asignatura</h4>
 
+        <div class="mb-3">
+          <label for="nombreAsignatura" class="form-label">Nombre</label>
+          <input type="text" id="nombreAsignatura" class="form-control">
+        </div>
 
-<!-- Modal personalizado -->
-<div id="modal" class="modal">
-  <div class="modal-dialog">
-    <div class="modal-content p-4">
-      <h2 id="tituloForm" class="text-center mb-3 text-azul fw-bold">Agregar Asignatura</h2>
+        <div class="mb-3">
+          <label for="descripcionAsignatura" class="form-label">Descripción</label>
+          <textarea id="descripcionAsignatura" class="form-control"></textarea>
+        </div>
 
-      <label>Nombre de la Asignatura:
-        <input type="text" id="nombreAsignatura" class="form-control">
-      </label>
+      <div class="mb-3">
+        <label>Ciclo:
+          <select id="cicloAsignatura" class="form-select">
+            <option value="">-- Seleccione --</option>
+            {% for curso in cursos %}
+              <option value="{{ curso.Grado }}">{{ curso.Grado }} {{ curso.Grupo or '' }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
 
-      <label>Descripción / Temas:
-        <textarea id="descripcionAsignatura" class="form-control"></textarea>
-      </label>
+        <div class="mb-3">
+          <label for="profesorAsignatura" class="form-label">Docente Encargado</label>
+          <select id="profesorAsignatura" class="form-select">
+            <option value="">-- Seleccione --</option>
+            {% for docente in docentes %}
+              <option value="{{ docente.ID_Usuario }}">{{ docente.Nombre }} {{ docente.Apellido }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
 
       <label>Ciclo:
         <select id="cicloAsignatura" class="form-select">
@@ -179,15 +199,107 @@
       <div class="d-flex justify-content-end mt-4">
         <button class="btn btn-success me-2" onclick="guardarAsignatura()">Guardar</button>
         <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+
       </div>
     </div>
   </div>
-</div>
 
+  <!-- SCRIPTS -->
+  <script>
+  const guardarURL = "{{ url_for('Administrador.guardar_asignatura') }}";
+  const editarBaseURL = "{{ url_for('Administrador.editar_asignatura', id=0) }}".slice(0, -1);
+  const desactivarBaseURL = "{{ url_for('Administrador.desactivar_asignatura', id=0) }}".slice(0, -1);
+  const reactivarBaseURL = "{{ url_for('Administrador.reactivar_asignatura', id=0) }}".slice(0, -1);
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ url_for('static', filename='js/Administrador/asignaturas.js') }}"></script>
+  function mostrarFormulario() {
+    document.getElementById("modal").style.display = "block";
+  }
+
+  function cerrarModal() {
+    document.getElementById("modal").style.display = "none";
+    limpiarFormulario();
+  }
+
+  function limpiarFormulario() {
+    document.getElementById("nombreAsignatura").value = '';
+    document.getElementById("descripcionAsignatura").value = '';
+    document.getElementById("cicloAsignatura").value = '';
+    document.getElementById("profesorAsignatura").value = '';
+  }
+
+  function guardarAsignatura() {
+    const nombre = document.getElementById("nombreAsignatura").value.trim();
+    const descripcion = document.getElementById("descripcionAsignatura").value.trim();
+    const ciclo = document.getElementById("cicloAsignatura").value;
+    const id_docente = document.getElementById("profesorAsignatura").value;
+
+    if (!nombre || !id_docente || !ciclo) {
+      alert("Por favor complete todos los campos obligatorios.");
+      return;
+    }
+
+    fetch(guardarURL, {
+      method: "POST",
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: `nombre=${encodeURIComponent(nombre)}&descripcion=${encodeURIComponent(descripcion)}&ciclo=${ciclo}&id_docente=${id_docente}`
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert(data.success);
+        location.reload();
+      } else {
+        alert(data.error);
+      }
+    })
+    .catch(err => console.error(err));
+  }
+
+  function editarAsignatura(id) {
+    const nombre = prompt("Nuevo nombre:");
+    const descripcion = prompt("Nueva descripción:");
+    const ciclo = prompt("Nuevo ciclo:");
+
+    if (!nombre && !descripcion && !ciclo) return;
+
+    fetch(`${editarBaseURL}${id}`, {
+      method: "POST",
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: `nombre=${encodeURIComponent(nombre)}&descripcion=${encodeURIComponent(descripcion)}&ciclo=${encodeURIComponent(ciclo)}`
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.success || data.error);
+      if (data.success) location.reload();
+    });
+  }
+
+  function desactivarAsignatura(id) {
+    if (confirm("¿Seguro que deseas desactivar esta asignatura?")) {
+      fetch(`${desactivarBaseURL}${id}`, { method: "POST" })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.success || data.error);
+        if (data.success) location.reload();
+      });
+    }
+  }
+
+  function reactivarAsignatura(id) {
+    if(confirm("¿Seguro que quieres reactivar esta asignatura?")) {
+        fetch(`${reactivarBaseURL}${id}`, { method: "POST" })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.success || data.error);
+            if(data.success) {
+                location.reload();
+            }
+        })
+        .catch(err => console.error(err));
+    }
+}
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-

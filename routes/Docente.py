@@ -2,7 +2,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from flask_mail import Message
 from werkzeug.utils import secure_filename
-from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Curso, Notificacion, Programacion, Observacion)
+from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Curso, Notificacion, Programacion, Observacion, Docente_Asignatura)
+import datetime
 from datetime import date
 import os
 
@@ -48,24 +49,45 @@ def resumensemanal():
 def registrotutorias():
     return render_template('Docentes/RegistroTutorías.html')
 
+
+
+# ----------------------------------------------------------------------------------------
+#---------------------------------parte de actividades----------------------------
+# -------------------------------------------------------------------------------
+
 @Docente_bp.route('/tareas_actividades1')
+@login_required
 def tareas_actividades1():
-    return render_template('Docentes/Registrar_Tareas_Actividades1.html')
+    # Obtener el ID del docente logueado
+    docente_id = current_user.ID_Usuario
+    print("Docente ID en sesión:", docente_id)
 
-@Docente_bp.route('/tareas_actividades2/<int:curso_id>')
-def tareas_actividades2(curso_id):
-    curso = Curso.query.get(curso_id)
-    actividades = (Actividad.query
-                   .join(Cronograma_Actividades)
-                   .filter(Cronograma_Actividades.ID_Curso == curso_id)
-                   .all())
+    # Buscar cursos donde ese docente tiene asignaciones
+    cursos_asignados = (
+        db.session.query(Curso)
+        .join(Docente_Asignatura)
+        .filter(Docente_Asignatura.ID_Docente == docente_id)
+        .filter(Curso.Estado == 'Activo')
+        .distinct()
+        .all()
+        
+    )
+    print("Cursos asignados:", [c.Grupo for c in cursos_asignados])
+    # Clasificar por ciclo
+    ciclos = {1: [], 2: [], 3: []}
+    for c in cursos_asignados:
+        grado = int(c.Grado)
+        if grado in (6, 7):
+            ciclos[1].append(c)
+        elif grado in (8, 9):
+            ciclos[2].append(c)
+        elif grado in (10, 11):
+            ciclos[3].append(c)
+            
+    
 
-    return render_template('Docentes/Registrar_Tareas_Actividades2.html',
-                           curso=curso,
-                           curso_id=curso_id,
-                           actividades=actividades)
-
-
+    return render_template('Docentes/Registrar_Tareas_Actividades1.html', ciclos=ciclos)
+    
 @Docente_bp.route('/tareas_actividades3/<int:curso_id>/<int:actividad_id>')
 def tareas_actividades3(curso_id, actividad_id):
     # Buscar la actividad en la base de datos
@@ -101,72 +123,92 @@ def tareas_actividades3(curso_id, actividad_id):
 @Docente_bp.route('/tareas_actividades/<int:curso_id>')
 @login_required
 def tareas_actividades(curso_id):
-    curso = Curso.query.get(curso_id)
-    actividades = Actividad.query.filter_by(ID_Curso=curso_id).all()
+    curso = Curso.query.get_or_404(curso_id)
+
+    # Unir Actividad con Cronograma_Actividades para obtener las del curso
+    actividades = (
+        db.session.query(Actividad)
+        .join(Cronograma_Actividades)
+        .filter(Cronograma_Actividades.ID_Curso == curso_id)
+        .all()
+    )
+
     return render_template(
         'Docentes/Registrar_Tareas_Actividades2.html',
         curso=curso,
-        actividades=actividades
+        actividades=actividades,
+        curso_id=curso_id  # 👈 Esto es lo que faltaba
     )
-
-
 # -------------------------------------------
 # Crear nueva actividad
 # -------------------------------------------
 @Docente_bp.route('/crear_actividad/<int:curso_id>', methods=['GET', 'POST'])
 @login_required
 def crear_actividad(curso_id):
-    curso = Curso.query.get_or_404(curso_id) # Buscar el curso por su ID
     if request.method == 'POST':
-        titulo = request.form.get('titulo')
-        tipo = request.form.get('tipo')  # 👈 coincide con Enum del modelo
-        fecha = request.form.get('fecha')
-        estado = request.form.get('estado') or 'Pendiente'  # valor por defecto
-        porcentaje = request.form.get('porcentaje')
-        instrucciones = request.form.get('instrucciones')  # opcional si lo agregas a la tabla
+        try:
+            titulo = request.form.get('titulo')
+            descripcion = request.form.get('instrucciones')
+            tipo = request.form.get('tipo')
+            estado = request.form.get('estado', 'Pendiente')
+            porcentaje = request.form.get('porcentaje')
+            fecha = request.form.get('fecha')
+            hora = request.form.get('hora')
+            pdf = request.files.get('pdfUpload')
 
-        # Buscar el cronograma correspondiente
-        cronograma = Cronograma_Actividades.query.filter_by(ID_Curso=curso_id).first()
-        if not cronograma:
-            flash("No se encontró el cronograma para este curso.", "warning")
+            if not all([titulo, descripcion, tipo, fecha, hora, porcentaje]):
+                flash("Por favor completa todos los campos obligatorios.", "warning")
+                return redirect(request.url)
+
+            # Buscar o crear cronograma
+            cronograma = Cronograma_Actividades.query.filter_by(ID_Curso=curso_id).first()
+            if not cronograma:
+                cronograma = Cronograma_Actividades(
+                    ID_Curso=curso_id,
+                    ID_Periodo=1,
+                    FechaInicial=datetime.datetime.now().date(),
+                    FechaFinal=datetime.datetime.now().date()
+                )
+                db.session.add(cronograma)
+                db.session.commit()
+
+            # Guardar PDF en carpeta
+            nombre_pdf = None
+            if pdf and pdf.filename:
+                nombre_seguro = secure_filename(pdf.filename)
+                nombre_pdf = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{nombre_seguro}"
+                ruta_pdf = os.path.join(current_app.config['UPLOAD_FOLDER'], nombre_pdf)
+                print("Archivo recibido:", pdf)
+                print("Nombre del archivo:", pdf.filename)
+                print("Ruta donde se guardará:", ruta_pdf)
+                pdf.save(ruta_pdf)
+                print(f"✅ PDF guardado en: {ruta_pdf}")
+            # Crear actividad
+            nueva_actividad = Actividad(
+                Titulo=titulo,
+                Tipo=tipo,
+                Fecha=datetime.datetime.strptime(fecha, "%Y-%m-%d").date(),
+                Hora=datetime.datetime.strptime(hora, "%H:%M").time(),
+                Descripcion=descripcion,
+                ArchivoPDF=nombre_pdf,  # 👈 solo guardamos el nombre
+                Estado=estado,
+                Porcentaje=porcentaje,
+                ID_Cronograma_Actividades=cronograma.ID_Cronograma_Actividades
+            )
+
+            db.session.add(nueva_actividad)
+            db.session.commit()
+
+            flash("✅ Actividad publicada correctamente.", "success")
             return redirect(url_for('Docente.tareas_actividades', curso_id=curso_id))
 
-        # Procesar archivo PDF
-        pdf_file = request.files.get('pdfUpload')
-        pdf_nombre = None
-        if pdf_file and pdf_file.filename != '':
-            upload_folder = os.path.join(os.getcwd(), 'app', 'static', 'uploads')
-            os.makedirs(upload_folder, exist_ok=True)
-            pdf_nombre = secure_filename(pdf_file.filename)
-            pdf_file.save(os.path.join(upload_folder, pdf_nombre))
+        except Exception as e:
+            db.session.rollback()
+            print("❌ Error al crear actividad:", e)
+            flash("Ocurrió un error al crear la actividad.", "danger")
+            return redirect(request.url)
 
-        # Crear objeto Actividad
-        nueva_actividad = Actividad(
-            Titulo=titulo,
-            Tipo=tipo,
-            Fecha=fecha,
-            ID_Cronograma_Actividades=cronograma.ID_Cronograma_Actividades,
-            Estado=estado,
-            Porcentaje=porcentaje
-        )
-
-        # (Si luego agregas un campo para instrucciones o PDF, puedes guardarlos también)
-        if hasattr(Actividad, 'Descripcion'):
-            nueva_actividad.Descripcion = instrucciones
-        if hasattr(Actividad, 'ArchivoPDF'):
-            nueva_actividad.ArchivoPDF = pdf_nombre
-
-        # Guardar en BD
-        db.session.add(nueva_actividad)
-        db.session.commit()
-
-        flash("Actividad registrada correctamente.", "success")
-        return redirect(url_for('Docente.tareas_actividades', curso_id=curso_id))
-    
-    curso = Curso.query.get_or_404(curso_id)
-
-    # GET → Mostrar formulario vacío
-    return render_template('Docentes/Registrar_Tareas_Actividades2.html', curso=curso)
+    return render_template("Docentes/Crear_Actividad.html", curso_id=curso_id)
     
 @Docente_bp.route('/editar_actividad/<int:id_actividad>', methods=['GET', 'POST'])
 @login_required
@@ -211,7 +253,7 @@ def editar_actividad(id_actividad):
     # GET → Mostrar formulario con datos actuales
     return render_template('Docentes/Editar_Actividad.html', actividad=actividad)
 
-
+#----------------------------------------------------------------------------------------------------------------------------
 
 @Docente_bp.route('/aprobacion_academica')
 def aprobacion_academica():
@@ -263,36 +305,53 @@ def notas_consultar():
 def calculo_promedio():
     return render_template('Docentes/CalculoPromedio.html')
 
+
+# GESTIÓN DE LA OBSERVACIÓN
+
 @Docente_bp.route('/observador')
 def observador():
+    # Traer observaciones con sus estudiantes y cursos
     observaciones = (
-        db.session.query(Observacion, Usuario)
+        db.session.query(Observacion, Usuario, Curso)
         .join(Matricula, Observacion.ID_Matricula == Matricula.ID_Matricula)
         .join(Usuario, Matricula.ID_Estudiante == Usuario.ID_Usuario)
-        .add_columns(
-            Observacion.Fecha,
-            Observacion.Descripcion,
-            Observacion.Recomendacion,
-            Observacion.Tipo,
-            Observacion.NivelImportancia,
-            Usuario.Nombre,
-            Usuario.Apellido
-        )
+        .join(Curso, Matricula.ID_Curso == Curso.ID_Curso)
         .all()
     )
 
+    # Traer todos los estudiantes
+    estudiantes = Usuario.query.filter_by(Rol='Estudiante').all()
+
+    # Traer todos los cursos
+    cursos = Curso.query.all()
+
+    # Traer todas las matrículas (por si se usan más adelante)
     matriculas = Matricula.query.all()
-    return render_template('docentes/observador.html', observaciones=observaciones, matriculas=matriculas)
+
+    return render_template(
+        'docentes/observador.html',
+        observaciones=observaciones,
+        estudiantes=estudiantes,
+        cursos=cursos,
+        matriculas=matriculas
+    )
 
 
 @Docente_bp.route('/agregar_observacion', methods=['POST'])
 def agregar_observacion():
     try:
-        id_matricula = request.form['id_matricula']
+        id_estudiante = request.form['id_estudiante']
+        id_curso = request.form['id_curso']
         descripcion = request.form['descripcion']
         tipo = request.form['tipo']
-        nivel_importancia = request.form['nivel_importancia']
+        nivel_importancia = request.form['nivelImportancia']
         recomendacion = request.form['recomendacion']
+
+        # Buscar la matrícula correspondiente al estudiante y curso
+        matricula = Matricula.query.filter_by(ID_Estudiante=id_estudiante, ID_Curso=id_curso).first()
+        if not matricula:
+            flash('❌ No se encontró la matrícula para el estudiante en ese curso.', 'danger')
+            return redirect(url_for('Docente.observador'))
 
         nueva_observacion = Observacion(
             Fecha=date.today(),
@@ -302,17 +361,20 @@ def agregar_observacion():
             Recomendacion=recomendacion,
             Estado='Activa',
             ID_Horario=None,
-            ID_Matricula=id_matricula
+            ID_Matricula=matricula.ID_Matricula
         )
 
         db.session.add(nueva_observacion)
         db.session.commit()
         flash('✅ Observación agregada correctamente', 'success')
+
     except Exception as e:
         db.session.rollback()
         flash(f'❌ Error al agregar observación: {e}', 'danger')
 
-    return redirect(url_for('docentes.observador'))
+    return redirect(url_for('Docente.observador'))
+
+
 
 @Docente_bp.route('/horarios')
 def horarios():

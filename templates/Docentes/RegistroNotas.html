@@ -71,66 +71,102 @@
   </div>  
 
   <!-- CONTENIDO -->
-  <div class="container mt-4">
-    <div class="card">
-      <div class="card-body">
-        <h3 class="card-title">Curso {{ curso_id }}</h3>
+  <section class="container py-5 mt-5">
+        <h1 class="text-center mb-4 titulo-principal">REGISTRO DE NOTAS</h1>
+        
+        <h2 class="mt-4 mb-3 text-center fw-bold text-primary">Curso: {{ curso_nombre }}</h2>
 
-        <!-- selector de materia -->
-        <div class="mb-3">
-          <label for="materia" class="form-label">Selecciona una materia:</label>
-          <select id="materia" class="form-select"></select>
-        </div>
-      </div>
-    </div>
-  </div>
+        <form id="formRegistroNotas" method="POST" action="{{ url_for('Docente.guardar_notas_curso', curso_id=curso_id) }}">
+            
+            <div class="row mb-4 g-3 justify-content-center">
+                
+                <div class="col-md-4">
+                    <label for="periodo_select" class="form-label fw-bold">Período Académico</label>
+                    <select class="form-select" id="periodo_select" name="periodo" required>
+                        <option value="" disabled selected>Seleccione Período</option>
+                        <option value="1">Periodo 1</option>
+                        <option value="2">Periodo 2</option>
+                        <option value="3">Periodo 3</option>
+                        <option value="4">Periodo 4</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-4">
+                    <label for="asignatura_select" class="form-label fw-bold">Asignatura</label>
+                    <select class="form-select" id="asignatura_select" name="asignatura" required>
+                        <option value="" disabled selected>Seleccione Asignatura</option>
+                        {% for asignatura in asignaturas %}
+                            <option value="{{ asignatura.id }}">{{ asignatura.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+            </div>
+            
+            <div class="table-responsive mt-4">
+                <table class="table table-bordered table-hover align-middle" id="tablaNotas">
+                    <thead>
+                        <tr class="table-primary">
+                            <th class="text-center"># ID</th>
+                            <th>Nombre Completo</th>
+                            <th class="text-center">Nota 1</th>
+                            <th class="text-center">Nota 2</th>
+                            <th class="text-center">Nota 3</th>
+                            <th class="text-center">Nota 4</th>
+                            <th class="text-center">Nota 5</th>
+                            <th class="text-center">Promedio Final</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for estudiante in estudiantes %}
+                        <tr>
+                            <td class="text-center">{{ estudiante['ID_Usuario'] }}</td>
+                            <td>{{ estudiante.Nombre }} {{ estudiante.Apellido }}</td>
+                            
+                            <td class="text-center"><input type="number" class="form-control form-control-sm text-center nota-input" name="nota_1_{{ estudiante['ID_Usuario'] }}" step="0.1" min="0.0" max="5.0" value="{{ estudiante.nota_1 or '' }}"></td>
+                            <td class="text-center"><input type="number" class="form-control form-control-sm text-center nota-input" name="nota_2_{{ estudiante['ID_Usuario'] }}" step="0.1" min="0.0" max="5.0" value="{{ estudiante.nota_2 or '' }}"></td>
+                            <td class="text-center"><input type="number" class="form-control form-control-sm text-center nota-input" name="nota_3_{{ estudiante['ID_Usuario'] }}" step="0.1" min="0.0" max="5.0" value="{{ estudiante.nota_3 or '' }}"></td>
+                            <td class="text-center"><input type="number" class="form-control form-control-sm text-center nota-input" name="nota_4_{{ estudiante['ID_Usuario'] }}" step="0.1" min="0.0" max="5.0" value="{{ estudiante.nota_4 or '' }}"></td>
+                            <td class="text-center"><input type="number" class="form-control form-control-sm text-center nota-input" name="nota_5_{{ estudiante['ID_Usuario'] }}" step="0.1" min="0.0" max="5.0" value="{{ estudiante.nota_5 or '' }}"></td>
+                            
+                            <td class="text-center fw-bold" id="promedio_final_{{ estudiante['ID_Usuario'] }}">
+                                {{ '%.1f' | format(estudiante['Promedio_Final']) if estudiante['Promedio_Final'] is not none else 'N/A' }}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">No hay estudiantes matriculados en este curso.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-  <!-- BOTONES -->
-  <div class="container mt-3 text-center">
-    <button class="btn btn-success me-2" onclick="guardarNotas()">
-      <i class="bi bi-save"></i> Guardar
-    </button>
-    <button class="btn btn-warning me-2" onclick="restablecerNotas()">
-      <i class="bi bi-arrow-counterclockwise"></i> Restablecer
-    </button>
-    <button class="btn btn-primary" id="agregarColumnaBtn">
-      <i class="bi bi-plus-square"></i> Agregar columna de nota
-    </button>
-  </div>
+            <div class="d-flex justify-content-center mt-4">
+                <button type="submit" class="btn btn-success btn-lg">
+                    Guardar Todas las Notas
+                </button>
+            </div>
+        </form>
+    </section>
 
-  <!-- TABLA -->
-  <div class="tabla-container mt-4">
-    <table class="tabla table table-bordered text-center align-middle">
-      <thead>
-        <tr id="tablaHeader">
-          <th class="fijo">Nombre</th>
-          <th class="fijo">Curso</th>
-          <th class="fijo">Materia</th>
-          <th class="nota" draggable="true">Nota 1</th>
-          <th class="nota" draggable="true">Nota 2</th>
-          <th class="nota" draggable="true">Nota 3</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="fijo">Ana Gómez</td>
-          <td class="fijo">{{ curso_id }}</td>
-          <td class="fijo">Matemáticas</td>
-          <td><input type="number" step="0.1" min="1" max="5"></td>
-          <td><input type="number" step="0.1" min="1" max="5"></td>
-          <td><input type="number" step="0.1" min="1" max="5"></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <script>
+        // Variables principales necesarias para AJAX
+        const ASIGNATURA_ID = 0; // Se inicializa en 0, se carga después
+        const CURSO_ID = {{ curso_id | default(0) }}; // Se pasa el ID del curso
+        
+        // 🛑 URL base para cargar notas: Necesita el ID de CURSO, ASIGNATURA y PERIODO
+        // Debes crear una nueva ruta en Python para recibir los 3 parámetros vía AJAX
+        const URL_CARGAR_NOTAS = "{{ url_for('Docente.cargar_notas_ajax') }}"; 
+        
+        // URL de guardado (usa el ID del curso y asignatura_id se obtendría del formulario)
+        const URL_GUARDAR_NOTAS = "{{ url_for('Docente.guardar_notas_curso', curso_id=curso_id | default(0)) }}";
+        
+        // ... (El resto de tus variables y lógica JS) ...
+    </script>
 
-  <!-- JS -->
-  <script src="{{ url_for('static', filename='js/materias.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/acciones_notas.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/columnas_notas.js') }}"></script>
-  <script>
-    cargarMaterias("{{ curso_id }}");
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/Docentes/RegistroNotas.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

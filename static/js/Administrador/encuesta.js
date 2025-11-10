@@ -237,17 +237,12 @@ imgInput.addEventListener("change", e => {
 });
 
 
-form.addEventListener("submit", (e) => {
+form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const fecha = document.getElementById("fechaCierre").value;
     const titulo = document.getElementById("tituloEncuesta").value;
     const usuarios = [...document.querySelectorAll(".targetChk:checked")].map(el => el.value);
-
-    if (!fecha) { alert("Debe seleccionar una fecha de cierre."); return; }
-    if (!titulo.trim()) { alert("Debe ingresar un título."); return; }
-    if (usuarios.length === 0) { alert("Debe seleccionar al menos un destinatario."); return; }
-    if (document.querySelectorAll(".pregunta-box").length === 0) { alert("Debe agregar al menos una pregunta."); return; }
 
     const preguntas = [];
     let preguntasVacias = false;
@@ -259,34 +254,39 @@ form.addEventListener("submit", (e) => {
         preguntas.push({ texto, tipo, opciones: tipo === "text" ? [] : opciones });
     });
 
-    if (preguntasVacias) { alert("Hay preguntas sin texto."); return; }
+    if (!titulo.trim() || !fecha || usuarios.length === 0 || preguntasVacias) {
+        alert("Complete todos los campos obligatorios y asegúrese de que todas las preguntas tengan texto.");
+        return;
+    }
 
-    const nuevaEncuesta = {
-        id: isEditing ? parseInt(encuestaIdToEdit) : Date.now(),
-        fechaCierre: fecha,
-        titulo: titulo,
-        usuarios,
-        preguntas,
-    };
+    // Crear FormData para enviar archivo si hay imagen
+    const formData = new FormData();
+    formData.append("Titulo", titulo);
+    formData.append("FechaCierre", fecha);
+    formData.append("Usuarios", JSON.stringify(usuarios));
+    formData.append("Preguntas", JSON.stringify(preguntas));
+    
+    const archivo = document.getElementById("imgInput").files[0];
+    if (archivo) formData.append("Archivo", archivo);
 
-    let encuestas = JSON.parse(localStorage.getItem("encuestas")) || [];
-    if (isEditing) {
-        const index = encuestas.findIndex(e => e.id === nuevaEncuesta.id);
-        if (index !== -1) {
-            encuestas[index] = nuevaEncuesta;
-            localStorage.setItem("encuestas", JSON.stringify(encuestas));
-            alert("¡Cambios guardados correctamente!"); // <-- mensaje en lugar de redirección
+    try {
+        const response = await fetch(form.action, {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            Swal.fire("¡Éxito!", result.message, "success");
+            form.reset();
+            preguntasContainer.innerHTML = "";
+            imgPreview.textContent = "Sin imagen";
+            contadorPreguntas = 0;
         } else {
-            alert("No se encontró la encuesta original.");
-            return;
+            Swal.fire("Error", result.message, "error");
         }
-    } else {
-        encuestas.push(nuevaEncuesta);
-        localStorage.setItem("encuestas", JSON.stringify(encuestas));
-        alert("Encuesta creada correctamente.");
-        form.reset();
-        preguntasContainer.innerHTML = "";
-        imgPreview.textContent = "Sin imagen";
-        contadorPreguntas = 0;
+    } catch (error) {
+        console.error(error);
+        Swal.fire("Error", "Ocurrió un error al guardar la encuesta.", "error");
     }
 });

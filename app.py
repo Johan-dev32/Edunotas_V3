@@ -41,10 +41,12 @@ from Controladores.models import db, Usuario
 # Configuración de la aplicación
 app = Flask(__name__)
 
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# Carpeta donde se guardarán los archivos subidos
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+
+# Crear la carpeta si no existe
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Configuración de la base de datos
 DB_URL = 'mysql+pymysql://root:@127.0.0.1:3306/edunotas'
@@ -52,6 +54,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'clave_super_secreta'
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_pre_ping': True}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 app.config.update(
     MAIL_SERVER="smtp.gmail.com",
@@ -144,73 +147,6 @@ def indexdocente():
 @login_required
 def indexacudiente():
     return render_template("Acudiente/Paginainicio_Acudiente.html", usuario=current_user)
-
-
-# ---------------- NOTIFICACIONES ----------------
-
-@app.route('/notificaciones')
-@login_required
-def notificaciones():
-    rol = current_user.Rol
-    mensajes = notificaciones_globales.get(rol, [])
-    return jsonify({"notificaciones": mensajes})
-
-
-@app.route('/enviar_notificacion', methods=['POST'])
-@login_required
-def enviar_notificacion():
-    if current_user.Rol != "Administrador":
-        return jsonify({"status": "error", "message": "Solo el Administrador puede enviar notificaciones."})
-
-    try:
-        destino = request.form.get("destino")
-        asunto = request.form.get("asunto")
-        mensaje = request.form.get("mensaje")
-
-        texto_final = f"{asunto}: {mensaje}"
-
-        # Enviar a todos los roles
-        if destino == "Todos los roles":
-            for rol in notificaciones_globales.keys():
-                notificaciones_globales[rol].append(texto_final)
-
-        # Enviar a un rol específico
-        elif destino in notificaciones_globales:
-            notificaciones_globales[destino].append(texto_final)
-
-        else:
-            return jsonify({"status": "error", "message": "Destino no válido."})
-
-        return jsonify({"status": "success", "message": "Notificación enviada correctamente."})
-
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
-
-@app.route('/notificaciones/enviar_todos', methods=['POST'])
-@login_required
-def enviar_notificacion_todos():
-    data = request.get_json()
-    titulo = data.get('titulo')
-    contenido = data.get('contenido')
-
-    if not titulo or not contenido:
-        return jsonify({"error": "Faltan datos"}), 400
-
-    # Enviar a todos los usuarios conectados
-    for user_id in notificaciones_temporales.keys():
-        notificaciones_temporales[user_id].append({
-            "titulo": titulo,
-            "contenido": contenido
-        })
-
-    return jsonify({"status": "ok"})
-
-@app.route('/notificaciones/obtener')
-@login_required
-def obtener_notificaciones():
-    mensajes = notificaciones_temporales.get(current_user.ID_Usuario, [])
-    notificaciones_temporales[current_user.ID_Usuario] = []
-    return jsonify(mensajes)
 
 
 
@@ -399,6 +335,7 @@ app.register_blueprint(Docente_bp)
 app.register_blueprint(Estudiante_bp)
 app.register_blueprint(Acudiente_bp)
 app.register_blueprint(notificaciones_bp)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -88,34 +88,56 @@ cancelSend.addEventListener("click", () => {
 });
 
 // 📌 Botón confirmar → enviar noticia
-confirmSend.addEventListener("click", () => {
-  confirmModal.style.display = "none";
+// En Noticias.js, reemplazar la sección 'Botón confirmar → enviar noticia'
 
-  const fecha = document.getElementById("fecha").value;
-  const titulo = document.getElementById("titulo").value;
-  const contenido = document.getElementById("contenido").value;
-  const creadoPor = document.getElementById("creadoPor").value || "Anónimo";
+confirmSend.addEventListener("click", async () => {
+  confirmModal.style.display = "none";
 
-  let imagen = "";
-  if (preview.querySelector("img")) {
-    imagen = preview.querySelector("img").src;
-  }
+  const formNoticias = document.getElementById("formNoticias");
+  const fileInput = document.getElementById("fileInput"); // Asegúrate de que fileInput esté disponible
 
-  // --- Guardar noticia ---
-  let noticias = JSON.parse(localStorage.getItem("noticias")) || [];
+  // Crear FormData para enviar texto y archivo
+  const formData = new FormData();
+  
+  formData.append("fecha", document.getElementById("fecha").value);
+  formData.append("titulo", document.getElementById("titulo").value);
+  formData.append("contenido", document.getElementById("contenido").value);
+  // Usamos "creadoPor" como un campo de texto simple
+  formData.append("creadoPor", document.getElementById("creadoPor").value || "Anónimo");
 
-  // Agregar nueva noticia
-  noticias.push({ fecha, titulo, contenido, creadoPor, imagen });
+  // Añadir el archivo. Usa 'archivo' como nombre de campo (debe coincidir con Flask)
+  if (fileInput.files.length > 0) {
+    formData.append("archivo", fileInput.files[0]);
+  }
+ try {
+        const res = await fetch("/administrador/noticias/registro", {
+            method: "POST",
+            body: formData,
+        });
 
-  // Mantener solo las últimas 4
-  if (noticias.length > 4) {
-    noticias = noticias.slice(-4);
-  }
+        // Manejo de errores HTTP (400, 500, etc.)
+        if (!res.ok) {
+            // Intenta leer el error detallado del JSON si Flask lo proporciona
+            const errorData = await res.json().catch(() => ({ error: "Error de servidor no especificado." }));
+            alert("❌ Error al publicar noticia: " + (errorData.error || `Error HTTP ${res.status}.`));
+            return;
+        }
+        
+        const data = await res.json();
 
-  localStorage.setItem("noticias", JSON.stringify(noticias));
+        if (data.success) {
+            alert("✅ Noticia publicada correctamente en la Base de Datos.");
+            // Limpiar formulario y redireccionar
+            formNoticias.reset();
+            window.location.href = "Administrador/noticias_vistas";// O la ruta que desees
+        } else {
+            // Manejo de errores de validación de Flask (success: false)
+            alert("❌ Error al publicar noticia: " + (data.error || "Fallo desconocido."));
+        }
 
-  alert("✅ Noticia publicada correctamente");
-
-  // 🔁 Opcional: redirigir a inicio o noticias vistas
-   window.location.href = "/paginainicio";
+    } catch (error) {
+        console.error("Error de conexión (red o CORS):", error);
+        // ✨ CORRECCIÓN: Usamos un mensaje más simple para errores de red/fetch
+        alert("🛑 La conexión falló. Por favor, revisa tu red o intenta más tarde.");
+    }
 });

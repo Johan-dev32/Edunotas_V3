@@ -40,7 +40,7 @@ class Usuario(UserMixin, db.Model):
     Estado = db.Column(db.Enum(*EstadoEnum, name="estado_enum"), default="Activo")
     Genero = db.Column(db.Enum(*GeneroEnum, name="genero_enum"))
     Rol = db.Column(db.Enum(*RolEnum, name="rol_enum"), nullable=False)
-
+    
     # Relaciones
     notificaciones = relationship("Notificacion", back_populates="usuario", cascade="all, delete-orphan")
     acudientes = relationship("Acudiente", back_populates="usuario", foreign_keys="Acudiente.ID_Usuario", cascade="all, delete-orphan")
@@ -114,6 +114,7 @@ class Matricula(db.Model):
     curso = relationship("Curso", back_populates="matriculas")
     actividades_estudiante = relationship("Actividad_Estudiante", back_populates="matricula", cascade="all, delete-orphan")
     reportes = relationship("Reporte_Notas", back_populates="matricula", foreign_keys="Reporte_Notas.ID_Matricula")
+    
 
 class Periodo(db.Model):
     __tablename__ = "Periodo"
@@ -382,6 +383,8 @@ class Estudiantes_Repitentes(db.Model):
     TipoDocumento = db.Column(db.String(50))
     NumeroDocumento = db.Column(db.String(50))
     NombreCompleto = db.Column(db.String(200))
+    Curso = db.Column(db.String(50))
+    FechaRegistro = db.Column(db.DateTime, default=datetime.utcnow) 
     Veces = db.Column(db.Integer, default=1)
     ID_Matricula = db.Column(db.Integer, db.ForeignKey("Matricula.ID_Matricula", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
     Matriculado = db.Column(db.Boolean, default=False)
@@ -414,3 +417,40 @@ class Citaciones(db.Model):
 
     destinatario = relationship("Usuario", back_populates="recibidos_citaciones", foreign_keys=[ID_Usuario])
     enviado_por = relationship("Usuario", back_populates="enviados_citaciones", foreign_keys=[EnviadoPor])
+    
+
+class ResumenSemanal(db.Model):
+    __tablename__ = 'Resumen_Semanal'
+    ID_Resumen_Semanal = db.Column(db.Integer, primary_key=True)
+    Fecha = db.Column(db.DateTime, default=db.func.current_timestamp()) 
+    CreadoPor = db.Column(
+        db.Integer, 
+        db.ForeignKey('Usuario.ID_Usuario', ondelete='SET NULL'), 
+        nullable=True)
+    Titulo = db.Column(db.String(255), nullable=False)
+    ActividadesRealizadas = db.Column(db.Text) 
+    usuario_creador = db.relationship(
+        'Usuario', 
+        backref='resumenes_creados',
+        foreign_keys=[CreadoPor])
+    def __repr__(self):
+        return f"ResumenSemanal(ID={self.ID_Resumen_Semanal}, Título='{self.Titulo}')"
+    
+
+class Nota_Calificaciones(db.Model):
+    __tablename__ = 'Nota_Calificaciones'
+    
+    ID_Calificacion = db.Column(db.Integer, primary_key=True, autoincrement=True) 
+    ID_Estudiante = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
+    ID_Asignatura = db.Column(db.Integer, db.ForeignKey('Asignatura.ID_Asignatura'), nullable=False)
+    Periodo = db.Column(db.Integer, nullable=False) 
+    Nota_1 = db.Column(db.Float, nullable=True) 
+    Nota_2 = db.Column(db.Float, nullable=True)
+    Nota_3 = db.Column(db.Float, nullable=True)
+    Nota_4 = db.Column(db.Float, nullable=True)
+    Nota_5 = db.Column(db.Float, nullable=True)
+    Promedio_Final = db.Column(db.Float, nullable=True) 
+
+    __table_args__ = (
+        db.UniqueConstraint('ID_Estudiante', 'ID_Asignatura', 'Periodo', name='uq_calificacion_periodo'),
+    )

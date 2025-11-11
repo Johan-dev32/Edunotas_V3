@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import login_required, current_user
 from Controladores.models import db, Usuario, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Notificacion
 import os
@@ -7,9 +7,29 @@ from decimal import Decimal
 #Definir el Blueprint para el administardor
 Acudiente_bp = Blueprint('Acudiente', __name__, url_prefix='/acudiente')
 
+
 @Acudiente_bp.route('/paginainicio')
 def paginainicio():
     return render_template('Acudiente/Paginainicio_Acudiente.html')
+
+# ---------------- NOTIFICACIONES ACUDIENTE----------------
+
+@Acudiente_bp.route('/notificaciones', methods=['GET'])
+def obtener_notificaciones():
+    user_id = session.get('user_id')
+    notificaciones = Notificacion.query.filter_by(ID_Usuario=user_id, Estado='No leída').all()
+    return jsonify([
+        {"asunto": n.Asunto, "mensaje": n.Mensaje, "fecha": n.Fecha.strftime("%d-%m-%Y %H:%M")}
+        for n in notificaciones
+    ])
+    
+@Acudiente_bp.route("/notificaciones/recibir")
+@login_required
+def recibir_notificaciones():
+    usuario = current_user  # depende de tu setup con Flask-Login
+    notis = Notificacion.query.filter_by(usuario_id=usuario.id, leida=False).all()
+    lista = [{"titulo": n.titulo, "mensaje": n.mensaje} for n in notis]
+    return jsonify(lista)
 
 @Acudiente_bp.route('/ver_notas')
 def ver_notas():

@@ -59,7 +59,7 @@
 
 
 <!--  MENU  -->
-  <section class="bg-light py-5 mt-5">
+
   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
@@ -128,8 +128,15 @@
 
       <!-- Título -->
       <div class="col-md-6">
-  <label for="creadoPor" class="form-label">CREADO POR</label>
-  <input type="text" class="form-control" id="creadoPor" name="creadoPor" placeholder="Nombre del autor">
+  <label for="creadoPor" class="form-label">ROL DE CREACIÓN</label>
+  <select class="form-control" id="creadoPor" name="creadoPor" required>
+    <option value="" selected disabled>Seleccione el Rol</option>
+    <option value="Administrador">Administrador</option>
+    <option value="Acudiente">Acudiente</option>
+    <option value="Docente">Docente</option>
+    <option value="Estudiante">Estudiante</option>
+    <option value="Anónimo">Anónimo</option>
+  </select>
 </div>
 
 

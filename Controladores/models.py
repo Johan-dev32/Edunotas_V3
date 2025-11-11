@@ -114,6 +114,7 @@ class Matricula(db.Model):
     curso = relationship("Curso", back_populates="matriculas")
     actividades_estudiante = relationship("Actividad_Estudiante", back_populates="matricula", cascade="all, delete-orphan")
     reportes = relationship("Reporte_Notas", back_populates="matricula", foreign_keys="Reporte_Notas.ID_Matricula")
+    
 
 class Periodo(db.Model):
     __tablename__ = "Periodo"
@@ -375,6 +376,7 @@ class Estudiantes_Repitentes(db.Model):
     TipoDocumento = db.Column(db.String(50))
     NumeroDocumento = db.Column(db.String(50))
     NombreCompleto = db.Column(db.String(200))
+    Curso = db.Column(db.String(50))
     Veces = db.Column(db.Integer, default=1)
     ID_Matricula = db.Column(db.Integer, db.ForeignKey("Matricula.ID_Matricula", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
     Matriculado = db.Column(db.Boolean, default=False)
@@ -407,3 +409,21 @@ class Citaciones(db.Model):
 
     destinatario = relationship("Usuario", back_populates="recibidos_citaciones", foreign_keys=[ID_Usuario])
     enviado_por = relationship("Usuario", back_populates="enviados_citaciones", foreign_keys=[EnviadoPor])
+    
+
+class ResumenSemanal(db.Model):
+    __tablename__ = 'Resumen_Semanal'
+    ID_Resumen_Semanal = db.Column(db.Integer, primary_key=True)
+    Fecha = db.Column(db.DateTime, default=db.func.current_timestamp()) 
+    CreadoPor = db.Column(
+        db.Integer, 
+        db.ForeignKey('Usuario.ID_Usuario', ondelete='SET NULL'), 
+        nullable=True)
+    Titulo = db.Column(db.String(255), nullable=False)
+    ActividadesRealizadas = db.Column(db.Text) 
+    usuario_creador = db.relationship(
+        'Usuario', 
+        backref='resumenes_creados',
+        foreign_keys=[CreadoPor])
+    def __repr__(self):
+        return f"ResumenSemanal(ID={self.ID_Resumen_Semanal}, Título='{self.Titulo}')"

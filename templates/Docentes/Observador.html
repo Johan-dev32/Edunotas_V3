@@ -126,31 +126,18 @@
               </tr>
             </thead>
             <tbody>
-              {% for obs, est in observaciones %}
-            <tr>
-              <td>{{ est.Nombre }} {{ est.Apellido }}</td>
-              <td>
-                {{ obs.matricula.curso.NombreCurso if obs.matricula and
-                obs.matricula.curso else '' }}
-              </td>
-              <td>{{ obs.Tipo }}</td>
-              <td>{{ obs.NivelImportancia }}</td>
-              <td>{{ obs.Fecha.strftime('%d/%m/%Y') if obs.Fecha else '' }}</td>
-              <td class="text-start">
-                <pre class="mb-0">{{ obs.Descripcion }}</pre>
-              </td>
-              <td class="text-start">
-                <pre class="mb-0">{{ obs.Recomendacion }}</pre>
-              </td>
-              <td>{{ obs.Estado }}</td>
-            </tr>
-            {% else %}
-            <tr>
-              <td colspan="8" class="text-muted">
-                No hay observaciones registradas
-              </td>
-            </tr>
-            {% endfor %}
+              {% for obs, est, curso in observaciones %}
+                <tr>
+                  <td>{{ est.Nombre }} {{ est.Apellido }}</td>
+                  <td>{{ curso.NombreCurso }}</td>
+                  <td>{{ obs.Tipo }}</td>
+                  <td>{{ obs.NivelImportancia }}</td>
+                  <td>{{ obs.Fecha.strftime('%d/%m/%Y') if obs.Fecha else '' }}</td>
+                  <td class="text-start">{{ obs.Descripcion }}</td>
+                  <td class="text-start">{{ obs.Recomendacion }}</td>
+                  <td>{{ obs.Estado }}</td>
+                </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
@@ -169,14 +156,24 @@
           </div>
           <div class="modal-body">
             <div class="mb-3">
-              <label class="form-label fw-semibold">Estudiante</label>
-              <select name="id_matricula" class="form-select" required>
-                <option value="">Seleccione...</option>
-                {% for est in estudiantes %}
-                <option value="{{ est.ID_Usuario }}">{{ est.Nombre }} {{ est.Apellido }}</option>
-                {% endfor %}
-              </select>
-            </div>
+  <label class="form-label fw-semibold">Estudiante</label>
+  <select name="id_estudiante" class="form-control mb-2" required>
+    <option value="" selected disabled>Seleccione un estudiante</option>
+    {% for est in estudiantes %}
+      <option value="{{ est.ID_Usuario }}">{{ est.Nombre }} {{ est.Apellido }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+<div class="mb-3">
+  <label class="form-label fw-semibold">Curso</label>
+  <select name="id_curso" class="form-control mb-2" required>
+    <option value="" selected disabled>Seleccione un curso</option>
+    {% for curso in cursos %}
+      <option value="{{ curso.Grado }}">{{ curso.Grado }} {{ curso.Grupo or '' }}</option>
+    {% endfor %}
+  </select>
+</div>
 
             <select name="tipo" class="form-control mb-2" required>
             <option value="" selected disabled>Seleccione el tipo de observación</option>

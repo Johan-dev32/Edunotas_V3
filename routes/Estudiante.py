@@ -8,9 +8,30 @@ from decimal import Decimal
 #Definir el Blueprint para el administardor
 Estudiante_bp = Blueprint('Estudiante', __name__, url_prefix='/estudiante')
 
+
 @Estudiante_bp.route('/paginainicio')
 def paginainicio():
     return render_template('Estudiante/Paginainicio_Estudiante.html')
+
+# ---------------- NOTIFICACIONES ESTUDIANTE----------------
+
+@Estudiante_bp.route('/notificaciones', methods=['GET'])
+def obtener_notificaciones():
+    user_id = session.get('user_id')
+    notificaciones = Notificacion.query.filter_by(ID_Usuario=user_id, Estado='No leída').all()
+    return jsonify([
+        {"asunto": n.Asunto, "mensaje": n.Mensaje, "fecha": n.Fecha.strftime("%d-%m-%Y %H:%M")}
+        for n in notificaciones
+    ])
+    
+@Estudiante_bp.route("/notificaciones/recibir")
+@login_required
+def recibir_notificaciones():
+    usuario = current_user  # depende de tu setup con Flask-Login
+    notis = Notificacion.query.filter_by(usuario_id=usuario.id, leida=False).all()
+    lista = [{"titulo": n.titulo, "mensaje": n.mensaje} for n in notis]
+    return jsonify(lista)
+
 
 @Estudiante_bp.route('/verhorario')
 def verhorario():

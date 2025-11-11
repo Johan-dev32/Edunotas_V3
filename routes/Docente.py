@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app
 from flask_login import login_required, current_user
 from flask_mail import Message
 from werkzeug.utils import secure_filename
-from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Curso, Notificacion, Programacion, Observacion)
+from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Curso, Notificacion, Programacion, Observacion, ResumenSemanal, Tutorias)
 from datetime import date
 import os
 
@@ -13,24 +13,31 @@ from decimal import Decimal
 #Definir el Blueprint para el administardor
 Docente_bp = Blueprint('Docente', __name__, url_prefix='/docente')
 
-@Docente_bp.route('/notificaciones', methods=['GET'])
-@login_required
-def obtener_notificaciones():
-    notificaciones = Notificacion.query.filter_by(usuario_id=current_user.id).order_by(Notificacion.fecha.desc()).all()
-    data = [
-        {
-            'titulo': n.titulo,
-            'contenido': n.contenido,
-            'fecha': n.fecha.strftime('%Y-%m-%d %H:%M:%S'),
-            'leido': n.leido
-        }
-        for n in notificaciones
-    ]
-    return jsonify(data)
+
 
 @Docente_bp.route('/paginainicio')
 def paginainicio():
     return render_template('Docentes/Paginainicio_Docentes.html')
+
+# ---------------- NOTIFICACIONES DOCENTE----------------
+
+
+@Docente_bp.route('/notificaciones', methods=['GET'])
+def obtener_notificaciones():
+    user_id = session.get('user_id')
+    notificaciones = Notificacion.query.filter_by(ID_Usuario=user_id, Estado='No leída').all()
+    return jsonify([
+        {"asunto": n.Asunto, "mensaje": n.Mensaje, "fecha": n.Fecha.strftime("%d-%m-%Y %H:%M")}
+        for n in notificaciones
+    ])
+    
+@Docente_bp.route("/notificaciones/recibir")
+@login_required
+def recibir_notificaciones():
+    usuario = current_user  # depende de tu setup con Flask-Login
+    notis = Notificacion.query.filter_by(usuario_id=usuario.id, leida=False).all()
+    lista = [{"titulo": n.titulo, "mensaje": n.mensaje} for n in notis]
+    return jsonify(lista)
 
 @Docente_bp.route('/manual')
 def manual():
@@ -44,9 +51,137 @@ def materialapoyo():
 def resumensemanal():
     return render_template('Docentes/ResumenSemanal.html')
 
+@Docente_bp.route('/resumensemanal/registro', methods=['POST'])
+def registrar_resumen_semanal():
+    try:
+        # 1. Obtener datos del formulario
+        # Nota: Los nombres deben coincidir con los atributos 'name' del HTML
+        fecha_str = request.form.get('fecha')
+        titulo = request.form.get('titulo')
+        actividades = request.form.get('redaccion')
+        
+        # 2. Obtener el ID del usuario logueado (CRÍTICO)
+        # DEBES ASEGURARTE DE QUE ESTA VARIABLE FUNCIONE EN TU APLICACIÓN
+        # Si no usas session, usa el método que tengas para obtener el ID del usuario logueado.
+        creado_por_id = session.get('user_id', 1) # Usamos 1 como fallback si la sesión no está lista
+
+        if not fecha_str or not titulo or not actividades:
+            return jsonify({'success': False, 'error': 'Faltan campos obligatorios.'}), 400
+
+        # Convertir fecha de string a datetime si es necesario, o solo usar el string si la DB lo acepta
+        # Lo mejor es convertirlo:
+        from datetime import datetime
+        fecha_dt = datetime.strptime(fecha_str, '%Y-%m-%d')
+        
+        # 3. Crear y guardar el nuevo objeto ResumenSemanal
+        nuevo_resumen = ResumenSemanal(
+            Fecha=fecha_dt,
+            CreadoPor=creado_por_id,
+            Titulo=titulo,
+            ActividadesRealizadas=actividades
+        )
+        
+        db.session.add(nuevo_resumen)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Resumen guardado exitosamente.'})
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error al registrar resumen: {e}")
+        # Retornamos 500 para indicar un fallo interno del servidor
+        return jsonify({'success': False, 'error': f'Error interno del servidor: {str(e)}'}), 500
+
 @Docente_bp.route('/registrotutorias')
 def registrotutorias():
     return render_template('Docentes/RegistroTutorías.html')
+
+@Docente_bp.route("/tutorias/historial", methods=["GET"])
+def historial_tutorias():
+    """
+    Ruta API para cargar todas las tutorías guardadas en la BD.
+    Esta es la ruta que llama el JavaScript al cargar la página.
+    """
+    try:
+        # Consulta las tutorías ordenadas por fecha de realización descendente (más recientes primero)
+        tutorias = Tutorias.query.order_by(Tutorias.FechaRealizacion.desc()).all()
+        
+        result = [
+            {
+                "id": t.ID_Tutoria,
+                "nombre": t.NombreCompleto,
+                "rol": t.Rol,
+                "tema": t.Tema,
+                "fecha": t.FechaRealizacion.strftime("%Y-%m-%d"), 
+                "curso": t.Curso, 
+                "estudiante": t.NombreEstudiante, 
+                "correo": t.Correo,
+                "motivo": t.Motivo,
+                "observaciones": t.Observaciones
+            }
+            for t in tutorias
+        ]
+        
+        # Devuelve el JSON que el frontend espera
+        return jsonify({"success": True, "tutorias": result})
+        
+    except Exception as e:
+        print(f"Error al cargar historial de tutorías: {e}")
+        return jsonify({"success": False, "error": "Error de servidor al cargar datos."}), 500
+    
+@Docente_bp.route("/tutorias/registro", methods=["POST"])
+def guardar_tutoria():
+    """
+    Recibe los datos de la tutoría desde el modal y los guarda en la BD.
+    """
+    data = request.get_json()
+    
+    # 🚨 Validación de datos básicos
+    if not all(key in data for key in ["nombre", "rol", "tema", "fecha", "curso", "estudiante", "correo", "motivo", "observaciones"]):
+        return jsonify({"success": False, "error": "Faltan campos obligatorios."}), 400
+
+    try:
+        # Convertir la fecha de String ("YYYY-MM-DD") a objeto datetime
+        fecha_realizacion = datetime.strptime(data["fecha"], "%Y-%m-%d")
+        
+        # Crear el nuevo objeto Tutorias (Alineado con el modelo modificado)
+        nueva_tutoria = Tutorias(
+            NombreCompleto=data["nombre"],
+            Rol=data["rol"],
+            Tema=data["tema"],
+            FechaRealizacion=fecha_realizacion,
+            Curso=data["curso"],                  
+            NombreEstudiante=data["estudiante"],  
+            Correo=data["correo"],
+            Motivo=data["motivo"],
+            Observaciones=data["observaciones"]
+        )
+        
+        db.session.add(nueva_tutoria)
+        db.session.commit()
+        
+        # Devolver el objeto guardado para que el JS actualice la tabla
+        return jsonify({
+            "success": True,
+            "message": "Tutoría registrada con éxito.",
+            "tutoria": {
+                "id": nueva_tutoria.ID_Tutoria,
+                "nombre": nueva_tutoria.NombreCompleto,
+                "rol": nueva_tutoria.Rol,
+                "tema": nueva_tutoria.Tema,
+                "fecha": nueva_tutoria.FechaRealizacion.strftime("%Y-%m-%d"), 
+                "curso": nueva_tutoria.Curso,
+                "estudiante": nueva_tutoria.NombreEstudiante,
+                "correo": nueva_tutoria.Correo,
+                "motivo": nueva_tutoria.Motivo,
+                "observaciones": nueva_tutoria.Observaciones
+            }
+        }), 201 
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error crítico al guardar tutoría en BD: {e}") 
+        return jsonify({"success": False, "error": f"Error interno del servidor: {str(e)}", "trace": str(e)}), 500
 
 @Docente_bp.route('/tareas_actividades1')
 def tareas_actividades1():
@@ -263,36 +398,53 @@ def notas_consultar():
 def calculo_promedio():
     return render_template('Docentes/CalculoPromedio.html')
 
+
+# GESTIÓN DE LA OBSERVACIÓN
+
 @Docente_bp.route('/observador')
 def observador():
+    # Traer observaciones con sus estudiantes y cursos
     observaciones = (
-        db.session.query(Observacion, Usuario)
+        db.session.query(Observacion, Usuario, Curso)
         .join(Matricula, Observacion.ID_Matricula == Matricula.ID_Matricula)
         .join(Usuario, Matricula.ID_Estudiante == Usuario.ID_Usuario)
-        .add_columns(
-            Observacion.Fecha,
-            Observacion.Descripcion,
-            Observacion.Recomendacion,
-            Observacion.Tipo,
-            Observacion.NivelImportancia,
-            Usuario.Nombre,
-            Usuario.Apellido
-        )
+        .join(Curso, Matricula.ID_Curso == Curso.ID_Curso)
         .all()
     )
 
+    # Traer todos los estudiantes
+    estudiantes = Usuario.query.filter_by(Rol='Estudiante').all()
+
+    # Traer todos los cursos
+    cursos = Curso.query.all()
+
+    # Traer todas las matrículas (por si se usan más adelante)
     matriculas = Matricula.query.all()
-    return render_template('docentes/observador.html', observaciones=observaciones, matriculas=matriculas)
+
+    return render_template(
+        'docentes/observador.html',
+        observaciones=observaciones,
+        estudiantes=estudiantes,
+        cursos=cursos,
+        matriculas=matriculas
+    )
 
 
 @Docente_bp.route('/agregar_observacion', methods=['POST'])
 def agregar_observacion():
     try:
-        id_matricula = request.form['id_matricula']
+        id_estudiante = request.form['id_estudiante']
+        id_curso = request.form['id_curso']
         descripcion = request.form['descripcion']
         tipo = request.form['tipo']
-        nivel_importancia = request.form['nivel_importancia']
+        nivel_importancia = request.form['nivelImportancia']
         recomendacion = request.form['recomendacion']
+
+        # Buscar la matrícula correspondiente al estudiante y curso
+        matricula = Matricula.query.filter_by(ID_Estudiante=id_estudiante, ID_Curso=id_curso).first()
+        if not matricula:
+            flash('❌ No se encontró la matrícula para el estudiante en ese curso.', 'danger')
+            return redirect(url_for('Docente.observador'))
 
         nueva_observacion = Observacion(
             Fecha=date.today(),
@@ -302,17 +454,20 @@ def agregar_observacion():
             Recomendacion=recomendacion,
             Estado='Activa',
             ID_Horario=None,
-            ID_Matricula=id_matricula
+            ID_Matricula=matricula.ID_Matricula
         )
 
         db.session.add(nueva_observacion)
         db.session.commit()
         flash('✅ Observación agregada correctamente', 'success')
+
     except Exception as e:
         db.session.rollback()
         flash(f'❌ Error al agregar observación: {e}', 'danger')
 
-    return redirect(url_for('docentes.observador'))
+    return redirect(url_for('Docente.observador'))
+
+
 
 @Docente_bp.route('/horarios')
 def horarios():

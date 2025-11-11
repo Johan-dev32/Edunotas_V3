@@ -40,7 +40,7 @@ class Usuario(UserMixin, db.Model):
     Estado = db.Column(db.Enum(*EstadoEnum, name="estado_enum"), default="Activo")
     Genero = db.Column(db.Enum(*GeneroEnum, name="genero_enum"))
     Rol = db.Column(db.Enum(*RolEnum, name="rol_enum"), nullable=False)
-
+    
     # Relaciones
     notificaciones = relationship("Notificacion", back_populates="usuario", cascade="all, delete-orphan")
     acudientes = relationship("Acudiente", back_populates="usuario", foreign_keys="Acudiente.ID_Usuario", cascade="all, delete-orphan")
@@ -223,6 +223,13 @@ class Actividad(db.Model):
 
     cronograma = relationship("Cronograma_Actividades", back_populates="actividades")
     participaciones = relationship("Actividad_Estudiante", back_populates="actividad", cascade="all, delete-orphan")
+    
+    @property
+    def id(self):
+        return self.ID_Actividad
+
+    def __repr__(self):
+        return f"<Actividad {self.ID_Actividad} - {self.Titulo}>"
 
 class Actividad_Estudiante(db.Model):
     __tablename__ = "Actividad_Estudiante"
@@ -377,6 +384,7 @@ class Estudiantes_Repitentes(db.Model):
     NumeroDocumento = db.Column(db.String(50))
     NombreCompleto = db.Column(db.String(200))
     Curso = db.Column(db.String(50))
+    FechaRegistro = db.Column(db.DateTime, default=datetime.utcnow) 
     Veces = db.Column(db.Integer, default=1)
     ID_Matricula = db.Column(db.Integer, db.ForeignKey("Matricula.ID_Matricula", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
     Matriculado = db.Column(db.Boolean, default=False)
@@ -427,3 +435,22 @@ class ResumenSemanal(db.Model):
         foreign_keys=[CreadoPor])
     def __repr__(self):
         return f"ResumenSemanal(ID={self.ID_Resumen_Semanal}, Título='{self.Titulo}')"
+    
+
+class Nota_Calificaciones(db.Model):
+    __tablename__ = 'Nota_Calificaciones'
+    
+    ID_Calificacion = db.Column(db.Integer, primary_key=True, autoincrement=True) 
+    ID_Estudiante = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
+    ID_Asignatura = db.Column(db.Integer, db.ForeignKey('Asignatura.ID_Asignatura'), nullable=False)
+    Periodo = db.Column(db.Integer, nullable=False) 
+    Nota_1 = db.Column(db.Float, nullable=True) 
+    Nota_2 = db.Column(db.Float, nullable=True)
+    Nota_3 = db.Column(db.Float, nullable=True)
+    Nota_4 = db.Column(db.Float, nullable=True)
+    Nota_5 = db.Column(db.Float, nullable=True)
+    Promedio_Final = db.Column(db.Float, nullable=True) 
+
+    __table_args__ = (
+        db.UniqueConstraint('ID_Estudiante', 'ID_Asignatura', 'Periodo', name='uq_calificacion_periodo'),
+    )

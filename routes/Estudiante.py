@@ -1,7 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from Controladores.models import db, Matricula, Actividad, Curso, Periodo, Asignatura, Programacion, Actividad_Estudiante, Notificacion, Bloques, Usuario
+from datetime import datetime
+from sqlalchemy import or_, text
+from sqlalchemy.exc import IntegrityError
+from Controladores.models import db, Matricula, Actividad, Curso, Periodo, Asignatura, Programacion, Actividad_Estudiante, Notificacion, Bloques, Usuario, Encuesta, Encuesta_Respuesta
 import os
 
 from decimal import Decimal
@@ -12,6 +15,7 @@ Estudiante_bp = Blueprint('Estudiante', __name__, url_prefix='/estudiante')
 @Estudiante_bp.route('/paginainicio')
 def paginainicio():
     return render_template('Estudiante/Paginainicio_Estudiante.html')
+
 
 # ---------------- NOTIFICACIONES ESTUDIANTE----------------
 
@@ -33,19 +37,140 @@ def recibir_notificaciones():
     return jsonify(lista)
 
 
-@Estudiante_bp.route('/verhorario')
-def verhorario():
-    id_usuario = session.get('usuario_id')  # <- obtenemos el usuario logueado
-    if not id_usuario:
-        return redirect(url_for('login'))  # si no está logueado, redirige
-    estudiante = Usuario.query.filter_by(ID_Usuario=id_usuario, Rol='Estudiante').first()
+@Estudiante_bp.route('/encuestas')
+def encuestas_estudiante():
+    return render_template("Estudiante/encuestas.html")
 
-    if not estudiante:
-        return "Estudiante no encontrado", 404
+# Listar encuestas activas
+@Estudiante_bp.route('/api/encuestas')
+def api_encuestas():
+    # 1. Verificar autenticación usando Flask-Login
+    if not current_user.is_authenticated:
+        return jsonify([])
+
+    # 2. Obtener el ID del usuario directamente de Flask-Login
+    usuario_id = current_user.ID_Usuario
     
-    curso = Curso.query.filter_by(ID_Curso=estudiante.ID_Curso).first()
+    encuestas = Encuesta.query.filter_by(Activa=True).all()
+    data = []
+    for e in encuestas:
+        # Se sigue usando usuario_id para el filtro de respuesta
+        respondida = Encuesta_Respuesta.query.filter_by(ID_Encuesta=e.ID_Encuesta, ID_Usuario=usuario_id).first() is not None
+        
+        data.append({
+            "id": e.ID_Encuesta,
+            "titulo": e.Titulo,
+            "descripcion": e.Descripcion,
+            "respondida": respondida,
+            "vencida": e.FechaCierre < datetime.utcnow() if e.FechaCierre else False
+        })
+    return jsonify(data)
 
-    return render_template('Estudiante/VerHorario.html', estudiante=estudiante, curso=curso)
+# Obtener preguntas (No requiere cambios en la lógica de usuario)
+@Estudiante_bp.route('/api/encuestas/<int:id_encuesta>')
+def api_encuesta_detalle(id_encuesta):
+    encuesta = Encuesta.query.get_or_404(id_encuesta)
+    preguntas = []
+    for p in encuesta.preguntas:
+        preguntas.append({
+            "ID_Pregunta": p.ID_Pregunta,
+            "texto": p.TextoPregunta,
+            "tipo": p.TipoRespuesta
+        })
+    return jsonify({
+        "id": encuesta.ID_Encuesta,
+        "titulo": encuesta.Titulo,
+        "descripcion": encuesta.Descripcion,
+        "preguntas": preguntas
+    })
+
+# Guardar respuestas (Lógica de autenticación, rol y matrícula)
+@Estudiante_bp.route('/api/encuestas/<int:id_encuesta>/responder', methods=['POST'])
+def responder_encuesta(id_encuesta):
+    
+    # 1. Verificar autenticación y obtener ID
+    if not current_user.is_authenticated:
+        return jsonify({"error": "No hay sesión activa"}), 403
+    
+    usuario_id = current_user.ID_Usuario
+    
+    # 2. Obtener usuario y verificar Rol
+    usuario_check = Usuario.query.get(usuario_id) 
+    if usuario_check.Rol != 'Estudiante':
+        return jsonify({"error": "Permiso denegado: Rol no autorizado."}), 403
+
+    # 3. Verificar si la encuesta caducó
+    encuesta = Encuesta.query.get(id_encuesta)
+    if encuesta.FechaCierre and encuesta.FechaCierre < datetime.utcnow():
+        return jsonify({"error": "Esta encuesta ha caducado y no puede ser respondida."}), 409
+    
+    # 4. Usar el ID de la sesión para buscar la matrícula (Restricción)
+    matricula_registro = Matricula.query.filter_by(ID_Estudiante=usuario_id).first()
+    
+    if not matricula_registro or not matricula_registro.ID_Matricula:
+        return jsonify({"error": "Debe tener una matrícula activa para responder a esta encuesta."}), 403
+    
+    matricula_id = matricula_registro.ID_Matricula
+    
+    # 5. Prevenir doble envío
+    if Encuesta_Respuesta.query.filter_by(ID_Encuesta=id_encuesta, ID_Usuario=usuario_id).first():
+         return jsonify({"error": "Ya ha respondido esta encuesta."}), 409
+
+    # 6. Guardar respuestas
+    data = request.json
+    respuestas = data.get("respuestas", {})
+    
+    for id_pregunta, respuesta_texto in respuestas.items():
+        nueva_respuesta = Encuesta_Respuesta(
+            ID_Pregunta=int(id_pregunta),
+            ID_Usuario=usuario_id,
+            ID_Encuesta=id_encuesta,
+            ID_Matricula=matricula_id, 
+            Respuesta=respuesta_texto
+        )
+        db.session.add(nueva_respuesta)
+        
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        # Puedes usar un logger de Flask o un print temporal
+        print(f"ERROR DE BASE DE DATOS AL GUARDAR RESPUESTA: {e}") 
+        return jsonify({"error": "Error interno al guardar las respuestas. Intente de nuevo."}), 500
+        
+    return jsonify({"success": True})
+
+
+
+@Estudiante_bp.route('/verhorario')
+@login_required  # 👈 asegura que el usuario esté logueado
+def verhorario():
+    if current_user.Rol != 'Estudiante':
+        return "Acceso no autorizado", 403
+
+    estudiante = current_user  # ya es el usuario logueado
+
+    # Obtener la matrícula más reciente del estudiante
+    matricula = (
+        Matricula.query
+        .filter_by(ID_Estudiante=estudiante.ID_Usuario)
+        .order_by(Matricula.AnioLectivo.desc())
+        .first()
+    )
+
+    if not matricula:
+        return "El estudiante no tiene una matrícula registrada", 404
+
+    # Obtener el curso y las programaciones
+    curso = matricula.curso
+    programaciones = curso.programaciones.all() if curso else []
+
+    return render_template(
+        'Estudiante/VerHorario.html',
+        estudiante=estudiante,
+        curso=curso,
+        programaciones=programaciones
+    )
 
 @Estudiante_bp.route('/api/curso/<int:curso_id>/horario')
 def horario_estudiante(curso_id):
@@ -210,7 +335,3 @@ def notas_curso():
 @Estudiante_bp.route('/comunicacion')
 def comunicacion():
     return render_template('Estudiante/Comunicacion.html')
-
-@Estudiante_bp.route('/encuestas')
-def encuestas():
-    return render_template('Estudiante/Encuestas.html')

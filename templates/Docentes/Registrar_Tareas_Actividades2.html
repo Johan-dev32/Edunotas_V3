@@ -79,7 +79,7 @@
     {{ curso_id }}
   </div>
 
-  <a href="{{ url_for('Docente.crear_actividad', curso_id=curso_id) }}" class="btn-primary">Crear Actividad</a>
+  <a href="{{ url_for('Docente.crear_actividad', curso_id=curso.ID_Curso) }}" class="btn-primary">Crear Actividad</a>
 </header>
 
 <!-- Título -->
@@ -92,7 +92,7 @@
     {% for actividad in actividades %}
       <div class="actividad">
         <span>ACT {{ actividad.id }}</span>
-        <a href="{{ url_for('Docente.tareas_actividades3', actividad_id=actividad.id, curso_id=curso_id) }}" class="btn">
+        <a href="{{ url_for('Docente.tareas_actividades3', actividad_id=actividad.ID_Actividad, curso_id=curso_id) }}" class="btn">
           Enviar Tareas - Actividades
         </a>
       </div>

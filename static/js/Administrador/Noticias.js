@@ -5,12 +5,33 @@ const uploadText = document.getElementById("uploadText");
 const preview = document.getElementById("preview");
 
 const btnPublicar = document.getElementById("btnPublicar");
-const formNoticias = document.querySelector("form"); // Busca el único formulario en la página (Asegúrate de darle un ID como "formNoticias" en HTML, ver paso 2.A)
-
 
 // Modal dinámico
 const confirmModal = document.createElement("div");
-// ... (código del modal) ...
+confirmModal.className = "custom-modal";
+confirmModal.style.cssText = `
+  display: none;
+  position: fixed; 
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6); 
+  justify-content: center; 
+  align-items: center;
+  z-index: 1050;
+`;
+confirmModal.innerHTML = `
+  <div class="bg-white rounded shadow p-4" style="max-width: 400px; width: 90%;">
+    <div class="d-flex align-items-center mb-3">
+      <i class="bi bi-exclamation-triangle-fill text-warning fs-4 me-2"></i>
+      <h5 class="m-0 fw-bold">Confirmar envío</h5>
+    </div>
+    <p id="confirmText" class="mb-2"></p>
+    <p class="mb-0">¿Deseas continuar?</p>
+    <div class="d-flex justify-content-end gap-2 mt-3">
+      <button id="cancelSend" class="btn btn-secondary">Cancelar</button>
+      <button id="confirmSend" class="btn btn-danger">Subir</button>
+    </div>
+  </div>
+`;
 document.body.appendChild(confirmModal);
 
 const confirmText = confirmModal.querySelector("#confirmText");
@@ -22,60 +43,59 @@ uploadArea.addEventListener("click", () => fileInput.click());
 
 // 📌 Mostrar preview al seleccionar archivo
 fileInput.addEventListener("change", () => {
-  preview.innerHTML = ""; // limpiar preview anterior
+  preview.innerHTML = ""; // limpiar preview anterior
 
-  if (fileInput.files.length > 0) {
-    const file = fileInput.files[0];
+  if (fileInput.files.length > 0) {
+    const file = fileInput.files[0];
 
-    if (file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        // ocultar ícono y texto
-        uploadIcon.style.display = "none";
-        uploadText.style.display = "none";
+    if (file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        // ocultar ícono y texto
+        uploadIcon.style.display = "none";
+        uploadText.style.display = "none";
 
-        // mostrar imagen
-        const img = document.createElement("img");
-        img.src = e.target.result;
-        img.classList.add("img-fluid", "rounded");
-        img.style.maxHeight = "250px";
-        preview.appendChild(img);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      preview.innerHTML = `<p class="text-danger">⚠️ Solo se permiten imágenes.</p>`;
-    }
-  }
+        // mostrar imagen
+        const img = document.createElement("img");
+        img.src = e.target.result;
+        img.classList.add("img-fluid", "rounded");
+        img.style.maxHeight = "250px";
+        preview.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      preview.innerHTML = `<p class="text-danger">⚠️ Solo se permiten imágenes.</p>`;
+    }
+  }
 });
 
 // 📌 Abrir modal al dar click en "Publicar Noticia"
 btnPublicar.addEventListener("click", (e) => {
-  e.preventDefault(); // evita que se envíe el form directo
+  e.preventDefault(); // evita que se envíe el form directo
 
-  const fecha = document.getElementById("fecha").value;
-  const titulo = document.getElementById("titulo").value;
-  const contenido = document.getElementById("contenido").value;
-  
-  if (!fecha || !titulo || !contenido) {
-    alert("⚠️ Por favor, rellene todos los campos obligatorios (Fecha, Título, Redacción).");
-    return;
-  }
+  const fecha = document.getElementById("fecha").value;
+  const titulo = document.getElementById("titulo").value;
+  const contenido = document.getElementById("contenido").value;
 
-  confirmText.textContent = ` Fecha: ${fecha} |  Título: ${titulo} |  Contenido: ${contenido.substring(0, 30)}...`;
+  confirmText.textContent = ` Fecha: ${fecha || "No seleccionada"} |  Título: ${titulo || "Sin título"} |  Contenido: ${contenido.substring(0, 30)}...`;
 
-  confirmModal.style.display = "flex"; // mostrar modal
+  confirmModal.style.display = "flex"; // mostrar modal
 });
 
 // 📌 Botón cancelar → cerrar modal
 cancelSend.addEventListener("click", () => {
-  confirmModal.style.display = "none";
+  confirmModal.style.display = "none";
 });
 
 // 📌 Botón confirmar → enviar noticia
+// En Noticias.js, reemplazar la sección 'Botón confirmar → enviar noticia'
 
 confirmSend.addEventListener("click", async () => {
   confirmModal.style.display = "none";
-  
+
+  const formNoticias = document.getElementById("formNoticias");
+  const fileInput = document.getElementById("fileInput"); // Asegúrate de que fileInput esté disponible
+
   // Crear FormData para enviar texto y archivo
   const formData = new FormData();
   
@@ -90,36 +110,34 @@ confirmSend.addEventListener("click", async () => {
     formData.append("archivo", fileInput.files[0]);
   }
  try {
-        const res = await fetch("/administrador/noticias/registro", {
-            method: "POST",
-            body: formData,
-        });
+        const res = await fetch("/administrador/noticias/registro", {
+            method: "POST",
+            body: formData,
+        });
 
-        // Manejo de errores HTTP (400, 500, etc.)
-        if (!res.ok) {
-            // Intenta leer el error detallado del JSON si Flask lo proporciona
-            const errorData = await res.json().catch(() => ({ error: "Error de servidor no especificado." }));
-            alert("❌ Error al publicar noticia: " + (errorData.error || `Error HTTP ${res.status}.`));
-            return;
-        }
-        
-        const data = await res.json();
+        // Manejo de errores HTTP (400, 500, etc.)
+        if (!res.ok) {
+            // Intenta leer el error detallado del JSON si Flask lo proporciona
+            const errorData = await res.json().catch(() => ({ error: "Error de servidor no especificado." }));
+            alert("❌ Error al publicar noticia: " + (errorData.error || `Error HTTP ${res.status}.`));
+            return;
+        }
+        
+        const data = await res.json();
 
-        if (data.success) {
-            alert("✅ Noticia publicada correctamente en la Base de Datos.");
-            // Limpiar formulario y redireccionar (asumiendo que formNoticias es el formulario)
-            formNoticias.reset(); // Usa el formulario que obtuviste al inicio
+        if (data.success) {
+            alert("✅ Noticia publicada correctamente en la Base de Datos.");
+            // Limpiar formulario y redireccionar
+            formNoticias.reset();
+            window.location.href = "/administrador/noticias_vistas";// O la ruta que desees
+        } else {
+            // Manejo de errores de validación de Flask (success: false)
+            alert("❌ Error al publicar noticia: " + (data.error || "Fallo desconocido."));
+        }
 
-            // ⚠️ CLAVE: Redirige usando una URL absoluta
-            window.location.href = "/administrador/noticias"; // Ajusta esta URL a tu vista de noticias (puedes usar la ruta de la función 'noticias' si esa es la vista principal)
-        } else {
-            // Manejo de errores de validación de Flask (success: false)
-            alert("❌ Error al publicar noticia: " + (data.error || "Fallo desconocido."));
-        }
-
-    } catch (error) {
-        console.error("Error de conexión (red o CORS):", error);
-        // Este mensaje solo sale si falla la conexión de red (el navegador no pudo contactar al servidor)
-        alert("🛑 La conexión falló. Por favor, revisa tu red o intenta más tarde.");
-    }
+    } catch (error) {
+        console.error("Error de conexión (red o CORS):", error);
+        // ✨ CORRECCIÓN: Usamos un mensaje más simple para errores de red/fetch
+        alert("🛑 La conexión falló. Por favor, revisa tu red o intenta más tarde.");
+    }
 });

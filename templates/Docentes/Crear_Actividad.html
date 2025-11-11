@@ -77,7 +77,7 @@
     <div class="container actividad-container">
       <div class="row">
         <!-- 🧩 Formulario con enctype y name=pdfUpload -->
-        <form action="{{ url_for('Docente.crear_actividad', curso_id=curso_id) }}" 
+      <form action="{{ url_for('Docente.crear_actividad', curso_id=curso.ID_Curso) }}" 
       method="POST" 
       enctype="multipart/form-data">
 
@@ -85,7 +85,7 @@
     <!-- Panel izquierdo -->
     <div class="col-lg-4">
       <div class="card p-4 shadow-sm border-0">
-        <h3 class="fw-bold text-center mb-4">ACT <span class="numero">{{ actividad_id }}</span></h3>
+        <h3 class="fw-bold text-center mb-4">ACTIVIDAD NUEVA</h3>
 
         <div class="mb-4">
           <label class="form-label fw-semibold">Fecha de entrega</label>
@@ -94,7 +94,7 @@
 
         <div class="mb-4">
           <label class="form-label fw-semibold">Hora de entrega</label>
-          <input type="text" class="form-control" name="hora" placeholder="Ej: 23:59" required>
+          <input type="time" class="form-control" name="hora" required>
         </div>
       </div>
     </div>
@@ -114,6 +114,34 @@
           <textarea class="form-control" rows="5" name="instrucciones" placeholder="Describe aquí la tarea..." required></textarea>
         </div>
 
+        <!-- Campos adicionales -->
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label fw-semibold">Tipo de Actividad</label>
+            <select class="form-select" name="tipo" required>
+              <option value="Taller">Taller</option>
+              <option value="Examen">Examen</option>
+              <option value="Proyecto">Proyecto</option>
+              <option value="Participacion">Participación</option>
+              <option value="Grupo">Trabajo en Grupo</option>
+            </select>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label fw-semibold">Estado</label>
+            <select class="form-select" name="estado">
+              <option value="Pendiente" selected>Pendiente</option>
+              <option value="Calificada">Calificada</option>
+              <option value="Cancelada">Cancelada</option>
+            </select>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label fw-semibold">Porcentaje</label>
+            <input type="number" step="0.01" min="0" max="100" class="form-control" name="porcentaje" placeholder="Ej: 20" required>
+          </div>
+        </div>
+
         <!-- Subida de PDF -->
         <div class="upload-box border rounded py-5 mb-3 text-center">
           <label for="pdfUpload" class="d-block cursor-pointer">
@@ -124,7 +152,8 @@
         </div>
 
         <!-- Botón de publicar -->
-       <button type="submit" class="btn btn-subir w-100 py-3 fs-5">PUBLICAR ACTIVIDAD</button>      </div>
+        <button type="submit" class="btn btn-subir w-100 py-3 fs-5">PUBLICAR ACTIVIDAD</button>
+      </div>
     </div>
   </div>
 </form>

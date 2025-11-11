@@ -223,6 +223,13 @@ class Actividad(db.Model):
 
     cronograma = relationship("Cronograma_Actividades", back_populates="actividades")
     participaciones = relationship("Actividad_Estudiante", back_populates="actividad", cascade="all, delete-orphan")
+    
+    @property
+    def id(self):
+        return self.ID_Actividad
+
+    def __repr__(self):
+        return f"<Actividad {self.ID_Actividad} - {self.Titulo}>"
 
 class Actividad_Estudiante(db.Model):
     __tablename__ = "Actividad_Estudiante"

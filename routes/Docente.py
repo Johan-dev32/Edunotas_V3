@@ -2,7 +2,10 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from flask_mail import Message
 from werkzeug.utils import secure_filename
-from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Curso, Notificacion, Programacion, Observacion, ResumenSemanal, Tutorias)
+
+
+from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Curso, Notificacion, Programacion, Observacion, Nota_Calificaciones, Docente_Asignatura, ResumenSemanal, Tutorias )
+
 from datetime import date
 import os
 
@@ -10,8 +13,12 @@ import datetime
 
 
 from decimal import Decimal
+
+
 #Definir el Blueprint para el administardor
 Docente_bp = Blueprint('Docente', __name__, url_prefix='/docente')
+ID_DOCENTE_FIJO = 2
+
 
 
 
@@ -381,9 +388,196 @@ def notas_curso(curso_id):
     return render_template("Docentes/notas_curso.html", curso_id=curso_id)
 
 
-@Docente_bp.route('/registro_notas/<int:curso_id>')
-def registro_notas(curso_id):
-    return render_template('Administrador/RegistroNotas.html', curso_id=curso_id)
+# En routes/Docente.py
+
+
+def calcular_promedio(registro_notas):
+    """Calcula el promedio de las 5 notas, ignorando valores None."""
+    notas_validas = []
+    
+    for i in range(1, 6):
+        columna = f'Nota_{i}'
+        valor = getattr(registro_notas, columna, None)
+        if valor is not None:
+            notas_validas.append(float(valor))
+
+    if not notas_validas:
+        return None
+    
+    promedio = sum(notas_validas) / len(notas_validas)
+    return round(promedio, 1)
+
+
+# routes/Docente.py
+
+# 🛑 NOTA: Cambiamos el nombre de la función y del parámetro a 'curso_id'
+# routes/Docente.py
+
+@Docente_bp.route('/registro_notas_curso/<int:curso_id>', methods=['GET', 'POST'])
+def registro_notas_curso(curso_id):
+    
+    # 1. Obtener la información del curso
+    curso_obj = Curso.query.get(curso_id)
+    
+    # 🛑 CORRECCIÓN: Usar el atributo correcto (reemplaza 'NombreCurso' si el tuyo es diferente)
+    # Si la depuración te dijo que el atributo es 'Nombre_Completo_Curso', úsalo aquí.
+    if curso_obj:
+        print("--- DEBUG CURSO OBJETO ---")
+        print(f"Tipo de objeto: {type(curso_obj)}")
+        print(f"Atributos disponibles: {dir(curso_obj)}")
+        print("----------------------------")
+    curso_nombre = curso_obj.NOMBRE_CURSO if curso_obj and hasattr(curso_obj, 'NOMBRE_CURSO') else "Curso Desconocido"
+    
+        
+    
+    # 2. Obtener la lista de estudiantes matriculados en ESE CURSO
+    estudiantes_db = db.session.query(Usuario, Matricula). \
+        join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario). \
+        filter(
+            Matricula.ID_Curso == curso_id,
+            Usuario.Rol == 'Estudiante'
+        ).all()
+
+    # 3. Preparar la lista de estudiantes (Sin cambios)
+    lista_estudiantes = []
+    for usuario, matricula in estudiantes_db:
+        # Aquí también hay una potencial mejora: si tu modelo Usuario tiene los campos como
+        # .nombre y .apellido (minúscula), deberías cambiarlos aquí, pero lo dejaré 
+        # con .Nombre y .Apellido asumiendo que funciona.
+        lista_estudiantes.append({
+            'ID_Usuario': usuario.ID_Usuario,
+            'Nombre': usuario.Nombre,
+            'Apellido': usuario.Apellido,
+            'Promedio_Final': None,
+            'nota_1': None,
+            'notas_existentes': {}
+        })
+
+    # 4. Obtener las asignaturas (Sin cambios)
+    ID_DOCENTE_ACTUAL = 2 # 🛑 Reemplazar con session.get('ID_Usuario') o similar
+    asignaturas_db = db.session.query(Asignatura.ID_Asignatura.label('id'), 
+                                       Asignatura.Nombre.label('nombre'))\
+                               .join(Docente_Asignatura, Docente_Asignatura.ID_Asignatura == Asignatura.ID_Asignatura)\
+                               .filter(Docente_Asignatura.ID_Docente == ID_DOCENTE_ACTUAL)\
+                               .distinct()\
+                               .all()
+
+    return render_template('Docentes/RegistroNotas.html',
+                           curso_obj=curso_obj,
+                           curso_nombre=curso_nombre, # Ahora contiene el nombre real (si el atributo es correcto)
+                           estudiantes=lista_estudiantes, 
+                           curso_id=curso_id, 
+                           asignatura_id=0,
+                           asignaturas=asignaturas_db
+                           )
+
+# ----------------------------------------------------------------------
+# RUTA DE GUARDADO AJAX (Sin cambios, se mantiene para completar el contexto)
+# ----------------------------------------------------------------------
+
+# routes/Docente.py
+# ✅ ESTA ES LA DEFINICIÓN CORRECTA PARA PETICIONES AJAX POST ✅
+@Docente_bp.route('/cargar_notas_ajax', methods=['POST'])
+def cargar_notas_ajax():
+    # Los datos se obtienen del cuerpo JSON, no de la URL
+    data = request.get_json()
+    curso_id = data.get('curso_id')
+    asignatura_id = data.get('asignatura_id')
+    periodo = data.get('periodo')
+    
+    # ... (El resto de tu lógica de Python) ...
+
+
+
+
+# --- RUTA PRINCIPAL DE GUARDADO ---
+@Docente_bp.route('/guardar_notas_curso/<int:curso_id>', methods=['POST'])
+def guardar_notas_curso(curso_id):
+    
+    # --- FUNCIÓN DE CÁLCULO DE PROMEDIO (LOCAL RENOMBRADA) ---
+    # Usamos un nombre único (_calcular_promedio_local) para que Flask no la registre como endpoint.
+    def _calcular_promedio_local(registro_nota, ):
+        """Calcula el promedio de las notas que no son None (vacías)."""
+        notas = [
+            registro_nota.Nota_1, registro_nota.Nota_2, registro_nota.Nota_3, 
+            registro_nota.Nota_4, registro_nota.Nota_5
+        ]
+        
+        notas_validas = [n for n in notas if n is not None]
+        
+        if notas_validas:
+            # Calcula el promedio y lo redondea a 2 decimales
+            promedio = sum(notas_validas) / len(notas_validas)
+            return round(promedio, 2)
+        return None
+    # ------------------------------------------------
+    
+    datos_formulario = request.form
+    
+    # 1. Obtener filtros de asignatura y período
+    asignatura_id = datos_formulario.get('asignatura')
+    periodo = datos_formulario.get('periodo')
+    
+    if not asignatura_id or not periodo:
+        flash("Error: Seleccione la Asignatura y el Período antes de guardar.", "error")
+        return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id))
+    
+    # 2. Iterar sobre los datos del formulario y preparar/actualizar registros
+    for key, value in datos_formulario.items():
+        if key.startswith('nota_'):
+            
+            try:
+                # Extrae Estudiante ID y número de nota (1 a 5)
+                partes = key.split('_')
+                numero_nota = partes[1] 
+                id_usuario = int(partes[2]) 
+                
+                # Convierte a float. Si está vacío, se usa None.
+                valor_nota = float(value) if value and value.strip() != '' else None 
+                
+                # 3. Buscar el registro de la nota
+                registro_nota = Nota_Calificaciones.query.filter_by(
+                    ID_Estudiante=id_usuario,
+                    ID_Asignatura=asignatura_id,
+                    Periodo=periodo
+                ).first()
+                
+                # 4. CREACIÓN / ACTUALIZACIÓN
+                if not registro_nota:
+                    # Crea un nuevo registro si no existe
+                    registro_nota = Nota_Calificaciones(
+                        ID_Estudiante=id_usuario,
+                        ID_Asignatura=asignatura_id,
+                        Periodo=periodo
+                    )
+                    db.session.add(registro_nota)
+                
+                # 5. Aplicar la nota al campo correcto (Ej: Nota_1, Nota_2, etc.)
+                nombre_campo_db = f'Nota_{numero_nota}' 
+                setattr(registro_nota, nombre_campo_db, valor_nota)
+
+                # 6. Recalcular el promedio inmediatamente
+                promedio = _calcular_promedio_local(registro_nota) 
+                registro_nota.Promedio_Final = promedio
+
+            except Exception as e:
+                # Usa `continue` para pasar a la siguiente nota si hay un error
+                print(f"🛑 ERROR CRÍTICO AL PROCESAR NOTA {key}: {e}")
+                flash(f"Error al procesar la nota {key}: {e}", "warning")
+                continue 
+
+    # 7. Guardar todos los cambios en la base de datos
+    try:
+        db.session.commit()
+        flash("Notas guardadas exitosamente.", "success")
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error al guardar los cambios en la base de datos: {e}", "error")
+        print(f"❌ DB ROLLBACK/ERROR FINAL: {e}")
+        
+    return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id))
+
 
 
 @Docente_bp.route('/notas_registro')
@@ -397,6 +591,7 @@ def notas_consultar():
 @Docente_bp.route('/calculo_promedio')
 def calculo_promedio():
     return render_template('Docentes/CalculoPromedio.html')
+
 
 
 # GESTIÓN DE LA OBSERVACIÓN

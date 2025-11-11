@@ -28,6 +28,7 @@ header .btn-dark {
 .btn-edunotas {
   background-color: #050733ff;
   color: #fff;
+  margin-left: 800px;
 }
 
 .btn-usuario {
@@ -129,7 +130,12 @@ header .btn-dark {
   vertical-align: middle;
   min-width: 120px; /* ancho de cada columna de nota */
 }
-
+.titulo-principal {
+  font-size: 3rem;      
+  font-weight: 900;      
+  color: #050733ff;   
+  margin-top: -30px;   
+}
 /* header notas (color e inputs) */
 #tablaNotas thead th {
   background-color: #050733ff;

@@ -1,11 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app
 from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
 from sqlalchemy import or_, text
 from datetime import datetime
-from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes, Detalle_Asistencia, Asistencia, Encuesta, Encuesta_Pregunta, Encuesta_Respuesta, Historial_Academico
+from Controladores.models import db, Usuario, Matricula, Nota_Calificaciones, Reporte_Notas, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes, Detalle_Asistencia, Asistencia, Encuesta, Encuesta_Pregunta, Encuesta_Respuesta, Historial_Academico
 from flask_mail import Message
 import sys
 import os
@@ -1622,19 +1623,185 @@ def cursos():
 
 # ---------------------- Historial Académico ----------------------
 
-
 @Administrador_bp.route('/historialacademico')
 def historialacademico():
+    # Esta ruta ya no requiere el parámetro en la URL
     return render_template('Administrador/HistorialAcademico.html')
+    
+    
+@Administrador_bp.route('/api/historialacademico/buscar_documento/<numero_documento>', methods=['GET'])
+@login_required 
+def api_buscar_estudiante_por_documento(numero_documento):
+    
+    doc_limpio = numero_documento.strip()
+    
+    # 1. Buscar la Matrícula más reciente por NumeroDocumento (Usando TRIM())
+    matricula = Matricula.query.filter(
+        func.trim(Matricula.NumeroDocumento) == doc_limpio
+    ).order_by(Matricula.AnioLectivo.desc()).first()
+    
+    if not matricula:
+        return jsonify({"error": "Estudiante no encontrado o sin matrícula activa."}), 404
 
-@Administrador_bp.route('/historialacademico2')
+    # 2. Obtener el registro del Estudiante (Usuario)
+    estudiante = Usuario.query.get(matricula.ID_Estudiante)
+    
+    if not estudiante:
+         return jsonify({"error": "Error interno: Matrícula encontrada, pero sin registro de Usuario asociado."}), 500
+        
+    # 3. Construir el Nombre del Curso correctamente
+    if hasattr(matricula, 'curso') and matricula.curso:
+        # CONCATENAMOS GRADO y GRUPO para formar el nombre visible
+        curso_nombre = f"{matricula.curso.Grado} {matricula.curso.Grupo}"
+        grado = matricula.curso.Grado
+    else:
+        curso_nombre = "N/A"
+        grado = "N/A"
+
+    return jsonify({
+        "ID_Usuario": estudiante.ID_Usuario,
+        "NombreCompleto": f"{estudiante.Nombre} {estudiante.Apellido}", 
+        "NumeroDocumento": estudiante.NumeroDocumento, 
+        "ID_Matricula_Reciente": matricula.ID_Matricula,
+        "Grado": grado,
+        "Curso": curso_nombre
+    })
+    
+@Administrador_bp.route('/api/historialacademico/datos_estudiante/<int:matricula_id>', methods=['GET'])
+@login_required 
+def api_obtener_datos_estudiante(matricula_id):
+    # 1. Buscar la Matrícula
+    matricula = Matricula.query.get(matricula_id)
+    
+    if not matricula:
+        return jsonify({"error": "Matrícula no encontrada."}), 404
+        
+    # 2. Buscar el Estudiante (Usuario)
+    estudiante = Usuario.query.get(matricula.ID_Estudiante)
+    
+    if not estudiante:
+        return jsonify({"error": "Estudiante no asociado a esta matrícula."}), 404
+    
+    # 3. Construir el nombre del curso y obtener el grado
+    curso_nombre = "N/A"
+    grado = "N/A"
+    if hasattr(matricula, 'curso') and matricula.curso:
+        curso_nombre = f"{matricula.curso.Grado} {matricula.curso.Grupo}"
+        grado = matricula.curso.Grado
+
+    # 4. Devolver el JSON con los datos
+    return jsonify({
+        "NombreCompleto": f"{estudiante.Nombre} {estudiante.Apellido}",
+        "NumeroDocumento": estudiante.NumeroDocumento,
+        "Grado": grado,
+        "Curso": curso_nombre,
+    })
+
+@Administrador_bp.route('/historialacademico2') 
 def historialacademico2():
     return render_template('Administrador/HistorialAcademico2.html')
+    
+@Administrador_bp.route('/api/historialacademico/historiales/<int:matricula_id>', methods=['GET'])
+@login_required 
+def api_listar_historiales_por_matricula(matricula_id):
+    # Obtener todos los registros de Historial Académico para esa matrícula
+    # Asegúrate de que el modelo Historial_Academico se ha importado correctamente
+    historiales = Historial_Academico.query.filter_by(ID_Matricula=matricula_id).order_by(Historial_Academico.Anio.desc(), Historial_Academico.Periodo.desc()).all()
+    
+    # Si no hay historiales, devuelve una lista vacía, lo cual el JS maneja
+    if not historiales:
+        return jsonify([]), 200 
+        
+    historiales_data = []
+    for h in historiales:
+        historiales_data.append({
+            "ID_Historial": h.ID_Historial,
+            "Anio": h.Anio,
+            "Periodo": h.Periodo,
+            "Descripcion": h.Descripcion,
+            # Asegúrate que CreadoEn no sea NULL o maneja el error de strftime
+            "CreadoEn": h.CreadoEn.strftime('%Y-%m-%d') if h.CreadoEn else None 
+        })
+        
+    return jsonify(historiales_data)
+
+
+@Administrador_bp.route('/api/historialacademico/notas/<int:id_historial>', methods=['GET'])
+@login_required 
+def api_historial_academico_notas(id_historial):
+    
+    # --- 1. Verificación de Autenticación (API Guard) ---
+    if not current_user.is_authenticated:
+        return jsonify({"error": "No autorizado. Inicie sesión nuevamente."}), 401
+
+    try:
+        # --- 2. Búsqueda del Historial y Datos del Estudiante/Curso ---
+        historial = Historial_Academico.query.get(id_historial)
+        
+        if not historial:
+            return jsonify({"error": f"Historial con ID {id_historial} no encontrado."}), 404
+            
+        # Obtener los datos relacionados (Matrícula -> Estudiante/Curso)
+        matricula = Matricula.query.get(historial.ID_Matricula)
+        if not matricula:
+            return jsonify({"error": "Matrícula no encontrada para este historial."}), 404
+            
+        # Utilizamos el modelo 'Usuario' y 'Curso' (en singular)
+        estudiante = Usuario.query.get(matricula.ID_Estudiante)
+        curso = Curso.query.get(matricula.ID_Curso)
+        
+        # --- 3. Búsqueda de Notas (Solo Nota_Calificaciones) ---
+        
+        # Realiza un JOIN entre Nota_Calificaciones y Asignatura para obtener el nombre.
+        # CRUCIAL: Se corrigió la referencia a Notas_Calificaciones a Nota_Calificaciones.
+        notas_query = db.session.query(Nota_Calificaciones, Asignatura)\
+                            .join(Asignatura)\
+                            .filter(Nota_Calificaciones.ID_Historial == id_historial)\
+                            .all()
+        
+        notas_data = []
+        for nota_obj, asignatura_obj in notas_query:
+            notas_data.append({
+                "ID_Nota": nota_obj.ID_Nota,
+                "Materia": asignatura_obj.Nombre, 
+                "N1": f"{nota_obj.N1:.1f}" if nota_obj.N1 is not None else "N/A", # Formato con un decimal
+                "N2": f"{nota_obj.N2:.1f}" if nota_obj.N2 is not None else "N/A",
+                "N3": f"{nota_obj.N3:.1f}" if nota_obj.N3 is not None else "N/A",
+                "N4": f"{nota_obj.N4:.1f}" if nota_obj.N4 is not None else "N/A",
+                # Asumo que estos campos están en tu tabla Nota_Calificaciones
+                "PromedioCortes": f"{nota_obj.PromedioCortes:.1f}" if nota_obj.PromedioCortes is not None else "N/A",
+                "NotaFinal": f"{nota_obj.NotaFinal:.1f}" if nota_obj.NotaFinal is not None else "N/A",
+            })
+
+        # --- 4. Búsqueda de Recuperaciones (ELIMINADO y reemplazado con lista vacía) ---
+        # Como no tienes la tabla, simplemente devolvemos una lista vacía para que el frontend funcione.
+        recup_data = []
+            
+        # --- 5. Construcción de la Respuesta Final ---
+        response_data = {
+            "EstudianteNombre": f"{estudiante.Nombre} {estudiante.Apellido}" if estudiante else "Estudiante Desconocido",
+            "Curso": f"{curso.Grado}-{curso.Nombre}" if curso else "Curso Desconocido",
+            "Anio": historial.Anio,
+            "Periodo": historial.Periodo,
+            "Notas": notas_data,
+            "Recuperaciones": recup_data # Se mantiene la clave para evitar romper el frontend
+        }
+        
+        return jsonify(response_data), 200
+
+    except Exception as e:
+        # Manejo de cualquier error inesperado
+        print(f"Error crítico en api_historial_academico_notas: {e}") 
+        return jsonify({"error": "Error interno del servidor al obtener las notas. Verifique la conexión a DB, las importaciones y los nombres de modelos (Usuario, Curso, Nota_Calificaciones)."}), 500
+    
+    
 
 @Administrador_bp.route('/historialacademico3')
 def historialacademico3():
     periodo = request.args.get('periodo')
     return render_template('Administrador/HistorialAcademico3.html', periodo=periodo)
+
+
 
 # ----------------- SUB-PÁGINAS -----------------
 @Administrador_bp.route('/registrotutorias2')

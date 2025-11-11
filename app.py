@@ -61,11 +61,11 @@ app.config.update(
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
     MAIL_USE_SSL=False,
-    MAIL_USERNAME=os.getenv("MAIL_USERNAME", "soniagisell67@gmail.com"),
-    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD", "tadvqwwnkzajmwvm"),
+    MAIL_USERNAME=os.getenv("MAIL_USERNAME", "edunotas2025@gmail.com"),
+    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD", "keerxgqfufoynmhm"),
     MAIL_DEFAULT_SENDER=(
         "Edunotas",
-        os.getenv("MAIL_USERNAME", "soniagisell67@gmail.com"),
+        os.getenv("MAIL_USERNAME", "edunotas2025@gmail.com"),
     ),
 )
 mail.init_app(app)

@@ -107,9 +107,10 @@ header .btn-dark {
   font-size: 3rem;      
   font-weight: 900;      
   color: #050733ff;      
-  margin-top: -70px;
+  margin-top: 40px;
   text-align: center;
 }
+
 .descripcion {
   font-size: 1.3rem;     
   color: #555;   

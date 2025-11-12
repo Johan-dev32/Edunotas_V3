@@ -379,3 +379,7 @@ margin-left: 900px;
 .offcanvas1-body::-webkit-scrollbar {
   display: none; /* Chrome, Safari y Edge */
 }
+.txt-ultimo{
+  font-size: 12px;
+  color: #666464;
+}

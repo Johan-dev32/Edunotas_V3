@@ -87,3 +87,7 @@ def comunicacion():
 @Acudiente_bp.route('/horarios')
 def horarios():
     return render_template('Acudiente/Horarios.html')
+
+@Acudiente_bp.route('/circulares')
+def circulares():
+    return render_template('Acudiente/Circulares.html')

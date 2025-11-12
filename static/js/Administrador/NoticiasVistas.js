@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const card = document.createElement("div");
         card.className = "col-md-6 col-lg-3 d-flex";
+        card.style.cursor = "pointer";
 
         const imagen = noticia.archivo_url && noticia.archivo_url.trim() !== ""
           ? noticia.archivo_url
@@ -54,6 +55,40 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
           </div>
         `;
+
+        // Click para abrir modal con detalles completos
+        card.addEventListener("click", () => {
+          const modalEl = document.getElementById("noticiaModal");
+          if (!modalEl) {
+            console.warn("Modal #noticiaModal no encontrado en esta vista.");
+            return;
+          }
+          const modalTitulo = document.getElementById("noticiaModalLabel");
+          const modalImagen = document.getElementById("modalImagen");
+          const modalCreadoPor = document.getElementById("modalCreadoPor");
+          const modalFecha = document.getElementById("modalFecha");
+          const modalRedaccion = document.getElementById("modalRedaccion");
+
+          if (modalTitulo) modalTitulo.textContent = titulo;
+          if (modalImagen) {
+            modalImagen.src = imagen;
+            modalImagen.alt = `Imagen de ${titulo}`;
+          }
+          if (modalCreadoPor) modalCreadoPor.textContent = autor;
+          if (modalFecha) modalFecha.textContent = fecha;
+          if (modalRedaccion) modalRedaccion.innerHTML = (redaccion || "").replace(/\n/g, '<br>');
+
+          // Mostrar modal (Bootstrap 5)
+          if (window.bootstrap && typeof window.bootstrap.Modal === "function") {
+            const modal = new window.bootstrap.Modal(modalEl);
+            modal.show();
+          } else if (typeof $ !== "undefined" && typeof $(modalEl).modal === "function") {
+            // Fallback a jQuery si se usa Bootstrap con jQuery
+            $(modalEl).modal("show");
+          } else {
+            console.error("Bootstrap Modal no está disponible.");
+          }
+        });
 
         contenedor.appendChild(card);
       });

@@ -832,13 +832,24 @@ def historial_noticias():
             else:
                 archivo_url = None
 
+            autor = "Sistema"
+            try:
+                if getattr(n, "creador", None):
+                    nombre = getattr(n.creador, "Nombre", None) or ""
+                    apellido = getattr(n.creador, "Apellido", None) or ""
+                    nombre_completo = f"{nombre} {apellido}".strip()
+                    if nombre_completo:
+                        autor = nombre_completo
+            except Exception:
+                pass
+
             result.append({
                 "id": n.ID_Noticia,
                 "titulo": n.Titulo,
                 "redaccion": n.Redaccion,
                 "archivo_url": archivo_url,
                 "fecha": n.Fecha.strftime("%Y-%m-%d"),
-                "creado_por": "Sistema"
+                "creado_por": autor
             })
 
         return jsonify({"success": True, "noticias": result})
@@ -851,7 +862,57 @@ def historial_noticias():
 
 @Administrador_bp.route('/circulares')
 def circulares():
-    return render_template('Administrador/Circulares.html')
+    try:
+        carpeta = os.path.join(current_app.root_path, 'static', 'uploads', 'circulares')
+        os.makedirs(carpeta, exist_ok=True)
+        files = []
+        for f in os.listdir(carpeta):
+            full = os.path.join(carpeta, f)
+            if os.path.isfile(full):
+                files.append((f, os.path.getmtime(full)))
+        files = [f for f, _ in sorted(files, key=lambda x: x[1], reverse=True)]
+        return render_template('Administrador/Circulares.html', files=files)
+    except Exception:
+        return render_template('Administrador/Circulares.html', files=[])
+
+@Administrador_bp.route('/circulares/registro', methods=['POST'])
+@login_required
+def registrar_circular():
+    try:
+        archivo = request.files.get('file')
+        if not archivo or archivo.filename == '':
+            return jsonify({"success": False, "error": "No se envió archivo."}), 400
+
+        nombre_archivo = secure_filename(archivo.filename)
+        carpeta = os.path.join(current_app.root_path, 'static', 'uploads', 'circulares')
+        os.makedirs(carpeta, exist_ok=True)
+        ruta = os.path.join(carpeta, nombre_archivo)
+        archivo.save(ruta)
+
+        url_publica = url_for('static', filename=f'uploads/circulares/{nombre_archivo}')
+        return jsonify({"success": True, "file": nombre_archivo, "url": url_publica})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@Administrador_bp.route('/circulares/historial', methods=['GET'])
+def historial_circulares():
+    try:
+        carpeta = os.path.join(current_app.root_path, 'static', 'uploads', 'circulares')
+        os.makedirs(carpeta, exist_ok=True)
+        items = []
+        for f in os.listdir(carpeta):
+            full = os.path.join(carpeta, f)
+            if os.path.isfile(full):
+                items.append({
+                    "nombre": f,
+                    "url": url_for('static', filename=f'uploads/circulares/{f}'),
+                    "mtime": os.path.getmtime(full)
+                })
+        items.sort(key=lambda x: x["mtime"], reverse=True)
+        top = items[:5]
+        return jsonify({"success": True, "circulares": top})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @Administrador_bp.route('/noticias_vistas')

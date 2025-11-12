@@ -464,11 +464,12 @@ def _calcular_promedio_local(registro_nota):
 # administres.py (Función registro_notas_curso MEJORADA)
 
 @Docente_bp.route('/registro_notas_curso/<int:curso_id>', methods=['GET', 'POST'])
+@login_required
 def registro_notas_curso(curso_id):
     
     # 🛑 Asegúrate de que Docente_Asignatura esté importado al inicio del archivo
     # 🛑 Y que ID_DOCENTE_ACTUAL se obtenga de la sesión de Flask, no un valor fijo (ej: current_user.ID_Usuario si usas Flask-Login)
-    ID_DOCENTE_ACTUAL = 2 # DEBES REEMPLAZAR ESTO CON session.get('ID_Usuario') o similar
+    ID_DOCENTE_ACTUAL = current_user.ID_Usuario
     
     # --- 1. PROCESAR FILTROS Y OBTENER DATOS BASE ---
     

@@ -18,7 +18,7 @@ header {
   background-color: rgb(255, 255, 255); /* azul */
   color: rgb(207, 0, 0);
   background: #fff;
-  padding: 15px 30px;
+  height: 80px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -55,13 +55,33 @@ header .btn-outline-primary {
     background-color: #050733ff; 
     color: rgb(255, 255, 255);        
     margin-left: 730px;
-
 }
 .btn-usuario {
-  background-color: #050733ff; 
-    color: rgb(255, 255, 255);        
-    margin-left: 10px;
+  background-color: transparent; /* sin recuadro */
+  color: #050733ff;               /* color institucional para el icono */
+  border: none;                    /* sin borde */
+  box-shadow: none;                /* sin sombra */
+  padding: 6px 8px;                /* compacto */
+  margin-left: 10px;
 }
+
+.btn-usuario:hover,
+.btn-usuario:focus {
+  background-color: transparent;   /* mantener sin recuadro en hover/focus */
+  color: #050733ff;
+  box-shadow: none;
+}
+
+/* Oculta el caret del dropdown en el botón de usuario */
+.btn-usuario.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Tamaño del icono circular */
+.btn-usuario .bi-person-circle {
+  font-size: 1.6rem;
+}
+
 
 
 header .btn-outline-primary:hover {

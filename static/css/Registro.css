@@ -39,9 +39,62 @@ header .btn-dark {
 }
 
 .btn-usuario {
-  background-color: #050733ff;
-  color: #fff;
+  background: transparent !important;       /* sin recuadro */
+  background-color: transparent !important; /* redundante para asegurar */
+  color: #050733ff !important;              /* color institucional para el icono */
+  border: none !important;                  /* sin borde */
+  box-shadow: none !important;              /* sin sombra */
+  padding: 6px 8px;                         /* compacto */
   margin-left: 10px;
+}
+
+/* Aumentar especificidad para ganar sobre la regla general .btn */
+.btn.btn-usuario {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #050733ff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.btn-usuario:hover,
+.btn-usuario:focus {
+  background: transparent !important;   /* mantener sin recuadro en hover/focus */
+  background-color: transparent !important;
+  color: #050733ff;
+  box-shadow: none !important;
+}
+
+/* Quitar resaltado/halo azul en todos los estados del botón */
+.btn-usuario:focus,
+.btn-usuario:active,
+.btn-usuario:focus-visible,
+.btn-usuario:focus:active,
+.show > .btn-usuario.dropdown-toggle,
+.btn-usuario[aria-expanded="true"] {
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+/* Quitar foco/halo en elementos internos (por si el focus lo recibe el span o pseudo-elementos) */
+.btn-usuario *,
+.btn-usuario *:focus,
+.btn-usuario *:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Oculta el caret del dropdown en el botón de usuario */
+.btn-usuario.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Tamaño del icono circular */
+.btn-usuario .bi-person-circle {
+  font-size: 1.6rem;
 }
 
 /*  menu_des  */

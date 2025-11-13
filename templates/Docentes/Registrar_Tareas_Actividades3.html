@@ -106,12 +106,17 @@
           </div>
 
           <!-- Archivo PDF -->
-          <div class="border rounded bg-light-subtle p-4 text-center mb-4">
- {% if pdf_url %}
-  <iframe src="{{ pdf_url }}" width="100%" height="400px"></iframe>
-{% else %}
-  <p>No hay archivo adjunto</p>
-{% endif %}
+        <div class="border rounded bg-light-subtle p-4 text-center mb-4">
+          {% if pdf_url %}
+            <iframe src="{{ pdf_url }}" width="100%" height="400px"></iframe>
+            <br>
+            <a href="{{ pdf_url }}" target="_blank" class="btn btn-primary mt-3">
+              📄 Abrir PDF en nueva pestaña
+            </a>
+          {% else %}
+            <p>No hay archivo adjunto</p>
+          {% endif %}
+</div>
 </div>
 
 

@@ -180,10 +180,26 @@
           </select>
         </div>
 
-        <div class="d-flex justify-content-end">
-          <button class="btn btn-success me-2" onclick="guardarAsignatura()">Guardar</button>
-          <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
-        </div>
+
+      <label>Ciclo:
+        <select id="cicloAsignatura" class="form-select">
+          <option value="">-- Seleccione --</option>
+          <option value="1">Ciclo 1 (601-603, 701-703)</option>
+          <option value="2">Ciclo 2 (801-803, 901-903)</option>
+          <option value="3">Ciclo 3 (1001-1003, 1101-1103)</option>
+        </select>
+      </label>
+
+      <label>Profesor Encargado:
+        <select id="profesorAsignatura" class="form-select">
+          <option value="">-- Seleccione --</option>
+        </select>
+      </label>
+
+      <div class="d-flex justify-content-end mt-4">
+        <button class="btn btn-success me-2" onclick="guardarAsignatura()">Guardar</button>
+        <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+
       </div>
     </div>
   </div>

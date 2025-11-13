@@ -105,4 +105,55 @@ window.onclick = function(e) {
   if (e.target.id === "modal") {
     cerrarModal();
   }
+<<<<<<< HEAD
 }
+
+// 🔹 Cargar asignaturas desde el backend
+async function cargarAsignaturas() {
+  const res = await fetch('/api/asignaturas');
+  const data = await res.json();
+  asignaturas = data.map(a => ({
+    id: a.id,
+    nombre: a.nombre,
+    descripcion: a.descripcion || '',
+    ciclo: a.grado || '',
+    cursos: [],
+    profesor: '',
+    activa: a.estado === 'Activa'
+  }));
+  renderTabla();
+}
+
+async function guardarAsignatura() {
+  let nombre = document.getElementById("nombreAsignatura").value;
+  let descripcion = document.getElementById("descripcionAsignatura").value;
+  let ciclo = document.getElementById("cicloAsignatura").value;
+  let profesor = document.getElementById("profesorAsignatura").value;
+
+  if (!nombre || !ciclo || !profesor) {
+    alert("El nombre, ciclo y profesor son obligatorios");
+    return;
+  }
+
+  const nueva = { nombre, descripcion, grado: ciclo, codigo: nombre.slice(0,3) + Date.now() };
+
+  const res = await fetch('/api/asignaturas', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(nueva)
+  });
+
+  const result = await res.json();
+  if (result.success) {
+    alert('Asignatura guardada correctamente');
+    await cargarAsignaturas();
+    cerrarModal();
+  }
+}
+
+// Cargar al iniciar
+document.addEventListener("DOMContentLoaded", cargarAsignaturas);
+
+=======
+}
+>>>>>>> 3585df233ed24a5fd37bc5c408466eda7f6d949b

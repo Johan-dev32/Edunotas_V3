@@ -17,16 +17,8 @@ from Controladores.models import db
 
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired,BadSignature
 
+import os
 
-# Diccionario temporal para guardar notificaciones por usuario/rol
-notificaciones_globales = {
-    "Administrador": [],
-    "Docente": [],
-    "Estudiante": [],
-    "Acudiente": []
-}
-
-notificaciones_temporales = {}
 mail = Mail()
 
 s = URLSafeTimedSerializer("clave_super_secreta")
@@ -36,6 +28,7 @@ from Controladores.models import db, Usuario
 
 # Configuración de la aplicación
 app = Flask(__name__)
+
 
 # Carpeta donde se guardarán los archivos subidos
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')

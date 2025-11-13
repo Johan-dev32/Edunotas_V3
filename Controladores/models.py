@@ -59,6 +59,10 @@ class Usuario(UserMixin, db.Model):
     def get_id(self):
         return str(self.ID_Usuario)
 
+class EstadoNotifEnum(Enum):
+    NO_LEIDA = "No leída"
+    LEIDA = "Leída"
+
 
 class Notificacion(db.Model):
     __tablename__ = "Notificacion"
@@ -66,11 +70,14 @@ class Notificacion(db.Model):
     Titulo = db.Column(db.String(150), nullable=False)
     Mensaje = db.Column(db.String(300), nullable=False)
     Enlace = db.Column(db.String(255))
-    Estado = db.Column(db.Enum(*EstadoNotifEnum, name="estado_notif_enum"), default="No leída")
+    Estado = db.Column(db.Enum('No leída', 'Leída', name="estado_notif_enum"), default='No leída')
     Fecha = db.Column(db.DateTime, default=datetime.utcnow)
     ID_Usuario = db.Column(db.Integer, db.ForeignKey("Usuario.ID_Usuario", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
 
     usuario = relationship("Usuario", back_populates="notificaciones")
+    
+    def __repr__(self):
+        return f'<Notificacion {self.ID_Notificacion} - Usuario: {self.ID_Usuario}>'
 
 class Acudiente(db.Model):
     __tablename__ = "Acudiente"
@@ -223,6 +230,13 @@ class Actividad(db.Model):
 
     cronograma = relationship("Cronograma_Actividades", back_populates="actividades")
     participaciones = relationship("Actividad_Estudiante", back_populates="actividad", cascade="all, delete-orphan")
+    
+    @property
+    def id(self):
+        return self.ID_Actividad
+
+    def __repr__(self):
+        return f"<Actividad {self.ID_Actividad} - {self.Titulo}>"
 
 class Actividad_Estudiante(db.Model):
     __tablename__ = "Actividad_Estudiante"
@@ -436,13 +450,14 @@ class Nota_Calificaciones(db.Model):
     ID_Calificacion = db.Column(db.Integer, primary_key=True, autoincrement=True) 
     ID_Estudiante = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
     ID_Asignatura = db.Column(db.Integer, db.ForeignKey('Asignatura.ID_Asignatura'), nullable=False)
+    ID_Historial = db.Column(db.Integer, db.ForeignKey('Historial.ID_Historial'), nullable=False)
     Periodo = db.Column(db.Integer, nullable=False) 
     Nota_1 = db.Column(db.Float, nullable=True) 
     Nota_2 = db.Column(db.Float, nullable=True)
     Nota_3 = db.Column(db.Float, nullable=True)
     Nota_4 = db.Column(db.Float, nullable=True)
     Nota_5 = db.Column(db.Float, nullable=True)
-    Promedio_Final = db.Column(db.Float, nullable=True) 
+    Promedio_Final = db.Column(db.Float, nullable=True)
 
     __table_args__ = (
         db.UniqueConstraint('ID_Estudiante', 'ID_Asignatura', 'Periodo', name='uq_calificacion_periodo'),

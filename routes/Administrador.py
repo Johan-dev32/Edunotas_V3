@@ -30,41 +30,7 @@ def paginainicio():
 
 # ---------------- NOTIFICACIONES ADMINISTRADOR----------------
 
-@Administrador_bp.route('/notificaciones/enviar', methods=['POST'])
-def enviar_notificacion():
-    data = request.get_json()
-    destinatario_id = data.get('destinatario_id')
-    titulo = data.get('titulo')
-    contenido = data.get('contenido')
 
-    noti = Notificacion(Titulo=titulo, Mensaje=contenido, ID_Usuario=destinatario_id)
-    db.session.add(noti)
-    db.session.commit()
-    return jsonify({"success": True})
-
-@Administrador_bp.route('/notificaciones/enviar_todos', methods=['POST'])
-def enviar_todos():
-    data = request.get_json()
-    titulo = data.get('titulo')
-    contenido = data.get('contenido')
-    rol_destino = data.get('rol')  # "Docente", "Estudiante", etc.
-
-    if rol_destino == "Todos":
-        usuarios = Usuario.query.all()
-    else:
-        usuarios = Usuario.query.filter_by(Rol=rol_destino).all()
-
-    for u in usuarios:
-        noti = Notificacion(Titulo=titulo, Mensaje=contenido, ID_Usuario=u.ID_Usuario)
-        db.session.add(noti)
-
-    db.session.commit()
-    return jsonify({"success": True})
-
-@Administrador_bp.route('Administrador/notificaciones/recibir')
-def recibir_notificaciones():
-    notis = Notificacion.query.filter_by(ID_Usuario=current_user.ID_Usuario).order_by(Notificacion.Fecha.desc()).limit(5).all()
-    return jsonify([{"titulo": n.Titulo, "contenido": n.Mensaje} for n in notis])
 
 
 
@@ -843,6 +809,7 @@ def usuarios():
     return render_template('Administrador/Usuarios.html')
 
 
+
 # CREAR ASIGNATURAS #
 
 @Administrador_bp.route('/asignaturas', methods=['GET'])
@@ -978,6 +945,96 @@ def reactivar_asignatura(id):
 
 
 
+# 📌 Endpoint para obtener todas las asignaturas (API JSON)
+@Administrador_bp.route('/api/asignaturas', methods=['GET'])
+def api_get_asignaturas():
+    asignaturas = Asignatura.query.all()
+    data = []
+    for a in asignaturas:
+        data.append({
+            "id": a.ID_Asignatura,
+            "nombre": a.Nombre,
+            "descripcion": a.Descripcion,
+            "grado": a.Grado,
+            "area": a.Area,
+            "codigo": a.CodigoAsignatura,
+            "estado": a.Estado
+        })
+    return jsonify(data)
+
+
+# 📌 Endpoint para agregar una nueva asignatura
+@Administrador_bp.route('/api/asignaturas', methods=['POST'])
+def crear_asignatura():
+    data = request.get_json()
+
+    nombre = data.get('nombre')
+    descripcion = data.get('descripcion')
+    grado = data.get('grado')
+    area = data.get('area', '')
+    codigo = data.get('codigo')
+    id_docente = data.get('id_docente')
+
+    # Crear la asignatura
+    nueva = Asignatura(
+        Nombre=nombre,
+        Descripcion=descripcion,
+        Grado=grado,
+        Area=area,
+        CodigoAsignatura=codigo,
+        Estado='Activa'
+    )
+    db.session.add(nueva)
+    db.session.flush()  # Para obtener ID antes del commit
+
+    # Crear relación docente-asignatura
+    if id_docente:
+        relacion = Docente_Asignatura(
+            ID_Docente=id_docente,
+            ID_Asignatura=nueva.ID_Asignatura
+        )
+        db.session.add(relacion)
+
+    db.session.commit()
+
+    return jsonify({"success": True, "id": nueva.ID_Asignatura})
+
+
+@Administrador_bp.route('/api/docentes', methods=['GET'])
+def obtener_docentes():
+    docentes = Usuario.query.filter_by(Rol='Docente', Estado='Activo').all()
+    data = [
+        {
+            "id": d.ID_Usuario,
+            "nombre": f"{d.Nombre} {d.Apellido}"
+        }
+        for d in docentes
+    ]
+    return jsonify(data)
+
+
+@Administrador_bp.route('/api/asignaturas', methods=['GET'])
+def listar_asignaturas():
+    asignaturas = Asignatura.query.all()
+    data = []
+    for a in asignaturas:
+        relacion = Docente_Asignatura.query.filter_by(ID_Asignatura=a.ID_Asignatura).first()
+        docente_nombre = None
+        if relacion and relacion.docente:
+            docente_nombre = f"{relacion.docente.Nombre} {relacion.docente.Apellido}"
+        data.append({
+            "id": a.ID_Asignatura,
+            "nombre": a.Nombre,
+            "descripcion": a.Descripcion,
+            "grado": a.Grado,
+            "area": a.Area,
+            "codigo": a.CodigoAsignatura,
+            "estado": a.Estado,
+            "profesor": docente_nombre
+        })
+    return jsonify(data)
+
+#----------------------------------------------------------------------
 #----------------------parte de horarios-------------------
 @Administrador_bp.route('/horarios', defaults={'curso_id': None})
 

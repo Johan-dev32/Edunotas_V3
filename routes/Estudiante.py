@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, abort
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -322,10 +322,8 @@ def calculo_promedio():
 
 @Estudiante_bp.route('/observador')
 def observador():
-    # ID del estudiante logueado (Asegúrate de que current_user esté disponible y tenga ID_Usuario)
     estudiante_id = current_user.ID_Usuario 
 
-    # Consulta para obtener las observaciones del estudiante logueado
     observaciones = (
         db.session.query(Observacion, Usuario, Curso)
         .join(Matricula, Observacion.ID_Matricula == Matricula.ID_Matricula)
@@ -346,7 +344,6 @@ def observador():
 def observador_detalle(anotacion_id):
     estudiante_id = current_user.ID_Usuario 
 
-    # Consulta para obtener una observación específica, asegurando que pertenezca al estudiante logueado
     anotacion = (
         db.session.query(Observacion, Usuario, Curso)
         .join(Matricula, Observacion.ID_Matricula == Matricula.ID_Matricula)
@@ -357,7 +354,7 @@ def observador_detalle(anotacion_id):
     )
 
     if not anotacion:
-        abort(404) # Si la anotación no existe o no pertenece al estudiante
+        abort(404)
 
     return render_template(
         'Estudiante/Observador2.html',

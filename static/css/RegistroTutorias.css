@@ -181,21 +181,23 @@ header .btn-dark {
 
 .titulo-principal {
   
-  font-size: 3rem;      
+  font-size: 3rem;    
+  font-family: 'Trebuchet MS', sans-serif;  
   font-weight: bolder;     
   color: #050733ff;      
   margin-top: 40px;
   text-align: center;
 }
+.descripcion {
+  font-size: 1.3rem;     
+  color: #555;   
+  margin-left:300px;
+}
 .modal-content {
     font-family: 'Trebuchet MS', sans-serif;
 }
 
-/* ========================================= */
-/* ESTILOS DEL MODAL (Ventana Emergente)     */
-/* ========================================= */
 
-/* Fondo del encabezado del modal */
 .modal-header {
     background-color: #050733ff; /* Color principal */
     color: white; /* Texto blanco para el título */

@@ -81,6 +81,24 @@ header .btn-dark {
   font-weight: bold;
 }
 
+
+
+/* titulos */
+
+.titulo-principal {
+  font-size: 3rem;      
+  font-weight: 900;      
+  color: #050733ff;    
+  margin-left: 50px;  
+  margin-top: 40px;
+}
+
+
+.descripcion {
+  font-size: 1.3rem;     
+  color: #555;  
+  margin-left: 50px;         
+}
 .section-title {
   margin-top: 0;
   color: var(--accent);

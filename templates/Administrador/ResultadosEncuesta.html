@@ -56,7 +56,6 @@
   </header>
 
 <!--  MENU  -->
-   <section class="bg-light py-5 mt-5">
   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
@@ -106,6 +105,77 @@
   </div>
 </section>
   <!-- CONTENIDO  -->
+
+  <main class="container py-5">
+    <h1 class="text-center titulo-principal mb-2">RESULTADOS DE ENCUESTA</h1>
+    <h2 class="text-center text-secondary mb-4">{{ encuesta.Titulo }}</h2>
+    <p class="text-center descripcion">{{ encuesta.Descripcion }}</p>
+
+    {% set preguntas_agrupadas = {} %}
+    {% for respuesta in respuestas %}
+        {% set pregunta_id = respuesta.pregunta.ID_Pregunta %}
+        {% if pregunta_id not in preguntas_agrupadas %}
+            {% set dummy = preguntas_agrupadas.update({pregunta_id: {
+                'pregunta': respuesta.pregunta, 
+                'respuestas': []
+            }}) %}
+        {% endif %}
+        {% set dummy = preguntas_agrupadas[pregunta_id]['respuestas'].append(respuesta) %}
+    {% endfor %}
+    
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <h3 class="mb-4">Resumen ({{ respuestas | length }} respuestas totales)</h3>
+
+            {% for id, data in preguntas_agrupadas.items() %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">{{ loop.index }}. {{ data.pregunta.TextoPregunta }} ({{ data.pregunta.TipoRespuesta }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if data.pregunta.TipoRespuesta == 'Texto' or data.pregunta.TipoRespuesta == 'Escala' %}
+                        <ul class="list-group list-group-flush">
+                            {% for r in data.respuestas %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div>
+                                    <small class="text-muted">Por: {{ r.usuario.Nombre if r.usuario else 'N/A' }}</small>
+                                    <p class="mb-0 fw-bold">{{ r.Respuesta }}</p>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    
+                    {% else %}
+                        {% set conteo = {} %}
+                        {% for r in data.respuestas %}
+                            {% set respuesta_key = r.Respuesta %}
+                            {% set count = conteo.get(respuesta_key, 0) + 1 %}
+                            {% set dummy = conteo.update({respuesta_key: count}) %}
+                        {% endfor %}
+                        
+                        {% set total_respuestas_pregunta = data.respuestas | length %}
+                        
+                        <ul class="list-group">
+                            {% for opcion, count in conteo.items() %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ opcion }}</span>
+                                <span class="badge bg-secondary rounded-pill me-2">{{ count }}</span>
+                                <div class="progress flex-grow-1 ms-3" style="height: 20px;">
+                                    {% set porcentaje = (count / total_respuestas_pregunta) * 100 %}
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: {{ porcentaje }}%;" aria-valuenow="{{ porcentaje | round(2) }}" aria-valuemin="0" aria-valuemax="100">{{ porcentaje | round(1) }}%</div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <a href="{{ url_for('Administrador.encuesta') }}" class="btn btn-secondary mt-3"><i class="bi bi-arrow-left"></i> Volver a Encuestas</a>
+        </div>
+    </div>
+</main>
 
 
 

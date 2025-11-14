@@ -43,8 +43,19 @@ header .btn-dark {
   border: none;
   margin-left: 20px; 
 }
-
-
+.titulo {
+  font-size: 3rem;     
+  font-family: 'Trebuchet MS', sans-serif; 
+  font-weight: bold;      
+  color: #050733ff;      
+  margin-top: 40px;
+  text-align: center;
+}
+.descripcion {
+  font-size: 1.3rem;     
+  color: #555;   
+  margin-left:550px;
+}
 /* Botón de iniciar sesión */
 header .btn-outline-primary {
   color: #050733ff;

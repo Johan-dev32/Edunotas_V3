@@ -40,27 +40,24 @@
 
 
     <div class="dropdown">
-      <button 
-        class="btn btn-usuario dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton2" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
-        <span class="bi bi-person-lines-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
-        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
-      </ul>
-    </div>
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      
+      <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
+      <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
+
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
   </header>
 
 
 
 <!--  MENU  -->
-  <section class="bg-light py-5 mt-5">
   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
@@ -120,63 +117,14 @@
   <p class="descripcion"></p>
 </div>
 
-<!-- TABLA Y FILTROS -->
+<!-- TABLA -->
 <div class="container my-4 tabla-container">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <label for="curso" class="form-label me-2">Curso:</label>
-      <select id="curso" class="form-select d-inline-block w-auto">
-        <option>601</option>
-        <option>602</option>
-        <option>603</option>
-        <option>701</option>
-        <option>702</option>
-        <option>703</option>
-        <option>801</option>
-        <option>802</option>
-        <option>803</option>
-        <option>901</option>
-        <option>902</option>
-        <option>903</option>
-        <option>1001</option>
-        <option>1002</option>
-        <option>1003</option>
-        <option>1101</option>
-        <option>1102</option>
-        <option>1103</option>
-      </select>
-
-      <label for="materia" class="form-label ms-3 me-2">Materia:</label>
-      </select>
-
-      <label for="materia" class="form-label ms-3 me-2">Materia:</label>
-      <select id="materia" class="form-select d-inline-block w-auto">
-        <option>Español</option>
-<option>Matemáticas</option>
-<option>Inglés</option>
-<option>Sociales</option>
-<option>Ética</option>
-<option>Filosofía</option>
-<option>Educación Física</option>
-<option>Artística</option>
-<option>Biología</option>
-<option>Física</option>
-<option>Química</option>
-<option>Religión</option>
-<option>Tecnología - Informática</option>
-<option>P.T.I</option>
-<option>RUTA</option>
-
-      </select>
-    </div>
-
-    <div class="d-flex align-items-center">
-      <button class="btn btn-outline-primary me-3">Editar</button>
-      <i class="bi bi-person-circle fs-4 me-3"></i>
-      <div class="input-group input-group-sm w-auto">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input type="text" class="form-control" placeholder="search">
-      </div>
+  <div class="d-flex justify-content-end align-items-center mb-3">
+    <button class="btn btn-outline-primary me-3">Editar</button>
+    <i class="bi bi-person-circle fs-4 me-3"></i>
+    <div class="input-group input-group-sm w-auto">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="text" class="form-control" placeholder="search">
     </div>
   </div>
 
@@ -192,38 +140,7 @@
         <th>Período</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td>1</td><td>Luis Rodríguez</td><td>1634527823</td><td>4.7</td><td>Superior</td><td>excelente desempeño</td><td>II</td>
-      </tr>
-      <tr>
-        <td>2</td><td>Mariana Torres</td><td>1045678932</td><td>4.3</td><td>Alto</td><td>muy buena participación</td><td>II</td>
-      </tr>
-      <tr>
-        <td>3</td><td>Daniel Morales</td><td>1098765432</td><td>3.5</td><td>Básico</td><td>debe reforzar ciencias</td><td>II</td>
-      </tr>
-      <tr>
-        <td>4</td><td>Sofía Herrera</td><td>1054321890</td><td>4.8</td><td>Superior</td><td>actitud destacada en grupo</td><td>II</td>
-      </tr>
-      <tr>
-        <td>5</td><td>Andrés Gómez</td><td>1087654321</td><td>2.1</td><td>Bajo</td><td>necesita apoyo académico</td><td>II</td>
-      </tr>
-      <tr>
-        <td>6</td><td>Valentina Ramírez</td><td>1076543210</td><td>3.9</td><td>Alto</td><td>cumple con todas las tareas</td><td>II</td>
-      </tr>
-      <tr>
-        <td>7</td><td>Camilo Rodríguez</td><td>1065432187</td><td>4.0</td><td>Alto</td><td>demuestra interés y compromiso</td><td>II</td>
-      </tr>
-      <tr>
-        <td>8</td><td>Juliana Mendoza</td><td>1034567890</td><td>3.2</td><td>Básico</td><td>debe mejorar en lectura crítica</td><td>II</td>
-      </tr>
-      <tr>
-        <td>9</td><td>Sergio Martínez</td><td>101234567</td><td>2.7</td><td>Bajo</td><td>bajo rendimiento y ausencias</td><td>II</td>
-      </tr>
-      <tr class="table-active">
-        <td>10</td><td>Natalia Fernández</td><td>1023456712</td><td>4.5</td><td>Alto</td><td>excelente actitud en clases</td><td>II</td>
-      </tr>
-    </tbody>
+    <tbody></tbody>
   </table>
 </div>
 

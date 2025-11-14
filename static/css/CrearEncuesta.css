@@ -9,6 +9,7 @@ header {
   background-color: white;
   color: #050733ff;
   font-family: 'Trebuchet MS', sans-serif;
+  height: 57px;
 }
 
 .titulo-header {
@@ -18,11 +19,19 @@ header {
   font-family: 'Trebuchet MS', sans-serif;
   margin: 0;
   margin-left: 60px;
+  margin-top: -20px;
 }
 
 header .btn-dark {
   background-color: #050733ff;
   border: none;
+  margin-top: -20px;
+}
+
+.btn-edunotas {
+  background-color: #050733ff;
+  color: #fff;
+  margin-top: -20px;
 }
 
 .btn-edunotas {
@@ -31,9 +40,30 @@ header .btn-dark {
 }
 
 .btn-usuario {
-  background-color: #050733ff;
-  color: #fff;
+  background-color: transparent; /* sin recuadro */
+  color: #050733ff;               /* color institucional para el icono */
+  border: none;                    /* sin borde */
+  box-shadow: none;                /* sin sombra */
+  padding: 6px 8px;                /* compacto */
   margin-left: 10px;
+  margin-top: -20px;
+}
+
+.btn-usuario:hover,
+.btn-usuario:focus {
+  background-color: transparent;   /* mantener sin recuadro en hover/focus */
+  color: #050733ff;
+  box-shadow: none;
+}
+
+/* Oculta el caret del dropdown en el botón de usuario */
+.btn-usuario.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Tamaño del icono circular */
+.btn-usuario .bi-person-circle {
+  font-size: 1.6rem;
 }
 
 /*  menu_des  */
@@ -87,6 +117,7 @@ header .btn-dark {
   font-size: 2.5rem;
   font-weight: bold;
   color: #050733ff;
+  margin-top: 30px;
 }
 
 .descripcion {

@@ -67,8 +67,8 @@ header .btn-dark {
   width: 220px;
   min-height: 100vh;
   background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
-}
 
+}
 #sidebar .nav-link:hover {
   background: linear-gradient(180deg, #11064e, #ffffff);
   border-radius: 8px;

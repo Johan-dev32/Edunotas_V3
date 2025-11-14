@@ -52,7 +52,7 @@ def ver_observador_estudiante():
         estudiante_a_cargo_id = Acudiente(current_user.ID_Usuario) 
     except:
         # Si la función lanza el ValueError, se captura aquí y se redirige
-        return render_template('Acudiente/NoEstudiante.html', mensaje="No tienes un estudiante asociado.")
+        return render_template('Acudiente/ObservadorEstudiante.html', mensaje="No tienes un estudiante asociado.")
 
     observaciones = (
         db.session.query(Observacion, Usuario, Curso)

@@ -16,7 +16,7 @@
     <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
       <i class="bi bi-list"></i>
     </button>
-    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRÍA</h2>
+    <h2 class="titulo-header mx-2 mb-0">| COLEGIO FE Y ALEGRÍA</h2>
 
     <!-- MENÚ DE NOTIFICACIONES -->
     <div class="dropdown ms-auto me-3">
@@ -32,16 +32,19 @@
 
     <!-- MENÚ DE USUARIO -->
     <div class="dropdown">
-      <button class="btn btn-usuario dropdown-toggle" data-bs-toggle="dropdown">
-        <span class="bi bi-person-lines-fill"></span>
-      </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('Administrador.configuracion_academica') }}">Configuración Académica</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('Administrador.historialacademico') }}">Historial Académico</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
-      </ul>
-    </div>
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      
+      <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
+      <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
+
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
   </header>
 
   <!-- MENÚ LATERAL -->

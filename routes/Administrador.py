@@ -711,92 +711,175 @@ def noticias():
 
 # En administradores.py
 
-# En administradores.py, en historial_noticias()
+@Administrador_bp.route("/noticias/registro", methods=["POST"])
+@login_required 
+def registrar_noticia():
+    try:
+        titulo = request.form.get("titulo")
+        # ✅ CORRECCIÓN: Usar 'contenido'
+        contenido = request.form.get("contenido") 
+        fecha_str = request.form.get("fecha")
+        creado_por_rol = request.form.get("creadoPor")
+        archivo = request.files.get("archivo")
 
+        if not titulo or not contenido:
+            return jsonify({"success": False, "error": "El título y la redacción son obligatorios."}), 400
+
+        # Conversión de fecha
+        # Asegúrate de que el formato de fecha coincida con el envío del formulario (YYYY-MM-DD)
+        try:
+            fecha_noticia = datetime.strptime(fecha_str, '%Y-%m-%d')
+        except (ValueError, TypeError):
+            fecha_noticia = datetime.utcnow() # Usa la fecha actual si falla la conversión
+
+        # Guardar imagen si existe
+        ruta_para_bd = None
+        if archivo and archivo.filename != '':
+            nombre_archivo_seguro = secure_filename(archivo.filename)
+            # Define la carpeta de destino absoluta. Asumo 'static/uploads' existe.
+            carpeta_destino = os.path.join(current_app.root_path, 'static', 'uploads')
+            
+            # Asegúrate de que la carpeta exista
+            os.makedirs(carpeta_destino, exist_ok=True)
+            
+            ruta_guardado = os.path.join(carpeta_destino, nombre_archivo_seguro)
+            archivo.save(ruta_guardado)
+            
+            # Guardamos una ruta RELATIVA en la BD, luego se construye la URL pública con url_for
+            # Evita duplicar /static cuando se serializa en el historial
+            ruta_para_bd = f'uploads/{nombre_archivo_seguro}'
+
+        # El campo CreadoPor en tu modelo Noticias debe ser un campo de texto (string)
+        # o un ID de usuario. Lo mantendré como ID, y añadiremos el rol.
+        
+        # Opcional: Si quieres guardar el rol junto con el ID del usuario
+        # Asumiendo que Noticias.CreadoPor solo guarda el ID_Usuario (FK)
+        # y que el Rol se podría obtener de la sesión si es necesario
+        
+        nueva_noticia = Noticias(
+            Fecha=fecha_noticia, 
+            Titulo=titulo,
+            Redaccion=contenido, # ✅ Correcto: usa 'contenido'
+            Archivo=ruta_para_bd, 
+            CreadoPor=current_user.ID_Usuario, # Asumiendo que es el ID del usuario
+            # Podrías agregar un campo "RolPublicador" si lo necesitas en la DB
+            # RolPublicador=creado_por_rol 
+        )
+
+        db.session.add(nueva_noticia)
+        db.session.commit()
+
+        return jsonify({"success": True, "message": "✅ Noticia registrada correctamente."})
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"⚠️ Error al registrar noticia: {e}")
+        return jsonify({"success": False, "error": f"Error de servidor: {e}"}), 500
+    
 @Administrador_bp.route("/noticias/historial", methods=["GET"])
 def historial_noticias():
     """
-    Ruta API para cargar todas las noticias guardadas, ordenadas por fecha.
+    Ruta API para devolver las 4 noticias más recientes.
     """
     try:
-        # CORRECCIÓN: Ordenar por Fecha descendente, Y si hay empate, por ID_Noticia descendente.
-        # Esto garantiza que la última noticia registrada (mayor ID) vaya primero.
-        noticias = Noticias.query.order_by(Noticias.Fecha.desc(), Noticias.ID_Noticia.desc()).all()
-        
+        # ✅ Traer solo las 4 noticias más recientes por creación (ID descendente)
+        # Usar ID evita que una fecha ingresada manualmente más antigua oculte la noticia recién creada
+        noticias = Noticias.query.order_by(Noticias.ID_Noticia.desc()).limit(4).all()
+
         result = []
         for n in noticias:
-            # ... el resto del código es correcto y usa el rol de texto ...
-            nombre_rol = n.CreadoPor if n.CreadoPor else "Rol no especificado"
-            
+            # Construir URL de archivo evitando duplicaciones:
+            # - Si en BD está guardado como 'uploads/archivo.jpg' => usar url_for('static', filename=...)
+            # - Si en BD ya está como '/static/...' => usar tal cual
+            if n.Archivo:
+                if isinstance(n.Archivo, str) and n.Archivo.strip().startswith('/static/'):
+                    archivo_url = n.Archivo
+                else:
+                    archivo_url = url_for('static', filename=n.Archivo)
+            else:
+                archivo_url = None
+
+            autor = "Sistema"
+            try:
+                if getattr(n, "creador", None):
+                    nombre = getattr(n.creador, "Nombre", None) or ""
+                    apellido = getattr(n.creador, "Apellido", None) or ""
+                    nombre_completo = f"{nombre} {apellido}".strip()
+                    if nombre_completo:
+                        autor = nombre_completo
+            except Exception:
+                pass
+
             result.append({
                 "id": n.ID_Noticia,
                 "titulo": n.Titulo,
                 "redaccion": n.Redaccion,
-                "archivo_url": url_for('static', filename=n.Archivo) if n.Archivo else None, 
-                "fecha": n.Fecha.strftime("%Y-%m-%d"), 
-                "creado_por": nombre_rol, 
+                "archivo_url": archivo_url,
+                "fecha": n.Fecha.strftime("%Y-%m-%d"),
+                "creado_por": autor
             })
-        
+
         return jsonify({"success": True, "noticias": result})
-        
+    
     except Exception as e:
-        # ... (código de manejo de errores) ...
         print(f"Error al cargar historial de noticias: {e}")
-        return jsonify({"success": False, "error": f"Error de servidor al cargar datos: {e}"}), 500
-    
-    
-    
-@Administrador_bp.route("/noticias/registro", methods=["POST"])
-def registrar_noticia():
-    try:
-        # 1. Obtener datos (incluyendo el rol como texto)
-        titulo = request.form.get('titulo')
-        contenido = request.form.get('contenido')
-        fecha_str = request.form.get('fecha')
-        
-        # OBTENEMOS EL TEXTO DEL ROL DIRECTAMENTE DEL FORMULARIO
-        creado_por_rol = request.form.get('creadoPor') 
-        
-        archivo_obj = request.files.get('archivo')
-        
-        # Validación básica de datos
-        if not titulo or not contenido or not fecha_str or not creado_por_rol:
-            return jsonify({"success": False, "error": "Faltan campos obligatorios (título, contenido, fecha, rol)."}), 400
+        return jsonify({"success": False, "error": "Error de servidor al cargar noticias"}), 500
 
-        fecha = datetime.strptime(fecha_str, "%Y-%m-%d").date()
-
-        ruta_archivo = None
-        
-        # 2. Procesar y guardar el archivo si existe (mismo código)
-        if archivo_obj and archivo_obj.filename:
-            filename = secure_filename(archivo_obj.filename)
-            ruta_guardado_completa = os.path.join(UPLOAD_FOLDER, filename) 
-            archivo_obj.save(ruta_guardado_completa)
-            ruta_archivo = os.path.join('uploads', 'noticias', filename).replace('\\', '/')
-
-        # 3. Guardar en la Base de Datos (usando el texto del rol)
-        nueva_noticia = Noticias(
-            Titulo=titulo,
-            Redaccion=contenido,
-            Fecha=fecha,
-            CreadoPor=creado_por_rol, # <-- ¡Guardamos el TEXTO del rol!
-            Archivo=ruta_archivo
-        )
-        
-        db.session.add(nueva_noticia)
-        db.session.commit()
-
-        return jsonify({"success": True, "message": "Noticia registrada exitosamente."})
-
-    except Exception as e:
-        db.session.rollback()
-        print(f"Error al registrar noticia: {e}")
-        return jsonify({"success": False, "error": f"Error interno del servidor: {e}"}), 500
 
 
 @Administrador_bp.route('/circulares')
 def circulares():
-    return render_template('Administrador/Circulares.html')
+    try:
+        carpeta = os.path.join(current_app.root_path, 'static', 'uploads', 'circulares')
+        os.makedirs(carpeta, exist_ok=True)
+        files = []
+        for f in os.listdir(carpeta):
+            full = os.path.join(carpeta, f)
+            if os.path.isfile(full):
+                files.append((f, os.path.getmtime(full)))
+        files = [f for f, _ in sorted(files, key=lambda x: x[1], reverse=True)]
+        return render_template('Administrador/Circulares.html', files=files)
+    except Exception:
+        return render_template('Administrador/Circulares.html', files=[])
+
+@Administrador_bp.route('/circulares/registro', methods=['POST'])
+@login_required
+def registrar_circular():
+    try:
+        archivo = request.files.get('file')
+        if not archivo or archivo.filename == '':
+            return jsonify({"success": False, "error": "No se envió archivo."}), 400
+
+        nombre_archivo = secure_filename(archivo.filename)
+        carpeta = os.path.join(current_app.root_path, 'static', 'uploads', 'circulares')
+        os.makedirs(carpeta, exist_ok=True)
+        ruta = os.path.join(carpeta, nombre_archivo)
+        archivo.save(ruta)
+
+        url_publica = url_for('static', filename=f'uploads/circulares/{nombre_archivo}')
+        return jsonify({"success": True, "file": nombre_archivo, "url": url_publica})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@Administrador_bp.route('/circulares/historial', methods=['GET'])
+def historial_circulares():
+    try:
+        carpeta = os.path.join(current_app.root_path, 'static', 'uploads', 'circulares')
+        os.makedirs(carpeta, exist_ok=True)
+        items = []
+        for f in os.listdir(carpeta):
+            full = os.path.join(carpeta, f)
+            if os.path.isfile(full):
+                items.append({
+                    "nombre": f,
+                    "url": url_for('static', filename=f'uploads/circulares/{f}'),
+                    "mtime": os.path.getmtime(full)
+                })
+        items.sort(key=lambda x: x["mtime"], reverse=True)
+        top = items[:5]
+        return jsonify({"success": True, "circulares": top})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @Administrador_bp.route('/noticias_vistas')

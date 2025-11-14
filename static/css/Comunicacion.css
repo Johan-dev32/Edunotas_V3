@@ -45,9 +45,29 @@ header .btn-dark {
 }
 
 .btn-usuario {
-  background-color: #050733ff; 
-  color: #fff;        
+  background-color: transparent; /* sin recuadro */
+  color: #050733ff;               /* color institucional para el icono */
+  border: none;                    /* sin borde */
+  box-shadow: none;                /* sin sombra */
+  padding: 6px 8px;                /* compacto */
   margin-left: 10px;
+}
+
+.btn-usuario:hover,
+.btn-usuario:focus {
+  background-color: transparent;   /* mantener sin recuadro en hover/focus */
+  color: #050733ff;
+  box-shadow: none;
+}
+
+/* Oculta el caret del dropdown en el botón de usuario */
+.btn-usuario.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Tamaño del icono circular */
+.btn-usuario .bi-person-circle {
+  font-size: 1.6rem;
 }
 
 /* sidebar texto */
@@ -109,7 +129,7 @@ header .btn-dark {
   font-size: 40px;
   font-weight: bold;
   color: #050733ff;
-  margin-top: -90px; 
+  margin-top: 60px; 
   text-align: center;
 }
 
@@ -137,3 +157,57 @@ header .btn-dark {
   margin-left: -1050px;
   margin-bottom: 30px;
 } 
+
+/* ===== Rediseño ligero: tarjetas y acentos ===== */
+.card-elevated {
+  border: 0 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 10px 24px rgba(5, 7, 51, 0.12) !important;
+  overflow: hidden;
+}
+
+.card-header-navy {
+  background: #050733ff;
+  color: #fff;
+  padding: 12px 16px;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+
+.card-section-title {
+  color: #050733ff;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.btn-primary-edunotas {
+  background-color: #050733ff !important;
+  border-color: #050733ff !important;
+  color: #fff !important;
+}
+
+.btn-outline-edunotas {
+  border-color: #050733ff !important;
+  color: #050733ff !important;
+}
+.btn-outline-edunotas:hover {
+  background-color: #050733ff !important;
+  color: #fff !important;
+}
+
+.table thead th {
+  background: #f4f6ff;
+  color: #050733ff;
+  border-bottom: 2px solid #e5e7ff;
+}
+
+.meta-muted {
+  color: #6b7280;
+  font-size: .9rem;
+}
+
+/* Espaciados responsivos */
+.container .row > [class^="col-"],
+.container .row > [class*=" col-"] {
+  margin-bottom: 18px;
+}

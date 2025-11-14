@@ -57,7 +57,6 @@
     </div>
   </header>
 <!--  MENU  -->
-  <section class="bg-light py-5 mt-5">
   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
@@ -115,7 +114,8 @@
 
       <!-- Formulario -->
       <div class="col-md-6">
-        <form action="{{ url_for('Administrador.enviar_correo') }}" method="POST" enctype="multipart/form-data" class="card p-3 mb-3">
+        <h5 class="card-section-title">Enviar por Whatsapp</h5>
+        <form action="{{ url_for('Administrador.enviar_correo') }}" method="POST" enctype="multipart/form-data" class="card card-elevated p-3 mb-4">
           <label for="emailDestino" class="form-label">Numero del Destinatario</label>
           
 
@@ -139,16 +139,16 @@
           <input type="file" id="fileInput" name="archivo" class="form-control mb-3" required>
 
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success"><i class="bi bi-envelope-fill"></i> Enviar por Whatsapp</button>
-            <button type="reset" class="btn btn-danger"><i class="bi bi-trash"></i> Limpiar</button>
+            <button type="submit" class="btn btn-primary-edunotas"><i class="bi bi-envelope-fill"></i> Enviar por Whatsapp</button>
+            <button type="reset" class="btn btn-outline-edunotas"><i class="bi bi-trash"></i> Limpiar</button>
           </div>
         </form>
       </div>
 
       <!-- Historial -->
       <div class="col-md-6">
-        <div class="card p-3">
-          <h5>Historial</h5>
+        <h5 class="card-section-title">Historial de envíos</h5>
+        <div class="card card-elevated p-3">
           <table class="table table-striped">
             <thead>
               <tr>

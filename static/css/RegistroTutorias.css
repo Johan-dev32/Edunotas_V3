@@ -45,10 +45,31 @@ header .btn-dark {
 }
 
 .btn-usuario {
-  background-color: #050733ff; 
-  color: #fff;        
+  background-color: transparent; /* sin recuadro */
+  color: #050733ff;               /* color institucional para el icono */
+  border: none;                    /* sin borde */
+  box-shadow: none;                /* sin sombra */
+  padding: 6px 8px;                /* compacto */
   margin-left: 10px;
 }
+
+.btn-usuario:hover,
+.btn-usuario:focus {
+  background-color: transparent;   /* mantener sin recuadro en hover/focus */
+  color: #050733ff;
+  box-shadow: none;
+}
+
+/* Oculta el caret del dropdown en el botón de usuario */
+.btn-usuario.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Tamaño del icono circular */
+.btn-usuario .bi-person-circle {
+  font-size: 1.6rem;
+}
+
 
 /* sidebar texto */
 .offcanvas {
@@ -88,12 +109,6 @@ header .btn-dark {
 
 }
 
-
-/* tabla */
-.registro-tutorias h2 {
-  margin-bottom: 20px;
-  font-weight: bold;
-}
 
 .btn-tutoria {
   display: inline-block;
@@ -166,10 +181,11 @@ header .btn-dark {
 
 .titulo-principal {
   
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #050733ff;
-  text-align: center;   /* centrado */
+  font-size: 3rem;      
+  font-weight: bolder;     
+  color: #050733ff;      
+  margin-top: 40px;
+  text-align: center;
 }
 .modal-content {
     font-family: 'Trebuchet MS', sans-serif;

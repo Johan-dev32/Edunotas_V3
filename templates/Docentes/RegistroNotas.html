@@ -31,16 +31,18 @@
       </ul>
     </div>
 
-    <div class="dropdown">
-      <button class="btn btn-usuario dropdown-toggle" type="button" data-bs-toggle="dropdown">
-        <span class="bi bi-person-lines-fill"></span>
-      </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-         <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
-      </ul>
-    </div>
+     <div class="dropdown">
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      
+      <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
+      <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
   </header>
 
   <!-- MENU -->
@@ -72,101 +74,127 @@
 
   <!-- CONTENIDO -->
   <section class="container py-5 mt-5">
-        <h1 class="text-center mb-4 titulo-principal">REGISTRO DE NOTAS</h1>
-        
-        <h2 class="mt-4 mb-3 text-center fw-bold text-primary">Curso: {{ curso_nombre }}</h2>
 
-        <form id="formRegistroNotas" method="POST" action="{{ url_for('Docente.guardar_notas_curso', curso_id=curso_id) }}">
+    <h1 class="text-center mb-4 titulo-principal">REGISTRO DE NOTAS</h1>
+
+    <h2 class="mt-4 mb-3 text-center fw-bold text-primary">Curso: {{ curso_nombre }}</h2>
+
+    <form id="formRegistroNotas" method="POST" action="{{ url_for('Docente.guardar_notas_curso', curso_id=curso_id) }}">
+
+        <div class="d-flex justify-content-between mt-4">
+
+            <button type="submit" name="action" value="guardar" class="btn btn-primary">
+                <i class="fas fa-save"></i> Guardar Todas las Notas
+            </button>
+
+            <button type="submit" name="action" value="reporte" class="btn btn-success">
+                <i class="fas fa-file-pdf"></i> Reporte de Notas (PDF)
+            </button>
             
-            <div class="row mb-4 g-3 justify-content-center">
-                
-                <div class="col-md-4">
-                    <label for="periodo_select" class="form-label fw-bold">Período Académico</label>
-                    <select class="form-select" id="periodo_select" name="periodo" required>
-                        <option value="" disabled selected>Seleccione Período</option>
-                        <option value="1">Periodo 1</option>
-                        <option value="2">Periodo 2</option>
-                        <option value="3">Periodo 3</option>
-                        <option value="4">Periodo 4</option>
-                    </select>
-                </div>
-                
-                <div class="col-md-4">
-                    <label for="asignatura_select" class="form-label fw-bold">Asignatura</label>
-                    <select class="form-select" id="asignatura_select" name="asignatura" required>
-                        <option value="" disabled selected>Seleccione Asignatura</option>
-                        {% for asignatura in asignaturas %}
-                            <option value="{{ asignatura.id }}">{{ asignatura.nombre }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-            </div>
-            
-            <div class="table-responsive mt-4">
-                <table class="table table-bordered table-hover align-middle" id="tablaNotas">
-                    <thead>
-                        <tr class="table-primary">
-                            <th class="text-center"># ID</th>
-                            <th>Nombre Completo</th>
-                            <th class="text-center">Nota 1</th>
-                            <th class="text-center">Nota 2</th>
-                            <th class="text-center">Nota 3</th>
-                            <th class="text-center">Nota 4</th>
-                            <th class="text-center">Nota 5</th>
-                            <th class="text-center">Promedio Final</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for estudiante in estudiantes %}
-                        <tr>
-                            <td class="text-center">{{ estudiante['ID_Usuario'] }}</td>
-                            <td>{{ estudiante.Nombre }} {{ estudiante.Apellido }}</td>
-                            
-                            <td class="text-center"><input type="number" class="form-control form-control-sm text-center nota-input" name="nota_1_{{ estudiante['ID_Usuario'] }}" step="0.1" min="0.0" max="5.0" value="{{ estudiante.nota_1 or '' }}"></td>
-                            <td class="text-center"><input type="number" class="form-control form-control-sm text-center nota-input" name="nota_2_{{ estudiante['ID_Usuario'] }}" step="0.1" min="0.0" max="5.0" value="{{ estudiante.nota_2 or '' }}"></td>
-                            <td class="text-center"><input type="number" class="form-control form-control-sm text-center nota-input" name="nota_3_{{ estudiante['ID_Usuario'] }}" step="0.1" min="0.0" max="5.0" value="{{ estudiante.nota_3 or '' }}"></td>
-                            <td class="text-center"><input type="number" class="form-control form-control-sm text-center nota-input" name="nota_4_{{ estudiante['ID_Usuario'] }}" step="0.1" min="0.0" max="5.0" value="{{ estudiante.nota_4 or '' }}"></td>
-                            <td class="text-center"><input type="number" class="form-control form-control-sm text-center nota-input" name="nota_5_{{ estudiante['ID_Usuario'] }}" step="0.1" min="0.0" max="5.0" value="{{ estudiante.nota_5 or '' }}"></td>
-                            
-                            <td class="text-center fw-bold" id="promedio_final_{{ estudiante['ID_Usuario'] }}">
-                                {{ '%.1f' | format(estudiante['Promedio_Final']) if estudiante['Promedio_Final'] is not none else 'N/A' }}
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="8" class="text-center">No hay estudiantes matriculados en este curso.</td>
-                        </tr>
+            <div style="width: 150px;"></div> </div>
+
+        <div class="row mb-4 g-3 justify-content-center mt-3">
+
+            <div class="col-md-4">
+                <label for="periodo_select" class="form-label fw-bold">Período Académico</label>
+                <select class="form-select" id="periodo_select" name="periodo" required onchange="this.form.submit()">
+                    <option value="" disabled {% if not periodo_seleccionado or periodo_seleccionado == 0 %}selected{% endif %}>Seleccione Período</option>
+                    {% for i in range(1, 5) %} 
+                        <option value="{{ i }}" {% if i|string == periodo_seleccionado|string %}selected{% endif %}>
+                            Periodo {{ i }}
+                        </option>
                     {% endfor %}
-                    </tbody>
-                </table>
+                </select>
             </div>
 
-            <div class="d-flex justify-content-center mt-4">
-                <button type="submit" class="btn btn-success btn-lg">
-                    Guardar Todas las Notas
-                </button>
+            <div class="col-md-4">
+                <label for="asignatura_select" class="form-label fw-bold">Asignatura</label>
+                <select class="form-select" id="asignatura_select" name="asignatura" required onchange="this.form.submit()">
+                    <option value="" disabled {% if not asignatura_id or asignatura_id == 0 %}selected{% endif %}>Seleccione Asignatura</option>
+                    {% for asignatura in asignaturas %}
+                        <option value="{{ asignatura.id }}" {% if asignatura.id|string == asignatura_id|string %}selected{% endif %}>
+                            {{ asignatura.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
             </div>
-        </form>
-    </section>
 
-    <script>
-        // Variables principales necesarias para AJAX
-        const ASIGNATURA_ID = 0; // Se inicializa en 0, se carga después
-        const CURSO_ID = {{ curso_id | default(0) }}; // Se pasa el ID del curso
-        
-        // 🛑 URL base para cargar notas: Necesita el ID de CURSO, ASIGNATURA y PERIODO
-        // Debes crear una nueva ruta en Python para recibir los 3 parámetros vía AJAX
-        const URL_CARGAR_NOTAS = "{{ url_for('Docente.cargar_notas_ajax') }}"; 
-        
-        // URL de guardado (usa el ID del curso y asignatura_id se obtendría del formulario)
-        const URL_GUARDAR_NOTAS = "{{ url_for('Docente.guardar_notas_curso', curso_id=curso_id | default(0)) }}";
-        
-        // ... (El resto de tus variables y lógica JS) ...
-    </script>
+        </div>
+
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered table-hover align-middle" id="tablaNotas">
+                <thead>
+                    <tr class="table-primary">
+                        <th class="text-center"># ID</th>
+                        <th>Nombre Completo</th>
+                        <th class="text-center">Nota 1</th>
+                        <th class="text-center">Nota 2</th>
+                        <th class="text-center">Nota 3</th>
+                        <th class="text-center">Nota 4</th>
+                        <th class="text-center">Nota 5</th>
+                        <th class="text-center">Promedio Final</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for estudiante in estudiantes %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ estudiante.Nombre }} {{ estudiante.Apellido }}</td>
+                        {% set registro = estudiante.registro_nota %}
+{% for i in range(1, 6) %}
+    <td>
+        {% set nombre_columna = 'Nota_' ~ i %}
+        {# 🛑 Reemplaza la línea problemática con esta: #}
+        {% set valor_actual = registro[nombre_columna] if registro and registro[nombre_columna] is not none else '' %}
+        <input type="text"
+               name="nota_{{ i }}_{{ estudiante.ID_Usuario }}"
+               class="form-control input-nota"
+               maxlength="4"
+               pattern="[0-9]{1,2}(\.[0-9]{1,2})?"
+               value="{{ valor_actual }}"
+        >
+    </td>
+{% endfor %}
+                        <td>{{ estudiante.Promedio_Final | default('') }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">No hay estudiantes matriculados en este curso o los filtros no han cargado datos.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-center mt-4">
+             </div>
+    </form>
+</section>
+
+<script>
+    // Pequeño script para manejar el submit automático de los selectores
+    document.addEventListener('DOMContentLoaded', function() {
+        const selects = document.querySelectorAll('#periodo_select, #asignatura_select');
+        selects.forEach(select => {
+            select.onchange = function() {
+                // Cambiamos la acción para que use la ruta de registro_notas_curso (GET) y cargue
+                const form = document.getElementById('formRegistroNotas');
+                form.action = "{{ url_for('Docente.registro_notas_curso', curso_id=curso_id) }}?asignatura=" + document.getElementById('asignatura_select').value + "&periodo=" + document.getElementById('periodo_select').value;
+                form.method = 'GET';
+                form.submit();
+                form.method = 'POST'; // Lo volvemos a POST para que los botones de Guardar/Reporte funcionen
+                form.action = "{{ url_for('Docente.guardar_notas_curso', curso_id=curso_id) }}";
+            };
+        });
+    });
+    // Tus otras variables JS
+    const ASIGNATURA_ID = {{ asignatura_id | default(0) }};
+    const CURSO_ID = {{ curso_id | default(0) }};
+    const URL_CARGAR_NOTAS = "{{ url_for('Docente.cargar_notas_ajax') }}";
+    const URL_GUARDAR_NOTAS = "{{ url_for('Docente.guardar_notas_curso', curso_id=curso_id | default(0)) }}"
+</script>
 
     <script src="{{ url_for('static', filename='js/Docentes/RegistroNotas.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

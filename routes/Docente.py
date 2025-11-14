@@ -1,9 +1,15 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app, make_response
 from flask_login import login_required, current_user
 from flask_mail import Message
 from werkzeug.utils import secure_filename
-import datetime
+import io
+from xhtml2pdf import pisa
 from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Curso, Notificacion, Programacion, Observacion, Nota_Calificaciones, Docente_Asignatura, ResumenSemanal, Tutorias )
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
 from datetime import date
 import os
 
@@ -417,21 +423,22 @@ def notas_curso(curso_id):
 # En routes/Docente.py
 
 
-def calcular_promedio(registro_notas):
-    """Calcula el promedio de las 5 notas, ignorando valores None."""
-    notas_validas = []
+def _calcular_promedio_local(registro_nota):
+    """Calcula el promedio de las notas que no son None (vacías)."""
+    notas = [
+        registro_nota.Nota_1, registro_nota.Nota_2, registro_nota.Nota_3, 
+        registro_nota.Nota_4, registro_nota.Nota_5
+    ]
     
-    for i in range(1, 6):
-        columna = f'Nota_{i}'
-        valor = getattr(registro_notas, columna, None)
-        if valor is not None:
-            notas_validas.append(float(valor))
-
-    if not notas_validas:
-        return None
+    # Convierte None a 0 temporalmente para facilitar la suma, o mejor, filtra solo los que tienen valor.
+    # Usaremos el filtro para no incluir notas no registradas en el cálculo.
+    notas_validas = [n for n in notas if n is not None and n >= 0]
     
-    promedio = sum(notas_validas) / len(notas_validas)
-    return round(promedio, 1)
+    if notas_validas:
+        # Calcula el promedio y lo redondea a 2 decimales
+        promedio = sum(notas_validas) / len(notas_validas)
+        return round(promedio, 2)
+    return None
 
 
 # routes/Docente.py
@@ -439,69 +446,194 @@ def calcular_promedio(registro_notas):
 # 🛑 NOTA: Cambiamos el nombre de la función y del parámetro a 'curso_id'
 # routes/Docente.py
 
+# administres.py (Función registro_notas_curso MEJORADA)
+
 @Docente_bp.route('/registro_notas_curso/<int:curso_id>', methods=['GET', 'POST'])
+@login_required
 def registro_notas_curso(curso_id):
     
-    # 1. Obtener la información del curso
+    # 🛑 Asegúrate de que Docente_Asignatura esté importado al inicio del archivo
+    # 🛑 Y que ID_DOCENTE_ACTUAL se obtenga de la sesión de Flask, no un valor fijo (ej: current_user.ID_Usuario si usas Flask-Login)
+    ID_DOCENTE_ACTUAL = current_user.ID_Usuario
+    
+    # --- 1. PROCESAR FILTROS Y OBTENER DATOS BASE ---
+    
+    # 1.1. Obtener la información del curso
     curso_obj = Curso.query.get(curso_id)
+    curso_nombre = f"{curso_obj.Grado}-{curso_obj.Grupo}" if curso_obj and hasattr(curso_obj, 'Grado') else "Curso Desconocido"
     
-    # 🛑 CORRECCIÓN: Usar el atributo correcto (reemplaza 'NombreCurso' si el tuyo es diferente)
-    # Si la depuración te dijo que el atributo es 'Nombre_Completo_Curso', úsalo aquí.
-    if curso_obj:
-        print("--- DEBUG CURSO OBJETO ---")
-        print(f"Tipo de objeto: {type(curso_obj)}")
-        print(f"Atributos disponibles: {dir(curso_obj)}")
-        print("----------------------------")
-    curso_nombre = curso_obj.NOMBRE_CURSO if curso_obj and hasattr(curso_obj, 'NOMBRE_CURSO') else "Curso Desconocido"
+    # 1.2. Claves de sesión para este curso específico
+    session_key_asignatura = f'last_asignatura_{curso_id}'
+    session_key_periodo = f'last_periodo_{curso_id}'
     
+    # 1.3. Obtener filtros, priorizando: 1. URL/GET, 2. Sesión
+    
+    # Intentar obtener de la URL/GET
+    asignatura_id_str = request.args.get('asignatura')
+    periodo_str = request.args.get('periodo')
+
+    # Si no están en la URL, intentar obtener de la Sesión para persistencia
+    if not asignatura_id_str and session_key_asignatura in session:
+        asignatura_id_str = str(session[session_key_asignatura])
         
-    
-    # 2. Obtener la lista de estudiantes matriculados en ESE CURSO
+    if not periodo_str and session_key_periodo in session:
+        periodo_str = str(session[session_key_periodo])
+        
+    # Convertir a entero (usar 0 si no hay valor en la URL ni en la sesión)
+    try:
+        asignatura_id = int(asignatura_id_str or 0)
+        periodo_seleccionado = int(periodo_str or 0)
+    except ValueError:
+        asignatura_id = 0
+        periodo_seleccionado = 0
+        
+    # 1.4. Si se obtuvieron valores válidos, guardarlos en la sesión (para que persistan)
+    if asignatura_id > 0 and periodo_seleccionado > 0:
+        session[session_key_asignatura] = asignatura_id
+        session[session_key_periodo] = periodo_seleccionado
+
+    # 1.5. Obtener la lista de estudiantes matriculados (Ordenados por apellido y nombre)
     estudiantes_db = db.session.query(Usuario, Matricula). \
         join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario). \
         filter(
             Matricula.ID_Curso == curso_id,
             Usuario.Rol == 'Estudiante'
-        ).all()
+        ).order_by(Usuario.Apellido, Usuario.Nombre).all()
 
-    # 3. Preparar la lista de estudiantes (Sin cambios)
+    # 1.6. Obtener las asignaturas del docente
+    # Asumo que Docente_Asignatura es una tabla de unión
+    asignaturas_db = db.session.query(Asignatura.ID_Asignatura.label('id'), 
+                                     Asignatura.Nombre.label('nombre'))\
+                             .join(Docente_Asignatura, Docente_Asignatura.ID_Asignatura == Asignatura.ID_Asignatura)\
+                             .filter(Docente_Asignatura.ID_Docente == ID_DOCENTE_ACTUAL)\
+                             .distinct()\
+                             .all()
+    
+    # --- 2. OBTENER NOTAS EXISTENTES (PERSISTENCIA) ---
+    notas_por_estudiante = {}
     lista_estudiantes = []
+
+    if asignatura_id > 0 and periodo_seleccionado > 0:
+        # Consulta de notas solo si hay filtros válidos
+        notas_db = Nota_Calificaciones.query.filter_by(
+            ID_Asignatura=asignatura_id,
+            Periodo=periodo_seleccionado
+        ).all()
+        
+        # Mapear las notas por ID de Estudiante para acceso rápido en la plantilla
+        notas_por_estudiante = {nota.ID_Estudiante: nota for nota in notas_db}
+
+    # 3. Preparar la lista de estudiantes con sus notas
     for usuario, matricula in estudiantes_db:
-        # Aquí también hay una potencial mejora: si tu modelo Usuario tiene los campos como
-        # .nombre y .apellido (minúscula), deberías cambiarlos aquí, pero lo dejaré 
-        # con .Nombre y .Apellido asumiendo que funciona.
+        estudiante_id = usuario.ID_Usuario
+        
+        # Obtener el registro de nota o usar None si no existe
+        registro_nota = notas_por_estudiante.get(estudiante_id)
+
         lista_estudiantes.append({
-            'ID_Usuario': usuario.ID_Usuario,
+            'ID_Usuario': estudiante_id,
             'Nombre': usuario.Nombre,
             'Apellido': usuario.Apellido,
-            'Promedio_Final': None,
-            'nota_1': None,
-            'notas_existentes': {}
+            'Promedio_Final': registro_nota.Promedio_Final if registro_nota else None,
+            'registro_nota': registro_nota # Pasar el objeto completo para acceder a Nota_1, Nota_2, etc.
         })
-
-    # 4. Obtener las asignaturas (Sin cambios)
-    ID_DOCENTE_ACTUAL = 2 # 🛑 Reemplazar con session.get('ID_Usuario') o similar
-    asignaturas_db = db.session.query(Asignatura.ID_Asignatura.label('id'), 
-                                       Asignatura.Nombre.label('nombre'))\
-                               .join(Docente_Asignatura, Docente_Asignatura.ID_Asignatura == Asignatura.ID_Asignatura)\
-                               .filter(Docente_Asignatura.ID_Docente == ID_DOCENTE_ACTUAL)\
-                               .distinct()\
-                               .all()
-
+        
+    # 4. Renderizar la plantilla
     return render_template('Docentes/RegistroNotas.html',
                            curso_obj=curso_obj,
-                           curso_nombre=curso_nombre, # Ahora contiene el nombre real (si el atributo es correcto)
+                           curso_nombre=curso_nombre, 
                            estudiantes=lista_estudiantes, 
                            curso_id=curso_id, 
-                           asignatura_id=0,
+                           asignatura_id=asignatura_id,
+                           periodo_seleccionado=periodo_seleccionado, # Pasar el filtro seleccionado
                            asignaturas=asignaturas_db
                            )
+    
+@Docente_bp.route('/generar_reporte_pdf/<int:curso_id>', methods=['GET'])
+def generar_reporte_pdf(curso_id):
+    
+    # 0. Obtener filtros de la URL (vienen del redirect POST/GET)
+    asignatura_id_str = request.args.get('asignatura', '0')
+    periodo_str = request.args.get('periodo', '0')
+    
+    # 0.1. Validar y convertir a entero
+    try:
+        asignatura_id = int(asignatura_id_str)
+        periodo = int(periodo_str)
+    except ValueError:
+        flash("Error: Los filtros de Asignatura o Período no son válidos.", "error")
+        return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id))
 
-# ----------------------------------------------------------------------
-# RUTA DE GUARDADO AJAX (Sin cambios, se mantiene para completar el contexto)
-# ----------------------------------------------------------------------
+    # --- 1. OBTENER DATOS DE LA BASE DE DATOS ---
+    
+    curso_obj = Curso.query.get_or_404(curso_id)
+    asignatura_obj = Asignatura.query.get_or_404(asignatura_id)
+    
+    # 1.1. Obtener todos los estudiantes matriculados en el curso
+    # Se une Matricula con Usuario para obtener los nombres
+    estudiantes_query = db.session.query(Usuario).join(Matricula, Usuario.ID_Usuario == Matricula.ID_Estudiante).filter(
+        Matricula.ID_Curso == curso_id
+    ).order_by(Usuario.Apellido, Usuario.Nombre).all()
 
-# routes/Docente.py
+    estudiantes_con_notas = []
+    
+    # 1.2. Iterar sobre estudiantes para adjuntar sus notas
+    for estudiante in estudiantes_query:
+        # Buscar la nota para el período y asignatura específicos
+        registro_nota = Nota_Calificaciones.query.filter_by(
+            ID_Estudiante=estudiante.ID_Usuario,
+            ID_Asignatura=asignatura_id,
+            Periodo=periodo
+        ).first()
+
+        # Crear un diccionario de datos para la plantilla
+        datos_estudiante = {
+            'ID_Usuario': estudiante.ID_Usuario,
+            'NombreCompleto': f"{estudiante.Apellido} {estudiante.Nombre}",
+            # Proporcionar el objeto Nota_Calificaciones o un objeto vacío para evitar errores
+            'registro_nota': registro_nota if registro_nota else Nota_Calificaciones(),
+            'Promedio_Final': registro_nota.Promedio_Final if registro_nota else None
+        }
+        estudiantes_con_notas.append(datos_estudiante)
+
+    # --- 2. Renderizar la plantilla del PDF ---
+    # Debes crear el archivo 'templates/Docentes/ReporteNotas.html'
+    html_out = render_template(
+        'Docentes/ReporteNotas.html',
+        curso_nombre=f"{curso_obj.Grado} {curso_obj.Grupo}",
+        asignatura_nombre=asignatura_obj.Nombre,
+        periodo=periodo,
+        estudiantes=estudiantes_con_notas # Pasamos la lista de estudiantes con sus notas
+    )
+    
+    # --- 3. Generar el PDF usando xhtml2pdf ---
+    result_file = io.BytesIO()
+
+    # Usamos io.BytesIO() para capturar la salida binaria del PDF
+    pisa_status = pisa.CreatePDF(
+        io.StringIO(html_out),  # El HTML renderizado como fuente
+        dest=result_file,       # El objeto BytesIO como destino
+        encoding='utf-8'
+    )
+    
+    # Verifica si la generación fue exitosa
+    if pisa_status.err:
+        flash("Error al generar el PDF del reporte de notas.", "error")
+        return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id))
+    
+    # --- 4. Devolver la respuesta al navegador ---
+    result_file.seek(0)
+    pdf = result_file.read()
+    
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    
+    # Nombre de archivo dinámico
+    filename = f'Reporte_Notas_{asignatura_obj.Nombre}_{curso_obj.Grado}{curso_obj.Grupo}_P{periodo}.pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename={filename}'
+    
+    return response
+
 # ✅ ESTA ES LA DEFINICIÓN CORRECTA PARA PETICIONES AJAX POST ✅
 @Docente_bp.route('/cargar_notas_ajax', methods=['POST'])
 def cargar_notas_ajax():
@@ -517,60 +649,54 @@ def cargar_notas_ajax():
 
 
 # --- RUTA PRINCIPAL DE GUARDADO ---
+# routes/Docente.py
+
 @Docente_bp.route('/guardar_notas_curso/<int:curso_id>', methods=['POST'])
 def guardar_notas_curso(curso_id):
     
-    # --- FUNCIÓN DE CÁLCULO DE PROMEDIO (LOCAL RENOMBRADA) ---
-    # Usamos un nombre único (_calcular_promedio_local) para que Flask no la registre como endpoint.
-    def _calcular_promedio_local(registro_nota, ):
-        """Calcula el promedio de las notas que no son None (vacías)."""
-        notas = [
-            registro_nota.Nota_1, registro_nota.Nota_2, registro_nota.Nota_3, 
-            registro_nota.Nota_4, registro_nota.Nota_5
-        ]
-        
-        notas_validas = [n for n in notas if n is not None]
-        
-        if notas_validas:
-            # Calcula el promedio y lo redondea a 2 decimales
-            promedio = sum(notas_validas) / len(notas_validas)
-            return round(promedio, 2)
-        return None
-    # ------------------------------------------------
+    # Define las claves de sesión basadas en el ID del curso
+    session_key_asignatura = f'last_asignatura_{curso_id}'
+    session_key_periodo = f'last_periodo_{curso_id}'
     
     datos_formulario = request.form
     
-    # 1. Obtener filtros de asignatura y período
-    asignatura_id = datos_formulario.get('asignatura')
-    periodo = datos_formulario.get('periodo')
+    # 1. Obtener acción y filtros
+    accion = datos_formulario.get('action', 'guardar') 
+    asignatura_id_str = datos_formulario.get('asignatura')
+    periodo_str = datos_formulario.get('periodo')
     
-    if not asignatura_id or not periodo:
-        flash("Error: Seleccione la Asignatura y el Período antes de guardar.", "error")
+    # 1.1. Validar filtros
+    if not asignatura_id_str or not periodo_str:
+        flash("Error: Seleccione la Asignatura y el Período antes de guardar o reportar.", "error")
         return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id))
     
-    # 2. Iterar sobre los datos del formulario y preparar/actualizar registros
-    for key, value in datos_formulario.items():
-        if key.startswith('nota_'):
-            
-            try:
-                # Extrae Estudiante ID y número de nota (1 a 5)
+    try:
+        asignatura_id = int(asignatura_id_str)
+        periodo = int(periodo_str)
+    except ValueError:
+        flash("Error: Los filtros de Asignatura o Período no son válidos.", "error")
+        return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id))
+
+    # 2. PROCESAMIENTO DE NOTAS 
+    try:
+        for key, value in datos_formulario.items():
+            if key.startswith('nota_'):
+                # Descomponer la clave: nota_[numero_nota]_[id_usuario]
                 partes = key.split('_')
                 numero_nota = partes[1] 
                 id_usuario = int(partes[2]) 
                 
-                # Convierte a float. Si está vacío, se usa None.
+                # Convertir la nota a float o None si está vacío
                 valor_nota = float(value) if value and value.strip() != '' else None 
                 
-                # 3. Buscar el registro de la nota
+                # Buscar o crear el registro de notas
                 registro_nota = Nota_Calificaciones.query.filter_by(
                     ID_Estudiante=id_usuario,
                     ID_Asignatura=asignatura_id,
                     Periodo=periodo
                 ).first()
                 
-                # 4. CREACIÓN / ACTUALIZACIÓN
                 if not registro_nota:
-                    # Crea un nuevo registro si no existe
                     registro_nota = Nota_Calificaciones(
                         ID_Estudiante=id_usuario,
                         ID_Asignatura=asignatura_id,
@@ -578,23 +704,19 @@ def guardar_notas_curso(curso_id):
                     )
                     db.session.add(registro_nota)
                 
-                # 5. Aplicar la nota al campo correcto (Ej: Nota_1, Nota_2, etc.)
+                # Asignar la nota al campo correcto (Nota_1, Nota_2, etc.)
                 nombre_campo_db = f'Nota_{numero_nota}' 
                 setattr(registro_nota, nombre_campo_db, valor_nota)
 
-                # 6. Recalcular el promedio inmediatamente
-                promedio = _calcular_promedio_local(registro_nota) 
-                registro_nota.Promedio_Final = promedio
-
-            except Exception as e:
-                # Usa `continue` para pasar a la siguiente nota si hay un error
-                print(f"🛑 ERROR CRÍTICO AL PROCESAR NOTA {key}: {e}")
-                flash(f"Error al procesar la nota {key}: {e}", "warning")
-                continue 
-
-    # 7. Guardar todos los cambios en la base de datos
-    try:
+                # Recalcular el promedio (asumiendo que _calcular_promedio_local está definido globalmente)
+                registro_nota.Promedio_Final = _calcular_promedio_local(registro_nota)
+        
         db.session.commit()
+        
+        # ✅ CLAVE DE PERSISTENCIA: Guardar los filtros en la sesión
+        session[session_key_asignatura] = asignatura_id
+        session[session_key_periodo] = periodo
+        
         flash("Notas guardadas exitosamente.", "success")
         
     except Exception as e:
@@ -602,7 +724,24 @@ def guardar_notas_curso(curso_id):
         flash(f"Error al guardar los cambios en la base de datos: {e}", "error")
         print(f"❌ DB ROLLBACK/ERROR FINAL: {e}")
         
-    return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id))
+    # 3. REDIRECCIONAMIENTO FINAL
+    if accion == 'reporte':
+        # Redirigir a la generación de PDF (usa GET)
+        return redirect(url_for(
+            'Docente.generar_reporte_pdf', 
+            curso_id=curso_id, 
+            asignatura=asignatura_id, 
+            periodo=periodo
+        ))
+    
+    # Si la acción es 'guardar' o si falla el reporte, redirigir a la vista,
+    # manteniendo los filtros en la URL para recargar la tabla actualizada.
+    return redirect(url_for(
+        'Docente.registro_notas_curso', 
+        curso_id=curso_id,
+        asignatura=asignatura_id, 
+        periodo=periodo
+    ))
 
 
 

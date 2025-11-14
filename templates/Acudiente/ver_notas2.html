@@ -12,12 +12,11 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/Acudiente/ver_notas2.css') }}">
 </head>
 <body>
-     <header class="d-flex align-items-center p-3 border-bottom w-100">
+<header class="d-flex align-items-center p-3 border-bottom w-100">
     <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
       <i class="bi bi-list"></i>
     </button>
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
-
 
     <div class="dropdown ms-auto me-2">
         <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -39,16 +38,13 @@
     </button>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu" id="dropdownSTUDENT">
         <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('Acudiente.manual') }}">Manual de Usuario</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('Acudiente.historial_academico') }}">Historial Academico</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('Estudiante.manual') }}">Manual de Usuario</a></li>
         <li><hr class="dropdown-divider"></li>
         <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
     </ul>
 </div>
 
   </header>
-
-
 
   <!-- Menú lateral -->
   <section class="bg-light py-5 mt-5">
@@ -57,18 +53,6 @@
     <h5 class="offcanvas-title">MENÚ</h5>
   </div>
   <div class="offcanvas1-body">
-    <ul class="nav flex-column">
-                   <li class="nav-item"><a href="{{ url_for('Acudiente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
-          
-          <li  class="nav-item"><a href="{{url_for('Acudiente.ver_notas') }}" class="nav-link text-white"><i class="bi bi-list-stars "></i> Notas</a></li>
-          <li class="nav-item"><a href="{{url_for('Acudiente.ver_citaciones')}}" class="nav-link text-white"><i class="bi bi-person-rolodex menu-icon"></i> Citaciones</a></li>
-          <li class="nav-item"><a href="{{url_for('Acudiente.inasistencias_justificadas')}}" class="nav-link text-white"><i class="bi bi-journal-text menu-icon"></i> Asistencias justificadas</a></li>
-          <li class="nav-item"><a href="{{url_for('Acudiente.informes_academicos')}}" class="nav-link text-white"><i class="bi bi-folder2-open menu-icon"></i> Informe de Tareas</a></li>
-          <li class="nav-item"><a href="{{url_for('Acudiente.comunicados')}}" class="nav-link text-white"><i class="bi bi-pencil-square menu-icon"></i> Comunicados</a></li>
-          <li class="nav-item"><a href="{{ url_for('Estudiante.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-          <li class="nav-item"><a href="{{url_for('Acudiente.comunicacion')}}" class="nav-link text-white"><i class="bi bi-chat-dots menu-icon"></i> Comunicación</a></li>
-          <li class="nav-item"><a href="{{url_for('Acudiente.horarios')}}" class="nav-link text-white"><i class="bi bi-calendar4-week menu-icon"></i> Horarios</a></li>
-
       <ul class="nav flex-column">
         
         <li class="nav-item"><a href="{{ url_for('Acudiente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
@@ -92,7 +76,6 @@
       </ul>
     </div>
   </div>
-
 </section>
 
  <div class="d-flex justify-content-between align-items-center mb-4">

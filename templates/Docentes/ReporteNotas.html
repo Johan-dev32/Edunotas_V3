@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Reporte de Notas</title>
+    <style>
+        body { font-family: sans-serif; }
+        h1 { text-align: center; color: #0D6EFD; }
+        .info-header { margin-bottom: 20px; font-size: 14px; }
+        .info-header p { margin: 5px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background-color: #0D6EFD; color: white; font-size: 13px; }
+        td { font-size: 12px; }
+        .promedio { font-weight: bold; background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+
+    <h1>REPORTE DE NOTAS</h1>
+
+    <div class="info-header">
+        <p><strong>Curso:</strong> {{ curso_nombre }}</p>
+        <p><strong>Asignatura:</strong> {{ asignatura_nombre }}</p>
+        <p><strong>Período Académico:</strong> {{ periodo }}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Estudiante</th>
+                <th>Nota 1</th>
+                <th>Nota 2</th>
+                <th>Nota 3</th>
+                <th>Nota 4</th>
+                <th>Nota 5</th>
+                <th class="promedio">Promedio Final</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for estudiante in estudiantes %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td style="text-align: left;">{{ estudiante.NombreCompleto }}</td>
+                <td>{{ estudiante.registro_nota.Nota_1 | default('-') }}</td>
+                <td>{{ estudiante.registro_nota.Nota_2 | default('-') }}</td>
+                <td>{{ estudiante.registro_nota.Nota_3 | default('-') }}</td>
+                <td>{{ estudiante.registro_nota.Nota_4 | default('-') }}</td>
+                <td>{{ estudiante.registro_nota.Nota_5 | default('-') }}</td>
+                <td class="promedio">{{ estudiante.Promedio_Final | default('-') }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8">No se encontraron notas registradas para estos filtros.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

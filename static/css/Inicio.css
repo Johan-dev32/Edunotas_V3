@@ -2,7 +2,7 @@ body {
   font-family: 'Trebuchet MS', sans-serif;
   margin: 0;
   padding: 0;
-  padding-bottom: 250px;
+  padding-bottom: 80px;
   overflow-x: hidden;
 }
 
@@ -61,13 +61,33 @@ header .btn-outline-primary {
 .btn-edunotas {
     background-color: #050733ff; 
     color: rgb(255, 255, 255);        
-    margin-left: 800px;
+    margin-left: 820px;
 
 }
 .btn-usuario {
-  background-color: #050733ff; 
-    color: rgb(255, 255, 255);        
-    margin-left: 10px;
+  background-color: transparent; /* sin recuadro */
+  color: #050733ff;               /* color institucional para el icono */
+  border: none;                    /* sin borde */
+  box-shadow: none;                /* sin sombra */
+  padding: 6px 8px;                /* compacto */
+  margin-left: 10px;
+}
+
+.btn-usuario:hover,
+.btn-usuario:focus {
+  background-color: transparent;   /* mantener sin recuadro en hover/focus */
+  color: #050733ff;
+  box-shadow: none;
+}
+
+/* Oculta el caret del dropdown en el botón de usuario */
+.btn-usuario.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Tamaño del icono circular */
+.btn-usuario .bi-person-circle {
+  font-size: 1.6rem;
 }
 
 
@@ -378,4 +398,76 @@ margin-left: 900px;
 
 .offcanvas1-body::-webkit-scrollbar {
   display: none; /* Chrome, Safari y Edge */
+}
+.txt-ultimo{
+  font-size: 12px;
+  color: #666464;
+}
+
+/* ========================= */
+/* Hero NOTICIAS - Estilos   */
+/* ========================= */
+.section-title{
+  color:#050733ff;
+  font-weight:800;
+  font-size:30px;
+  margin-left: 140px;
+}
+.section-title2{
+  color:#050733ff;
+  font-weight:800;
+  font-size:30px;
+  margin-right: 90px;
+}
+.news-card {
+  border-radius: 16px;
+}
+
+.news-hero {
+  min-height: 220px;
+  background: linear-gradient(135deg, #050733 0%, #0b0f5e 50%, #151b8a 100%);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(5, 7, 51, 0.25);
+}
+
+/* Brillo diagonal sutil */
+.news-hero::after {
+  content: "";
+  position: absolute;
+  top: -40%;
+  left: -40%;
+  width: 80%;
+  height: 180%;
+  transform: rotate(25deg);
+  background: radial-gradient(
+    100% 60% at 50% 50%,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.06) 45%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  pointer-events: none;
+}
+
+.news-hero:hover {
+  box-shadow: 0 14px 28px rgba(5, 7, 51, 0.35);
+  transition: box-shadow .25s ease, transform .25s ease;
+  transform: translateY(-2px);
+}
+
+/* Badges tipo vidrio (glassmorphism) */
+.badge-glass {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* Responsivo */
+@media (max-width: 576px) {
+  .news-hero { min-height: 180px; }
 }

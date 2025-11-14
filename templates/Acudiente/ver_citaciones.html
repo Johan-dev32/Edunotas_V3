@@ -83,69 +83,46 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
   <div class="text-center flex-grow-1">
     <h1 class="titulo-principal mb-0">CITACIONES</h1>
-    <p class="descripcion">Mira las Citaciones que le hacen al Estudiante</p>
+    <p class="descripcion">
+      {% if estudiante %}
+        Citaciones para {{ estudiante.Nombre }} {{ estudiante.Apellido }}
+      {% else %}
+        No hay estudiante asociado a este acudiente.
+      {% endif %}
+    </p>
   </div>
 </div>
 
 <div class="container mt-4 mb-5">
+  {% if estudiante and citaciones and citaciones|length > 0 %}
     <div class="row g-4">
-
-      <!-- Citación 1 -->
+      {% for c in citaciones %}
       <div class="col-md-6 col-lg-4">
-        <div class="card card-citacion p-3">
-          <div class="card-header">
-             Materia: Matemáticas
+        <div class="card card-citacion p-3 h-100" style="border-color:#050733ff;">
+          <div class="card-header fw-bold" style="background:#050733ff; color:#fff;">
+            Asunto: {{ c.Asunto or 'Sin asunto' }}
           </div>
           <div class="card-body">
-            <p><strong>Fecha:</strong> 12/10/2025</p>
-            <p><strong>Correo:</strong> profesor.mate@gmail.com</p>
-            <p><strong>Asunto:</strong> Bajo rendimiento en exámenes</p>
-            <p><strong>Citación:</strong> Estudiante, se le cita para conversar sobre su bajo desempeño en las últimas evaluaciones.</p>
-            <button class="btn btn-ver mt-2 w-100"><a href="{{ url_for('Acudiente.ver_citaciones2') }}" class="nav-link text-white">Ver Detalles</a></button>
+            <p><strong>Fecha:</strong> {{ c.Fecha.strftime('%Y-%m-%d') if c.Fecha else '-' }}</p>
+            <p><strong>Correo:</strong> {{ c.Correo or '-' }}</p>
+            <p><strong>Mensaje:</strong> {{ c.RedaccionCitacion or '-' }}</p>
+            <span class="badge" style="background:#050733ff;">{{ c.Estado or 'Pendiente' }}</span>
+          </div>
+          <div class="card-footer bg-transparent border-0">
+            <a href="{{ url_for('Acudiente.ver_citaciones2') }}?id={{ c.ID_Citacion }}" class="btn w-100 text-white" style="background:#050733ff;">Ver Detalles</a>
           </div>
         </div>
       </div>
-
-      <!-- Citación 2 -->
-      <div class="col-md-6 col-lg-4">
-        <div class="card card-citacion p-3">
-          <div class="card-header">
-             Materia: Química
-          </div>
-          <div class="card-body">
-            <p><strong>Fecha:</strong> 15/10/2025</p>
-            <p><strong>Correo:</strong> admin.colegio@gmail.com</p>
-            <p><strong>Asunto:</strong> Citación administrativa</p>
-            <p><strong>Citación:</strong> Se requiere su presencia en la oficina administrativa para revisar asuntos disciplinarios.</p>
-            <button class="btn btn-ver mt-2 w-100"><a href ="{{ url_for('Acudiente.ver_citaciones2') }}" class="nav-link text-white">Ver Detalles</a></button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Citación 3 -->
-      <div class="col-md-6 col-lg-4">
-        <div class="card card-citacion p-3">
-          <div class="card-header">
-             Materia: Lengua Castellana
-          </div>
-          <div class="card-body">
-            <p><strong>Fecha:</strong> 20/10/2025</p>
-            <p><strong>Correo:</strong> docente.castellano@gmail.com</p>
-            <p><strong>Asunto:</strong> Falta de participación en clase</p>
-            <p><strong>Citación:</strong> Se le invita a una tutoría para conversar sobre su participación y trabajo en grupo.</p>
-            <button class="btn btn-ver mt-2 w-100"><a href="{{ url_for('Acudiente.ver_citaciones2') }}" class="nav-link text-white">Ver Detalles</a></button>
-          </div>
-        </div>
-      </div>
-
+      {% endfor %}
     </div>
-  </div>
+  {% else %}
+    <div class="alert alert-info">No hay citaciones registradas para este estudiante.</div>
+  {% endif %}
+</div>
 
 
 
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- JavaScript externo -->
-  <script src="{{ url_for('static', filename='js/Rstudiante/Crear_Actividad.js') }}"></script>
 
 </body>
 </html>

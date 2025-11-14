@@ -75,6 +75,11 @@ header .btn-dark {
   color: #050733ff;
   text-transform: uppercase;
 }
+.descripcion {
+  font-size: 1.3rem;     
+  color: #555;   
+  margin-left: 450px;
+}
 
 .curso-id {
   font-size: 60px;

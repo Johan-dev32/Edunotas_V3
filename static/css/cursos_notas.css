@@ -29,13 +29,22 @@ header .btn-dark {
   color: #fff;
 }
 
-.btn-usuario {
-  background-color: transparent; /* sin recuadro */
-  color: #050733ff;               /* color institucional para el icono */
-  border: none;                    /* sin borde */
-  box-shadow: none;                /* sin sombra */
-  padding: 6px 8px;                /* compacto */
-  margin-left: 10px;
+.titulo-principal {
+  font-size: 3rem;      
+  font-weight: 900;      
+  color: #050733ff; 
+  margin-top: -40px;     
+}
+
+.subtitulo {
+  font-size: 2rem;       
+  font-weight: 700;
+  color: #050733ff;        
+}
+
+.descripcion {
+  font-size: 1.3rem;     
+  color: #555;           
 }
 
 .btn-usuario:hover,

@@ -107,16 +107,46 @@
   </div>
 </section>
 
-
+ <h1 class="text-center titulo-principal">CONSULTA DE NOTAS</h1>
+      <p class="text-center descripcion">Aquí podrás consultar todas las notas de los cursos...</p>
+      <h2 class="text-center mb-4 subtitulo">LISTA DE CURSOS</h2><br><br> 
   <div class="container mt-4">
     <div class="card">
       <div class="card-body">
-        <h3 class="card-title">Curso {{ curso_id }}</h3>
-
-        <!-- selector de materia -->
-        <div class="mb-3">
-          <label for="materia" class="form-label">Selecciona una materia:</label>
-          <select id="materia" class="form-select"></select>
+        <h5 class="card-title mb-3">Filtros</h5>
+        <div class="row g-3">
+          {% if curso_id %}
+          <div class="col-md-4">
+            <label class="form-label d-block">Curso</label>
+            <div class="form-control bg-light">{{ curso_id }}</div>
+            <select id="selectCurso" class="form-select d-none">
+              <option value="{{ curso_id }}" selected>{{ curso_id }}</option>
+            </select>
+          </div>
+          {% else %}
+          <div class="col-md-4">
+            <label for="selectCurso" class="form-label">Curso</label>
+            <select id="selectCurso" class="form-select">
+              <option value="">Seleccione...</option>
+            </select>
+          </div>
+          {% endif %}
+          <div class="col-md-4">
+            <label for="selectAsignatura" class="form-label">Asignatura</label>
+            <select id="selectAsignatura" class="form-select">
+              <option value="">Seleccione...</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="selectPeriodo" class="form-label">Período</label>
+            <select id="selectPeriodo" class="form-select">
+              <option value="">Seleccione...</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -125,47 +155,27 @@
 
 <!-- tabla principal  -->
 <div class="tabla-container mt-4">
-  <table class="tabla">
-    <thead>
+  <table class="tabla table table-striped table-bordered align-middle">
+    <thead class="table-light">
       <tr>
-        <th class="fijo">Nombre</th>
-        <th class="fijo">Curso</th>
-        <th class="fijo">Materia</th>
+        <th class="fijo">Estudiante</th>
         <th>Nota 1</th>
         <th>Nota 2</th>
         <th>Nota 3</th>
-        <th>Asistencia 1</th>
-        <th>Asistencia 2</th>
+        <th>Nota 4</th>
+        <th>Nota 5</th>
+        <th>Promedio</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td class="fijo">Ana Gómez</td>
-        <td class="fijo">{{ curso_id }}</td>
-        <td class="fijo">ESPAÑOL</td>
-        <td><input type="number" step="0.1" min="1" max="5" value="4.5" readonly></td>
-        <td><input type="number" step="0.1" min="1" max="5" value="4.0" readonly></td>
-        <td><input type="number" step="0.1" min="1" max="5" value="3.8" readonly></td>
-        <td>
-          <select disabled>
-            <option>Asistió</option>
-          </select>
-        </td>
-        <td>
-          <select disabled>
-            <option>No asistió</option>
-          </select>
-        </td>
-      </tr>
+    <tbody id="tbodyNotas">
+      <tr><td colspan="7" class="text-center text-muted">Seleccione curso, asignatura y período para ver las notas.</td></tr>
     </tbody>
   </table>
 </div>
-    <script src="{{ url_for('static', filename='js/Administrador//validacion_planilla_notas.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/Administrador//materias.js') }}"></script>
     <script>
-   
-    cargarMaterias("{{ curso_id }}");
+      window.CURSO_ID = {{ curso_id if curso_id is not none else 'null' }};
     </script>
+    <script src="{{ url_for('static', filename='js/Administrador/Notas_Consultar.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -3,9 +3,10 @@ from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
+from sqlalchemy import func, and_, or_, extract
 from sqlalchemy import or_, text
 from datetime import datetime
-from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes, Detalle_Asistencia, Asistencia, Encuesta, Encuesta_Pregunta, Encuesta_Respuesta
+from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes, Detalle_Asistencia, Asistencia, Encuesta, Encuesta_Pregunta, Encuesta_Respuesta, Nota_Calificaciones
 from flask_mail import Message
 import sys
 import os
@@ -25,6 +26,172 @@ Administrador_bp = Blueprint('Administrador', __name__, url_prefix='/administrad
 @Administrador_bp.route('/paginainicio')
 def paginainicio():
     return render_template('Administrador/Paginainicio_Administrador.html')
+
+# ---------------- CONSULTA DE NOTAS (ADMINISTRADOR) ----------------
+@Administrador_bp.route('/notas_curso')
+@Administrador_bp.route('/notas_curso/<int:curso_id>')
+def notas_curso(curso_id=None):
+    return render_template('Administrador/notas_curso.html', curso_id=curso_id)
+
+@Administrador_bp.route('/cursos/lista', methods=['GET'])
+def lista_cursos_activos():
+    cursos = Curso.query.filter_by(Estado='Activo').order_by(Curso.Grado, Curso.Grupo).all()
+    data = [
+        {
+            "id": c.ID_Curso,
+            "grado": getattr(c, 'Grado', None),
+            "grupo": getattr(c, 'Grupo', None),
+            "nombre": f"{getattr(c,'Grado', '')}-{getattr(c,'Grupo','')}".strip('-')
+        }
+        for c in cursos
+    ]
+    return jsonify({"success": True, "cursos": data})
+
+@Administrador_bp.route('/asignaturas/lista', methods=['GET'])
+def lista_asignaturas():
+    # Opcional: filtrar por curso_id para evitar duplicados y mostrar solo asignaturas del curso
+    curso_id = request.args.get('curso_id', type=int)
+    try:
+        # Traer todas las asignaturas disponibles (base)
+        todas_asign = Asignatura.query.order_by(Asignatura.Nombre).all()
+
+        prioritarias = set()
+        if curso_id:
+            # Intentar mapear curso_id tipo 1101 -> ID_Curso real si es necesario
+            sub_base = db.session.query(Matricula.ID_Estudiante).filter(Matricula.ID_Curso == curso_id)
+            if sub_base.count() == 0 and isinstance(curso_id, int) and curso_id >= 100:
+                grado_calc = curso_id // 100
+                grupo_calc = curso_id % 100
+                grupo_candidatos = [str(grupo_calc), f"{grupo_calc:02d}"]
+                letra_map = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E'}
+                if grupo_calc in letra_map:
+                    grupo_candidatos.append(letra_map[grupo_calc])
+                curso_alt = None
+                for g in grupo_candidatos:
+                    curso_alt = Curso.query.filter(
+                        or_(Curso.Grado == str(grado_calc), Curso.Grado == grado_calc),
+                        or_(Curso.Grupo == g, Curso.Grupo == int(g)) if g.isdigit() else (Curso.Grupo == g)
+                    ).first()
+                    if curso_alt:
+                        break
+                if curso_alt:
+                    curso_id = curso_alt.ID_Curso
+
+            # Asignaturas con notas en el curso (para priorizar en la lista)
+            subquery_est = db.session.query(Matricula.ID_Estudiante).filter(Matricula.ID_Curso == curso_id).subquery()
+            asign_ids_rows = db.session.query(Nota_Calificaciones.ID_Asignatura).filter(Nota_Calificaciones.ID_Estudiante.in_(subquery_est)).distinct().all()
+            prioritarias = {row[0] for row in asign_ids_rows}
+
+        # Deduplicar por nombre y construir lista final
+        vistos = set()
+        lista = []
+        for a in todas_asign:
+            nombre = (a.Nombre or '').strip()
+            key = nombre.lower()
+            if key in vistos:
+                continue
+            vistos.add(key)
+            lista.append({"id": a.ID_Asignatura, "nombre": nombre, "prioridad": 1 if a.ID_Asignatura in prioritarias else 0})
+
+        # Orden: primero las que tienen datos para el curso, luego alfabético
+        lista.sort(key=lambda x: (-x["prioridad"], x["nombre"]))
+
+        # Quitar campo de prioridad antes de responder
+        for item in lista:
+            item.pop("prioridad", None)
+
+        return jsonify({"success": True, "asignaturas": lista})
+    except Exception as e:
+        print('Error en /asignaturas/lista:', e)
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@Administrador_bp.route('/notas', methods=['GET'])
+def consultar_notas():
+    try:
+        curso_id = request.args.get('curso_id', type=int)
+        asignatura_id = request.args.get('asignatura_id', type=int)
+        periodo = request.args.get('periodo', type=int)
+
+        if not curso_id or not asignatura_id or not periodo:
+            return jsonify({"success": False, "error": "Parámetros requeridos: curso_id, asignatura_id, periodo"}), 400
+
+        # Estudiantes matriculados en el curso (con fallback a grado+grupo si no coincide por ID)
+        q_est = (
+            db.session.query(Usuario, Matricula)
+            .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+            .filter(Matricula.ID_Curso == curso_id, Usuario.Rol == 'Estudiante')
+            .order_by(Usuario.Apellido, Usuario.Nombre)
+        )
+        estudiantes_db = q_est.all()
+        if len(estudiantes_db) == 0 and isinstance(curso_id, int) and curso_id >= 100:
+            grado_calc = curso_id // 100
+            grupo_calc = curso_id % 100
+            grupo_candidatos = [str(grupo_calc), f"{grupo_calc:02d}"]
+            letra_map = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E'}
+            if grupo_calc in letra_map:
+                grupo_candidatos.append(letra_map[grupo_calc])
+            curso_alt = None
+            for g in grupo_candidatos:
+                curso_alt = Curso.query.filter(
+                    or_(Curso.Grado == str(grado_calc), Curso.Grado == grado_calc),
+                    or_(Curso.Grupo == g, Curso.Grupo == int(g)) if g.isdigit() else (Curso.Grupo == g)
+                ).first()
+                if curso_alt:
+                    break
+            if curso_alt:
+                curso_id = curso_alt.ID_Curso
+                estudiantes_db = (
+                    db.session.query(Usuario, Matricula)
+                    .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+                    .filter(Matricula.ID_Curso == curso_id, Usuario.Rol == 'Estudiante')
+                    .order_by(Usuario.Apellido, Usuario.Nombre)
+                    .all()
+                )
+            else:
+                # Último recurso: traer estudiantes por grado/grupo desde Curso join, si existe
+                # Intentar por combinaciones de tipos
+                for g in grupo_candidatos:
+                    estudiantes_db = (
+                        db.session.query(Usuario, Matricula)
+                        .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+                        .join(Curso, Curso.ID_Curso == Matricula.ID_Curso)
+                        .filter(
+                            or_(Curso.Grado == str(grado_calc), Curso.Grado == grado_calc),
+                            (Curso.Grupo == g) if not g.isdigit() else or_(Curso.Grupo == g, Curso.Grupo == int(g)),
+                            Usuario.Rol == 'Estudiante'
+                        )
+                        .order_by(Usuario.Apellido, Usuario.Nombre)
+                        .all()
+                    )
+                    if estudiantes_db:
+                        break
+
+        # Notas para la asignatura y periodo
+        notas_db = Nota_Calificaciones.query.filter_by(
+            ID_Asignatura=asignatura_id,
+            Periodo=periodo
+        ).all()
+        notas_por_estudiante = {n.ID_Estudiante: n for n in notas_db}
+
+        resultados = []
+        for usuario, _mat in estudiantes_db:
+            reg = notas_por_estudiante.get(usuario.ID_Usuario)
+            resultados.append({
+                "estudiante_id": usuario.ID_Usuario,
+                "apellido": usuario.Apellido,
+                "nombre": usuario.Nombre,
+                "nota_1": getattr(reg, 'Nota_1', None) if reg else None,
+                "nota_2": getattr(reg, 'Nota_2', None) if reg else None,
+                "nota_3": getattr(reg, 'Nota_3', None) if reg else None,
+                "nota_4": getattr(reg, 'Nota_4', None) if reg else None,
+                "nota_5": getattr(reg, 'Nota_5', None) if reg else None,
+                "promedio_final": getattr(reg, 'Promedio_Final', None) if reg else None
+            })
+
+        return jsonify({"success": True, "notas": resultados})
+    except Exception as e:
+        print("Error en /administrador/notas:", e)
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 # ---------------- NOTIFICACIONES ADMINISTRADOR----------------
@@ -1464,20 +1631,14 @@ def registro_notas(curso_id):
     return render_template('Administrador/RegistroNotas.html', curso_id=curso_id)
 
 
-@Administrador_bp.route('/notas_curso/<int:curso_id>')
-def notas_curso(curso_id):
-    return render_template("Administrador/notas_curso.html", curso_id=curso_id)
-
-
-
-
 @Administrador_bp.route('/notas_registro')
 def notas_registro():
     return render_template('Administrador/Notas_Registro.html')
 
 @Administrador_bp.route('/notas_consultar')
 def notas_consultar():
-    return render_template('Administrador/Notas_Consultar.html')
+    cursos = Curso.query.filter_by(Estado='Activo').order_by(Curso.Grado, Curso.Grupo).all()
+    return render_template('Administrador/Notas_Consultar.html', cursos=cursos)
 
 
 # GESTIÓN DE LA OBSERVACIÓN #
@@ -1544,6 +1705,75 @@ def registrar_observacion():
 @Administrador_bp.route('/calculo_promedio')
 def calculo_promedio():
     return render_template('Administrador/CalculoPromedio.html')
+
+@Administrador_bp.route('/promedios', methods=['GET'])
+def promedios_por_curso():
+    try:
+        curso_id_raw = request.args.get('curso_id')  # puede ser 'all' o un int
+        periodo = request.args.get('periodo', type=int)
+
+        if not periodo:
+            return jsonify({"success": False, "error": "Falta parámetro periodo"}), 400
+
+        cursos_q = Curso.query.filter_by(Estado='Activo')
+        if curso_id_raw and curso_id_raw != 'all':
+            try:
+                curso_id = int(curso_id_raw)
+                cursos_q = cursos_q.filter(Curso.ID_Curso == curso_id)
+            except ValueError:
+                return jsonify({"success": False, "error": "curso_id inválido"}), 400
+
+        cursos = cursos_q.all()
+        cursos_ids = [c.ID_Curso for c in cursos]
+
+        if not cursos_ids:
+            return jsonify({"success": True, "items": []})
+
+        # Estudiantes matriculados en los cursos seleccionados
+        est_q = (
+            db.session.query(Usuario.ID_Usuario.label('id'), Usuario.Nombre, Usuario.Apellido, Usuario.NumeroDocumento,
+                             Curso.ID_Curso.label('curso_id'), Curso.Grado, Curso.Grupo)
+            .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+            .join(Curso, Curso.ID_Curso == Matricula.ID_Curso)
+            .filter(Usuario.Rol == 'Estudiante', Matricula.ID_Curso.in_(cursos_ids))
+        )
+        estudiantes = est_q.all()
+
+        if not estudiantes:
+            return jsonify({"success": True, "items": []})
+
+        est_ids = [e.id for e in estudiantes]
+
+        # Notas por estudiante para el período indicado
+        notas = (
+            db.session.query(
+                Nota_Calificaciones.ID_Estudiante.label('id_est'),
+                func.avg(Nota_Calificaciones.Promedio_Final).label('promedio')
+            )
+            .filter(Nota_Calificaciones.ID_Estudiante.in_(est_ids), Nota_Calificaciones.Periodo == periodo)
+            .group_by(Nota_Calificaciones.ID_Estudiante)
+            .all()
+        )
+        map_prom = {n.id_est: float(n.promedio) if n.promedio is not None else 0.0 for n in notas}
+
+        items = []
+        for e in estudiantes:
+            prom = map_prom.get(e.id, 0.0)
+            items.append({
+                "estudiante_id": e.id,
+                "nombre": f"{e.Apellido} {e.Nombre}",
+                "documento": e.NumeroDocumento,
+                "curso": f"{e.Grado}{e.Grupo}",
+                "curso_id": e.curso_id,
+                "promedio": round(prom, 2)
+            })
+
+        # Ordenar por curso y nombre
+        items.sort(key=lambda x: (x['curso'], x['nombre']))
+        return jsonify({"success": True, "items": items})
+    except Exception as e:
+        print('Error en /promedios:', e)
+        return jsonify({"success": False, "error": str(e)}), 500
 
 # ------------------- ENCUESTAS -------------------
 
@@ -2092,8 +2322,10 @@ def detallesmateria(curso_id):
     # Obtener la materia según el curso (si existe)
     materia = materias.get(curso_id, "Materia no encontrada")
 
-    # Enviar curso y materia al HTML
-    return render_template('Administrador/detallesmateria.html', curso=curso_id, materia=materia)
+    # Curso real (si viene desde otra vista)
+    curso_id_real = request.args.get('curso_id', type=int)
+    # Enviar a la plantilla
+    return render_template('Administrador/detallesmateria.html', curso=curso_id, materia=materia, curso_id_real=curso_id_real)
 
 
     materia_nombre = materias.get(curso_id, "Materia desconocida")   
@@ -2178,6 +2410,205 @@ def evaluaciones():
 def informe():
     return render_template('Administrador/informe.html')
 
+@Administrador_bp.route('/informe/<int:curso_id>')
+def informe_curso(curso_id):
+    curso = Curso.query.get(curso_id)
+    # Si no existe por ID directo, intentar mapear 1101 -> grado=11, grupo=1/01/A
+    if not curso and isinstance(curso_id, int) and curso_id >= 100:
+        grado_calc = curso_id // 100
+        grupo_calc = curso_id % 100
+        grupo_candidatos = [str(grupo_calc), f"{grupo_calc:02d}"]
+        letra_map = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E'}
+        if grupo_calc in letra_map:
+            grupo_candidatos.append(letra_map[grupo_calc])
+        for g in grupo_candidatos:
+            curso = Curso.query.filter(
+                or_(Curso.Grado == str(grado_calc), Curso.Grado == grado_calc),
+                or_(Curso.Grupo == g, Curso.Grupo == int(g)) if g.isdigit() else (Curso.Grupo == g)
+            ).first()
+            if curso:
+                break
+        if not curso:
+            return render_template('Administrador/informe.html', curso_id=curso_id, curso_nombre=str(curso_id))
+        curso_id = curso.ID_Curso
+    return render_template('Administrador/informe.html', curso_id=curso_id, curso_nombre=f"{curso.Grado}{curso.Grupo}")
+
+@Administrador_bp.route('/informe/datos', methods=['GET'])
+def informe_datos():
+    try:
+        curso_id = request.args.get('curso_id', type=int)
+        periodo_num = request.args.get('periodo', type=int)
+        if not curso_id:
+            return jsonify({"success": False, "error": "curso_id requerido"}), 400
+
+        # Intentar mapear si no hay matrículas para ese ID (por si llega como 1101)
+        est_ids = [row.ID_Estudiante for row in Matricula.query.with_entities(Matricula.ID_Estudiante).filter_by(ID_Curso=curso_id).all()]
+        if not est_ids and isinstance(curso_id, int) and curso_id >= 100:
+            grado_calc = curso_id // 100
+            grupo_calc = curso_id % 100
+            grupo_candidatos = [str(grupo_calc), f"{grupo_calc:02d}"]
+            letra_map = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E'}
+            if grupo_calc in letra_map:
+                grupo_candidatos.append(letra_map[grupo_calc])
+            curso_alt = None
+            for g in grupo_candidatos:
+                curso_alt = Curso.query.filter(
+                    or_(Curso.Grado == str(grado_calc), Curso.Grado == grado_calc),
+                    or_(Curso.Grupo == g, Curso.Grupo == int(g)) if g.isdigit() else (Curso.Grupo == g)
+                ).first()
+                if curso_alt:
+                    break
+            if curso_alt:
+                curso_id = curso_alt.ID_Curso
+                est_ids = [row.ID_Estudiante for row in Matricula.query.with_entities(Matricula.ID_Estudiante).filter_by(ID_Curso=curso_id).all()]
+
+        fecha_ini = fecha_fin = None
+        if periodo_num:
+            per = Periodo.query.filter_by(NumeroPeriodo=periodo_num).order_by(Periodo.Anio.desc()).first()
+            if per and per.FechaInicial and per.FechaFinal:
+                fecha_ini, fecha_fin = per.FechaInicial, per.FechaFinal
+
+        q_notas = db.session.query(
+            Asignatura.Nombre.label('asignatura'),
+            func.avg(Nota_Calificaciones.Promedio_Final).label('prom')
+        ).join(Asignatura, Asignatura.ID_Asignatura == Nota_Calificaciones.ID_Asignatura)
+        q_notas = q_notas.filter(Nota_Calificaciones.ID_Estudiante.in_(est_ids))
+        if periodo_num:
+            q_notas = q_notas.filter(Nota_Calificaciones.Periodo == periodo_num)
+        rendimiento = [
+            {"asignatura": n.asignatura, "promedio": round(float(n.prom or 0), 2)}
+            for n in q_notas.group_by(Asignatura.Nombre).all()
+        ]
+
+        q_asist = (
+            db.session.query(Detalle_Asistencia.Estado_Asistencia, func.count().label('cnt'))
+            .join(Asistencia, Asistencia.ID_Asistencia == Detalle_Asistencia.ID_Asistencia)
+            .join(Programacion, Programacion.ID_Programacion == Asistencia.ID_Programacion)
+            .filter(Programacion.ID_Curso == curso_id)
+        )
+        if est_ids:
+            q_asist = q_asist.filter(Detalle_Asistencia.ID_Estudiante.in_(est_ids))
+        if fecha_ini and fecha_fin:
+            q_asist = q_asist.filter(Asistencia.Fecha.between(fecha_ini, fecha_fin))
+        asist_rows = q_asist.group_by(Detalle_Asistencia.Estado_Asistencia).all()
+        asistencia = {"Presente": 0, "Ausente": 0, "Justificado": 0}
+        for estado, cnt in asist_rows:
+            if estado in asistencia:
+                asistencia[estado] = int(cnt)
+
+        linea_disciplina = []
+        periodos = Periodo.query.order_by(Periodo.NumeroPeriodo).all()
+        for p in periodos:
+            if periodo_num and p.NumeroPeriodo != periodo_num:
+                continue
+            q_obs = db.session.query(func.count(Observacion.ID_Observacion))
+            if est_ids:
+                q_obs = q_obs.filter(Observacion.ID_Estudiante.in_(est_ids))
+            q_obs = q_obs.filter(Observacion.Tipo == 'Convivencial')
+            if p.FechaInicial and p.FechaFinal:
+                q_obs = q_obs.filter(Observacion.Fecha.between(p.FechaInicial, p.FechaFinal))
+            cant = q_obs.scalar() or 0
+            linea_disciplina.append({"periodo": p.NumeroPeriodo, "observaciones": int(cant)})
+
+        # Datos extra para resumen
+        curso_obj = Curso.query.get(curso_id)
+        curso_label = f"{curso_obj.Grado}{curso_obj.Grupo}" if curso_obj else str(curso_id)
+        est_count = len(est_ids)
+
+        return jsonify({
+            "success": True,
+            "rendimiento": rendimiento,
+            "asistencia": asistencia,
+            "disciplina": linea_disciplina,
+            "curso_label": curso_label,
+            "est_count": est_count
+        })
+    except Exception as e:
+        print('Error en /informe/datos:', e)
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@Administrador_bp.route('/informe/estudiantes', methods=['GET'])
+def informe_estudiantes():
+    try:
+        curso_id = request.args.get('curso_id', type=int)
+        periodo_num = request.args.get('periodo', type=int)
+        if not curso_id:
+            return jsonify({"success": False, "error": "curso_id requerido"}), 400
+
+        # Mapear 1101 -> ID_Curso si aplica
+        est_ids = [row.ID_Estudiante for row in Matricula.query.with_entities(Matricula.ID_Estudiante).filter_by(ID_Curso=curso_id).all()]
+        if not est_ids and isinstance(curso_id, int) and curso_id >= 100:
+            grado_calc = curso_id // 100
+            grupo_calc = curso_id % 100
+            grupo_candidatos = [str(grupo_calc), f"{grupo_calc:02d}"]
+            letra_map = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E'}
+            if grupo_calc in letra_map:
+                grupo_candidatos.append(letra_map[grupo_calc])
+            curso_alt = None
+            for g in grupo_candidatos:
+                curso_alt = Curso.query.filter(
+                    or_(Curso.Grado == str(grado_calc), Curso.Grado == grado_calc),
+                    or_(Curso.Grupo == g, Curso.Grupo == int(g)) if g.isdigit() else (Curso.Grupo == g)
+                ).first()
+                if curso_alt:
+                    break
+            if curso_alt:
+                curso_id = curso_alt.ID_Curso
+                est_ids = [row.ID_Estudiante for row in Matricula.query.with_entities(Matricula.ID_Estudiante).filter_by(ID_Curso=curso_id).all()]
+
+        # Listado base de estudiantes
+        estudiantes = db.session.query(Usuario.ID_Usuario, Usuario.Nombre, Usuario.Apellido).join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario).filter(Matricula.ID_Curso == curso_id, Usuario.Rol == 'Estudiante').order_by(Usuario.Apellido, Usuario.Nombre).all()
+
+        # Ventana de fechas si hay período
+        fecha_ini = fecha_fin = None
+        if periodo_num:
+            per = Periodo.query.filter_by(NumeroPeriodo=periodo_num).order_by(Periodo.Anio.desc()).first()
+            if per and per.FechaInicial and per.FechaFinal:
+                fecha_ini, fecha_fin = per.FechaInicial, per.FechaFinal
+
+        # Asistencia por estudiante
+        q_asist = db.session.query(Detalle_Asistencia.ID_Estudiante, Detalle_Asistencia.Estado_Asistencia, func.count().label('cnt')) \
+            .join(Asistencia, Asistencia.ID_Asistencia == Detalle_Asistencia.ID_Asistencia) \
+            .join(Programacion, Programacion.ID_Programacion == Asistencia.ID_Programacion) \
+            .filter(Programacion.ID_Curso == curso_id)
+        if est_ids:
+            q_asist = q_asist.filter(Detalle_Asistencia.ID_Estudiante.in_(est_ids))
+        if fecha_ini and fecha_fin:
+            q_asist = q_asist.filter(Asistencia.Fecha.between(fecha_ini, fecha_fin))
+        q_asist = q_asist.group_by(Detalle_Asistencia.ID_Estudiante, Detalle_Asistencia.Estado_Asistencia).all()
+        asist_map = {}
+        for ide, est, cnt in q_asist:
+            if ide not in asist_map:
+                asist_map[ide] = {"Presente": 0, "Ausente": 0, "Justificado": 0}
+            if est in asist_map[ide]:
+                asist_map[ide][est] = int(cnt)
+
+        # Observaciones convivenciales por estudiante
+        q_obs = db.session.query(Observacion.ID_Estudiante, func.count(Observacion.ID_Observacion)) \
+            .filter(Observacion.ID_Estudiante.in_(est_ids)) \
+            .filter(Observacion.Tipo == 'Convivencial')
+        if fecha_ini and fecha_fin:
+            q_obs = q_obs.filter(Observacion.Fecha.between(fecha_ini, fecha_fin))
+        q_obs = q_obs.group_by(Observacion.ID_Estudiante).all()
+        obs_map = {row[0]: int(row[1]) for row in q_obs}
+
+        items = []
+        for e in estudiantes:
+            a = asist_map.get(e.ID_Usuario, {"Presente": 0, "Ausente": 0, "Justificado": 0})
+            items.append({
+                "id": e.ID_Usuario,
+                "nombre": f"{e.Apellido} {e.Nombre}",
+                "asistencias": a.get("Presente", 0),
+                "fallas": a.get("Ausente", 0),
+                "retardos": 0,
+                "observaciones": obs_map.get(e.ID_Usuario, 0)
+            })
+
+        return jsonify({"success": True, "items": items})
+    except Exception as e:
+        print('Error en /informe/estudiantes:', e)
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @Administrador_bp.route('/historialacademico3')
 def historialacademico3():
     periodo = request.args.get('periodo')
@@ -2186,3 +2617,86 @@ def historialacademico3():
 @Administrador_bp.route('/comunicacion2')
 def comunicacion2():
     return render_template('Administrador/Comunicación2.html')
+
+@Administrador_bp.route('/config3/datos', methods=['GET'])
+def config3_datos():
+    try:
+        curso_id = request.args.get('curso_id', type=int)
+        asignatura_id = request.args.get('asignatura_id', type=int)
+        periodo_num = request.args.get('periodo', type=int)
+        if not curso_id:
+            return jsonify({"success": False, "error": "curso_id requerido"}), 400
+
+        est_ids = [row.ID_Estudiante for row in Matricula.query.with_entities(Matricula.ID_Estudiante).filter_by(ID_Curso=curso_id).all()]
+        if not est_ids and isinstance(curso_id, int) and curso_id >= 100:
+            grado_calc = curso_id // 100
+            grupo_calc = curso_id % 100
+            grupo_candidatos = [str(grupo_calc), f"{grupo_calc:02d}"]
+            letra_map = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E'}
+            if grupo_calc in letra_map:
+                grupo_candidatos.append(letra_map[grupo_calc])
+            curso_alt = None
+            for g in grupo_candidatos:
+                curso_alt = Curso.query.filter(
+                    or_(Curso.Grado == str(grado_calc), Curso.Grado == grado_calc),
+                    or_(Curso.Grupo == g, Curso.Grupo == int(g)) if g.isdigit() else (Curso.Grupo == g)
+                ).first()
+                if curso_alt:
+                    break
+            if curso_alt:
+                curso_id = curso_alt.ID_Curso
+                est_ids = [row.ID_Estudiante for row in Matricula.query.with_entities(Matricula.ID_Estudiante).filter_by(ID_Curso=curso_id).all()]
+
+        q_est = (
+            db.session.query(Usuario.ID_Usuario, Usuario.Nombre, Usuario.Apellido, Usuario.NumeroDocumento)
+            .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+            .filter(Matricula.ID_Curso == curso_id, Usuario.Rol == 'Estudiante')
+            .order_by(Usuario.Apellido, Usuario.Nombre)
+        )
+        est_rows = q_est.all()
+        if not est_rows:
+            return jsonify({"success": True, "items": []})
+
+        q_notas = db.session.query(
+            Nota_Calificaciones.ID_Estudiante,
+            func.avg(Nota_Calificaciones.Promedio_Final).label('prom')
+        )
+        if est_ids:
+            q_notas = q_notas.filter(Nota_Calificaciones.ID_Estudiante.in_(est_ids))
+        if asignatura_id:
+            q_notas = q_notas.filter(Nota_Calificaciones.ID_Asignatura == asignatura_id)
+        if periodo_num:
+            q_notas = q_notas.filter(Nota_Calificaciones.Periodo == periodo_num)
+        q_notas = q_notas.group_by(Nota_Calificaciones.ID_Estudiante).all()
+        prom_map = {row[0]: float(row[1]) if row[1] is not None else None for row in q_notas}
+
+        def nivel_y_obs(prom):
+            if prom is None:
+                return ('-', '')
+            if prom >= 4.6:
+                return ('Superior', 'excelente desempeño')
+            if prom >= 4.0:
+                return ('Alto', 'muy buena participación')
+            if prom >= 3.0:
+                return ('Básico', 'debe reforzar contenidos')
+            return ('Bajo', 'necesita apoyo académico')
+
+        periodo_label = str(periodo_num) if periodo_num else ''
+        items = []
+        for idx, e in enumerate(est_rows, start=1):
+            prom = prom_map.get(e.ID_Usuario)
+            niv, obs = nivel_y_obs(prom)
+            items.append({
+                "detalles": idx,
+                "nombre": f"{e.Nombre} {e.Apellido}",
+                "documento": e.NumeroDocumento or '',
+                "promedio": round(prom, 2) if prom is not None else None,
+                "nivel": niv,
+                "observacion": obs,
+                "periodo": periodo_label
+            })
+
+        return jsonify({"success": True, "items": items})
+    except Exception as e:
+        print('Error en /config3/datos:', e)
+        return jsonify({"success": False, "error": str(e)}), 500

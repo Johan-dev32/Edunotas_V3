@@ -106,10 +106,8 @@
 
   <!-- 🔹 Botones de redirección arriba del formulario -->
   <div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
-    <a href="{{ url_for('Administrador.evaluaciones') }}" class="btn btn-primary">
-      <i class="bi bi-credit-card-2-front"></i> Evaluaciones
-    </a>
-    <a href="{{ url_for('Administrador.informe') }}" class="btn btn-primary">
+   
+    <a href="{{ url_for('Administrador.informe_curso', curso_id=curso_obj.ID_Curso) }}" class="btn btn-primary">
       <i class="bi bi-graph-up"></i> Informe Desempeño
     </a>
     <a href="{{ url_for('Administrador.citacion') }}" class="btn btn-primary">

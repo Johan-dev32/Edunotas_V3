@@ -24,7 +24,7 @@ mail = Mail()
 s = URLSafeTimedSerializer("clave_super_secreta")
 
 # Importa el objeto 'db' y los modelos desde tu archivo de modelos
-from Controladores.models import db, Usuario
+from Controladores.models import db, Usuario, Notificacion
 
 # Configuración de la aplicación
 app = Flask(__name__)
@@ -212,6 +212,15 @@ def actualizar_perfil():
         direccion = request.form.get('direccion')
         telefono = request.form.get('telefono')
 
+        # Tomar snapshot previo para comparar cambios
+        prev = {
+            'Nombre': usuario.Nombre,
+            'Apellido': usuario.Apellido,
+            'Correo': usuario.Correo,
+            'Direccion': usuario.Direccion,
+            'Telefono': usuario.Telefono,
+        }
+
         # Verificar si el nuevo correo pertenece a otro usuario
         correo_existente = Usuario.query.filter(
             Usuario.Correo == correo,
@@ -232,6 +241,48 @@ def actualizar_perfil():
         usuario.Telefono = telefono
 
         db.session.commit()
+
+        # Construir resumen de cambios y generar notificación + correo
+        cambios = []
+        if prev['Nombre'] != nombre or prev['Apellido'] != apellido:
+            cambios.append(f"Nombre completo: {prev['Nombre']} {prev['Apellido']} → {nombre} {apellido}")
+        if prev['Correo'] != correo:
+            cambios.append(f"Correo electrónico: {prev['Correo']} → {correo}")
+        if (prev['Direccion'] or '') != (direccion or ''):
+            cambios.append("Dirección de residencia actualizada")
+        if (prev['Telefono'] or '') != (telefono or ''):
+            cambios.append(f"Teléfono: {prev['Telefono'] or '—'} → {telefono or '—'}")
+
+        if cambios:
+            try:
+                resumen = "; ".join(cambios)
+                # Guardar notificación en el sistema
+                noti = Notificacion(
+                    Titulo='Actualización de perfil',
+                    Mensaje=f"Se actualizaron estos datos de tu perfil: {resumen}.",
+                    Enlace=None,
+                    ID_Usuario=usuario.ID_Usuario
+                )
+                db.session.add(noti)
+                db.session.commit()
+
+                # Enviar correo al usuario afectado
+                try:
+                    msg = Message(
+                        subject='Edunotas - Actualización de perfil',
+                        recipients=[usuario.Correo]
+                    )
+                    msg.html = render_template(
+                        'email_generico.html',
+                        titulo='Actualización de perfil',
+                        cuerpo=f"Hola {usuario.Nombre},<br><br>Hemos detectado cambios en tu perfil:<br>• " + "<br>• ".join(cambios) + "<br><br>Si no fuiste tú, por favor comunícate con el administrador."
+                    )
+                    mail.send(msg)
+                except Exception as _:
+                    # Evitar romper el flujo si falla el correo
+                    pass
+            except Exception as _:
+                db.session.rollback()
 
         return jsonify({
             'status': 'success',

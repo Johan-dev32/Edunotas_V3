@@ -61,8 +61,17 @@ async function obtenerNotificaciones() {
 
     notificaciones.forEach(noti => {
       const elemento = document.createElement("div");
-      elemento.classList.add("border", "rounded", "p-2", "mb-1", "bg-light", "small");
-      elemento.innerHTML = `<strong>${noti.titulo}</strong><br>${noti.contenido}`;
+      elemento.className = "list-group-item border-0 p-2 mb-1";
+      const titulo = document.createElement("div");
+      titulo.className = "fw-semibold text-dark small";
+      titulo.textContent = noti.titulo;
+      const cuerpo = document.createElement("div");
+      cuerpo.className = "text-muted small mt-1";
+      cuerpo.style.whiteSpace = 'pre-wrap';
+      cuerpo.style.wordBreak = 'break-word';
+      cuerpo.textContent = noti.contenido;
+      elemento.appendChild(titulo);
+      elemento.appendChild(cuerpo);
       contenedor.appendChild(elemento);
     });
   } catch (error) {
@@ -70,6 +79,48 @@ async function obtenerNotificaciones() {
   }
 }
 
+// --- Contador de no leídas (badge/punto rojo) ---
+async function actualizarContadorNotificaciones() {
+  try {
+    const res = await fetch('/notificaciones/contador');
+    if (!res.ok) return;
+    const data = await res.json();
+    const badge = document.getElementById('contadorMensajes');
+    if (!badge) return;
+    const n = Number(data.unread || 0);
+    if (n > 0) {
+      badge.style.display = 'inline-block';
+      badge.textContent = n;
+    } else {
+      badge.style.display = 'none';
+      badge.textContent = '0';
+    }
+  } catch (e) {
+    // Silencioso
+  }
+}
+
+// Marcar como leídas al abrir el dropdown de la campana
+function wireDropdownMarkAsRead() {
+  const trigger = document.getElementById('dropdownMenuButton');
+  if (!trigger) return;
+  trigger.addEventListener('show.bs.dropdown', async () => {
+    try {
+      await fetch('/notificaciones/marcar_leidas', { method: 'POST' });
+      // Refrescar listado y contador
+      obtenerNotificaciones();
+      actualizarContadorNotificaciones();
+    } catch (e) {}
+  });
+}
+
 document.getElementById("btnEnviarNotificacion")?.addEventListener("click", enviarNotificacion);
-setInterval(obtenerNotificaciones, 15000);
-document.addEventListener("DOMContentLoaded", obtenerNotificaciones);
+
+// Polling
+setInterval(() => { obtenerNotificaciones(); actualizarContadorNotificaciones(); }, 15000);
+
+document.addEventListener("DOMContentLoaded", () => {
+  obtenerNotificaciones();
+  actualizarContadorNotificaciones();
+  wireDropdownMarkAsRead();
+});

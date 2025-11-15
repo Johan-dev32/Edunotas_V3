@@ -37,97 +37,27 @@
     <!-- Dropdown mensajes -->
     <!-- Dropdown mensajes (ADMINISTRADOR) -->
 <div class="dropdown">
-  <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-    <span class="bi bi-envelope-fill"></span>
+  <button
+    class="position-relative"
+    type="button"
+    id="dropdownMenuButton"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    style="border: none; background: transparent; padding: 0;"
+  >
+    <i class="bi bi-bell-fill" style="font-size: 1.25rem; margin-left:850px;"></i>
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          id="contadorMensajes" style="display:none">0</span>
   </button>
-  <ul class="dropdown-menu p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
-    <li class="mb-2"><h6 class="dropdown-header text-center">Enviar Notificación</h6></li>
-
-    <form id="formNotificacion">
-  <div class="mb-3">
-    <label>Destino:</label>
-    <select id="destino" class="form-select">
-      <option>Todos los roles</option>
-      <option>Administrador</option>
-      <option>Docente</option>
-      <option>Estudiante</option>
-      <option>Acudiente</option>
-    </select>
-  </div>
-  <div class="mb-3">
-    <label>Asunto</label>
-    <input type="text" id="asunto" class="form-control" placeholder="Asunto del mensaje">
-  </div>
-  <div class="mb-3">
-    <label>Mensaje</label>
-    <textarea id="mensaje" class="form-control" rows="3" placeholder="Escribe tu mensaje..."></textarea>
-  </div>
-  <button type="button" id="btnEnviarNotificacion" class="btn btn-primary w-100">Enviar</button>
-</form>
-
-    <li><hr class="dropdown-divider"></li>
+  <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
     <li class="text-center text-muted small">Últimas notificaciones</li>
-    <div id="notificacionesRecientes" class="mt-2" style="max-height: 150px; overflow-y: auto;">
-      <p class="text-center small text-secondary">Sin notificaciones recientes</p>
+    <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+      <p class="text-center small text-secondary mb-0">Sin notificaciones recientes</p>
     </div>
   </ul>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-document.getElementById("formNotificacionDropdown").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const destino = document.getElementById("destinoNoti").value;
-  const idDestinatario = document.getElementById("idDestinatario").value;
-  const titulo = document.getElementById("tituloNoti").value;
-  const mensaje = document.getElementById("mensajeNoti").value;
-
-  let url = "/notificaciones/enviar_todos";
-  let body = { titulo: titulo, contenido: mensaje };
-
-  if (destino === "usuario") {
-    url = "/notificaciones/enviar";
-    body.destinatario_id = idDestinatario;
-  }
-
-  try {
-    const respuesta = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-
-    if (respuesta.ok) {
-      Swal.fire({
-        icon: "success",
-        title: "Notificación enviada",
-        text: destino === "todos"
-          ? "Notificación enviada a todos los roles"
-          : "Notificación enviada al usuario seleccionado.",
-        confirmButtonColor: "#5A4AE3"
-      });
-      e.target.reset();
-    } else {
-      const error = await respuesta.json();
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.error || "No se pudo enviar la notificación.",
-        confirmButtonColor: "#5A4AE3"
-      });
-    }
-  } catch (err) {
-    console.error(err);
-    Swal.fire({
-      icon: "error",
-      title: "Error de conexión",
-      text: "No se pudo comunicar con el servidor.",
-      confirmButtonColor: "#5A4AE3"
-    });
-  }
-});
-</script>
+<script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
 
   <!-- Dropdown usuario -->
   <div class="dropdown">

@@ -246,6 +246,29 @@ def agregar_docente():
         db.session.commit()
         flash("✅ Docente agregado correctamente", "success")
 
+        # Notificaciones automáticas: bienvenida al docente y aviso a administradores
+        try:
+            notis = []
+            notis.append(Notificacion(
+                Titulo='Bienvenido a EduNotas',
+                Mensaje=f"Hola {nuevo_docente.Nombre}, tu cuenta de {nuevo_docente.Rol} fue creada con éxito.",
+                Enlace=None,
+                ID_Usuario=nuevo_docente.ID_Usuario
+            ))
+            admins = Usuario.query.filter_by(Rol='Administrador', Estado='Activo').all()
+            for adm in admins:
+                notis.append(Notificacion(
+                    Titulo='Nuevo registro de usuario',
+                    Mensaje=f"Se registró un {nuevo_docente.Rol}: {nuevo_docente.Nombre} {nuevo_docente.Apellido} ({nuevo_docente.Correo}).",
+                    Enlace=None,
+                    ID_Usuario=adm.ID_Usuario
+                ))
+            if notis:
+                db.session.bulk_save_objects(notis)
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
+
     except SQLAlchemyError as e:
         db.session.rollback()
         flash(f"❌ Error al agregar docente: {str(e)}", "danger")
@@ -341,8 +364,51 @@ def agregar_estudiante():
         db.session.add(nuevo_estudiante)
         db.session.commit()
 
+        # Notificaciones automáticas: bienvenida al estudiante y aviso a administradores
+        try:
+            notis = []
+            notis.append(Notificacion(
+                Titulo='Bienvenido a EduNotas',
+                Mensaje=f"Hola {nuevo_estudiante.Nombre}, tu cuenta de {nuevo_estudiante.Rol} fue creada con éxito.",
+                Enlace=None,
+                ID_Usuario=nuevo_estudiante.ID_Usuario
+            ))
+            admins = Usuario.query.filter_by(Rol='Administrador', Estado='Activo').all()
+            for adm in admins:
+                notis.append(Notificacion(
+                    Titulo='Nuevo registro de usuario',
+                    Mensaje=f"Se registró un {nuevo_estudiante.Rol}: {nuevo_estudiante.Nombre} {nuevo_estudiante.Apellido} ({nuevo_estudiante.Correo}).",
+                    Enlace=None,
+                    ID_Usuario=adm.ID_Usuario
+                ))
+            if notis:
+                db.session.bulk_save_objects(notis)
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
+
         print(f"✅ Estudiante registrado correctamente: {nombre} {apellido}")
         return jsonify({'success': True, 'id_estudiante': nuevo_estudiante.ID_Usuario})
+
+        #     notis.append(Notificacion(
+        #         Titulo='Bienvenido a EduNotas',
+        #         Mensaje=f"Hola {nuevo_estudiante.Nombre}, tu cuenta de {nuevo_estudiante.Rol} fue creada con éxito.",
+        #         Enlace=None,
+        #         ID_Usuario=nuevo_estudiante.ID_Usuario
+        #     ))
+        #     admins = Usuario.query.filter_by(Rol='Administrador', Estado='Activo').all()
+        #     for adm in admins:
+        #         notis.append(Notificacion(
+        #             Titulo='Nuevo registro de usuario',
+        #             Mensaje=f"Se registró un {nuevo_estudiante.Rol}: {nuevo_estudiante.Nombre} {nuevo_estudiante.Apellido} ({nuevo_estudiante.Correo}).",
+        #             Enlace=None,
+        #             ID_Usuario=adm.ID_Usuario
+        #         ))
+        #     if notis:
+        #         db.session.bulk_save_objects(notis)
+        #         db.session.commit()
+        # except Exception:
+        #     db.session.rollback()
 
     except Exception as e:
         print("❌ Error al registrar estudiante:", e)
@@ -500,6 +566,31 @@ def registrar_usuario_acudiente():
         db.session.add(nuevo_usuario)
         db.session.commit()
 
+        # Crear notificaciones automáticas
+        try:
+            notis = []
+            # Bienvenida al usuario creado
+            notis.append(Notificacion(
+                Titulo='Bienvenido a EduNotas',
+                Mensaje=f"Hola {nuevo_usuario.Nombre}, tu cuenta de {nuevo_usuario.Rol} fue creada con éxito.",
+                Enlace=None,
+                ID_Usuario=nuevo_usuario.ID_Usuario
+            ))
+            # Aviso a administradores
+            admins = Usuario.query.filter_by(Rol='Administrador', Estado='Activo').all()
+            for adm in admins:
+                notis.append(Notificacion(
+                    Titulo='Nuevo registro de usuario',
+                    Mensaje=f"Se registró un {nuevo_usuario.Rol}: {nuevo_usuario.Nombre} {nuevo_usuario.Apellido} ({nuevo_usuario.Correo}).",
+                    Enlace=None,
+                    ID_Usuario=adm.ID_Usuario
+                ))
+            if notis:
+                db.session.bulk_save_objects(notis)
+                db.session.commit()
+        except Exception as _:
+            db.session.rollback()
+
         return jsonify({
         'message': 'Acudiente registrado correctamente.',
         'id': nuevo_usuario.ID_Usuario
@@ -642,6 +733,30 @@ def registro():
 
             print("-> Usuario registrado: ", correo)
             flash('Usuario registrado correctamente ✅', 'success')
+
+            # Notificaciones automáticas: bienvenida y aviso a administradores
+            try:
+                notis = []
+                notis.append(Notificacion(
+                    Titulo='Bienvenido a EduNotas',
+                    Mensaje=f"Hola {new_user.Nombre}, tu cuenta de {new_user.Rol} fue creada con éxito.",
+                    Enlace=None,
+                    ID_Usuario=new_user.ID_Usuario
+                ))
+                admins = Usuario.query.filter_by(Rol='Administrador', Estado='Activo').all()
+                for adm in admins:
+                    notis.append(Notificacion(
+                        Titulo='Nuevo registro de usuario',
+                        Mensaje=f"Se registró un {new_user.Rol}: {new_user.Nombre} {new_user.Apellido} ({new_user.Correo}).",
+                        Enlace=None,
+                        ID_Usuario=adm.ID_Usuario
+                    ))
+                if notis:
+                    db.session.bulk_save_objects(notis)
+                    db.session.commit()
+            except Exception:
+                db.session.rollback()
+
             return redirect(url_for('Administrador.registro'))
 
         except SQLAlchemyError as e:

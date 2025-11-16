@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Colegio Fe y Alegría</title>
+  <title>Editar Actividad | Colegio Fe y Alegría</title>
+
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Iconos -->
@@ -35,8 +36,8 @@
       <span class="bi bi-person-lines-fill"></span>
     </button>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-      <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+      <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
+      <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
       <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
     </ul>
   </div>
@@ -67,23 +68,23 @@
 </div>
 
 <main class="container">
-  <h1 class="titulo">DETALLES DE LA ACTIVIDAD </h1><br><br>
+  <h1 class="titulo">✏️ EDITAR ACTIVIDAD</h1><br>
 
-
-    <div class="row justify-content-center">
+  <form action="{{ url_for('Docente.editar_actividad', id_actividad=actividad.ID_Actividad) }}" method="POST" enctype="multipart/form-data">
+      
       <!-- Panel Izquierdo -->
       <div class="col-lg-4">
         <div class="card p-4 shadow-sm border-0">
-          <h3 class="fw-bold text-center mb-4">ACT {{ id_actividad }}</h3>
+          <h3 class="fw-bold text-center mb-4">ACT {{ actividad.ID_Actividad }}</h3>
 
           <div class="mb-3">
             <label class="form-label fw-semibold">📅 Fecha de entrega</label>
-            <p class="form-control bg-light">{{ fecha_entrega or "No especificada" }}</p>
+            <input type="date" name="fecha_entrega" class="form-control" value="{{ actividad.FechaEntrega }}">
           </div>
 
           <div>
             <label class="form-label fw-semibold">⏰ Hora de entrega</label>
-            <p class="form-control bg-light">{{ hora_entrega or "No especificada" }}</p>
+            <input type="time" name="hora_entrega" class="form-control" value="{{ actividad.HoraEntrega }}">
           </div>
         </div>
       </div>
@@ -95,33 +96,43 @@
 
           <div class="mb-4">
             <label class="form-label fw-semibold">Título de la Actividad</label>
-            <p class="form-control bg-light">{{ titulo_actividad or "Título no disponible" }}</p>
+            <input type="text" class="form-control" name="titulo" value="{{ actividad.Titulo }}" required>
           </div>
 
           <div class="mb-4">
             <label class="form-label fw-semibold">Instrucciones o Descripción</label>
-            <div class="form-control bg-light" style="min-height: 150px;">
-              {{ descripcion_actividad or "Sin descripción disponible." }}
-            </div>
+            <textarea class="form-control" name="descripcion" rows="5" required>{{ actividad.Descripcion }}</textarea>
           </div>
 
-          <!-- Archivo PDF -->
-        <div class="border rounded bg-light-subtle p-4 text-center mb-4">
-          {% if pdf_url %}
-            <iframe src="{{ pdf_url }}" width="100%" height="400px"></iframe>
-            <br>
-            <a href="{{ pdf_url }}" target="_blank" class="btn btn-primary mt-3">
-              📄 Abrir PDF en nueva pestaña
+          <!-- PDF -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">📄 Actualizar PDF (opcional)</label>
+            <input type="file" class="form-control" name="pdfUpload" accept="application/pdf">
+
+            {% if actividad.ArchivoPDF %}
+            <p class="mt-3">
+              Archivo actual:
+              <a href="{{ url_for('Docente.ver_pdf', filename=actividad.ArchivoPDF) }}" target="_blank" class="text-decoration-none">
+                {{ actividad.ArchivoPDF }}
+              </a>
+            </p>
+            {% endif %}
+          </div>
+
+          <div class="text-end mt-4">
+            <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Guardar cambios</button>
+            <a href="{{ url_for('Docente.tareas_actividades', curso_id=actividad.cronograma.ID_Curso) }}" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
             </a>
-          {% else %}
-            <p>No hay archivo adjunto</p>
-          {% endif %}
-</div>
-</div>
+          </div>
 
+        </div>
+      </div>
+    </div>
+  </form>
+</main>
 
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="{{ url_for('static', filename='js/Docente/registro_tareas3.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/Docente/registro_tareas3.js') }}"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app, send_from_directory
 from flask_login import login_required, current_user
 from flask_mail import Message
 from werkzeug.utils import secure_filename
@@ -229,10 +229,10 @@ def tareas_actividades1():
 
     return render_template('Docentes/Registrar_Tareas_Actividades1.html', ciclos=ciclos)
     
-@Docente_bp.route('/tareas_actividades3/<int:curso_id>/<int:actividad_id>')
-def tareas_actividades3(curso_id, actividad_id):
+@Docente_bp.route('/tareas_actividades3/<int:curso_id>/<int:id_actividad>')
+def tareas_actividades3(curso_id, id_actividad):
     # Buscar la actividad en la base de datos
-    actividad = Actividad.query.get(actividad_id)
+    actividad = Actividad.query.get(id_actividad)
 
     if not actividad:
         flash("No se encontró la actividad seleccionada.", "warning")
@@ -248,7 +248,7 @@ def tareas_actividades3(curso_id, actividad_id):
 
     return render_template('Docentes/Registrar_Tareas_Actividades3.html',
                            curso_id=curso_id,
-                           actividad_id=actividad.ID_Actividad,
+                           id_actividad=actividad.ID_Actividad,
                            titulo_actividad=actividad.Titulo,
                            descripcion_actividad=getattr(actividad, 'Descripcion', None),  # si agregas ese campo
                            fecha_entrega=actividad.Fecha.strftime('%Y-%m-%d') if actividad.Fecha else None,
@@ -358,42 +358,61 @@ def editar_actividad(id_actividad):
 
     if request.method == 'POST':
         try:
-            # Obtener valores del formulario
             actividad.Titulo = request.form.get('titulo')
             actividad.Tipo = request.form.get('tipo')
-            actividad.Fecha = request.form.get('fecha')
+            actividad.Fecha = datetime.strptime(request.form.get('fecha'), "%Y-%m-%d").date()
             actividad.Estado = request.form.get('estado')
             actividad.Porcentaje = request.form.get('porcentaje')
-            
-            # Procesar archivo PDF nuevo si se sube
+
+            # Subida de nuevo PDF
             pdf_file = request.files.get('pdfUpload')
-            if pdf_file and pdf_file.filename != '':
-                upload_folder = os.path.join(os.getcwd(), 'app', 'static', 'uploads')
+            if pdf_file and pdf_file.filename:
+                upload_folder = os.path.join(current_app.config['UPLOAD_FOLDER'])
                 os.makedirs(upload_folder, exist_ok=True)
                 pdf_nombre = secure_filename(pdf_file.filename)
                 pdf_path = os.path.join(upload_folder, pdf_nombre)
                 pdf_file.save(pdf_path)
-                # Si tu modelo tiene un campo de archivo:
-                if hasattr(actividad, 'ArchivoPDF'):
-                    actividad.ArchivoPDF = pdf_nombre
+                actividad.ArchivoPDF = pdf_nombre
 
-            # Guardar cambios
             db.session.commit()
-            flash("Actividad actualizada correctamente.", "success")
+            flash("✅ Actividad actualizada correctamente.", "success")
 
-            # Redirigir al listado del curso correspondiente
-            if actividad.cronograma and actividad.cronograma.curso:
-                return redirect(url_for('Docente.tareas_actividades', curso_id=actividad.cronograma.curso.ID_Curso))
-            else:
-                return redirect(url_for('Docente.tareas_actividades', curso_id=1))  # fallback
+            return redirect(url_for('Docente.tareas_actividades', curso_id=actividad.cronograma.curso.ID_Curso))
 
         except Exception as e:
             db.session.rollback()
-            flash(f"Error al actualizar la actividad: {e}", "danger")
+            flash(f"❌ Error al actualizar la actividad: {e}", "danger")
 
-    # GET → Mostrar formulario con datos actuales
     return render_template('Docentes/Editar_Actividad.html', actividad=actividad)
 
+
+# -------------------------------------------
+# Desactivar actividad
+# -------------------------------------------
+@Docente_bp.route('/desactivar_actividad/<int:id_actividad>')
+@login_required
+def desactivar_actividad(id_actividad):
+    actividad = Actividad.query.get_or_404(id_actividad)
+    actividad.Estado = "Inactiva"
+    db.session.commit()
+    flash("🚫 Actividad desactivada correctamente.", "info")
+
+    return redirect(url_for('Docente.tareas_actividades', curso_id=actividad.cronograma.curso.ID_Curso))
+
+
+@Docente_bp.route('/ver_pdf/<path:filename>')
+@login_required
+def ver_pdf(filename):
+    """
+    Permite ver o descargar el PDF de una actividad directamente desde /uploads.
+    """
+    upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
+    
+    try:
+        return send_from_directory(upload_folder, filename, as_attachment=False)
+    except FileNotFoundError:
+        flash("❌ El archivo PDF no fue encontrado.", "danger")
+        return redirect(url_for('Docente.tareas_actividades1'))
 #----------------------------------------------------------------------------------------------------------------------------
 
 @Docente_bp.route('/aprobacion_academica')
@@ -831,7 +850,7 @@ def api_notas_por_materia(curso_id, asignatura_id):
 
 
 # --- ENDPOINT: crear nueva actividad + cronograma (opcional para cuando agregues columna nueva)
-@Docente_bp.route('/api/crear_actividad/<int:curso_id>', methods=['POST'], endpoint='api_crear_actividad')
+"""@Docente_bp.route('/api/crear_actividad/<int:curso_id>', methods=['POST'], endpoint='api_crear_actividad')
 @login_required
 def api_crear_actividad(curso_id):
     if request.method == 'POST':
@@ -863,13 +882,13 @@ def api_crear_actividad(curso_id):
         flash('Actividad creada correctamente ✅', 'success')
         return redirect(url_for('Docente.tareas_actividades1'))
 
-    return render_template('Docente/Crear_Actividad.html', curso_id=curso_id)
+    return render_template('Docente/Crear_Actividad.html', curso_id=curso_id)"""
 
 
-@Docente_bp.route('/crear_actividad/<int:curso_id>', methods=['GET', 'POST'], endpoint='form_crear_actividad')
-@login_required
-def form_crear_actividad(curso_id):
-    return render_template('Docentes/Crear_Actividad.html', curso_id=curso_id)
+#@Docente_bp.route('/crear_actividad/<int:curso_id>', methods=['GET', 'POST'], endpoint='form_crear_actividad')
+#@login_required
+#def form_crear_actividad(curso_id):
+#    return render_template('Docentes/Crear_Actividad.html', curso_id=curso_id)
 
 # --- ENDPOINT: guardar (insert/update) calificaciones desde el frontend
 @Docente_bp.route('/api/guardar_notas', methods=['POST'])
@@ -882,17 +901,17 @@ def api_guardar_notas():
 
         for u in updates:
             try:
-                actividad_id = int(u.get('actividad_id'))
+                id_actividad = int(u.get('id_actividad'))
                 matricula_id = int(u.get('matricula_id'))
                 cal = u.get('calificacion')
                 cal_val = None if cal in [None, ""] else float(cal)
 
                 # --- Verificar existencia antes de insertar
-                actividad = Actividad.query.get(actividad_id)
+                actividad = Actividad.query.get(id_actividad)
                 matricula = Matricula.query.get(matricula_id)
                 if not actividad or not matricula:
                     results['errors'].append({
-                        'actividad_id': actividad_id,
+                        'id_actividad': id_actividad,
                         'matricula_id': matricula_id,
                         'error': 'Actividad o matrícula no existe'
                     })
@@ -900,14 +919,14 @@ def api_guardar_notas():
 
                 # --- Actualizar o crear registro
                 row = Actividad_Estudiante.query.filter_by(
-                    ID_Actividad=actividad_id, ID_Matricula=matricula_id
+                    ID_Actividad=id_actividad, ID_Matricula=matricula_id
                 ).first()
                 if row:
                     row.Calificacion = cal_val
                     results['saved'] += 1
                 else:
                     nueva = Actividad_Estudiante(
-                        ID_Actividad=actividad_id,
+                        ID_Actividad=id_actividad,
                         ID_Matricula=matricula_id,
                         Observaciones='',
                         Calificacion=cal_val
@@ -917,7 +936,7 @@ def api_guardar_notas():
 
             except Exception as row_error:
                 results['errors'].append({
-                    'actividad_id': u.get('actividad_id'),
+                    'id_actividad': u.get('id_actividad'),
                     'matricula_id': u.get('matricula_id'),
                     'error': str(row_error)
                 })

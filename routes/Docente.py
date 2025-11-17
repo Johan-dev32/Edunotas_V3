@@ -4,7 +4,9 @@ from flask_mail import Message
 from werkzeug.utils import secure_filename
 import io
 from xhtml2pdf import pisa
-from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Curso, Notificacion, Programacion, Observacion, Nota_Calificaciones, Docente_Asignatura, ResumenSemanal, Tutorias )
+from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Curso, Notificacion, Programacion, Observacion, Nota_Calificaciones, Docente_Asignatura, ResumenSemanal, Tutorias, Acudiente, Detalle_Asistencia)
+from sqlalchemy import text
+
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
@@ -29,6 +31,47 @@ ID_DOCENTE_FIJO = 2
 @Docente_bp.route('/paginainicio')
 def paginainicio():
     return render_template('Docentes/Paginainicio_Docentes.html')
+
+
+@Docente_bp.route('/excusa/<int:id_detalle>/estado', methods=['PUT'])
+def actualizar_estado_excusa(id_detalle):
+    try:
+        data = request.json
+        nuevo_estado = data.get("estado")  # aceptada / rechazada
+
+        if nuevo_estado not in ["aceptada", "rechazada"]:
+            return jsonify({
+                "success": False,
+                "error": "Estado inválido, debe ser 'aceptada' o 'rechazada'"
+            }), 400
+
+        detalle = Detalle_Asistencia.query.get(id_detalle)
+
+        if not detalle:
+            return jsonify({
+                "success": False,
+                "error": "No se encontró el registro de asistencia"
+            }), 404
+
+        # Actualizar estado
+        detalle.EstadoExcusa = nuevo_estado
+
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "mensaje": "Estado de la excusa actualizado correctamente",
+            "id_detalle": id_detalle,
+            "estado": nuevo_estado
+        }), 200
+
+    except Exception as e:
+        print(e)
+        return jsonify({
+            "success": False,
+            "error": "Error al actualizar la excusa"
+        }), 500
+
 
 # ---------------- NOTIFICACIONES DOCENTE----------------
 
@@ -519,6 +562,10 @@ def registro_notas_curso(curso_id):
             ID_Asignatura=asignatura_id,
             Periodo=periodo_seleccionado
         ).all()
+        try:
+            print(f"[registro_notas_curso] Registros cargados para asig={asignatura_id}, periodo={periodo_seleccionado}: {len(notas_db)}")
+        except Exception:
+            pass
         
         # Mapear las notas por ID de Estudiante para acceso rápido en la plantilla
         notas_por_estudiante = {nota.ID_Estudiante: nota for nota in notas_db}
@@ -679,39 +726,108 @@ def guardar_notas_curso(curso_id):
 
     # 2. PROCESAMIENTO DE NOTAS 
     try:
-        for key, value in datos_formulario.items():
-            if key.startswith('nota_'):
-                # Descomponer la clave: nota_[numero_nota]_[id_usuario]
-                partes = key.split('_')
-                numero_nota = partes[1] 
-                id_usuario = int(partes[2]) 
-                
-                # Convertir la nota a float o None si está vacío
-                valor_nota = float(value) if value and value.strip() != '' else None 
-                
-                # Buscar o crear el registro de notas
-                registro_nota = Nota_Calificaciones.query.filter_by(
-                    ID_Estudiante=id_usuario,
-                    ID_Asignatura=asignatura_id,
-                    Periodo=periodo
-                ).first()
-                
-                if not registro_nota:
-                    registro_nota = Nota_Calificaciones(
-                        ID_Estudiante=id_usuario,
-                        ID_Asignatura=asignatura_id,
-                        Periodo=periodo
-                    )
-                    db.session.add(registro_nota)
-                
-                # Asignar la nota al campo correcto (Nota_1, Nota_2, etc.)
-                nombre_campo_db = f'Nota_{numero_nota}' 
-                setattr(registro_nota, nombre_campo_db, valor_nota)
+        # DEBUG: contar campos de notas y mostrar muestra
+        nota_items = [(k, v) for k, v in datos_formulario.items() if k.startswith('nota_')]
+        print(f"[guardar_notas_curso] Campos de notas recibidos: {len(nota_items)}")
+        print(f"[guardar_notas_curso] Muestra notas: {nota_items[:5]}")
 
-                # Recalcular el promedio (asumiendo que _calcular_promedio_local está definido globalmente)
-                registro_nota.Promedio_Final = _calcular_promedio_local(registro_nota)
-        
+        # Agrupar notas por estudiante para calcular promedio y actualizar por SQL crudo
+        por_estudiante = {}
+        for key, value in nota_items:
+            partes = key.split('_')  # ['nota', 'n', 'id']
+            if len(partes) != 3:
+                continue
+            n = partes[1]
+            est_id = int(partes[2])
+            if est_id not in por_estudiante:
+                por_estudiante[est_id] = {}
+            if value and value.strip() != '':
+                try:
+                    por_estudiante[est_id][f'Nota_{n}'] = float(value)
+                except ValueError:
+                    pass
+
+        updated_estudiante_ids = set()
+        for est_id, notas_dict in por_estudiante.items():
+            # Asegurar fila existente
+            db.session.execute(
+                text("""
+                    INSERT INTO Nota_Calificaciones (ID_Estudiante, ID_Asignatura, Periodo)
+                    SELECT :est, :asig, :per
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM Nota_Calificaciones 
+                        WHERE ID_Estudiante=:est AND ID_Asignatura=:asig AND Periodo=:per
+                    )
+                """), {"est": est_id, "asig": asignatura_id, "per": periodo}
+            )
+            # Construir SET dinámico para UPDATE
+            sets = []
+            params = {"est": est_id, "asig": asignatura_id, "per": periodo}
+            for campo, val in notas_dict.items():
+                sets.append(f"{campo} = :{campo}")
+                params[campo] = val
+
+            # Calcular promedio localmente con las notas presentes en BD sería lo ideal;
+            # como simplificación, usamos el promedio de las notas_dict ingresadas ahora
+            if notas_dict:
+                prom = round(sum(notas_dict.values()) / len(notas_dict), 2)
+                sets.append("Promedio_Final = :prom")
+                params["prom"] = prom
+
+            if sets:
+                sql = f"UPDATE Nota_Calificaciones SET {', '.join(sets)} WHERE ID_Estudiante=:est AND ID_Asignatura=:asig AND Periodo=:per"
+                db.session.execute(text(sql), params)
+                updated_estudiante_ids.add(est_id)
+
         db.session.commit()
+
+        # DEBUG: verificar cuántos registros hay ahora
+        try:
+            cnt = db.session.execute(
+                text("SELECT COUNT(*) AS c FROM Nota_Calificaciones WHERE ID_Asignatura=:asig AND Periodo=:per"),
+                {"asig": asignatura_id, "per": periodo}
+            ).scalar()
+            print(f"[guardar_notas_curso] Registros ahora para asig={asignatura_id}, periodo={periodo}: {cnt}")
+        except Exception as _:
+            pass
+        
+        # 2.1. Notificaciones automáticas a estudiantes y acudientes
+        try:
+            notis = []
+            asig = Asignatura.query.get(asignatura_id)
+            asignatura_nombre = asig.Nombre if asig else f"Asignatura {asignatura_id}"
+            for est_id in updated_estudiante_ids:
+                est = Usuario.query.get(est_id)
+                nombre_est = f"{est.Nombre} {est.Apellido}" if est else f"Estudiante {est_id}"
+                # Notificación al estudiante
+                notis.append(Notificacion(
+                    Titulo='Nueva calificación registrada',
+                    Mensaje=f"Se registró/actualizó una calificación en {asignatura_nombre}, período {periodo}.",
+                    Enlace=None,
+                    ID_Usuario=est_id
+                ))
+                # Notificaciones a acudientes relacionados y activos
+                relaciones = Acudiente.query.filter_by(ID_Estudiante=est_id, Estado='Activo').all()
+                print(f"[guardar_notas_curso] Estudiante {est_id}: acudientes activos encontrados = {len(relaciones)}")
+                if relaciones:
+                    print(f"[guardar_notas_curso] Acudientes IDs: {[r.ID_Usuario for r in relaciones]}")
+                for rel in relaciones:
+                    notis.append(Notificacion(
+                        Titulo='Nueva calificación del estudiante',
+                        Mensaje=f"El estudiante {nombre_est} tiene una nueva calificación en {asignatura_nombre}, período {periodo}.",
+                        Enlace=None,
+                        ID_Usuario=rel.ID_Usuario
+                    ))
+            if notis:
+                db.session.bulk_save_objects(notis)
+                db.session.commit()
+                print(f"[guardar_notas_curso] Notificaciones creadas: {len(notis)}")
+        except Exception as e:
+            db.session.rollback()
+            try:
+                print(f"[guardar_notas_curso] Error creando notificaciones: {e}")
+            except Exception:
+                pass
         
         # ✅ CLAVE DE PERSISTENCIA: Guardar los filtros en la sesión
         session[session_key_asignatura] = asignatura_id
@@ -719,10 +835,13 @@ def guardar_notas_curso(curso_id):
         
         flash("Notas guardadas exitosamente.", "success")
         
+        # Redirigir conservando filtros para repoblar la vista
+        return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id, asignatura=asignatura_id, periodo=periodo))
+        
     except Exception as e:
         db.session.rollback()
         flash(f"Error al guardar los cambios en la base de datos: {e}", "error")
-        print(f"❌ DB ROLLBACK/ERROR FINAL: {e}")
+        return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id, asignatura=asignatura_id, periodo=periodo))
         
     # 3. REDIRECCIONAMIENTO FINAL
     if accion == 'reporte':

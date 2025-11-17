@@ -1,89 +1,61 @@
-const form = document.getElementById('justificacionForm');
-const notifContainer = document.getElementById('notifications');
-const formMessage = document.getElementById('formMessage');
-const clearBtn = document.getElementById('clearBtn');
+const form = document.getElementById("justificacionForm");
+const formMessage = document.getElementById("formMessage");
+const clearBtn = document.getElementById("clearBtn");
 
-// Recuperar notificaciones guardadas en localStorage
-const STORAGE_KEY = 'justificaciones_acudiente';
-function loadStored(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw? JSON.parse(raw): [];
-  }catch(e){
-    console.error(e);
-    return [];
-  }
-}
+// === Enviar excusa al servidor ===
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-function store(entry){
-  const arr = loadStored();
-  arr.unshift(entry);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-}
+    const studentName = form.studentName.value.trim();
+    const relation = form.relation.value.trim();
+    const date = form.date.value;
+    const reason = form.reason.value.trim();
+    const evidence = form.evidence.files[0];
 
-function renderNotifications(){
-  const arr = loadStored();
-  notifContainer.innerHTML = '';
-  if(arr.length === 0){
-    notifContainer.innerHTML = '<p class="empty">Aquí verás la notificación enviada al docente o coordinación.</p>';
-    return;
-  }
-  arr.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'notif';
-    const date = new Date(item.sentAt).toLocaleString();
-    div.innerHTML = `<strong>${item.studentName}</strong> — <span style="color:var(--muted)">${date}</span>
-                     <div style="margin-top:6px">${escapeHtml(item.reason)}</div>
-                     <div style="margin-top:6px;font-size:0.85rem;color:var(--muted)">Enviado por: ${escapeHtml(item.relation)}</div>`;
-    notifContainer.appendChild(div);
-  });
-}
+    // Validación
+    if (!studentName || !relation || !date || !reason) {
+        formMessage.textContent = "Por favor completa todos los campos obligatorios.";
+        formMessage.style.color = "red";
+        return;
+    }
 
-function escapeHtml(text){
-  if(!text) return '';
-  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+    // === Preparar datos con archivo ===
+    const formData = new FormData();
+    formData.append("studentName", studentName);
+    formData.append("relation", relation);
+    formData.append("date", date);
+    formData.append("reason", reason);
+    if (evidence) formData.append("evidence", evidence);
 
-form.addEventListener('submit', (e)=>{
-  e.preventDefault();
-  const studentName = form.studentName.value.trim();
-  const relation = form.relation.value.trim();
-  const date = form.date.value;
-  const reason = form.reason.value.trim();
-  // Validación básica
-  if(!studentName || !relation || !date || !reason){
-    formMessage.textContent = 'Por favor completa todos los campos obligatorios.';
-    formMessage.style.color = 'var(--danger)';
-    return;
-  }
+    try {
+        const response = await fetch("/api/excusas", {
+            method: "POST",
+            body: formData
+        });
 
-  const entry = {
-    studentName,
-    relation,
-    date,
-    reason,
-    // evidencia no se sube a servidor en este ejemplo; guardamos solo el nombre del archivo si existe
-    evidenceName: form.evidence.files[0]?.name || null,
-    sentAt: new Date().toISOString()
-  };
+        const data = await response.json();
 
-  // Simular envío — guardar localmente y mostrar notificación
-  store(entry);
-  renderNotifications();
+        if (!response.ok) {
+            formMessage.textContent = data.error || "Error al enviar la excusa.";
+            formMessage.style.color = "red";
+            return;
+        }
 
-  // Mensaje al acudiente
-  formMessage.textContent = 'Justificación enviada correctamente. El docente o coordinación fue notificado.';
-  formMessage.style.color = 'green';
+        // Éxito
+        formMessage.textContent = "Justificación enviada correctamente. El docente fue notificado.";
+        formMessage.style.color = "green";
 
-  // Opcional: limpiar campos
-  form.reset();
+        form.reset();
+
+    } catch (error) {
+        console.error(error);
+        formMessage.textContent = "Error inesperado. Intenta nuevamente.";
+        formMessage.style.color = "red";
+    }
 });
 
-clearBtn.addEventListener('click', ()=>{
-  form.reset();
-  formMessage.textContent = '';
+// === Botón limpiar ===
+clearBtn.addEventListener("click", () => {
+    form.reset();
+    formMessage.textContent = "";
 });
-
-// Inicializar
-renderNotifications();
-

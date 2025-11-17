@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, abort
 from flask_login import login_required, current_user
-from Controladores.models import db, Usuario, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Notificacion, Acudiente, Nota_Calificaciones, Citaciones
+from Controladores.models import db, Usuario, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Notificacion, Acudiente, Nota_Calificaciones, Citaciones, Detalle_Asistencia, Asistencia, Observacion, Matricula
 from sqlalchemy import or_, func
+from datetime import datetime
 import os
 import unicodedata
 
@@ -13,6 +14,80 @@ Acudiente_bp = Blueprint('Acudiente', __name__, url_prefix='/acudiente')
 @Acudiente_bp.route('/paginainicio')
 def paginainicio():
     return render_template('Acudiente/Paginainicio_Acudiente.html')
+
+# ---------------- INASISTENCIAS ACUDIENTE----------------
+@Acudiente_bp.route('/inasistencias')
+@login_required
+def ver_inasistencias():
+    # Buscar estudiantes asociados al acudiente
+    relaciones = Acudiente.query.filter_by(ID_Usuario=current_user.ID_Usuario, Estado='Activo').all()
+    if not relaciones:
+        flash("No tiene estudiantes asociados.", "warning")
+        return render_template("Acudiente/InasistenciasLista.html", inasistencias=[])
+
+    estudiante_id = relaciones[0].ID_Estudiante
+
+    faltas = Detalle_Asistencia.query.filter_by(
+        ID_Estudiante=estudiante_id,
+        Estado_Asistencia='Ausente'
+    ).all()
+
+    return render_template("Acudiente/InasistenciasLista.html", faltas=faltas)
+
+
+@Acudiente_bp.route('/enviar_excusa/<int:id_detalle>', methods=['POST'])
+@login_required
+def enviar_excusa(id_detalle):
+    detalle = Detalle_Asistencia.query.get_or_404(id_detalle)
+
+    # validar que ese estudiante SI pertenece a este acudiente
+    relacion = Acudiente.query.filter_by(
+        ID_Usuario=current_user.ID_Usuario,
+        ID_Estudiante=detalle.ID_Estudiante,
+        Estado="Activo"
+    ).first()
+
+    if not relacion:
+        abort(403)
+
+    texto = request.form.get("texto_excusa")
+    archivo = request.files.get("archivo_excusa")
+
+    nombre_archivo = None
+    if archivo and archivo.filename:
+        carpeta = "static/excusas/"
+        os.makedirs(carpeta, exist_ok=True)
+        nombre_archivo = f"excusa_{id_detalle}_{archivo.filename}"
+        archivo.save(os.path.join(carpeta, nombre_archivo))
+
+    detalle.TextoExcusa = texto
+    detalle.ArchivoExcusa = nombre_archivo
+    detalle.FechaExcusa = datetime.now()
+    detalle.ID_Acudiente = relacion.ID_Acudiente
+    detalle.EstadoExcusa = "pendiente"
+
+    db.session.commit()
+
+    flash("Excusa enviada correctamente.", "success")
+    return redirect(url_for('Acudiente.ver_inasistencias'))
+
+@Acudiente_bp.route('/mis_excusas')
+@login_required
+def mis_excusas():
+    relaciones = Acudiente.query.filter_by(ID_Usuario=current_user.ID_Usuario, Estado='Activo').all()
+    if not relaciones:
+        flash("No tiene estudiantes asociados.", "warning")
+        return render_template("Acudiente/MisExcusas.html", excusas=[])
+
+    estudiante_id = relaciones[0].ID_Estudiante
+
+    excusas = Detalle_Asistencia.query.filter(
+        Detalle_Asistencia.ID_Estudiante == estudiante_id,
+        Detalle_Asistencia.TextoExcusa.isnot(None)
+    ).order_by(Detalle_Asistencia.FechaExcusa.desc()).all()
+
+    return render_template("Acudiente/MisExcusas.html", excusas=excusas)
+
 
 # ---------------- NOTIFICACIONES ACUDIENTE----------------
 

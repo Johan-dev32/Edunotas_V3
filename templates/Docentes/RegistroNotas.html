@@ -83,7 +83,7 @@
 
         <div class="d-flex justify-content-between mt-4">
 
-            <button type="submit" name="action" value="guardar" class="btn btn-primary">
+            <button id="btnGuardarNotas" type="submit" name="action" value="guardar" class="btn btn-primary">
                 <i class="fas fa-save"></i> Guardar Todas las Notas
             </button>
 
@@ -141,21 +141,22 @@
                         <td>{{ loop.index }}</td>
                         <td>{{ estudiante.Nombre }} {{ estudiante.Apellido }}</td>
                         {% set registro = estudiante.registro_nota %}
-{% for i in range(1, 6) %}
-    <td>
-        {% set nombre_columna = 'Nota_' ~ i %}
-        {# 🛑 Reemplaza la línea problemática con esta: #}
-        {% set valor_actual = registro[nombre_columna] if registro and registro[nombre_columna] is not none else '' %}
-        <input type="text"
-               name="nota_{{ i }}_{{ estudiante.ID_Usuario }}"
-               class="form-control input-nota"
-               maxlength="4"
-               pattern="[0-9]{1,2}(\.[0-9]{1,2})?"
-               value="{{ valor_actual }}"
-        >
-    </td>
-{% endfor %}
-                        <td>{{ estudiante.Promedio_Final | default('') }}</td>
+                        <td>
+                          <input type="number" step="0.01" name="nota_1_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_1 if registro and registro.Nota_1 is not none else '' }}">
+                        </td>
+                        <td>
+                          <input type="number" step="0.01" name="nota_2_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_2 if registro and registro.Nota_2 is not none else '' }}">
+                        </td>
+                        <td>
+                          <input type="number" step="0.01" name="nota_3_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_3 if registro and registro.Nota_3 is not none else '' }}">
+                        </td>
+                        <td>
+                          <input type="number" step="0.01" name="nota_4_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_4 if registro and registro.Nota_4 is not none else '' }}">
+                        </td>
+                        <td>
+                          <input type="number" step="0.01" name="nota_5_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_5 if registro and registro.Nota_5 is not none else '' }}">
+                        </td>
+                        <td>{{ registro.Promedio_Final if registro and registro.Promedio_Final is not none else '' }}</td>
                     </tr>
                 {% else %}
                     <tr>
@@ -174,17 +175,31 @@
 <script>
     // Pequeño script para manejar el submit automático de los selectores
     document.addEventListener('DOMContentLoaded', function() {
-        const selects = document.querySelectorAll('#periodo_select, #asignatura_select');
-        selects.forEach(select => {
-            select.onchange = function() {
-                // Cambiamos la acción para que use la ruta de registro_notas_curso (GET) y cargue
-                const form = document.getElementById('formRegistroNotas');
-                form.action = "{{ url_for('Docente.registro_notas_curso', curso_id=curso_id) }}?asignatura=" + document.getElementById('asignatura_select').value + "&periodo=" + document.getElementById('periodo_select').value;
-                form.method = 'GET';
-                form.submit();
-                form.method = 'POST'; // Lo volvemos a POST para que los botones de Guardar/Reporte funcionen
-                form.action = "{{ url_for('Docente.guardar_notas_curso', curso_id=curso_id) }}";
-            };
+        // Evitar enviar el formulario al cambiar filtros; navegar por URL para cargar tabla
+        const selPeriodo = document.getElementById('periodo_select');
+        const selAsignatura = document.getElementById('asignatura_select');
+        function navegarConFiltros() {
+            const asig = selAsignatura.value;
+            const per = selPeriodo.value;
+            if (asig && per) {
+                window.location.href = "{{ url_for('Docente.registro_notas_curso', curso_id=curso_id) }}?asignatura=" + encodeURIComponent(asig) + "&periodo=" + encodeURIComponent(per);
+            }
+        }
+        if (selPeriodo) selPeriodo.onchange = navegarConFiltros;
+        if (selAsignatura) selAsignatura.onchange = navegarConFiltros;
+
+        // Forzar que el botón Guardar siempre envíe POST al endpoint correcto
+        const btnGuardar = document.getElementById('btnGuardarNotas');
+        btnGuardar.addEventListener('click', function(e) {
+            const form = document.getElementById('formRegistroNotas');
+            form.method = 'POST';
+            form.action = "{{ url_for('Docente.guardar_notas_curso', curso_id=curso_id) }}";
+            // Asegurar que asignatura y periodo actuales viajen en el POST
+            // (ya viajan porque los <select> tienen name, pero reforzamos)
+            const selAsig = document.getElementById('asignatura_select');
+            const selPer = document.getElementById('periodo_select');
+            if (!selAsig.name) selAsig.name = 'asignatura';
+            if (!selPer.name) selPer.name = 'periodo';
         });
     });
     // Tus otras variables JS
@@ -194,7 +209,7 @@
     const URL_GUARDAR_NOTAS = "{{ url_for('Docente.guardar_notas_curso', curso_id=curso_id | default(0)) }}"
 </script>
 
-    <script src="{{ url_for('static', filename='js/Docentes/RegistroNotas.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/Docente/RegistroNotas.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -37,109 +37,41 @@
     <!-- Dropdown mensajes -->
     <!-- Dropdown mensajes (ADMINISTRADOR) -->
 <div class="dropdown">
-  <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-    <span class="bi bi-envelope-fill"></span>
+  <button
+    class="position-relative"
+    type="button"
+    id="dropdownMenuButton"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    style="border: none; background: transparent; padding: 0;"
+  >
+    <i class="bi bi-bell-fill" style="font-size: 1.25rem; margin-left:850px;"></i>
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          id="contadorMensajes" style="display:none">0</span>
   </button>
-  <ul class="dropdown-menu p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
-    <li class="mb-2"><h6 class="dropdown-header text-center">Enviar Notificación</h6></li>
-
-    <form id="formNotificacion">
-  <div class="mb-3">
-    <label>Destino:</label>
-    <select id="destino" class="form-select">
-      <option>Todos los roles</option>
-      <option>Administrador</option>
-      <option>Docente</option>
-      <option>Estudiante</option>
-      <option>Acudiente</option>
-    </select>
-  </div>
-  <div class="mb-3">
-    <label>Asunto</label>
-    <input type="text" id="asunto" class="form-control" placeholder="Asunto del mensaje">
-  </div>
-  <div class="mb-3">
-    <label>Mensaje</label>
-    <textarea id="mensaje" class="form-control" rows="3" placeholder="Escribe tu mensaje..."></textarea>
-  </div>
-  <button type="button" id="btnEnviarNotificacion" class="btn btn-primary w-100">Enviar</button>
-</form>
-
-    <li><hr class="dropdown-divider"></li>
+  <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
     <li class="text-center text-muted small">Últimas notificaciones</li>
-    <div id="notificacionesRecientes" class="mt-2" style="max-height: 150px; overflow-y: auto;">
-      <p class="text-center small text-secondary">Sin notificaciones recientes</p>
+    <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+      <p class="text-center small text-secondary mb-0">Sin notificaciones recientes</p>
     </div>
   </ul>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-document.getElementById("formNotificacionDropdown").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const destino = document.getElementById("destinoNoti").value;
-  const idDestinatario = document.getElementById("idDestinatario").value;
-  const titulo = document.getElementById("tituloNoti").value;
-  const mensaje = document.getElementById("mensajeNoti").value;
-
-  let url = "/notificaciones/enviar_todos";
-  let body = { titulo: titulo, contenido: mensaje };
-
-  if (destino === "usuario") {
-    url = "/notificaciones/enviar";
-    body.destinatario_id = idDestinatario;
-  }
-
-  try {
-    const respuesta = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-
-    if (respuesta.ok) {
-      Swal.fire({
-        icon: "success",
-        title: "Notificación enviada",
-        text: destino === "todos"
-          ? "Notificación enviada a todos los roles"
-          : "Notificación enviada al usuario seleccionado.",
-        confirmButtonColor: "#5A4AE3"
-      });
-      e.target.reset();
-    } else {
-      const error = await respuesta.json();
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.error || "No se pudo enviar la notificación.",
-        confirmButtonColor: "#5A4AE3"
-      });
-    }
-  } catch (err) {
-    console.error(err);
-    Swal.fire({
-      icon: "error",
-      title: "Error de conexión",
-      text: "No se pudo comunicar con el servidor.",
-      confirmButtonColor: "#5A4AE3"
-    });
-  }
-});
-</script>
+<script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
 
   <!-- Dropdown usuario -->
   <div class="dropdown">
     <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-      <span class="bi bi-person-lines-fill"></span>
+      <span class="bi bi-person-circle"></span>
     </button>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
       <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-      <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+      
       <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
       <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
 
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
     </ul>
   </div>
 </header>
@@ -222,7 +154,7 @@ document.getElementById("formNotificacionDropdown").addEventListener("submit", a
           <div class="collapse" id="submenuNotas">
             <ul class="nav flex-column ms-3">
               <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
+              
              <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
 
 
@@ -232,7 +164,6 @@ document.getElementById("formNotificacionDropdown").addEventListener("submit", a
 
           <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
           <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.reporte') }}" class="nav-link text-white"><i class="bi bi-calendar2"></i></i> Generar reporte</a></li>
 
           <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
             <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
@@ -261,46 +192,94 @@ document.getElementById("formNotificacionDropdown").addEventListener("submit", a
 </section>
 
 <!-- Noticias y Circulares -->
-<div class="contenedor-bajo container mt-4">
-  <div class="row">
-    <div class="col-md-6">
-      <h4 class="h4">NOTICIAS</h4>
-      <a href="{{ url_for('Administrador.noticias_vistas') }}" class="text-decoration-none mt-3">
-        <div id="noticia1" class="bg-secondary text-white rounded shadow-sm">Noticia 1</div>
-      </a>
+<div class="container mt-4">
+  <div class="row align-items-center mb-2">
+    <div class="col-md-7">
+      <h4 class="section-title mb-0">NOTICIAS</h4>
     </div>
-
-    <div class="Circulares">
-      <p class="h5">CIRCULARES</p>
-      <p class="h6">ESTUDIANTILES</p>
-      <div class="accordion accordion-flush" id="accordionFlushExample">
-        <div class="accordion-item">
-          <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne">
-              Circular #1
-            </button>
-          </h2>
-          <div id="flush-collapseOne" class="accordion-collapse collapse">
-            <div class="accordion-body text-center"><div id="circular1-contenido"></div></div>
+    <div class="col-md-5">
+      <h4 class="section-title2 mb-0 text-md-end">CIRCULARES ESTUDIANTILES</h4>
+    </div>
+  </div>
+  <div class="row g-4 align-items-stretch">
+    <!-- Noticias -->
+    <div class="col-md-7">
+      <div class="card shadow border-0 h-100 news-card">
+        <div class="card-header bg-white border-0">
+          
+        </div>
+        <div class="card-body">
+          <a href="{{ url_for('Administrador.noticias_vistas') }}" class="text-decoration-none">
+            <div class="news-hero rounded-4 w-100 d-flex flex-column align-items-center justify-content-center text-white">
+              <div class="fs-5 fw-semibold d-flex align-items-center gap-2">
+                <i class="bi bi-newspaper"></i>
+                Ver últimas noticias
+              </div>
+              <div class="small text-white-50 mt-1">Actualizaciones del colegio, eventos y anuncios</div>
+              <div class="d-flex gap-2 mt-3">
+                <span class="badge badge-glass">Eventos</span>
+                <span class="badge badge-glass">Anuncios</span>
+                <span class="badge badge-glass">Comunidad</span>
+              </div>
+            </div>
+          </a>
+          <div class="text-end mt-3">
+            <a href="{{ url_for('Administrador.noticias') }}" class="btn btn-sm btn-outline-dark">
+              <i class="bi bi-pencil-square"></i> Crear noticia
+            </a>
           </div>
         </div>
-        <div class="accordion-item">
-          <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo">
-              Circular #2
-            </button>
-          </h2>
-          <div id="flush-collapseTwo" class="accordion-collapse collapse">
-            <div class="accordion-body text-center"><div id="circular2-contenido"></div></div>
+      </div>
+    </div>
+
+    <!-- Circulares -->
+    <div class="col-md-5">
+      <div class="card shadow border-0 h-100">
+        <div class="card-header bg-white border-0">
+          
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h6 class="text-muted mb-2">Recientes</h6>
+            <div id="circularesRecientes" class="list-group small"></div>
+          </div>
+          <div class="accordion" id="accordionFlushExample">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne">
+                  Circular #1
+                </button>
+              </h2>
+              <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                <div class="accordion-body text-center"><div id="circular1-contenido"></div></div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo">
+                  Circular #2
+                </button>
+              </h2>
+              <div id="flush-collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                <div class="accordion-body text-center"><div id="circular2-contenido"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="text-end mt-3">
+            <a href="{{ url_for('Administrador.circulares') }}" class="btn btn-sm btn-outline-dark">
+              <i class="bi bi-pencil-square"></i> Gestionar circulares
+            </a>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+<hr class="my-5">
+<h1 class="text-center txt-ultimo">Edunotas te acompaña en tu proceso educativo con herramientas simples, seguras y efectivas.
+Creado con compromiso y tecnología por el equipo del Colegio Fe y Alegría © 2025.</h1>
 
-<a href="{{ url_for('Administrador.noticias') }}" class="text-decoration-none"><div class="editar1"><i class="bi bi-pencil-square"></i></div></a>
-<a href="{{ url_for('Administrador.circulares') }}" class="text-decoration-none"><div class="editar"><i class="bi bi-pencil-square"></i></div></a>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
@@ -407,6 +386,35 @@ document.getElementById("btnEnviarNotificacion").addEventListener("click", envia
 setInterval(obtenerNotificaciones, 15000);
 
 document.addEventListener("DOMContentLoaded", obtenerNotificaciones);
+
+// Cargar circulares recientes para la tarjeta de inicio
+document.addEventListener("DOMContentLoaded", async () => {
+  const cont = document.getElementById("circularesRecientes");
+  if (!cont) return;
+  cont.innerHTML = '<div class="text-muted">Cargando...</div>';
+  try {
+    const res = await fetch("/administrador/circulares/historial?ts=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    cont.innerHTML = "";
+    if (!data.success || !Array.isArray(data.circulares) || data.circulares.length === 0) {
+      cont.innerHTML = '<div class="text-muted">No hay circulares.</div>';
+      return;
+    }
+    data.circulares.slice(0,3).forEach((c) => {
+      const a = document.createElement('a');
+      a.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center';
+      a.href = c.url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.innerHTML = `<span class="text-truncate" style="max-width: 80%;">📄 ${c.nombre}</span><span class="bi bi-download"></span>`;
+      cont.appendChild(a);
+    });
+  } catch (e) {
+    cont.innerHTML = '<div class="text-danger">Error al cargar circulares.</div>';
+    console.error(e);
+  }
+});
 </script>
 {% endblock %}
 

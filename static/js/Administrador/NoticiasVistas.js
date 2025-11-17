@@ -1,117 +1,108 @@
-// NoticiasVistas.js
+document.addEventListener("DOMContentLoaded", async () => {
+  console.log("✅ Script NoticiasVistas cargado correctamente.");
 
-document.addEventListener("DOMContentLoaded", function() {
-    // Si Bootstrap no se ha cargado, intentamos forzar la carga de noticias de todos modos.
-    cargarNoticias();
-});
+  const contenedor = document.getElementById("noticiasContainer");
 
-// Referencias a los elementos del modal (deben ser globales para usarse en la función de llenado)
-const modalTitle = document.getElementById('noticiaModalLabel');
-const modalImagen = document.getElementById('modalImagen');
-const modalCreadoPor = document.getElementById('modalCreadoPor');
-const modalFecha = document.getElementById('modalFecha');
-const modalRedaccion = document.getElementById('modalRedaccion');
+  if (!contenedor) {
+    console.error("❌ No se encontró el contenedor de noticias (#noticiasContainer)");
+    return;
+  }
 
+  contenedor.innerHTML = "<p>Cargando noticias...</p>";
 
-async function cargarNoticias() {
-    const contenedor = document.getElementById("noticiasContainer");
-    if (!contenedor) return;
-    contenedor.innerHTML = `<p class="text-center text-muted">Cargando noticias...</p>`;
+  try {
+    // Se agrega timestamp para evitar caché
+    const res = await fetch(`/administrador/noticias/historial?ts=${Date.now()}`, {
+      cache: "no-store",
+    });
 
-    try {
-        const res = await fetch("/administrador/noticias/historial");
-        const data = await res.json();
-
-        if (data.success) {
-            let noticias = data.noticias;
-            const noticiasRecientes = noticias.slice(0, 4); // Límite de 4 noticias
-
-            contenedor.innerHTML = ''; // Limpiar después de cargar
-            
-            noticiasRecientes.forEach(noticia => {
-                const col = document.createElement('div');
-                col.className = 'col-md-6 col-lg-3 d-flex align-items-stretch';
-                
-                // 📌 Guardamos TODOS los datos en el elemento del DOM (data-atributos)
-                col.setAttribute('data-id', noticia.id);
-                col.setAttribute('data-titulo', noticia.titulo);
-                col.setAttribute('data-redaccion', noticia.redaccion); // <-- Texto completo
-                col.setAttribute('data-creado_por', noticia.creado_por);
-                col.setAttribute('data-fecha', noticia.fecha);
-                col.setAttribute('data-archivo_url', noticia.archivo_url || '');
-
-                const imagenURL = noticia.archivo_url || '';
-                const imagenHTML = imagenURL
-                    ? `<img src="${imagenURL}" class="card-img-top" alt="Imagen de la noticia" style="height: 200px; object-fit: cover;">`
-                    : `<div class="placeholder-img d-flex align-items-center justify-content-center bg-light text-muted" style="height: 200px; border-bottom: 1px solid #ddd;">Sin Imagen</div>`;
-
-                col.innerHTML = `
-                    <div class="card shadow-sm w-100 noticia-card" style="cursor: pointer;" 
-                         data-bs-toggle="modal" data-bs-target="#noticiaModal">
-                        ${imagenHTML}
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold">${noticia.titulo}</h5>
-                            <p class="card-text">${noticia.redaccion.substring(0, 80)}...</p> 
-                            
-                            <div class="mt-auto pt-2 border-top">
-                                <small class="text-muted d-block">Publicado por: ${noticia.creado_por}</small>
-                                <small class="text-muted d-block">Fecha: ${noticia.fecha}</small>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                contenedor.appendChild(col);
-            });
-            
-            // 📌 Agregar el evento de clic a TODAS las tarjetas
-            // El clic ahora solo llama a la función de llenado. El modal se abre con los data-atributos.
-            document.querySelectorAll('.noticia-card').forEach(card => {
-                // Buscamos el elemento padre con los data-atributos
-                const parentCol = card.closest('.col-md-6'); 
-                
-                card.addEventListener('click', function() {
-                    mostrarNoticiaCompleta(parentCol);
-                });
-            });
-
-
-        } else {
-            contenedor.innerHTML = `<p class="alert alert-warning">${data.error || "Error al cargar las noticias."}</p>`;
-        }
-
-    } catch (error) {
-        console.error("Error al conectar con el historial:", error);
-        contenedor.innerHTML = `<p class="alert alert-danger">🛑 Error crítico al cargar datos del servidor.</p>`;
+    if (!res.ok) {
+      throw new Error(`Error HTTP ${res.status}`);
     }
-}
 
-// 📌 Función para mostrar la información completa en el modal
-// Recibe el elemento que contiene los data-atributos
-function mostrarNoticiaCompleta(cardElement) {
-    
-    // Obtener datos del data-attribute
-    const titulo = cardElement.getAttribute('data-titulo');
-    const redaccion = cardElement.getAttribute('data-redaccion');
-    const creadoPor = cardElement.getAttribute('data-creado_por');
-    const fecha = cardElement.getAttribute('data-fecha');
-    const imagenURL = cardElement.getAttribute('data-archivo_url');
-    
-    // Llenar el modal
-    modalTitle.textContent = titulo;
-    modalCreadoPor.textContent = creadoPor;
-    modalFecha.textContent = fecha;
-    modalRedaccion.textContent = redaccion;
-    
-    // Configurar la imagen
-    if (imagenURL) {
-        modalImagen.src = imagenURL;
-        modalImagen.style.display = 'block';
+    const data = await res.json();
+    console.log("📡 Respuesta del servidor:", data);
+
+    if (data.success && Array.isArray(data.noticias) && data.noticias.length > 0) {
+      contenedor.innerHTML = ""; // limpiar el "Cargando..."
+
+      data.noticias.slice(0, 4).forEach((noticia, index) => {
+        console.log(`📰 Renderizando noticia ${index + 1}:`, noticia);
+
+        const card = document.createElement("div");
+        card.className = "col-md-6 col-lg-3 d-flex";
+        card.style.cursor = "pointer";
+
+        const imagen = noticia.archivo_url && noticia.archivo_url.trim() !== ""
+          ? noticia.archivo_url
+          : "/static/img/default.jpg";
+
+        const titulo = noticia.titulo || "Sin título";
+        const redaccion = noticia.redaccion || "Sin contenido.";
+        const autor = noticia.creado_por || "Sistema";
+        const fecha = noticia.fecha || "Fecha no disponible";
+
+        card.innerHTML = `
+          <div class="card shadow-sm flex-fill h-100 border-0">
+            <img src="${imagen}" class="card-img-top" alt="Imagen de la noticia" style="object-fit: cover; height: 180px;">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title text-truncate">${titulo}</h5>
+              <p class="card-text small text-secondary text-truncate" style="max-height: 60px;">${redaccion}</p>
+              <div class="mt-auto">
+                <small class="text-muted d-block">Por: ${autor}</small>
+                <small class="text-muted">📅 ${fecha}</small>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Click para abrir modal con detalles completos
+        card.addEventListener("click", () => {
+          const modalEl = document.getElementById("noticiaModal");
+          if (!modalEl) {
+            console.warn("Modal #noticiaModal no encontrado en esta vista.");
+            return;
+          }
+          const modalTitulo = document.getElementById("noticiaModalLabel");
+          const modalImagen = document.getElementById("modalImagen");
+          const modalCreadoPor = document.getElementById("modalCreadoPor");
+          const modalFecha = document.getElementById("modalFecha");
+          const modalRedaccion = document.getElementById("modalRedaccion");
+
+          if (modalTitulo) modalTitulo.textContent = titulo;
+          if (modalImagen) {
+            modalImagen.src = imagen;
+            modalImagen.alt = `Imagen de ${titulo}`;
+          }
+          if (modalCreadoPor) modalCreadoPor.textContent = autor;
+          if (modalFecha) modalFecha.textContent = fecha;
+          if (modalRedaccion) modalRedaccion.innerHTML = (redaccion || "").replace(/\n/g, '<br>');
+
+          // Mostrar modal (Bootstrap 5)
+          if (window.bootstrap && typeof window.bootstrap.Modal === "function") {
+            const modal = new window.bootstrap.Modal(modalEl);
+            modal.show();
+          } else if (typeof $ !== "undefined" && typeof $(modalEl).modal === "function") {
+            // Fallback a jQuery si se usa Bootstrap con jQuery
+            $(modalEl).modal("show");
+          } else {
+            console.error("Bootstrap Modal no está disponible.");
+          }
+        });
+
+        contenedor.appendChild(card);
+      });
     } else {
-        // Usar una imagen de placeholder si no hay URL (opcional)
-        // Ocultar la imagen si no existe
-        modalImagen.style.display = 'none'; 
+      console.warn("⚠️ No hay noticias disponibles o error en formato.");
+      contenedor.innerHTML = `<p class="text-warning text-center">No hay noticias disponibles.</p>`;
     }
-    
-    // **NOTA:** El modal se abre automáticamente gracias a data-bs-toggle y data-bs-target
-    // en la estructura HTML de la tarjeta, ¡no necesitamos llamarlo aquí!
-}
+
+  } catch (err) {
+    console.error("💥 Error al cargar noticias:", err);
+    contenedor.innerHTML = `
+      <p class="text-danger text-center mt-3">
+        Error al conectar con el servidor.<br>
+        <small>${err.message}</small>
+      </p>`;
+  }
+});

@@ -37,20 +37,17 @@
 
 
     <div class="dropdown">
-      <button 
-        class="btn btn-usuario dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton2" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
-        <span class="bi bi-person-lines-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
-      </ul>
-    </div>
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      
+      <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
+      <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
   </header>
 
 
@@ -69,7 +66,7 @@
           <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas </a>
             <div class="collapse" id="submenuNotas">
               <ul class="nav flex-column ms-3">
-                <li><a href="{{ url_for('Docente.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-search"></i> Consultar Notas </a></li>
+                
                 <li><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Registrar Notas </a></li>
                 <li><a href="{{ url_for('Docente.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-calculator"></i> Cálculo de Promedios </a></li>
               </ul>
@@ -88,6 +85,7 @@
     </div>
   </div>
 
+  
 
 <h1 class="titulo">RESUMEN SEMANAL</h1>
   <p class="descripcion">CREA EL DOCUMENTO PDF PARA INFORMAR AL COLEGIO</p>

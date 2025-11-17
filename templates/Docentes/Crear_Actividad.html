@@ -56,7 +56,7 @@
         <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas </a>
         <div class="collapse" id="submenuNotas">
           <ul class="nav flex-column ms-3">
-            <li><a href="{{ url_for('Docente.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-search"></i> Consultar Notas</a></li>
+            
             <li><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Registrar Notas</a></li>
             <li><a href="{{ url_for('Docente.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-calculator"></i> Cálculo de Promedios</a></li>
           </ul>
@@ -148,7 +148,9 @@
             <i class="bi bi-file-earmark-pdf-fill fs-1 text-danger"></i>
             <p class="mt-2 fw-semibold">Adjuntar material en PDF</p>
           </label>
-          <input type="file" id="pdfUpload" name="pdfUpload" accept="application/pdf" hidden>
+          <input type="file" id="pdfUpload" name="pdfUpload" accept="application/pdf" class="d-none">
+
+
         </div>
 
         <!-- Botón de publicar -->

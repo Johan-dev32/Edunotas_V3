@@ -1,11 +1,13 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app
 from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
+from sqlalchemy import func, and_, or_, extract
 from sqlalchemy import or_, text
 from datetime import datetime
-from Controladores.models import db, Usuario, Matricula, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Actividad, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes, Detalle_Asistencia, Asistencia, Encuesta, Encuesta_Pregunta, Encuesta_Respuesta
+from Controladores.models import db, Usuario, Matricula, Nota_Calificaciones, Reporte_Notas, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes, Detalle_Asistencia, Asistencia, Encuesta, Encuesta_Pregunta, Encuesta_Respuesta, Historial_Academico
 from flask_mail import Message
 import sys
 import os
@@ -26,44 +28,176 @@ Administrador_bp = Blueprint('Administrador', __name__, url_prefix='/administrad
 def paginainicio():
     return render_template('Administrador/Paginainicio_Administrador.html')
 
+# ---------------- CONSULTA DE NOTAS (ADMINISTRADOR) ----------------
+@Administrador_bp.route('/notas_curso')
+@Administrador_bp.route('/notas_curso/<int:curso_id>')
+def notas_curso(curso_id=None):
+    return render_template('Administrador/notas_curso.html', curso_id=curso_id)
+
+@Administrador_bp.route('/cursos/lista', methods=['GET'])
+def lista_cursos_activos():
+    cursos = Curso.query.filter_by(Estado='Activo').order_by(Curso.Grado, Curso.Grupo).all()
+    data = [
+        {
+            "id": c.ID_Curso,
+            "grado": getattr(c, 'Grado', None),
+            "grupo": getattr(c, 'Grupo', None),
+            "nombre": f"{getattr(c,'Grado', '')}-{getattr(c,'Grupo','')}".strip('-')
+        }
+        for c in cursos
+    ]
+    return jsonify({"success": True, "cursos": data})
+
+@Administrador_bp.route('/asignaturas/lista', methods=['GET'])
+def lista_asignaturas():
+    # Opcional: filtrar por curso_id para evitar duplicados y mostrar solo asignaturas del curso
+    curso_id = request.args.get('curso_id', type=int)
+    try:
+        # Traer todas las asignaturas disponibles (base)
+        todas_asign = Asignatura.query.order_by(Asignatura.Nombre).all()
+
+        prioritarias = set()
+        if curso_id:
+            # Intentar mapear curso_id tipo 1101 -> ID_Curso real si es necesario
+            sub_base = db.session.query(Matricula.ID_Estudiante).filter(Matricula.ID_Curso == curso_id)
+            if sub_base.count() == 0 and isinstance(curso_id, int) and curso_id >= 100:
+                grado_calc = curso_id // 100
+                grupo_calc = curso_id % 100
+                grupo_candidatos = [str(grupo_calc), f"{grupo_calc:02d}"]
+                letra_map = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E'}
+                if grupo_calc in letra_map:
+                    grupo_candidatos.append(letra_map[grupo_calc])
+                curso_alt = None
+                for g in grupo_candidatos:
+                    curso_alt = Curso.query.filter(
+                        or_(Curso.Grado == str(grado_calc), Curso.Grado == grado_calc),
+                        or_(Curso.Grupo == g, Curso.Grupo == int(g)) if g.isdigit() else (Curso.Grupo == g)
+                    ).first()
+                    if curso_alt:
+                        break
+                if curso_alt:
+                    curso_id = curso_alt.ID_Curso
+
+            # Asignaturas con notas en el curso (para priorizar en la lista)
+            subquery_est = db.session.query(Matricula.ID_Estudiante).filter(Matricula.ID_Curso == curso_id).subquery()
+            asign_ids_rows = db.session.query(Nota_Calificaciones.ID_Asignatura).filter(Nota_Calificaciones.ID_Estudiante.in_(subquery_est)).distinct().all()
+            prioritarias = {row[0] for row in asign_ids_rows}
+
+        # Deduplicar por nombre y construir lista final
+        vistos = set()
+        lista = []
+        for a in todas_asign:
+            nombre = (a.Nombre or '').strip()
+            key = nombre.lower()
+            if key in vistos:
+                continue
+            vistos.add(key)
+            lista.append({"id": a.ID_Asignatura, "nombre": nombre, "prioridad": 1 if a.ID_Asignatura in prioritarias else 0})
+
+        # Orden: primero las que tienen datos para el curso, luego alfabético
+        lista.sort(key=lambda x: (-x["prioridad"], x["nombre"]))
+
+        # Quitar campo de prioridad antes de responder
+        for item in lista:
+            item.pop("prioridad", None)
+
+        return jsonify({"success": True, "asignaturas": lista})
+    except Exception as e:
+        print('Error en /asignaturas/lista:', e)
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@Administrador_bp.route('/notas', methods=['GET'])
+def consultar_notas():
+    try:
+        curso_id = request.args.get('curso_id', type=int)
+        asignatura_id = request.args.get('asignatura_id', type=int)
+        periodo = request.args.get('periodo', type=int)
+
+        if not curso_id or not asignatura_id or not periodo:
+            return jsonify({"success": False, "error": "Parámetros requeridos: curso_id, asignatura_id, periodo"}), 400
+
+        # Estudiantes matriculados en el curso (con fallback a grado+grupo si no coincide por ID)
+        q_est = (
+            db.session.query(Usuario, Matricula)
+            .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+            .filter(Matricula.ID_Curso == curso_id, Usuario.Rol == 'Estudiante')
+            .order_by(Usuario.Apellido, Usuario.Nombre)
+        )
+        estudiantes_db = q_est.all()
+        if len(estudiantes_db) == 0 and isinstance(curso_id, int) and curso_id >= 100:
+            grado_calc = curso_id // 100
+            grupo_calc = curso_id % 100
+            grupo_candidatos = [str(grupo_calc), f"{grupo_calc:02d}"]
+            letra_map = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E'}
+            if grupo_calc in letra_map:
+                grupo_candidatos.append(letra_map[grupo_calc])
+            curso_alt = None
+            for g in grupo_candidatos:
+                curso_alt = Curso.query.filter(
+                    or_(Curso.Grado == str(grado_calc), Curso.Grado == grado_calc),
+                    or_(Curso.Grupo == g, Curso.Grupo == int(g)) if g.isdigit() else (Curso.Grupo == g)
+                ).first()
+                if curso_alt:
+                    break
+            if curso_alt:
+                curso_id = curso_alt.ID_Curso
+                estudiantes_db = (
+                    db.session.query(Usuario, Matricula)
+                    .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+                    .filter(Matricula.ID_Curso == curso_id, Usuario.Rol == 'Estudiante')
+                    .order_by(Usuario.Apellido, Usuario.Nombre)
+                    .all()
+                )
+            else:
+                # Último recurso: traer estudiantes por grado/grupo desde Curso join, si existe
+                # Intentar por combinaciones de tipos
+                for g in grupo_candidatos:
+                    estudiantes_db = (
+                        db.session.query(Usuario, Matricula)
+                        .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+                        .join(Curso, Curso.ID_Curso == Matricula.ID_Curso)
+                        .filter(
+                            or_(Curso.Grado == str(grado_calc), Curso.Grado == grado_calc),
+                            (Curso.Grupo == g) if not g.isdigit() else or_(Curso.Grupo == g, Curso.Grupo == int(g)),
+                            Usuario.Rol == 'Estudiante'
+                        )
+                        .order_by(Usuario.Apellido, Usuario.Nombre)
+                        .all()
+                    )
+                    if estudiantes_db:
+                        break
+
+        # Notas para la asignatura y periodo
+        notas_db = Nota_Calificaciones.query.filter_by(
+            ID_Asignatura=asignatura_id,
+            Periodo=periodo
+        ).all()
+        notas_por_estudiante = {n.ID_Estudiante: n for n in notas_db}
+
+        resultados = []
+        for usuario, _mat in estudiantes_db:
+            reg = notas_por_estudiante.get(usuario.ID_Usuario)
+            resultados.append({
+                "estudiante_id": usuario.ID_Usuario,
+                "apellido": usuario.Apellido,
+                "nombre": usuario.Nombre,
+                "nota_1": getattr(reg, 'Nota_1', None) if reg else None,
+                "nota_2": getattr(reg, 'Nota_2', None) if reg else None,
+                "nota_3": getattr(reg, 'Nota_3', None) if reg else None,
+                "nota_4": getattr(reg, 'Nota_4', None) if reg else None,
+                "nota_5": getattr(reg, 'Nota_5', None) if reg else None,
+                "promedio_final": getattr(reg, 'Promedio_Final', None) if reg else None
+            })
+
+        return jsonify({"success": True, "notas": resultados})
+    except Exception as e:
+        print("Error en /administrador/notas:", e)
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 # ---------------- NOTIFICACIONES ADMINISTRADOR----------------
 
-@Administrador_bp.route('/notificaciones/enviar', methods=['POST'])
-def enviar_notificacion():
-    data = request.get_json()
-    destinatario_id = data.get('destinatario_id')
-    titulo = data.get('titulo')
-    contenido = data.get('contenido')
 
-    noti = Notificacion(Titulo=titulo, Mensaje=contenido, ID_Usuario=destinatario_id)
-    db.session.add(noti)
-    db.session.commit()
-    return jsonify({"success": True})
-
-@Administrador_bp.route('/notificaciones/enviar_todos', methods=['POST'])
-def enviar_todos():
-    data = request.get_json()
-    titulo = data.get('titulo')
-    contenido = data.get('contenido')
-    rol_destino = data.get('rol')  # "Docente", "Estudiante", etc.
-
-    if rol_destino == "Todos":
-        usuarios = Usuario.query.all()
-    else:
-        usuarios = Usuario.query.filter_by(Rol=rol_destino).all()
-
-    for u in usuarios:
-        noti = Notificacion(Titulo=titulo, Mensaje=contenido, ID_Usuario=u.ID_Usuario)
-        db.session.add(noti)
-
-    db.session.commit()
-    return jsonify({"success": True})
-
-@Administrador_bp.route('Administrador/notificaciones/recibir')
-def recibir_notificaciones():
-    notis = Notificacion.query.filter_by(ID_Usuario=current_user.ID_Usuario).order_by(Notificacion.Fecha.desc()).limit(5).all()
-    return jsonify([{"titulo": n.Titulo, "contenido": n.Mensaje} for n in notis])
 
 
 
@@ -111,6 +245,29 @@ def agregar_docente():
         db.session.add(nuevo_docente)
         db.session.commit()
         flash("✅ Docente agregado correctamente", "success")
+
+        # Notificaciones automáticas: bienvenida al docente y aviso a administradores
+        try:
+            notis = []
+            notis.append(Notificacion(
+                Titulo='Bienvenido a EduNotas',
+                Mensaje=f"Hola {nuevo_docente.Nombre}, tu cuenta de {nuevo_docente.Rol} fue creada con éxito.",
+                Enlace=None,
+                ID_Usuario=nuevo_docente.ID_Usuario
+            ))
+            admins = Usuario.query.filter_by(Rol='Administrador', Estado='Activo').all()
+            for adm in admins:
+                notis.append(Notificacion(
+                    Titulo='Nuevo registro de usuario',
+                    Mensaje=f"Se registró un {nuevo_docente.Rol}: {nuevo_docente.Nombre} {nuevo_docente.Apellido} ({nuevo_docente.Correo}).",
+                    Enlace=None,
+                    ID_Usuario=adm.ID_Usuario
+                ))
+            if notis:
+                db.session.bulk_save_objects(notis)
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
 
     except SQLAlchemyError as e:
         db.session.rollback()
@@ -207,8 +364,51 @@ def agregar_estudiante():
         db.session.add(nuevo_estudiante)
         db.session.commit()
 
+        # Notificaciones automáticas: bienvenida al estudiante y aviso a administradores
+        try:
+            notis = []
+            notis.append(Notificacion(
+                Titulo='Bienvenido a EduNotas',
+                Mensaje=f"Hola {nuevo_estudiante.Nombre}, tu cuenta de {nuevo_estudiante.Rol} fue creada con éxito.",
+                Enlace=None,
+                ID_Usuario=nuevo_estudiante.ID_Usuario
+            ))
+            admins = Usuario.query.filter_by(Rol='Administrador', Estado='Activo').all()
+            for adm in admins:
+                notis.append(Notificacion(
+                    Titulo='Nuevo registro de usuario',
+                    Mensaje=f"Se registró un {nuevo_estudiante.Rol}: {nuevo_estudiante.Nombre} {nuevo_estudiante.Apellido} ({nuevo_estudiante.Correo}).",
+                    Enlace=None,
+                    ID_Usuario=adm.ID_Usuario
+                ))
+            if notis:
+                db.session.bulk_save_objects(notis)
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
+
         print(f"✅ Estudiante registrado correctamente: {nombre} {apellido}")
         return jsonify({'success': True, 'id_estudiante': nuevo_estudiante.ID_Usuario})
+
+        #     notis.append(Notificacion(
+        #         Titulo='Bienvenido a EduNotas',
+        #         Mensaje=f"Hola {nuevo_estudiante.Nombre}, tu cuenta de {nuevo_estudiante.Rol} fue creada con éxito.",
+        #         Enlace=None,
+        #         ID_Usuario=nuevo_estudiante.ID_Usuario
+        #     ))
+        #     admins = Usuario.query.filter_by(Rol='Administrador', Estado='Activo').all()
+        #     for adm in admins:
+        #         notis.append(Notificacion(
+        #             Titulo='Nuevo registro de usuario',
+        #             Mensaje=f"Se registró un {nuevo_estudiante.Rol}: {nuevo_estudiante.Nombre} {nuevo_estudiante.Apellido} ({nuevo_estudiante.Correo}).",
+        #             Enlace=None,
+        #             ID_Usuario=adm.ID_Usuario
+        #         ))
+        #     if notis:
+        #         db.session.bulk_save_objects(notis)
+        #         db.session.commit()
+        # except Exception:
+        #     db.session.rollback()
 
     except Exception as e:
         print("❌ Error al registrar estudiante:", e)
@@ -366,6 +566,31 @@ def registrar_usuario_acudiente():
         db.session.add(nuevo_usuario)
         db.session.commit()
 
+        # Crear notificaciones automáticas
+        try:
+            notis = []
+            # Bienvenida al usuario creado
+            notis.append(Notificacion(
+                Titulo='Bienvenido a EduNotas',
+                Mensaje=f"Hola {nuevo_usuario.Nombre}, tu cuenta de {nuevo_usuario.Rol} fue creada con éxito.",
+                Enlace=None,
+                ID_Usuario=nuevo_usuario.ID_Usuario
+            ))
+            # Aviso a administradores
+            admins = Usuario.query.filter_by(Rol='Administrador', Estado='Activo').all()
+            for adm in admins:
+                notis.append(Notificacion(
+                    Titulo='Nuevo registro de usuario',
+                    Mensaje=f"Se registró un {nuevo_usuario.Rol}: {nuevo_usuario.Nombre} {nuevo_usuario.Apellido} ({nuevo_usuario.Correo}).",
+                    Enlace=None,
+                    ID_Usuario=adm.ID_Usuario
+                ))
+            if notis:
+                db.session.bulk_save_objects(notis)
+                db.session.commit()
+        except Exception as _:
+            db.session.rollback()
+
         return jsonify({
         'message': 'Acudiente registrado correctamente.',
         'id': nuevo_usuario.ID_Usuario
@@ -508,6 +733,30 @@ def registro():
 
             print("-> Usuario registrado: ", correo)
             flash('Usuario registrado correctamente ✅', 'success')
+
+            # Notificaciones automáticas: bienvenida y aviso a administradores
+            try:
+                notis = []
+                notis.append(Notificacion(
+                    Titulo='Bienvenido a EduNotas',
+                    Mensaje=f"Hola {new_user.Nombre}, tu cuenta de {new_user.Rol} fue creada con éxito.",
+                    Enlace=None,
+                    ID_Usuario=new_user.ID_Usuario
+                ))
+                admins = Usuario.query.filter_by(Rol='Administrador', Estado='Activo').all()
+                for adm in admins:
+                    notis.append(Notificacion(
+                        Titulo='Nuevo registro de usuario',
+                        Mensaje=f"Se registró un {new_user.Rol}: {new_user.Nombre} {new_user.Apellido} ({new_user.Correo}).",
+                        Enlace=None,
+                        ID_Usuario=adm.ID_Usuario
+                    ))
+                if notis:
+                    db.session.bulk_save_objects(notis)
+                    db.session.commit()
+            except Exception:
+                db.session.rollback()
+
             return redirect(url_for('Administrador.registro'))
 
         except SQLAlchemyError as e:
@@ -744,92 +993,175 @@ def noticias():
 
 # En administradores.py
 
-# En administradores.py, en historial_noticias()
+@Administrador_bp.route("/noticias/registro", methods=["POST"])
+@login_required 
+def registrar_noticia():
+    try:
+        titulo = request.form.get("titulo")
+        # ✅ CORRECCIÓN: Usar 'contenido'
+        contenido = request.form.get("contenido") 
+        fecha_str = request.form.get("fecha")
+        creado_por_rol = request.form.get("creadoPor")
+        archivo = request.files.get("archivo")
 
+        if not titulo or not contenido:
+            return jsonify({"success": False, "error": "El título y la redacción son obligatorios."}), 400
+
+        # Conversión de fecha
+        # Asegúrate de que el formato de fecha coincida con el envío del formulario (YYYY-MM-DD)
+        try:
+            fecha_noticia = datetime.strptime(fecha_str, '%Y-%m-%d')
+        except (ValueError, TypeError):
+            fecha_noticia = datetime.utcnow() # Usa la fecha actual si falla la conversión
+
+        # Guardar imagen si existe
+        ruta_para_bd = None
+        if archivo and archivo.filename != '':
+            nombre_archivo_seguro = secure_filename(archivo.filename)
+            # Define la carpeta de destino absoluta. Asumo 'static/uploads' existe.
+            carpeta_destino = os.path.join(current_app.root_path, 'static', 'uploads')
+            
+            # Asegúrate de que la carpeta exista
+            os.makedirs(carpeta_destino, exist_ok=True)
+            
+            ruta_guardado = os.path.join(carpeta_destino, nombre_archivo_seguro)
+            archivo.save(ruta_guardado)
+            
+            # Guardamos una ruta RELATIVA en la BD, luego se construye la URL pública con url_for
+            # Evita duplicar /static cuando se serializa en el historial
+            ruta_para_bd = f'uploads/{nombre_archivo_seguro}'
+
+        # El campo CreadoPor en tu modelo Noticias debe ser un campo de texto (string)
+        # o un ID de usuario. Lo mantendré como ID, y añadiremos el rol.
+        
+        # Opcional: Si quieres guardar el rol junto con el ID del usuario
+        # Asumiendo que Noticias.CreadoPor solo guarda el ID_Usuario (FK)
+        # y que el Rol se podría obtener de la sesión si es necesario
+        
+        nueva_noticia = Noticias(
+            Fecha=fecha_noticia, 
+            Titulo=titulo,
+            Redaccion=contenido, # ✅ Correcto: usa 'contenido'
+            Archivo=ruta_para_bd, 
+            CreadoPor=current_user.ID_Usuario, # Asumiendo que es el ID del usuario
+            # Podrías agregar un campo "RolPublicador" si lo necesitas en la DB
+            # RolPublicador=creado_por_rol 
+        )
+
+        db.session.add(nueva_noticia)
+        db.session.commit()
+
+        return jsonify({"success": True, "message": "✅ Noticia registrada correctamente."})
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"⚠️ Error al registrar noticia: {e}")
+        return jsonify({"success": False, "error": f"Error de servidor: {e}"}), 500
+    
 @Administrador_bp.route("/noticias/historial", methods=["GET"])
 def historial_noticias():
     """
-    Ruta API para cargar todas las noticias guardadas, ordenadas por fecha.
+    Ruta API para devolver las 4 noticias más recientes.
     """
     try:
-        # CORRECCIÓN: Ordenar por Fecha descendente, Y si hay empate, por ID_Noticia descendente.
-        # Esto garantiza que la última noticia registrada (mayor ID) vaya primero.
-        noticias = Noticias.query.order_by(Noticias.Fecha.desc(), Noticias.ID_Noticia.desc()).all()
-        
+        # ✅ Traer solo las 4 noticias más recientes por creación (ID descendente)
+        # Usar ID evita que una fecha ingresada manualmente más antigua oculte la noticia recién creada
+        noticias = Noticias.query.order_by(Noticias.ID_Noticia.desc()).limit(4).all()
+
         result = []
         for n in noticias:
-            # ... el resto del código es correcto y usa el rol de texto ...
-            nombre_rol = n.CreadoPor if n.CreadoPor else "Rol no especificado"
-            
+            # Construir URL de archivo evitando duplicaciones:
+            # - Si en BD está guardado como 'uploads/archivo.jpg' => usar url_for('static', filename=...)
+            # - Si en BD ya está como '/static/...' => usar tal cual
+            if n.Archivo:
+                if isinstance(n.Archivo, str) and n.Archivo.strip().startswith('/static/'):
+                    archivo_url = n.Archivo
+                else:
+                    archivo_url = url_for('static', filename=n.Archivo)
+            else:
+                archivo_url = None
+
+            autor = "Sistema"
+            try:
+                if getattr(n, "creador", None):
+                    nombre = getattr(n.creador, "Nombre", None) or ""
+                    apellido = getattr(n.creador, "Apellido", None) or ""
+                    nombre_completo = f"{nombre} {apellido}".strip()
+                    if nombre_completo:
+                        autor = nombre_completo
+            except Exception:
+                pass
+
             result.append({
                 "id": n.ID_Noticia,
                 "titulo": n.Titulo,
                 "redaccion": n.Redaccion,
-                "archivo_url": url_for('static', filename=n.Archivo) if n.Archivo else None, 
-                "fecha": n.Fecha.strftime("%Y-%m-%d"), 
-                "creado_por": nombre_rol, 
+                "archivo_url": archivo_url,
+                "fecha": n.Fecha.strftime("%Y-%m-%d"),
+                "creado_por": autor
             })
-        
+
         return jsonify({"success": True, "noticias": result})
-        
+    
     except Exception as e:
-        # ... (código de manejo de errores) ...
         print(f"Error al cargar historial de noticias: {e}")
-        return jsonify({"success": False, "error": f"Error de servidor al cargar datos: {e}"}), 500
-    
-    
-    
-@Administrador_bp.route("/noticias/registro", methods=["POST"])
-def registrar_noticia():
-    try:
-        # 1. Obtener datos (incluyendo el rol como texto)
-        titulo = request.form.get('titulo')
-        contenido = request.form.get('contenido')
-        fecha_str = request.form.get('fecha')
-        
-        # OBTENEMOS EL TEXTO DEL ROL DIRECTAMENTE DEL FORMULARIO
-        creado_por_rol = request.form.get('creadoPor') 
-        
-        archivo_obj = request.files.get('archivo')
-        
-        # Validación básica de datos
-        if not titulo or not contenido or not fecha_str or not creado_por_rol:
-            return jsonify({"success": False, "error": "Faltan campos obligatorios (título, contenido, fecha, rol)."}), 400
+        return jsonify({"success": False, "error": "Error de servidor al cargar noticias"}), 500
 
-        fecha = datetime.strptime(fecha_str, "%Y-%m-%d").date()
-
-        ruta_archivo = None
-        
-        # 2. Procesar y guardar el archivo si existe (mismo código)
-        if archivo_obj and archivo_obj.filename:
-            filename = secure_filename(archivo_obj.filename)
-            ruta_guardado_completa = os.path.join(UPLOAD_FOLDER, filename) 
-            archivo_obj.save(ruta_guardado_completa)
-            ruta_archivo = os.path.join('uploads', 'noticias', filename).replace('\\', '/')
-
-        # 3. Guardar en la Base de Datos (usando el texto del rol)
-        nueva_noticia = Noticias(
-            Titulo=titulo,
-            Redaccion=contenido,
-            Fecha=fecha,
-            CreadoPor=creado_por_rol, # <-- ¡Guardamos el TEXTO del rol!
-            Archivo=ruta_archivo
-        )
-        
-        db.session.add(nueva_noticia)
-        db.session.commit()
-
-        return jsonify({"success": True, "message": "Noticia registrada exitosamente."})
-
-    except Exception as e:
-        db.session.rollback()
-        print(f"Error al registrar noticia: {e}")
-        return jsonify({"success": False, "error": f"Error interno del servidor: {e}"}), 500
 
 
 @Administrador_bp.route('/circulares')
 def circulares():
-    return render_template('Administrador/Circulares.html')
+    try:
+        carpeta = os.path.join(current_app.root_path, 'static', 'uploads', 'circulares')
+        os.makedirs(carpeta, exist_ok=True)
+        files = []
+        for f in os.listdir(carpeta):
+            full = os.path.join(carpeta, f)
+            if os.path.isfile(full):
+                files.append((f, os.path.getmtime(full)))
+        files = [f for f, _ in sorted(files, key=lambda x: x[1], reverse=True)]
+        return render_template('Administrador/Circulares.html', files=files)
+    except Exception:
+        return render_template('Administrador/Circulares.html', files=[])
+
+@Administrador_bp.route('/circulares/registro', methods=['POST'])
+@login_required
+def registrar_circular():
+    try:
+        archivo = request.files.get('file')
+        if not archivo or archivo.filename == '':
+            return jsonify({"success": False, "error": "No se envió archivo."}), 400
+
+        nombre_archivo = secure_filename(archivo.filename)
+        carpeta = os.path.join(current_app.root_path, 'static', 'uploads', 'circulares')
+        os.makedirs(carpeta, exist_ok=True)
+        ruta = os.path.join(carpeta, nombre_archivo)
+        archivo.save(ruta)
+
+        url_publica = url_for('static', filename=f'uploads/circulares/{nombre_archivo}')
+        return jsonify({"success": True, "file": nombre_archivo, "url": url_publica})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@Administrador_bp.route('/circulares/historial', methods=['GET'])
+def historial_circulares():
+    try:
+        carpeta = os.path.join(current_app.root_path, 'static', 'uploads', 'circulares')
+        os.makedirs(carpeta, exist_ok=True)
+        items = []
+        for f in os.listdir(carpeta):
+            full = os.path.join(carpeta, f)
+            if os.path.isfile(full):
+                items.append({
+                    "nombre": f,
+                    "url": url_for('static', filename=f'uploads/circulares/{f}'),
+                    "mtime": os.path.getmtime(full)
+                })
+        items.sort(key=lambda x: x["mtime"], reverse=True)
+        top = items[:5]
+        return jsonify({"success": True, "circulares": top})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @Administrador_bp.route('/noticias_vistas')
@@ -1381,20 +1713,14 @@ def registro_notas(curso_id):
     return render_template('Administrador/RegistroNotas.html', curso_id=curso_id)
 
 
-@Administrador_bp.route('/notas_curso/<int:curso_id>')
-def notas_curso(curso_id):
-    return render_template("Administrador/notas_curso.html", curso_id=curso_id)
-
-
-
-
 @Administrador_bp.route('/notas_registro')
 def notas_registro():
     return render_template('Administrador/Notas_Registro.html')
 
 @Administrador_bp.route('/notas_consultar')
 def notas_consultar():
-    return render_template('Administrador/Notas_Consultar.html')
+    cursos = Curso.query.filter_by(Estado='Activo').order_by(Curso.Grado, Curso.Grupo).all()
+    return render_template('Administrador/Notas_Consultar.html', cursos=cursos)
 
 
 # GESTIÓN DE LA OBSERVACIÓN #
@@ -1462,6 +1788,75 @@ def registrar_observacion():
 def calculo_promedio():
     return render_template('Administrador/CalculoPromedio.html')
 
+@Administrador_bp.route('/promedios', methods=['GET'])
+def promedios_por_curso():
+    try:
+        curso_id_raw = request.args.get('curso_id')  # puede ser 'all' o un int
+        periodo = request.args.get('periodo', type=int)
+
+        if not periodo:
+            return jsonify({"success": False, "error": "Falta parámetro periodo"}), 400
+
+        cursos_q = Curso.query.filter_by(Estado='Activo')
+        if curso_id_raw and curso_id_raw != 'all':
+            try:
+                curso_id = int(curso_id_raw)
+                cursos_q = cursos_q.filter(Curso.ID_Curso == curso_id)
+            except ValueError:
+                return jsonify({"success": False, "error": "curso_id inválido"}), 400
+
+        cursos = cursos_q.all()
+        cursos_ids = [c.ID_Curso for c in cursos]
+
+        if not cursos_ids:
+            return jsonify({"success": True, "items": []})
+
+        # Estudiantes matriculados en los cursos seleccionados
+        est_q = (
+            db.session.query(Usuario.ID_Usuario.label('id'), Usuario.Nombre, Usuario.Apellido, Usuario.NumeroDocumento,
+                             Curso.ID_Curso.label('curso_id'), Curso.Grado, Curso.Grupo)
+            .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+            .join(Curso, Curso.ID_Curso == Matricula.ID_Curso)
+            .filter(Usuario.Rol == 'Estudiante', Matricula.ID_Curso.in_(cursos_ids))
+        )
+        estudiantes = est_q.all()
+
+        if not estudiantes:
+            return jsonify({"success": True, "items": []})
+
+        est_ids = [e.id for e in estudiantes]
+
+        # Notas por estudiante para el período indicado
+        notas = (
+            db.session.query(
+                Nota_Calificaciones.ID_Estudiante.label('id_est'),
+                func.avg(Nota_Calificaciones.Promedio_Final).label('promedio')
+            )
+            .filter(Nota_Calificaciones.ID_Estudiante.in_(est_ids), Nota_Calificaciones.Periodo == periodo)
+            .group_by(Nota_Calificaciones.ID_Estudiante)
+            .all()
+        )
+        map_prom = {n.id_est: float(n.promedio) if n.promedio is not None else 0.0 for n in notas}
+
+        items = []
+        for e in estudiantes:
+            prom = map_prom.get(e.id, 0.0)
+            items.append({
+                "estudiante_id": e.id,
+                "nombre": f"{e.Apellido} {e.Nombre}",
+                "documento": e.NumeroDocumento,
+                "curso": f"{e.Grado}{e.Grupo}",
+                "curso_id": e.curso_id,
+                "promedio": round(prom, 2)
+            })
+
+        # Ordenar por curso y nombre
+        items.sort(key=lambda x: (x['curso'], x['nombre']))
+        return jsonify({"success": True, "items": items})
+    except Exception as e:
+        print('Error en /promedios:', e)
+        return jsonify({"success": False, "error": str(e)}), 500
+
 # ------------------- ENCUESTAS -------------------
 
 
@@ -1479,7 +1874,7 @@ def crear_encuesta():
         descripcion = request.form.get('Descripcion')
         fecha_cierre = request.form.get('FechaCierre')
         dirigido_a = request.form.get('DirigidoA')
-        creado_por = session.get('user_id')  # ID del admin logueado
+        creado_por = session.get('user_id')
 
         # Archivo opcional
         archivo = request.files.get("Archivo")
@@ -1703,45 +2098,195 @@ def agregar_repitente():
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@Administrador_bp.route('/repitentes2/<int:id_estudiante>')
-@login_required
-def historial_repitente(id_estudiante):
-    estudiante = Usuario.query.get_or_404(id_estudiante)
 
-    # buscamos todas sus matrículas
-    historial = db.session.query(
-        Matricula.AnioLectivo,
-        Curso.Grado.label("Curso"),
-        db.func.avg(Actividad.Calificacion).label("Promedio")
-    ).join(Curso, Curso.ID_Curso == Matricula.ID_Curso) \
-     .join(Actividad, Actividad.ID_Matricula == Matricula.ID_Matricula) \
-     .filter(Matricula.ID_Estudiante == id_estudiante) \
-     .group_by(Matricula.AnioLectivo, Curso.Grado) \
-     .order_by(Matricula.AnioLectivo.asc()) \
-     .all()
-
-    # contar cuántas veces se matriculó
-    veces = Matricula.query.filter_by(ID_Estudiante=id_estudiante).count()
-
-    # último curso (curso actual)
-    curso_actual = historial[-1].Curso if historial else "N/A"
-
-    return render_template(
-        'Administrador/historial_repitente.html',
-        estudiante=estudiante,
-        historial=historial,
-        curso_actual=curso_actual,
-        veces=veces
-    )
 
 @Administrador_bp.route('/cursos')
 def cursos():
     cursos = Curso.query.all()
     return render_template('Administrador/Cursos.html', cursos=cursos)
 
+
+# ---------------------- Historial Académico ----------------------
+
 @Administrador_bp.route('/historialacademico')
 def historialacademico():
+    # Esta ruta ya no requiere el parámetro en la URL
     return render_template('Administrador/HistorialAcademico.html')
+    
+    
+@Administrador_bp.route('/api/historialacademico/buscar_documento/<numero_documento>', methods=['GET'])
+@login_required 
+def api_buscar_estudiante_por_documento(numero_documento):
+    
+    doc_limpio = numero_documento.strip()
+    
+    # 1. Buscar la Matrícula más reciente por NumeroDocumento (Usando TRIM())
+    matricula = Matricula.query.filter(
+        func.trim(Matricula.NumeroDocumento) == doc_limpio
+    ).order_by(Matricula.AnioLectivo.desc()).first()
+    
+    if not matricula:
+        return jsonify({"error": "Estudiante no encontrado o sin matrícula activa."}), 404
+
+    # 2. Obtener el registro del Estudiante (Usuario)
+    estudiante = Usuario.query.get(matricula.ID_Estudiante)
+    
+    if not estudiante:
+         return jsonify({"error": "Error interno: Matrícula encontrada, pero sin registro de Usuario asociado."}), 500
+        
+    # 3. Construir el Nombre del Curso correctamente
+    if hasattr(matricula, 'curso') and matricula.curso:
+        # CONCATENAMOS GRADO y GRUPO para formar el nombre visible
+        curso_nombre = f"{matricula.curso.Grado} {matricula.curso.Grupo}"
+        grado = matricula.curso.Grado
+    else:
+        curso_nombre = "N/A"
+        grado = "N/A"
+
+    return jsonify({
+        "ID_Usuario": estudiante.ID_Usuario,
+        "NombreCompleto": f"{estudiante.Nombre} {estudiante.Apellido}", 
+        "NumeroDocumento": estudiante.NumeroDocumento, 
+        "ID_Matricula_Reciente": matricula.ID_Matricula,
+        "Grado": grado,
+        "Curso": curso_nombre
+    })
+    
+@Administrador_bp.route('/api/historialacademico/datos_estudiante/<int:matricula_id>', methods=['GET'])
+@login_required 
+def api_obtener_datos_estudiante(matricula_id):
+    # 1. Buscar la Matrícula
+    matricula = Matricula.query.get(matricula_id)
+    
+    if not matricula:
+        return jsonify({"error": "Matrícula no encontrada."}), 404
+        
+    # 2. Buscar el Estudiante (Usuario)
+    estudiante = Usuario.query.get(matricula.ID_Estudiante)
+    
+    if not estudiante:
+        return jsonify({"error": "Estudiante no asociado a esta matrícula."}), 404
+    
+    # 3. Construir el nombre del curso y obtener el grado
+    curso_nombre = "N/A"
+    grado = "N/A"
+    if hasattr(matricula, 'curso') and matricula.curso:
+        curso_nombre = f"{matricula.curso.Grado} {matricula.curso.Grupo}"
+        grado = matricula.curso.Grado
+
+    # 4. Devolver el JSON con los datos
+    return jsonify({
+        "NombreCompleto": f"{estudiante.Nombre} {estudiante.Apellido}",
+        "NumeroDocumento": estudiante.NumeroDocumento,
+        "Grado": grado,
+        "Curso": curso_nombre,
+    })
+
+@Administrador_bp.route('/historialacademico2') 
+def historialacademico2():
+    return render_template('Administrador/HistorialAcademico2.html')
+    
+@Administrador_bp.route('/api/historialacademico/historiales/<int:matricula_id>', methods=['GET'])
+@login_required 
+def api_listar_historiales_por_matricula(matricula_id):
+    # Obtener todos los registros de Historial Académico para esa matrícula
+    # Asegúrate de que el modelo Historial_Academico se ha importado correctamente
+    historiales = Historial_Academico.query.filter_by(ID_Matricula=matricula_id).order_by(Historial_Academico.Anio.desc(), Historial_Academico.Periodo.desc()).all()
+    
+    # Si no hay historiales, devuelve una lista vacía, lo cual el JS maneja
+    if not historiales:
+        return jsonify([]), 200 
+        
+    historiales_data = []
+    for h in historiales:
+        historiales_data.append({
+            "ID_Historial": h.ID_Historial,
+            "Anio": h.Anio,
+            "Periodo": h.Periodo,
+            "Descripcion": h.Descripcion,
+            # Asegúrate que CreadoEn no sea NULL o maneja el error de strftime
+            "CreadoEn": h.CreadoEn.strftime('%Y-%m-%d') if h.CreadoEn else None 
+        })
+        
+    return jsonify(historiales_data)
+
+
+@Administrador_bp.route('/api/historialacademico/notas/<int:id_historial>', methods=['GET'])
+@login_required 
+def api_historial_academico_notas(id_historial):
+    
+    # --- 1. Verificación de Autenticación (API Guard) ---
+    if not current_user.is_authenticated:
+        return jsonify({"error": "No autorizado. Inicie sesión nuevamente."}), 401
+
+    try:
+        # --- 2. Búsqueda del Historial y Datos del Estudiante/Curso ---
+        historial = Historial_Academico.query.get(id_historial)
+        
+        if not historial:
+            return jsonify({"error": f"Historial con ID {id_historial} no encontrado."}), 404
+            
+        # Obtener los datos relacionados (Matrícula -> Estudiante/Curso)
+        matricula = Matricula.query.get(historial.ID_Matricula)
+        if not matricula:
+            return jsonify({"error": "Matrícula no encontrada para este historial."}), 404
+            
+        # Utilizamos el modelo 'Usuario' y 'Curso' (en singular)
+        estudiante = Usuario.query.get(matricula.ID_Estudiante)
+        curso = Curso.query.get(matricula.ID_Curso)
+        
+        # --- 3. Búsqueda de Notas (Solo Nota_Calificaciones) ---
+        
+        # Realiza un JOIN entre Nota_Calificaciones y Asignatura para obtener el nombre.
+        # CRUCIAL: Se corrigió la referencia a Notas_Calificaciones a Nota_Calificaciones.
+        notas_query = db.session.query(Nota_Calificaciones, Asignatura)\
+                            .join(Asignatura)\
+                            .filter(Nota_Calificaciones.ID_Historial == id_historial)\
+                            .all()
+        
+        notas_data = []
+        for nota_obj, asignatura_obj in notas_query:
+            notas_data.append({
+                "ID_Nota": nota_obj.ID_Nota,
+                "Materia": asignatura_obj.Nombre, 
+                "N1": f"{nota_obj.N1:.1f}" if nota_obj.N1 is not None else "N/A", # Formato con un decimal
+                "N2": f"{nota_obj.N2:.1f}" if nota_obj.N2 is not None else "N/A",
+                "N3": f"{nota_obj.N3:.1f}" if nota_obj.N3 is not None else "N/A",
+                "N4": f"{nota_obj.N4:.1f}" if nota_obj.N4 is not None else "N/A",
+                # Asumo que estos campos están en tu tabla Nota_Calificaciones
+                "PromedioCortes": f"{nota_obj.PromedioCortes:.1f}" if nota_obj.PromedioCortes is not None else "N/A",
+                "NotaFinal": f"{nota_obj.NotaFinal:.1f}" if nota_obj.NotaFinal is not None else "N/A",
+            })
+
+        # --- 4. Búsqueda de Recuperaciones (ELIMINADO y reemplazado con lista vacía) ---
+        # Como no tienes la tabla, simplemente devolvemos una lista vacía para que el frontend funcione.
+        recup_data = []
+            
+        # --- 5. Construcción de la Respuesta Final ---
+        response_data = {
+            "EstudianteNombre": f"{estudiante.Nombre} {estudiante.Apellido}" if estudiante else "Estudiante Desconocido",
+            "Curso": f"{curso.Grado}-{curso.Nombre}" if curso else "Curso Desconocido",
+            "Anio": historial.Anio,
+            "Periodo": historial.Periodo,
+            "Notas": notas_data,
+            "Recuperaciones": recup_data # Se mantiene la clave para evitar romper el frontend
+        }
+        
+        return jsonify(response_data), 200
+
+    except Exception as e:
+        # Manejo de cualquier error inesperado
+        print(f"Error crítico en api_historial_academico_notas: {e}") 
+        return jsonify({"error": "Error interno del servidor al obtener las notas. Verifique la conexión a DB, las importaciones y los nombres de modelos (Usuario, Curso, Nota_Calificaciones)."}), 500
+    
+    
+
+@Administrador_bp.route('/historialacademico3')
+def historialacademico3():
+    periodo = request.args.get('periodo')
+    return render_template('Administrador/HistorialAcademico3.html', periodo=periodo)
+
+
 
 # ----------------- SUB-PÁGINAS -----------------
 @Administrador_bp.route('/registrotutorias2')
@@ -2009,8 +2554,10 @@ def detallesmateria(curso_id):
     # Obtener la materia según el curso (si existe)
     materia = materias.get(curso_id, "Materia no encontrada")
 
-    # Enviar curso y materia al HTML
-    return render_template('Administrador/detallesmateria.html', curso=curso_id, materia=materia)
+    # Curso real (si viene desde otra vista)
+    curso_id_real = request.args.get('curso_id', type=int)
+    # Enviar a la plantilla
+    return render_template('Administrador/detallesmateria.html', curso=curso_id, materia=materia, curso_id_real=curso_id_real)
 
 
     materia_nombre = materias.get(curso_id, "Materia desconocida")   
@@ -2083,10 +2630,6 @@ def enviar_correo():
 def asistencia():
     return render_template('Administrador/Asistencia.html')
 
-@Administrador_bp.route('/historialacademico2')
-def historialacademico2():
-    return render_template('Administrador/HistorialAcademico2.html')
-
 @Administrador_bp.route('/evaluaciones')
 def evaluaciones():
     return render_template('Administrador/evaluaciones.html')
@@ -2095,11 +2638,289 @@ def evaluaciones():
 def informe():
     return render_template('Administrador/informe.html')
 
-@Administrador_bp.route('/historialacademico3')
-def historialacademico3():
-    periodo = request.args.get('periodo')
-    return render_template('Administrador/HistorialAcademico3.html', periodo=periodo)
+@Administrador_bp.route('/informe/<int:curso_id>')
+def informe_curso(curso_id):
+    curso = Curso.query.get(curso_id)
+    # Si no existe por ID directo, intentar mapear 1101 -> grado=11, grupo=1/01/A
+    if not curso and isinstance(curso_id, int) and curso_id >= 100:
+        grado_calc = curso_id // 100
+        grupo_calc = curso_id % 100
+        grupo_candidatos = [str(grupo_calc), f"{grupo_calc:02d}"]
+        letra_map = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E'}
+        if grupo_calc in letra_map:
+            grupo_candidatos.append(letra_map[grupo_calc])
+        for g in grupo_candidatos:
+            curso = Curso.query.filter(
+                or_(Curso.Grado == str(grado_calc), Curso.Grado == grado_calc),
+                or_(Curso.Grupo == g, Curso.Grupo == int(g)) if g.isdigit() else (Curso.Grupo == g)
+            ).first()
+            if curso:
+                break
+        if not curso:
+            return render_template('Administrador/informe.html', curso_id=curso_id, curso_nombre=str(curso_id))
+        curso_id = curso.ID_Curso
+    return render_template('Administrador/informe.html', curso_id=curso_id, curso_nombre=f"{curso.Grado}{curso.Grupo}")
+
+@Administrador_bp.route('/informe/datos', methods=['GET'])
+def informe_datos():
+    try:
+        curso_id = request.args.get('curso_id', type=int)
+        periodo_num = request.args.get('periodo', type=int)
+        if not curso_id:
+            return jsonify({"success": False, "error": "curso_id requerido"}), 400
+
+        # Intentar mapear si no hay matrículas para ese ID (por si llega como 1101)
+        est_ids = [row.ID_Estudiante for row in Matricula.query.with_entities(Matricula.ID_Estudiante).filter_by(ID_Curso=curso_id).all()]
+        if not est_ids and isinstance(curso_id, int) and curso_id >= 100:
+            grado_calc = curso_id // 100
+            grupo_calc = curso_id % 100
+            grupo_candidatos = [str(grupo_calc), f"{grupo_calc:02d}"]
+            letra_map = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E'}
+            if grupo_calc in letra_map:
+                grupo_candidatos.append(letra_map[grupo_calc])
+            curso_alt = None
+            for g in grupo_candidatos:
+                curso_alt = Curso.query.filter(
+                    or_(Curso.Grado == str(grado_calc), Curso.Grado == grado_calc),
+                    or_(Curso.Grupo == g, Curso.Grupo == int(g)) if g.isdigit() else (Curso.Grupo == g)
+                ).first()
+                if curso_alt:
+                    break
+            if curso_alt:
+                curso_id = curso_alt.ID_Curso
+                est_ids = [row.ID_Estudiante for row in Matricula.query.with_entities(Matricula.ID_Estudiante).filter_by(ID_Curso=curso_id).all()]
+
+        fecha_ini = fecha_fin = None
+        if periodo_num:
+            per = Periodo.query.filter_by(NumeroPeriodo=periodo_num).order_by(Periodo.Anio.desc()).first()
+            if per and per.FechaInicial and per.FechaFinal:
+                fecha_ini, fecha_fin = per.FechaInicial, per.FechaFinal
+
+        q_notas = db.session.query(
+            Asignatura.Nombre.label('asignatura'),
+            func.avg(Nota_Calificaciones.Promedio_Final).label('prom')
+        ).join(Asignatura, Asignatura.ID_Asignatura == Nota_Calificaciones.ID_Asignatura)
+        q_notas = q_notas.filter(Nota_Calificaciones.ID_Estudiante.in_(est_ids))
+        if periodo_num:
+            q_notas = q_notas.filter(Nota_Calificaciones.Periodo == periodo_num)
+        rendimiento = [
+            {"asignatura": n.asignatura, "promedio": round(float(n.prom or 0), 2)}
+            for n in q_notas.group_by(Asignatura.Nombre).all()
+        ]
+
+        q_asist = (
+            db.session.query(Detalle_Asistencia.Estado_Asistencia, func.count().label('cnt'))
+            .join(Asistencia, Asistencia.ID_Asistencia == Detalle_Asistencia.ID_Asistencia)
+            .join(Programacion, Programacion.ID_Programacion == Asistencia.ID_Programacion)
+            .filter(Programacion.ID_Curso == curso_id)
+        )
+        if est_ids:
+            q_asist = q_asist.filter(Detalle_Asistencia.ID_Estudiante.in_(est_ids))
+        if fecha_ini and fecha_fin:
+            q_asist = q_asist.filter(Asistencia.Fecha.between(fecha_ini, fecha_fin))
+        asist_rows = q_asist.group_by(Detalle_Asistencia.Estado_Asistencia).all()
+        asistencia = {"Presente": 0, "Ausente": 0, "Justificado": 0}
+        for estado, cnt in asist_rows:
+            if estado in asistencia:
+                asistencia[estado] = int(cnt)
+
+        linea_disciplina = []
+        periodos = Periodo.query.order_by(Periodo.NumeroPeriodo).all()
+        for p in periodos:
+            if periodo_num and p.NumeroPeriodo != periodo_num:
+                continue
+            q_obs = db.session.query(func.count(Observacion.ID_Observacion))
+            if est_ids:
+                q_obs = q_obs.filter(Observacion.ID_Estudiante.in_(est_ids))
+            q_obs = q_obs.filter(Observacion.Tipo == 'Convivencial')
+            if p.FechaInicial and p.FechaFinal:
+                q_obs = q_obs.filter(Observacion.Fecha.between(p.FechaInicial, p.FechaFinal))
+            cant = q_obs.scalar() or 0
+            linea_disciplina.append({"periodo": p.NumeroPeriodo, "observaciones": int(cant)})
+
+        # Datos extra para resumen
+        curso_obj = Curso.query.get(curso_id)
+        curso_label = f"{curso_obj.Grado}{curso_obj.Grupo}" if curso_obj else str(curso_id)
+        est_count = len(est_ids)
+
+        return jsonify({
+            "success": True,
+            "rendimiento": rendimiento,
+            "asistencia": asistencia,
+            "disciplina": linea_disciplina,
+            "curso_label": curso_label,
+            "est_count": est_count
+        })
+    except Exception as e:
+        print('Error en /informe/datos:', e)
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@Administrador_bp.route('/informe/estudiantes', methods=['GET'])
+def informe_estudiantes():
+    try:
+        curso_id = request.args.get('curso_id', type=int)
+        periodo_num = request.args.get('periodo', type=int)
+        if not curso_id:
+            return jsonify({"success": False, "error": "curso_id requerido"}), 400
+
+        # Mapear 1101 -> ID_Curso si aplica
+        est_ids = [row.ID_Estudiante for row in Matricula.query.with_entities(Matricula.ID_Estudiante).filter_by(ID_Curso=curso_id).all()]
+        if not est_ids and isinstance(curso_id, int) and curso_id >= 100:
+            grado_calc = curso_id // 100
+            grupo_calc = curso_id % 100
+            grupo_candidatos = [str(grupo_calc), f"{grupo_calc:02d}"]
+            letra_map = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E'}
+            if grupo_calc in letra_map:
+                grupo_candidatos.append(letra_map[grupo_calc])
+            curso_alt = None
+            for g in grupo_candidatos:
+                curso_alt = Curso.query.filter(
+                    or_(Curso.Grado == str(grado_calc), Curso.Grado == grado_calc),
+                    or_(Curso.Grupo == g, Curso.Grupo == int(g)) if g.isdigit() else (Curso.Grupo == g)
+                ).first()
+                if curso_alt:
+                    break
+            if curso_alt:
+                curso_id = curso_alt.ID_Curso
+                est_ids = [row.ID_Estudiante for row in Matricula.query.with_entities(Matricula.ID_Estudiante).filter_by(ID_Curso=curso_id).all()]
+
+        # Listado base de estudiantes
+        estudiantes = db.session.query(Usuario.ID_Usuario, Usuario.Nombre, Usuario.Apellido).join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario).filter(Matricula.ID_Curso == curso_id, Usuario.Rol == 'Estudiante').order_by(Usuario.Apellido, Usuario.Nombre).all()
+
+        # Ventana de fechas si hay período
+        fecha_ini = fecha_fin = None
+        if periodo_num:
+            per = Periodo.query.filter_by(NumeroPeriodo=periodo_num).order_by(Periodo.Anio.desc()).first()
+            if per and per.FechaInicial and per.FechaFinal:
+                fecha_ini, fecha_fin = per.FechaInicial, per.FechaFinal
+
+        # Asistencia por estudiante
+        q_asist = db.session.query(Detalle_Asistencia.ID_Estudiante, Detalle_Asistencia.Estado_Asistencia, func.count().label('cnt')) \
+            .join(Asistencia, Asistencia.ID_Asistencia == Detalle_Asistencia.ID_Asistencia) \
+            .join(Programacion, Programacion.ID_Programacion == Asistencia.ID_Programacion) \
+            .filter(Programacion.ID_Curso == curso_id)
+        if est_ids:
+            q_asist = q_asist.filter(Detalle_Asistencia.ID_Estudiante.in_(est_ids))
+        if fecha_ini and fecha_fin:
+            q_asist = q_asist.filter(Asistencia.Fecha.between(fecha_ini, fecha_fin))
+        q_asist = q_asist.group_by(Detalle_Asistencia.ID_Estudiante, Detalle_Asistencia.Estado_Asistencia).all()
+        asist_map = {}
+        for ide, est, cnt in q_asist:
+            if ide not in asist_map:
+                asist_map[ide] = {"Presente": 0, "Ausente": 0, "Justificado": 0}
+            if est in asist_map[ide]:
+                asist_map[ide][est] = int(cnt)
+
+        # Observaciones convivenciales por estudiante
+        q_obs = db.session.query(Observacion.ID_Estudiante, func.count(Observacion.ID_Observacion)) \
+            .filter(Observacion.ID_Estudiante.in_(est_ids)) \
+            .filter(Observacion.Tipo == 'Convivencial')
+        if fecha_ini and fecha_fin:
+            q_obs = q_obs.filter(Observacion.Fecha.between(fecha_ini, fecha_fin))
+        q_obs = q_obs.group_by(Observacion.ID_Estudiante).all()
+        obs_map = {row[0]: int(row[1]) for row in q_obs}
+
+        items = []
+        for e in estudiantes:
+            a = asist_map.get(e.ID_Usuario, {"Presente": 0, "Ausente": 0, "Justificado": 0})
+            items.append({
+                "id": e.ID_Usuario,
+                "nombre": f"{e.Apellido} {e.Nombre}",
+                "asistencias": a.get("Presente", 0),
+                "fallas": a.get("Ausente", 0),
+                "retardos": 0,
+                "observaciones": obs_map.get(e.ID_Usuario, 0)
+            })
+
+        return jsonify({"success": True, "items": items})
+    except Exception as e:
+        print('Error en /informe/estudiantes:', e)
+        return jsonify({"success": False, "error": str(e)}), 500
+    
 
 @Administrador_bp.route('/comunicacion2')
 def comunicacion2():
     return render_template('Administrador/Comunicación2.html')
+
+@Administrador_bp.route('/config3/datos', methods=['GET'])
+def config3_datos():
+    try:
+        curso_id = request.args.get('curso_id', type=int)
+        asignatura_id = request.args.get('asignatura_id', type=int)
+        periodo_num = request.args.get('periodo', type=int)
+        if not curso_id:
+            return jsonify({"success": False, "error": "curso_id requerido"}), 400
+
+        est_ids = [row.ID_Estudiante for row in Matricula.query.with_entities(Matricula.ID_Estudiante).filter_by(ID_Curso=curso_id).all()]
+        if not est_ids and isinstance(curso_id, int) and curso_id >= 100:
+            grado_calc = curso_id // 100
+            grupo_calc = curso_id % 100
+            grupo_candidatos = [str(grupo_calc), f"{grupo_calc:02d}"]
+            letra_map = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E'}
+            if grupo_calc in letra_map:
+                grupo_candidatos.append(letra_map[grupo_calc])
+            curso_alt = None
+            for g in grupo_candidatos:
+                curso_alt = Curso.query.filter(
+                    or_(Curso.Grado == str(grado_calc), Curso.Grado == grado_calc),
+                    or_(Curso.Grupo == g, Curso.Grupo == int(g)) if g.isdigit() else (Curso.Grupo == g)
+                ).first()
+                if curso_alt:
+                    break
+            if curso_alt:
+                curso_id = curso_alt.ID_Curso
+                est_ids = [row.ID_Estudiante for row in Matricula.query.with_entities(Matricula.ID_Estudiante).filter_by(ID_Curso=curso_id).all()]
+
+        q_est = (
+            db.session.query(Usuario.ID_Usuario, Usuario.Nombre, Usuario.Apellido, Usuario.NumeroDocumento)
+            .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+            .filter(Matricula.ID_Curso == curso_id, Usuario.Rol == 'Estudiante')
+            .order_by(Usuario.Apellido, Usuario.Nombre)
+        )
+        est_rows = q_est.all()
+        if not est_rows:
+            return jsonify({"success": True, "items": []})
+
+        q_notas = db.session.query(
+            Nota_Calificaciones.ID_Estudiante,
+            func.avg(Nota_Calificaciones.Promedio_Final).label('prom')
+        )
+        if est_ids:
+            q_notas = q_notas.filter(Nota_Calificaciones.ID_Estudiante.in_(est_ids))
+        if asignatura_id:
+            q_notas = q_notas.filter(Nota_Calificaciones.ID_Asignatura == asignatura_id)
+        if periodo_num:
+            q_notas = q_notas.filter(Nota_Calificaciones.Periodo == periodo_num)
+        q_notas = q_notas.group_by(Nota_Calificaciones.ID_Estudiante).all()
+        prom_map = {row[0]: float(row[1]) if row[1] is not None else None for row in q_notas}
+
+        def nivel_y_obs(prom):
+            if prom is None:
+                return ('-', '')
+            if prom >= 4.6:
+                return ('Superior', 'excelente desempeño')
+            if prom >= 4.0:
+                return ('Alto', 'muy buena participación')
+            if prom >= 3.0:
+                return ('Básico', 'debe reforzar contenidos')
+            return ('Bajo', 'necesita apoyo académico')
+
+        periodo_label = str(periodo_num) if periodo_num else ''
+        items = []
+        for idx, e in enumerate(est_rows, start=1):
+            prom = prom_map.get(e.ID_Usuario)
+            niv, obs = nivel_y_obs(prom)
+            items.append({
+                "detalles": idx,
+                "nombre": f"{e.Nombre} {e.Apellido}",
+                "documento": e.NumeroDocumento or '',
+                "promedio": round(prom, 2) if prom is not None else None,
+                "nivel": niv,
+                "observacion": obs,
+                "periodo": periodo_label
+            })
+
+        return jsonify({"success": True, "items": items})
+    except Exception as e:
+        print('Error en /config3/datos:', e)
+        return jsonify({"success": False, "error": str(e)}), 500

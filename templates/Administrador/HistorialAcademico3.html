@@ -22,39 +22,44 @@
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
 
-    <div class="dropdown ms-auto">
-      <button 
-        class="btn btn-edunotas position-relative dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton1" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
-        <span class="bi bi-envelope-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-        <li><a class="dropdown-item" href="#">Ajustes</a></li>
-        <li><a class="dropdown-item" href="#">Opción 2</a></li>
-        <li><a class="dropdown-item" href="#">Opción 3</a></li>
-      </ul>
+    <div class="dropdown">
+  <button
+    class="position-relative"
+    type="button"
+    id="dropdownMenuButton"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    style="border: none; background: transparent; padding: 0;"
+  >
+    <i class="bi bi-bell-fill" style="font-size: 1.25rem; margin-left:850px;"></i>
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          id="contadorMensajes" style="display:none">0</span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
+    <li class="text-center text-muted small">Últimas notificaciones</li>
+    <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+      <p class="text-center small text-secondary mb-0">Sin notificaciones recientes</p>
     </div>
+  </ul>
+</div>
+
+<script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
 
 
     <div class="dropdown">
-      <button 
-        class="btn btn-usuario dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton2" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
-        <span class="bi bi-person-lines-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
-        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
-      </ul>
-    </div>
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      
+      <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
+      <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
+
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
   </header>
 
 
@@ -112,112 +117,73 @@
 
   <!-- titulos -->
   <section class="bg-light py-5 mt-5">
-    <div class="container">
-      <h1 class="text-center titulo-principal">HISTORIAL ACADÉMICO</h1>
-
-<h2 class="descripcion text-center">Historial Académico - Periodo {{ periodo }}</h2>
-
-
-  
-  <div class="container mt-5">
-    <!-- Barra de búsqueda -->
-    <div class="input-group mb-4 justify-content-center">
-      <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input type="text" class="form-control w-50" placeholder="Buscar estudiante...">
-    </div>
-
-    <!-- Datos del estudiante -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="fw-bold text-dark">Luis Gómez</h5>
-      <span class="fw-semibold">803</span>
-    </div>
-
-    <!-- Datos académicos -->
-    <div class="mb-3">
-      <label for="periodo" class="form-label fw-semibold">Datos Académicos</label>
-      <select id="periodo" class="form-select w-auto d-inline-block">
-        <option selected>Periodo 1</option>
-        <option>Periodo 2</option>
-        <option>Periodo 3</option>
-        <option>Periodo 4</option>
-      </select>
-    </div>
-
-    <!-- Tabla de materias -->
-    <div class="card mb-4 shadow-sm">
-      <div class="card-header text-white">Materias</div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-bordered table-striped mb-0 text-center align-middle">
-            <thead class="table-primary">
-              <tr>
-                <th>Materia</th>
-                <th>Nota 1</th>
-                <th>Nota 2</th>
-                <th>Nota 3</th>
-                <th>Nota Final</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>Español</td><td>3.6</td><td>3.8</td><td>4.0</td><td>4.0</td></tr>
-              <tr><td>Matemáticas</td><td>3.4</td><td>3.9</td><td>4.0</td><td>4.0</td></tr>
-              <tr><td>Inglés</td><td>3.8</td><td>3.7</td><td>4.0</td><td>4.0</td></tr>
-              <tr><td>Sociales</td><td>3.5</td><td>3.9</td><td>3.8</td><td>3.9</td></tr>
-              <tr><td>Ética</td><td>3.6</td><td>3.5</td><td>3.9</td><td>3.8</td></tr>
-              <tr><td>Filosofía</td><td>3.7</td><td>3.8</td><td>3.9</td><td>3.9</td></tr>
-              <tr><td>Educación Física</td><td>4.0</td><td>4.0</td><td>4.0</td><td>4.0</td></tr>
-              <tr><td>Artística</td><td>3.9</td><td>4.0</td><td>4.0</td><td>4.0</td></tr>
-              <tr><td>Biología</td><td>3.6</td><td>3.8</td><td>3.9</td><td>3.8</td></tr>
-              <tr><td>Física - Química</td><td>3.5</td><td>3.6</td><td>3.8</td><td>3.7</td></tr>
-              <tr><td>Religión</td><td>3.8</td><td>3.9</td><td>4.0</td><td>4.0</td></tr>
-              <tr><td>Tecnología - Informática</td><td>3.7</td><td>3.9</td><td>3.8</td><td>3.8</td></tr>
-              <tr><td>P.T.I</td><td>3.5</td><td>3.6</td><td>3.7</td><td>3.7</td></tr>
-              <tr><td>RUTA</td><td>3.9</td><td>3.8</td><td>3.9</td><td>3.9</td></tr>
-            </tbody>
-          </table>
+    <div class="container">
+      <h1 class="text-center titulo-principal">HISTORIAL ACADÉMICO</h1>
+        
+    <div class="container mt-4">
+        
+        <div class="card shadow mb-4 p-3 bg-light">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Estudiante:</strong> <span id="info-estudiante">Cargando...</span></p>
+                    <p class="mb-1"><strong>Curso:</strong> <span id="info-curso">Cargando...</span></p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-1"><strong>Año Académico:</strong> <span id="info-anio">Cargando...</span></p>
+                    <p class="mb-1"><strong>Periodo:</strong> <span id="info-periodo">Cargando...</span></p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Tabla de recuperaciones -->
-    <div class="card shadow-sm">
-      <div class="card-header text-white">Recuperaciones</div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-bordered table-striped mb-0 align-middle">
-            <thead class="table-primary text-center">
-              <tr>
-                <th>Materia</th>
-                <th>Observación</th>
-                <th>Nota</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>Español</td><td>No entregó recuperación</td><td></td></tr>
-              <tr><td>Matemáticas</td><td>Entregó correctamente</td><td></td></tr>
-              <tr><td>Inglés</td><td>Entregó a tiempo</td><td></td></tr>
-              <tr><td>Sociales</td><td>No hubo recuperación</td><td></td></tr>
-              <tr><td>Ética</td><td>Mejorar redacción en próxima entrega</td><td></td></tr>
-              <tr><td>Filosofía</td><td>No presentó</td><td></td></tr>
-              <tr><td>Educación Física</td><td>No aplica</td><td></td></tr>
-              <tr><td>Artística</td><td>Entregó correctamente</td><td></td></tr>
-              <tr><td>Biología</td><td>Entrega tardía</td><td></td></tr>
-              <tr><td>Física - Química</td><td>No entregó</td><td></td></tr>
-              <tr><td>Religión</td><td>No hubo recuperación</td><td></td></tr>
-              <tr><td>Tecnología - Informática</td><td>Entregó correctamente</td><td></td></tr>
-              <tr><td>P.T.I</td><td>No entregó</td><td></td></tr>
-              <tr><td>RUTA</td><td>Sin observaciones</td><td></td></tr>
-            </tbody>
-          </table>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white"><i class="bi bi-journal-text me-2"></i> Materias y Calificaciones</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped mb-0 text-center align-middle">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Materia</th>
+                                <th>N1</th>
+                                <th>N2</th>
+                                <th>N3</th>
+                                <th>N4</th>
+                                <th>Prom. Cortes</th>
+                                <th>Nota Final</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-notas">
+                            <tr><td colspan="7" class="text-center">Cargando notas académicas...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-  </div>
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark"><i class="bi bi-arrow-repeat me-2"></i> Recuperaciones Pendientes/Realizadas</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped mb-0 align-middle">
+                        <thead class="table-primary text-center">
+                            <tr>
+                                <th>Materia</th>
+                                <th>Observación</th>
+                                <th>Nota Recuperación</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-recuperaciones">
+                            <tr><td colspan="3" class="text-center" id="recuperaciones-status">Cargando recuperaciones...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
+    </div> 
+    </div>
+</section>
 
-
-<script src="{{ url_for('static', filename='js/Administrador/HistorialAcademico2.js') }}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/Administrador/HistorialAcademico3.js') }}"></script>
 </body>
 </html>

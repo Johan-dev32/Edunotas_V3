@@ -1,19 +1,19 @@
+:root { --brand:#050733ff; --brand-600:#1b2068; --brand-100:#eef0ff; }
 body {
   background-color: #f8f9fa; 
   font-family: 'Trebuchet MS', sans-serif;
   color: #212529;
-
 }
 
 /* navbar */
 header {
   background-color: white;
-  color: #050733ff;
+  color: var(--brand);
   font-family: 'Trebuchet MS', sans-serif;
 }
 
 .titulo-header {
-  color: #050733ff;
+  color: var(--brand);
   font-size: 40px;
   font-weight: bolder;
   font-family: 'Trebuchet MS', sans-serif;
@@ -22,26 +22,59 @@ header {
 }
 
 header .btn-dark {
-  background-color: #050733ff;
+  background-color: var(--brand);
   border: none;
 }
 
 .btn-edunotas {
-  background-color: #050733ff;
+  background-color: var(--brand);
   color: #fff;
 }
-
 .btn-usuario {
-  background-color: #050733ff;
-  color: #fff;
+  background-color: transparent; /* sin recuadro */
+  color: #050733ff;               /* color institucional para el icono */
+  border: none;                    /* sin borde */
+  box-shadow: none;                /* sin sombra */
+  padding: 6px 8px;                /* compacto */
   margin-left: 10px;
+}
+
+.btn-usuario:hover,
+.btn-usuario:focus {
+  background-color: transparent;   /* mantener sin recuadro en hover/focus */
+  color: #050733ff;
+  box-shadow: none;
+}
+
+/* Oculta el caret del dropdown en el botón de usuario */
+.btn-usuario.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Tamaño del icono circular */
+.btn-usuario .bi-person-circle {
+  font-size: 1.6rem;
+}
+
+.titulo {
+  font-size: 3rem;      
+  font-weight: 900;      
+  color: var(--brand);      
+  margin-top: 40px;
+  text-align: center;
+}
+
+.descripcion {
+  font-size: 1.3rem;     
+  color: #555;   
+  margin-left: 570px;
 }
 
 /*  menu_des  */
 #sidebar {
   width: 220px;
   min-height: 100vh;
-  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+  background: linear-gradient(180deg, rgb(9, 5, 80), var(--brand));
 }
 
 #sidebar .nav-link:hover {
@@ -78,7 +111,7 @@ header .btn-dark {
 /* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
 .nav-pills .nav-link {
   font-size: 25px;   /* tamaño botones nav */
-  color: #050733ff !important; 
+  color: var(--brand) !important; 
   font-weight: bold;
 
 }
@@ -107,10 +140,11 @@ h3 {
   padding: 25px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border: 1px solid var(--brand-100);
 }
 
 select.form-select {
-  border: 2px solid #212529;
+  border: 2px solid var(--brand);
 }
 
 .charts-section {
@@ -119,6 +153,7 @@ select.form-select {
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border: 1px solid var(--brand-100);
 }
 
 canvas {

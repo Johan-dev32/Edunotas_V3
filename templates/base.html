@@ -22,4 +22,43 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   {% block extra_js %}{% endblock %}
 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        // 1) Normalizar icono de usuario a bi-person-circle en Administrador
+        document.querySelectorAll('ul#dropdownADMIN').forEach((menu) => {
+          const btn = menu.previousElementSibling; // botón .btn-usuario
+          if (btn && btn.classList.contains('btn-usuario')) {
+            const icon = btn.querySelector('span.bi');
+            if (icon) {
+              icon.classList.remove('bi-person-lines-fill', 'bi-person-fill', 'bi-person');
+              icon.classList.add('bi', 'bi-person-circle');
+            }
+          }
+        });
+
+        // 2) Si es una vista de Administrador (tiene #sidebar) pero no existe el dropdown, insertarlo
+        const isAdminView = !!document.querySelector('#sidebar');
+        const hasDropdown = !!document.querySelector('ul#dropdownADMIN');
+        const headerEl = document.querySelector('header');
+        if (isAdminView && headerEl && !hasDropdown) {
+          const html = `
+  <div class="dropdown">
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="${location.origin}/perfil">Perfil</a></li>
+      <li><a class="dropdown-item" href="${location.origin}/administrador/configuracion_academica">Configuracion Academica</a></li>
+      <li><a class="dropdown-item" href="${location.origin}/administrador/historialacademico">Historial Academico</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item" href="${location.origin}/login">Cerrar sesión</a></li>
+    </ul>
+  </div>`;
+          headerEl.insertAdjacentHTML('beforeend', html);
+        }
+      } catch (e) { /* noop */ }
+    });
+  </script>
+
 </html>

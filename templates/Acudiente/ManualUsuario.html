@@ -13,28 +13,32 @@
 
 </head>
 <body>
-
-
-  <header class="d-flex align-items-center p-3 border-bottom w-100">
+<header class="d-flex align-items-center p-3 border-bottom w-100">
     <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
       <i class="bi bi-list"></i>
     </button>
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
-
-   <div class="dropdown ms-auto me-2">
-        <button class="btn btn-edunotas position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-            <span class="bi bi-envelope-fill"></span>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none;">
-                
-            </span>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="dropdownMenuButton" style="min-width: 300px;">
-            <li id="listaMensajes">
-                <p class="text-center text-muted mb-0">No tienes mensajes nuevos.</p>
-            </li>
-        </ul>
+   <div class="dropdown ms-auto">
+      <button
+        class="position-relative"
+        type="button"
+        id="dropdownMenuButton"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        style="border: none; background: transparent; padding: 0;"
+      >
+        <i class="bi bi-bell-fill" style="font-size: 1.25rem;"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none ">0</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="dropdownMenuButton" style="min-width: 300px;">
+        <li class="text-center text-muted small">Últimas notificaciones</li>
+        <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+          <p class="text-center small text-secondary mb-0">No tienes mensajes nuevos.</p>
+        </div>
+      </ul>
     </div>
+<script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
 
       <div class="dropdown">
     <button class="btn btn-usuario" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
@@ -42,8 +46,7 @@
     </button>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu" id="dropdownSTUDENT">
         <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('Acudiente.manual') }}">Manual de Usuario</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('Acudiente.historial_academico') }}">Historial Academico</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('Estudiante.manual') }}">Manual de Usuario</a></li>
         <li><hr class="dropdown-divider"></li>
         <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
     </ul>
@@ -51,29 +54,13 @@
 
   </header>
 
-
-
   <!-- Menú lateral -->
-  <section class="py-5 mt-5">
+
   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
   </div>
   <div class="offcanvas1-body">
-    <ul class="nav flex-column">
-                    <li class="nav-item"><a href="{{ url_for('Acudiente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
-          
-          <li  class="nav-item"><a href="{{url_for('Acudiente.ver_notas') }}" class="nav-link text-white"><i class="bi bi-list-stars "></i> Notas</a></li>
-          <li class="nav-item"><a href="{{url_for('Acudiente.ver_citaciones')}}" class="nav-link text-white"><i class="bi bi-person-rolodex menu-icon"></i> Citaciones</a></li>
-          <li class="nav-item"><a href="{{url_for('Acudiente.inasistencias_justificadas')}}" class="nav-link text-white"><i class="bi bi-journal-text menu-icon"></i> Asistencias justificadas</a></li>
-          <li class="nav-item"><a href="{{url_for('Acudiente.informes_academicos')}}" class="nav-link text-white"><i class="bi bi-folder2-open menu-icon"></i> Informe de Tareas</a></li>
-          <li class="nav-item"><a href="{{url_for('Acudiente.comunicados')}}" class="nav-link text-white"><i class="bi bi-pencil-square menu-icon"></i> Comunicados</a></li>
-          <li class="nav-item"><a href="{{ url_for('Estudiante.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-          <li class="nav-item"><a href="{{url_for('Acudiente.comunicacion')}}" class="nav-link text-white"><i class="bi bi-chat-dots menu-icon"></i> Comunicación</a></li>
-          <li class="nav-item"><a href="{{url_for('Acudiente.horarios')}}" class="nav-link text-white"><i class="bi bi-calendar4-week menu-icon"></i> Horarios</a></li>
-        </ul>
-      </div>
-
       <ul class="nav flex-column">
         
         <li class="nav-item"><a href="{{ url_for('Acudiente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
@@ -95,7 +82,6 @@
         <li class="nav-item"><a href="{{ url_for('Acudiente.manual') }}" class="nav-link text-white"><i class="bi bi-journal-bookmark-fill"></i> Manual de Usuario</a></li>
 
       </ul>
-
     </div>
   </div>
 </section>

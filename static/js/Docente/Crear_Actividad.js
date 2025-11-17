@@ -4,23 +4,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const publicarBtn = document.querySelector('.btn-subir');
   const form = publicarBtn.closest('form');
 
+  // Contenedor visible donde solo mostramos el nombre (NO borrar el input)
+  let fileLabel = document.createElement('div');
+  fileLabel.classList.add('mt-2', 'fw-semibold', 'text-center');
+  uploadBox.appendChild(fileLabel);
+
   // === Mostrar nombre del PDF seleccionado ===
   pdfUpload.addEventListener('change', (event) => {
     const file = event.target.files[0];
-    uploadBox.innerHTML = '';
 
     if (file) {
-      const fileName = document.createElement('p');
-      fileName.classList.add('fw-semibold', 'mt-2');
-      fileName.textContent = `📄 ${file.name}`;
-      uploadBox.appendChild(fileName);
+      fileLabel.textContent = `📄 ${file.name}`;
     } else {
-      uploadBox.innerHTML = `
-        <label for="pdfUpload" class="d-block cursor-pointer">
-          <i class="bi bi-file-earmark-pdf-fill fs-1 text-danger"></i>
-          <p class="mt-2 fw-semibold">Adjuntar material en PDF</p>
-        </label>
-      `;
+      fileLabel.textContent = '';
     }
   });
 
@@ -78,17 +74,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!fecha) return "Selecciona una fecha de entrega.";
     if (!hora) return "Selecciona una hora de entrega.";
 
-    // Validar fecha futura
     const hoy = new Date();
     const fechaSeleccionada = new Date(fecha);
     if (fechaSeleccionada < hoy.setHours(0, 0, 0, 0)) {
       return "La fecha debe ser futura o actual.";
     }
 
-    // Validar PDF opcional (si lo necesitas obligatorio, descomenta esta línea)
-    // if (!pdfUpload.files.length) return "Debes adjuntar un archivo PDF.";
-
-    return null; // sin errores
+    return null;
   }
 
   // === Acción al hacer clic en PUBLICAR ===
@@ -101,12 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Confirmación antes de enviar
     mostrarAdvertencia(
       '¿Deseas publicar esta actividad?',
-      () => {
-        form.submit();
-      },
+      () => { form.submit(); },
       () => mostrarMensaje('❌ Publicación cancelada', 'danger')
     );
   });

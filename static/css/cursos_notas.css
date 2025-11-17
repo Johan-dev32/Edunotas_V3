@@ -29,10 +29,39 @@ header .btn-dark {
   color: #fff;
 }
 
-.btn-usuario {
-  background-color: #050733ff;
-  color: #fff;
-  margin-left: 10px;
+.titulo-principal {
+  font-size: 3rem;      
+  font-weight: 900;      
+  color: #050733ff; 
+  margin-top: -40px;     
+}
+
+.subtitulo {
+  font-size: 2rem;       
+  font-weight: 700;
+  color: #050733ff;        
+}
+
+.descripcion {
+  font-size: 1.3rem;     
+  color: #555;           
+}
+
+.btn-usuario:hover,
+.btn-usuario:focus {
+  background-color: transparent;   /* mantener sin recuadro en hover/focus */
+  color: #050733ff;
+  box-shadow: none;
+}
+
+/* Oculta el caret del dropdown en el botón de usuario */
+.btn-usuario.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Tamaño del icono circular */
+.btn-usuario .bi-person-circle {
+  font-size: 1.6rem;
 }
 
 /* menú lateral */

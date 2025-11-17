@@ -2,6 +2,7 @@ body {
   background-color: #f8f9fa; 
   font-family: 'Trebuchet MS', sans-serif;
   color: #212529;
+  margin: 0;
 }
 
 /* navbar */
@@ -9,6 +10,7 @@ header {
   background-color: white;
   color: #050733ff;
   font-family: 'Trebuchet MS', sans-serif;
+  
 }
 
 .titulo-header {
@@ -101,19 +103,19 @@ header .btn-dark {
   font-weight: 900;      
   color: #050733ff;    
   margin-left: 50px;  
-  margin-top: -90px;
+  margin-top: -10px;
 }
-
 
 .descripcion {
   font-size: 1.3rem;     
   color: #555;  
   margin-left: 50px;         
 }
+
 /* CONTENEDOR GENERAL DEL OBSERVADOR */
 .observador-contenedor {
   max-width: 1300px;
-  margin: 40px auto;
+  margin: 20px auto;
   background-color: #fff;
   border: 3px solid #050733ff; /* borde azul alrededor */
   border-radius: 15px;

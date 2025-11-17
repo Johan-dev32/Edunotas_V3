@@ -1,0 +1,257 @@
+body {
+  background-color: #f8f9fa; 
+  font-family: 'Trebuchet MS', sans-serif;
+  color: #212529;
+}
+
+/* navbar */
+header {
+  background-color: white;
+  color: #050733ff;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas {
+  background-color: #050733ff;
+  color: #fff;
+}
+
+.btn-usuario {
+  background-color: #050733ff;
+  color: #fff;
+  margin-left: 10px;
+}
+
+/*  menu_des  */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+.offcanvas {
+  font-size: 25px;
+}
+
+.offcanvas-title {
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+.nav-item {
+  font-weight: bold;
+  font-size: 22px;
+}
+#sidebar .nav-link {
+  font-size: 18px;   /* tamaño menú hamburguesa */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
+.nav-pills .nav-link {
+  font-size: 25px;   /* tamaño botones nav */
+  color: #050733ff !important; 
+  font-weight: bold;
+
+}
+
+
+.logo-container {
+  width: auto;
+  height: auto;
+}
+
+.logo-container img {
+  max-width: 250px; 
+  height: auto;
+}
+
+
+/* titulos */
+
+.titulo-principal {
+  font-size: 3rem;      
+  font-weight: 900;      
+  color: #050733ff;    
+  margin-left: 50px;  
+  margin-top: 40px;
+}
+
+
+.descripcion {
+  font-size: 1.3rem;     
+  color: #555;  
+  margin-left: 50px;         
+}
+
+section.bg-light {
+  margin-top: 10px !important;
+  padding-top: 30px !important;
+
+}
+.container {
+  max-width: 950px;
+  margin-top: -10px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+  padding: 2.5rem;
+}
+
+
+
+.info-acudiente h2 {
+  color: #222;
+  margin-bottom: 0.5rem;
+}
+
+.info-acudiente p {
+  color: #555;
+  margin: 0.3rem 0 1.5rem 0;
+}
+
+.info-estudiante {
+  background-color: #f0f4ff;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border-left: 5px solid #2563eb;
+}
+
+.info-estudiante p {
+  margin: 0.3rem 0;
+  color: #333;
+}
+
+h3 {
+  color: #333;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+p {
+  color: #555;
+  margin-bottom: 1.8rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.8rem;
+}
+
+th {
+  background-color: #f0f4ff;
+  color: #333;
+  padding: 1rem;
+  border-radius: 8px 8px 0 0;
+  font-size: 0.95rem;
+}
+
+td {
+  background: #fafafa;
+  padding: 1rem;
+  border-radius: 8px;
+  vertical-align: middle;
+}
+
+tr:hover td {
+  background-color: #f4f6ff;
+}
+
+.btn {
+  background-color: #0a1655;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: 0.3s;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.btn-whatsapp {
+  background-color: #145c2f;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.alerta {
+  background-color: #fff3cd;
+  color: #856404;
+  border-left: 5px solid #ffe08a;
+  padding: 1rem 1.5rem;
+  margin-top: 2.5rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.btn-usuario {
+    background: none !important;        /* sin fondo */
+    border: none !important;            /* sin borde */
+    color: var(--primary-dark) !important; /* color del ícono */
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;                 /* cuadrado/redondo según necesidad */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    padding: 0;
+    box-shadow: none !important;
+}
+
+/* Al pasar el mouse — sin fondo azul */
+.btn-usuario:hover,
+.btn-usuario:focus,
+.btn-usuario:active {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--secondary-dark) !important; /* solo cambia el color del ícono */
+    outline: none !important;
+}
+
+/* 🔹 Evita que Bootstrap le ponga el ícono de desplegable (flechita ↓) */
+.btn-usuario::after {
+    display: none !important;
+}
+.txt-ultimo{
+  font-size: 12px;
+  color: #666464;
+}

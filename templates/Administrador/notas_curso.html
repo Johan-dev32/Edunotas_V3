@@ -21,39 +21,44 @@
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
 
-    <div class="dropdown ms-auto">
-      <button 
-        class="btn btn-edunotas position-relative dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton1" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
-        <span class="bi bi-envelope-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-        <li><a class="dropdown-item" href="#">Ajustes</a></li>
-        <li><a class="dropdown-item" href="#">Opción 2</a></li>
-        <li><a class="dropdown-item" href="#">Opción 3</a></li>
-      </ul>
+    <div class="dropdown">
+  <button
+    class="position-relative"
+    type="button"
+    id="dropdownMenuButton"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    style="border: none; background: transparent; padding: 0;"
+  >
+    <i class="bi bi-bell-fill" style="font-size: 1.25rem; margin-left:850px;"></i>
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          id="contadorMensajes" style="display:none">0</span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
+    <li class="text-center text-muted small">Últimas notificaciones</li>
+    <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+      <p class="text-center small text-secondary mb-0">Sin notificaciones recientes</p>
     </div>
+  </ul>
+</div>
+
+<script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
 
 
     <div class="dropdown">
-      <button 
-        class="btn btn-usuario dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton2" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
-        <span class="bi bi-person-lines-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
-        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
-      </ul>
-    </div>
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      
+      <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
+      <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
+
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
   </header>
 
 
@@ -109,16 +114,46 @@
   </div>
 </section>
 
-
+ <h1 class="text-center titulo-principal">CONSULTA DE NOTAS</h1>
+      <p class="text-center descripcion">Aquí podrás consultar todas las notas de los cursos...</p>
+      <h2 class="text-center mb-4 subtitulo">LISTA DE CURSOS</h2><br><br> 
   <div class="container mt-4">
     <div class="card">
       <div class="card-body">
-        <h3 class="card-title">Curso {{ curso_id }}</h3>
-
-        <!-- selector de materia -->
-        <div class="mb-3">
-          <label for="materia" class="form-label">Selecciona una materia:</label>
-          <select id="materia" class="form-select"></select>
+        <h5 class="card-title mb-3">Filtros</h5>
+        <div class="row g-3">
+          {% if curso_id %}
+          <div class="col-md-4">
+            <label class="form-label d-block">Curso</label>
+            <div class="form-control bg-light">{{ curso_id }}</div>
+            <select id="selectCurso" class="form-select d-none">
+              <option value="{{ curso_id }}" selected>{{ curso_id }}</option>
+            </select>
+          </div>
+          {% else %}
+          <div class="col-md-4">
+            <label for="selectCurso" class="form-label">Curso</label>
+            <select id="selectCurso" class="form-select">
+              <option value="">Seleccione...</option>
+            </select>
+          </div>
+          {% endif %}
+          <div class="col-md-4">
+            <label for="selectAsignatura" class="form-label">Asignatura</label>
+            <select id="selectAsignatura" class="form-select">
+              <option value="">Seleccione...</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="selectPeriodo" class="form-label">Período</label>
+            <select id="selectPeriodo" class="form-select">
+              <option value="">Seleccione...</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -127,47 +162,27 @@
 
 <!-- tabla principal  -->
 <div class="tabla-container mt-4">
-  <table class="tabla">
-    <thead>
+  <table class="tabla table table-striped table-bordered align-middle">
+    <thead class="table-light">
       <tr>
-        <th class="fijo">Nombre</th>
-        <th class="fijo">Curso</th>
-        <th class="fijo">Materia</th>
+        <th class="fijo">Estudiante</th>
         <th>Nota 1</th>
         <th>Nota 2</th>
         <th>Nota 3</th>
-        <th>Asistencia 1</th>
-        <th>Asistencia 2</th>
+        <th>Nota 4</th>
+        <th>Nota 5</th>
+        <th>Promedio</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td class="fijo">Ana Gómez</td>
-        <td class="fijo">{{ curso_id }}</td>
-        <td class="fijo">ESPAÑOL</td>
-        <td><input type="number" step="0.1" min="1" max="5" value="4.5" readonly></td>
-        <td><input type="number" step="0.1" min="1" max="5" value="4.0" readonly></td>
-        <td><input type="number" step="0.1" min="1" max="5" value="3.8" readonly></td>
-        <td>
-          <select disabled>
-            <option>Asistió</option>
-          </select>
-        </td>
-        <td>
-          <select disabled>
-            <option>No asistió</option>
-          </select>
-        </td>
-      </tr>
+    <tbody id="tbodyNotas">
+      <tr><td colspan="7" class="text-center text-muted">Seleccione curso, asignatura y período para ver las notas.</td></tr>
     </tbody>
   </table>
 </div>
-    <script src="{{ url_for('static', filename='js/Administrador//validacion_planilla_notas.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/Administrador//materias.js') }}"></script>
     <script>
-   
-    cargarMaterias("{{ curso_id }}");
+      window.CURSO_ID = {{ curso_id if curso_id is not none else 'null' }};
     </script>
+    <script src="{{ url_for('static', filename='js/Administrador/Notas_Consultar.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

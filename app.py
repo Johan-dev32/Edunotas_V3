@@ -14,36 +14,23 @@ from routes.notificaciones_routes import notificaciones_bp
 from flask_mail import Mail, Message
 from Controladores.models import db
 
-
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired,BadSignature
 
 import os
 
-
-
-
-# Diccionario temporal para guardar notificaciones por usuario/rol
-notificaciones_globales = {
-    "Administrador": [],
-    "Docente": [],
-    "Estudiante": [],
-    "Acudiente": []
-}
-
-notificaciones_temporales = {}
 mail = Mail()
 
 s = URLSafeTimedSerializer("clave_super_secreta")
 
 # Importa el objeto 'db' y los modelos desde tu archivo de modelos
-from Controladores.models import db, Usuario
+from Controladores.models import db, Usuario, Notificacion
 
 # Configuración de la aplicación
 app = Flask(__name__)
 
 
 # Carpeta donde se guardarán los archivos subidos
-UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
 
 # Crear la carpeta si no existe
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -61,11 +48,11 @@ app.config.update(
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
     MAIL_USE_SSL=False,
-    MAIL_USERNAME=os.getenv("MAIL_USERNAME", "soniagisell67@gmail.com"),
-    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD", "tadvqwwnkzajmwvm"),
+    MAIL_USERNAME=os.getenv("MAIL_USERNAME", "edunotas2025@gmail.com"),
+    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD", "keerxgqfufoynmhm"),
     MAIL_DEFAULT_SENDER=(
         "Edunotas",
-        os.getenv("MAIL_USERNAME", "soniagisell67@gmail.com"),
+        os.getenv("MAIL_USERNAME", "edunotas2025@gmail.com"),
     ),
 )
 mail.init_app(app)
@@ -224,6 +211,15 @@ def actualizar_perfil():
         direccion = request.form.get('direccion')
         telefono = request.form.get('telefono')
 
+        # Tomar snapshot previo para comparar cambios
+        prev = {
+            'Nombre': usuario.Nombre,
+            'Apellido': usuario.Apellido,
+            'Correo': usuario.Correo,
+            'Direccion': usuario.Direccion,
+            'Telefono': usuario.Telefono,
+        }
+
         # Verificar si el nuevo correo pertenece a otro usuario
         correo_existente = Usuario.query.filter(
             Usuario.Correo == correo,
@@ -244,6 +240,48 @@ def actualizar_perfil():
         usuario.Telefono = telefono
 
         db.session.commit()
+
+        # Construir resumen de cambios y generar notificación + correo
+        cambios = []
+        if prev['Nombre'] != nombre or prev['Apellido'] != apellido:
+            cambios.append(f"Nombre completo: {prev['Nombre']} {prev['Apellido']} → {nombre} {apellido}")
+        if prev['Correo'] != correo:
+            cambios.append(f"Correo electrónico: {prev['Correo']} → {correo}")
+        if (prev['Direccion'] or '') != (direccion or ''):
+            cambios.append("Dirección de residencia actualizada")
+        if (prev['Telefono'] or '') != (telefono or ''):
+            cambios.append(f"Teléfono: {prev['Telefono'] or '—'} → {telefono or '—'}")
+
+        if cambios:
+            try:
+                resumen = "; ".join(cambios)
+                # Guardar notificación en el sistema
+                noti = Notificacion(
+                    Titulo='Actualización de perfil',
+                    Mensaje=f"Se actualizaron estos datos de tu perfil: {resumen}.",
+                    Enlace=None,
+                    ID_Usuario=usuario.ID_Usuario
+                )
+                db.session.add(noti)
+                db.session.commit()
+
+                # Enviar correo al usuario afectado
+                try:
+                    msg = Message(
+                        subject='Edunotas - Actualización de perfil',
+                        recipients=[usuario.Correo]
+                    )
+                    msg.html = render_template(
+                        'email_generico.html',
+                        titulo='Actualización de perfil',
+                        cuerpo=f"Hola {usuario.Nombre},<br><br>Hemos detectado cambios en tu perfil:<br>• " + "<br>• ".join(cambios) + "<br><br>Si no fuiste tú, por favor comunícate con el administrador."
+                    )
+                    mail.send(msg)
+                except Exception as _:
+                    # Evitar romper el flujo si falla el correo
+                    pass
+            except Exception as _:
+                db.session.rollback()
 
         return jsonify({
             'status': 'success',

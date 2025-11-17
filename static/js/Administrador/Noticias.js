@@ -129,7 +129,7 @@ confirmSend.addEventListener("click", async () => {
             alert("✅ Noticia publicada correctamente en la Base de Datos.");
             // Limpiar formulario y redireccionar
             formNoticias.reset();
-            window.location.href = "Administrador/noticias_vistas";// O la ruta que desees
+            window.location.href = "/administrador/noticias_vistas";// O la ruta que desees
         } else {
             // Manejo de errores de validación de Flask (success: false)
             alert("❌ Error al publicar noticia: " + (data.error || "Fallo desconocido."));

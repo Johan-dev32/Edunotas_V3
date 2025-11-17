@@ -90,28 +90,38 @@ document.addEventListener("DOMContentLoaded", () => {
     confirmModal.style.display = "none";
   });
 
-  // 📌 Botón confirmar → guardar en localStorage y redirigir
-  confirmSend.addEventListener("click", () => {
+  // 📌 Botón confirmar → enviar al backend y redirigir
+  confirmSend.addEventListener("click", async () => {
     confirmModal.style.display = "none";
 
     const file = fileInput.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = e => {
-      const fileData = {
-        name: file.name,
-        type: file.type,
-        data: e.target.result
-      };
+    try {
+      const form = new FormData();
+      form.append("file", file);
 
-      // Guardamos la circular en localStorage
-      localStorage.setItem("circular1", JSON.stringify(fileData));
+      const res = await fetch("/administrador/circulares/registro", {
+        method: "POST",
+        body: form,
+      });
 
-      alert("✅ Documento subido correctamente");
-      window.location.href = "/paginainicio";
-    };
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: `Error HTTP ${res.status}` }));
+        alert("❌ Error al subir: " + (err.error || "Fallo desconocido"));
+        return;
+      }
 
-    reader.readAsDataURL(file);
+      const data = await res.json();
+      if (data.success) {
+        alert("✅ Circular subida correctamente. Te llevaremos al inicio.");
+        window.location.href = "/administrador/paginainicio";
+      } else {
+        alert("❌ Error al subir: " + (data.error || "Fallo desconocido"));
+      }
+    } catch (e) {
+      console.error(e);
+      alert("🛑 Error de conexión al subir el archivo");
+    }
   });
 });

@@ -19,43 +19,47 @@
     </button>
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
-    <div class="dropdown ms-auto">
-      <button 
-        class="btn btn-edunotas position-relative dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton1" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
-        <span class="bi bi-envelope-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-        <li><a class="dropdown-item" href="#">Ajustes</a></li>
-        <li><a class="dropdown-item" href="#">Opción 2</a></li>
-        <li><a class="dropdown-item" href="#">Opción 3</a></li>
-      </ul>
+    <div class="dropdown">
+  <button
+    class="position-relative"
+    type="button"
+    id="dropdownMenuButton"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    style="border: none; background: transparent; padding: 0;"
+  >
+    <i class="bi bi-bell-fill" style="font-size: 1.25rem; margin-left:850px;"></i>
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          id="contadorMensajes" style="display:none">0</span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
+    <li class="text-center text-muted small">Últimas notificaciones</li>
+    <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+      <p class="text-center small text-secondary mb-0">Sin notificaciones recientes</p>
     </div>
+  </ul>
+</div>
+
+<script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
 
     <div class="dropdown">
-      <button 
-        class="btn btn-usuario dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton2" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
-        <span class="bi bi-person-lines-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      
+      <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
+      <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
 
-        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
-        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
-      </ul>
-    </div>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
   </header>
 
 <!--  MENU  -->
-  <section class="bg-light py-5 mt-5">
+
   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
@@ -110,32 +114,39 @@
   <p class="text-center descripcion">Crea tus Circulares para que el Colegio se informe</p>
 
   <!-- 🔹 FORMULARIO -->
-  <form id="circularForm" enctype="multipart/form-data">
-    <div class="mb-3">
-      <label class="texto-documento">COLOCA EL DOCUMENTO</label>
-      <div class="upload-box text-center p-4 border rounded">
-        <input type="file" id="fileUpload" name="file" class="d-none" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif">
-        <label for="fileUpload" class="upload-label">
-          <!-- Ícono -->
-          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="blue" class="mb-2" viewBox="0 0 16 16">
-            <path d="M4 0a2 2 0 0 0-2 2v12a2 
-            2 0 0 0 2 2h8a2 2 0 0 0 
-            2-2V6l-6-6H4z"/>
-          </svg>
-          <p class="text-muted">Haz clic para seleccionar un archivo</p>
-        </label>
+  <div class="container">
+    <div class="card shadow border-0 mb-4">
+      <div class="card-header bg-white border-0">
+        <h5 class="mb-0" style="color:#050733ff; font-weight:800;">Subir nueva circular</h5>
+      </div>
+      <div class="card-body">
+        <form id="circularForm" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label class="form-label">Archivo</label>
+            <div class="upload-box text-center p-4 border rounded">
+              <input type="file" id="fileUpload" name="file" class="d-none" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif">
+              <label for="fileUpload" class="upload-label d-block">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="#050733ff" class="mb-2" viewBox="0 0 16 16">
+                  <path d="M4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6l-6-6H4z"/>
+                </svg>
+                <p class="text-muted m-0">Haz clic para seleccionar un archivo</p>
+              </label>
+            </div>
+          </div>
+          <div class="text-end">
+            <button type="submit" id="btnSubirDocumento" class="btn btn-primary" style="background-color:#050733ff; border-color:#050733ff;">
+              <i class="bi bi-upload"></i> Subir Documento
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-    <div class="text-center mb-5">
-      <button type="submit" id="btnSubirDocumento" class="btn btn-primary">
-        <i class="bi bi-upload"></i> Subir Documento
-      </button>
-    </div>
-  </form>
+  </div>
 
   <!-- 🔹 LISTA DE CIRCULARES EN ACORDEÓN -->
   <h2 class="text-center my-4">CIRCULARES ESTUDIANTILES</h2>
 
+  <div class="container">
   <div class="accordion" id="accordionCirculares">
     {% for file in files %}
     <div class="accordion-item">
@@ -146,15 +157,21 @@
       </h2>
       <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#accordionCirculares">
         <div class="accordion-body">
-          <a href="{{ url_for('static', filename='uploads/circulares/' + file) }}" target="_blank" class="btn btn-outline-primary">
-            📄 Ver Circular
-          </a>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="text-secondary">{{ file }}</span>
+            <div class="d-flex gap-2">
+              <a href="{{ url_for('static', filename='uploads/circulares/' + file) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                Ver / Descargar
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     {% else %}
     <p class="text-center">No hay circulares aún.</p>
     {% endfor %}
+  </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

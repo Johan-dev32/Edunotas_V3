@@ -135,7 +135,7 @@
           <th>Correo Institucional</th>
           <th>Número de Celular</th>
           <th>Direccion</th>
-          <th>Ciclo</th>
+          <th>Curso Asignado</th>
         </tr>
       </thead>
     <tbody>
@@ -147,7 +147,7 @@
     <td>{{ docente.Correo }}</td>
     <td>{{ docente.Telefono }}</td>
     <td>{{ docente.Direccion or 'Sin registrar' }}</td> <!-- profesión -->
-    <td>{{ docente.Calle or 'N/A' }}</td> <!-- ciclo -->
+    <td>{{ docente.Cursos or 'N/A' }}</td> <!-- ciclo -->
     <td>
       <!-- Botón Editar -->
       <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editarModal{{ docente.ID_Usuario }}">Editar</button>
@@ -175,8 +175,8 @@
           <input type="text" name="NumeroDocumento" value="{{ docente.NumeroDocumento }}" class="form-control mb-2">
           <input type="email" name="Correo" value="{{ docente.Correo }}" class="form-control mb-2">
           <input type="text" name="Telefono" value="{{ docente.Telefono }}" class="form-control mb-2">
-          <input type="text" name="Profesion" value="{{ docente.Direccion }}" class="form-control mb-2">
-          <input type="text" name="Ciclo" value="{{ docente.Calle }}" class="form-control mb-2">
+          <input type="text" name="Direccion" value="{{ docente.Direccion }}" class="form-control mb-2">
+          <input type="text" name="Curso" value="{{ docente.Curso }}" class="form-control mb-2">
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Guardar</button>
@@ -200,8 +200,8 @@
         <input type="text" name="NumeroDocumento" placeholder="Número Documento" class="form-control mb-2">
         <input type="email" name="Correo" placeholder="Correo Institucional" class="form-control mb-2">
         <input type="text" name="Telefono" placeholder="Teléfono" class="form-control mb-2">
-        <input type="text" name="Profesion" placeholder="Profesión" class="form-control mb-2">
-        <input type="text" name="Ciclo" placeholder="Ciclo" class="form-control mb-2">
+        <input type="text" name="Direccion" placeholder="Dirección" class="form-control mb-2">
+        <input type="text" name="Curso" placeholder="Curso" class="form-control mb-2">
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn btn-success">Guardar</button>

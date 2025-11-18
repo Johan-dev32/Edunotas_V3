@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, abort
 from flask_login import login_required, current_user
-from Controladores.models import db, Usuario, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Notificacion, Acudiente, Nota_Calificaciones, Citaciones
+from Controladores.models import db, Usuario, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Notificacion, Acudiente, Nota_Calificaciones, Citaciones, Observacion, Matricula
 from sqlalchemy import or_, func
 import os
 import unicodedata

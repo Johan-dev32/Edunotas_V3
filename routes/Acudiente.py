@@ -26,23 +26,39 @@ def ver_notas():
 @Acudiente_bp.route('/ver_notas2')
 @login_required
 def ver_notas2():
+    # 1. Intentar recibir directamente el ID de la asignatura
+    asignatura_id = request.args.get('asignatura_id', type=int)
     materia_nombre = request.args.get('materia')
-    if not materia_nombre:
-        flash('Debe seleccionar una materia.', 'warning')
-        return redirect(url_for('Acudiente.ver_notas'))
 
-    # Resolver asignatura por nombre (insensible a acentos y mayúsculas)
-    def _normalize(s):
-        if not s:
-            return ''
-        return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn').strip().upper()
+    if asignatura_id:
+        asignatura = Asignatura.query.get(asignatura_id)
+        if not asignatura:
+            flash('La materia seleccionada no existe.', 'danger')
+            return redirect(url_for('Acudiente.ver_notas'))
+        # Si el nombre no viene, usar el de la asignatura
+        if not materia_nombre:
+            materia_nombre = asignatura.Nombre
+    else:
+        # Compatibilidad: resolver por nombre (insensible a acentos y mayúsculas)
+        if not materia_nombre:
+            flash('Debe seleccionar una materia.', 'warning')
+            return redirect(url_for('Acudiente.ver_notas'))
 
-    materia_norm = _normalize(materia_nombre)
-    asignatura = None
-    for asig in Asignatura.query.all():
-        if _normalize(asig.Nombre) == materia_norm:
-            asignatura = asig
-            break
+        def _normalize(s):
+            if not s:
+                return ''
+            return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn').strip().upper()
+
+        materia_norm = _normalize(materia_nombre)
+        materia_root = materia_norm.split()[0] if materia_norm else ''
+
+        asignatura = None
+        for asig in Asignatura.query.all():
+            nombre_norm = _normalize(asig.Nombre)
+            if nombre_norm.startswith(materia_norm) or nombre_norm.startswith(materia_root):
+                asignatura = asig
+                break
+
     if not asignatura:
         flash('La materia seleccionada no existe.', 'danger')
         return redirect(url_for('Acudiente.ver_notas'))

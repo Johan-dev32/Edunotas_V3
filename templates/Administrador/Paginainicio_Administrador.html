@@ -364,24 +364,15 @@ async function obtenerNotificaciones() {
       elemento.innerHTML = `<strong>${noti.titulo}</strong><br>${noti.contenido}`;
       contenedor.appendChild(elemento);
     });
-
-    const ultima = notificaciones[0];
-    if (ultima && !ultima.mostrada) {
-      Swal.fire({
-        icon: "info",
-        title: ultima.titulo,
-        text: ultima.contenido,
-        confirmButtonColor: "#5A4AE3",
-        timer: 4000
-      });
-      ultima.mostrada = true;
-    }
   } catch (error) {
     console.error("Error al obtener notificaciones:", error);
   }
 }
 
-document.getElementById("btnEnviarNotificacion").addEventListener("click", enviarNotificacion);
+const btnEnviar = document.getElementById("btnEnviarNotificacion");
+if (btnEnviar) {
+  btnEnviar.addEventListener("click", enviarNotificacion);
+}
 
 setInterval(obtenerNotificaciones, 15000);
 

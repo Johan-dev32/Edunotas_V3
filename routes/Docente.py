@@ -389,6 +389,10 @@ def editar_actividad(id_actividad):
 
 #----------------------------------------------------------------------------------------------------------------------------
 
+@Docente_bp.route('/asistencia')
+def asistencia():
+    return render_template('Docentes/Asistencia.html')
+
 @Docente_bp.route('/aprobacion_academica')
 def aprobacion_academica():
     return render_template('Docentes/AprobacionAcademica.html')
@@ -453,20 +457,48 @@ def _calcular_promedio_local(registro_nota):
 @Docente_bp.route('/registro_notas_curso/<int:curso_id>', methods=['GET', 'POST'])
 @login_required
 def registro_notas_curso(curso_id):
-    
-    # 🛑 Asegúrate de que Docente_Asignatura esté importado al inicio del archivo
-    # 🛑 Y que ID_DOCENTE_ACTUAL se obtenga de la sesión de Flask, no un valor fijo (ej: current_user.ID_Usuario si usas Flask-Login)
+    """Pantalla de registro de notas.
+
+    Admite dos tipos de identificador en la URL:
+    - ID_Curso real (clave primaria de la tabla Curso)
+    - Código "visible" como 601, 701, 1001, 1103, etc. (grado*100 + grupo)
+
+    Si recibe un código (>=100), se decodifica a grado y grupo y se
+    busca el Curso correspondiente. A partir de ahí se trabaja siempre
+    con el ID_Curso real para consultas y formularios.
+    """
+
     ID_DOCENTE_ACTUAL = current_user.ID_Usuario
-    
-    # --- 1. PROCESAR FILTROS Y OBTENER DATOS BASE ---
-    
-    # 1.1. Obtener la información del curso
+
+    # --- 1. Resolver el curso real (ID_Curso) a partir del parámetro ---
     curso_obj = Curso.query.get(curso_id)
+    curso_pk = None
+
+    if not curso_obj and curso_id >= 100:
+        # Interpretar como código grado*100 + grupo
+        grado_calc = curso_id // 100
+        grupo_calc = curso_id % 100
+
+        # Aceptar grupo "1" y "01", "2" y "02", etc.
+        grupo_candidatos = {str(grupo_calc), f"{grupo_calc:02d}"}
+
+        curso_obj = Curso.query.filter(
+            (Curso.Grado == str(grado_calc)) | (Curso.Grado == grado_calc),
+            (Curso.Grupo.in_(list(grupo_candidatos)))
+        ).first()
+
+    if curso_obj:
+        curso_pk = curso_obj.ID_Curso
+    else:
+        # Fallback: usamos el ID tal cual para que al menos no rompa,
+        # pero el nombre mostrará "Curso Desconocido".
+        curso_pk = curso_id
+
     curso_nombre = f"{curso_obj.Grado}-{curso_obj.Grupo}" if curso_obj and hasattr(curso_obj, 'Grado') else "Curso Desconocido"
-    
-    # 1.2. Claves de sesión para este curso específico
-    session_key_asignatura = f'last_asignatura_{curso_id}'
-    session_key_periodo = f'last_periodo_{curso_id}'
+
+    # 1.2. Claves de sesión para este curso específico (usando el ID real)
+    session_key_asignatura = f'last_asignatura_{curso_pk}'
+    session_key_periodo = f'last_periodo_{curso_pk}'
     
     # 1.3. Obtener filtros, priorizando: 1. URL/GET, 2. Sesión
     
@@ -498,7 +530,7 @@ def registro_notas_curso(curso_id):
     estudiantes_db = db.session.query(Usuario, Matricula). \
         join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario). \
         filter(
-            Matricula.ID_Curso == curso_id,
+            Matricula.ID_Curso == curso_pk,
             Usuario.Rol == 'Estudiante'
         ).order_by(Usuario.Apellido, Usuario.Nombre).all()
 
@@ -510,6 +542,16 @@ def registro_notas_curso(curso_id):
                              .filter(Docente_Asignatura.ID_Docente == ID_DOCENTE_ACTUAL)\
                              .distinct()\
                              .all()
+
+    # 1.6.1. Agrupar por nombre base (primera palabra) para no repetir materias por grado
+    asignaturas_unicas_dict = {}
+    for asig in asignaturas_db:
+        partes = (asig.nombre or '').split()
+        nombre_base = partes[0] if partes else asig.nombre
+        if nombre_base not in asignaturas_unicas_dict:
+            asignaturas_unicas_dict[nombre_base] = asig
+
+    asignaturas_unicas = list(asignaturas_unicas_dict.values())
     
     # --- 2. OBTENER NOTAS EXISTENTES (PERSISTENCIA) ---
     notas_por_estudiante = {}
@@ -549,10 +591,10 @@ def registro_notas_curso(curso_id):
                            curso_obj=curso_obj,
                            curso_nombre=curso_nombre, 
                            estudiantes=lista_estudiantes, 
-                           curso_id=curso_id, 
+                           curso_id=curso_pk, 
                            asignatura_id=asignatura_id,
                            periodo_seleccionado=periodo_seleccionado, # Pasar el filtro seleccionado
-                           asignaturas=asignaturas_db
+                           asignaturas=asignaturas_unicas
                            )
     
 @Docente_bp.route('/generar_reporte_pdf/<int:curso_id>', methods=['GET'])
@@ -787,22 +829,18 @@ def guardar_notas_curso(curso_id):
                 print(f"[guardar_notas_curso] Error creando notificaciones: {e}")
             except Exception:
                 pass
-        
+
         # ✅ CLAVE DE PERSISTENCIA: Guardar los filtros en la sesión
         session[session_key_asignatura] = asignatura_id
         session[session_key_periodo] = periodo
-        
+
         flash("Notas guardadas exitosamente.", "success")
-        
-        # Redirigir conservando filtros para repoblar la vista
-        return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id, asignatura=asignatura_id, periodo=periodo))
         
     except Exception as e:
         db.session.rollback()
         flash(f"Error al guardar los cambios en la base de datos: {e}", "error")
-        return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id, asignatura=asignatura_id, periodo=periodo))
-        
-    # 3. REDIRECCIONAMIENTO FINAL
+
+    # 3. REDIRECCIONAMIENTO FINAL (según la acción solicitada)
     if accion == 'reporte':
         # Redirigir a la generación de PDF (usa GET)
         return redirect(url_for(
@@ -811,8 +849,8 @@ def guardar_notas_curso(curso_id):
             asignatura=asignatura_id, 
             periodo=periodo
         ))
-    
-    # Si la acción es 'guardar' o si falla el reporte, redirigir a la vista,
+
+    # Si la acción es 'guardar' o cualquier otra, redirigir de nuevo a la vista
     # manteniendo los filtros en la URL para recargar la tabla actualizada.
     return redirect(url_for(
         'Docente.registro_notas_curso', 

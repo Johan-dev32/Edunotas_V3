@@ -2322,11 +2322,11 @@ def gestion_cursos(): # <--- NOMBRE DE LA FUNCIÓN CAMBIADO
         # Redirige a la nueva función
         return redirect(url_for('Administrador.gestion_cursos')) 
 
-    # Para GET (mostrar cursos)
+    # Para GET (mostrar gestión de cursos)
     cursos = Curso.query.all()
-    usuarios = Usuario.query.all()
-    # Tu template Cursos2.html (la tabla con el formulario) deberá ser llamado aquí.
-    return render_template('Administrador/ver_estudiante_curso.html', cursos=cursos, usuarios=usuarios)
+    directores = Usuario.query.filter_by(Rol='Docente').all()
+    # Mostrar la vista general de cursos existente
+    return render_template('Administrador/Cursos.html', cursos=cursos, directores=directores)
 
 @Administrador_bp.route('/cursos/<int:curso_id>/estudiantes') 
 def _estudiantes_curso(curso_id):

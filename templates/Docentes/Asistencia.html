@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colegio Fe y Alegría</title>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Iconos -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- CSS propio -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Docente/Asistencia.css') }}">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="d-flex align-items-center p-3 border-bottom w-100">
+    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+
+    <div class="dropdown ms-auto">
+      <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" data-bs-toggle="dropdown">
+        <span class="bi bi-envelope-fill"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#">Ajustes</a></li>
+        <li><a class="dropdown-item" href="#">Opción 2</a></li>
+        <li><a class="dropdown-item" href="#">Opción 3</a></li>
+      </ul>
+    </div>
+
+     <div class="dropdown">
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      
+      <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
+      <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
+  </header>
+
+  <!-- MENU -->
+  <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">MENÚ</h5>
+    </div>
+    <div class="offcanvas1-body">
+      <ul class="nav flex-column">
+        <li class="nav-item"><a href="{{ url_for('Docente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+
+        <!-- Submenú Notas -->
+        <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
+        <div class="collapse" id="submenuNotas">
+          <ul class="nav flex-column ms-3">
+           
+            <li><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Registrar Notas</a></li>
+            <li><a href="{{ url_for('Docente.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-calculator"></i> Cálculo de Promedios</a></li>
+          </ul>
+        </div>
+        
+        <li class="nav-item"><a href="{{ url_for('Docente.tareas_actividades1') }}" class="nav-link text-white"><i class="bi bi-book-half"></i> Registro de Tareas y Actividades</a></li>
+        <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+        <li class="nav-item"><a href="{{ url_for('Docente.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Aprobación Académica</a></li>
+        <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones</a></li>
+      </ul>
+    </div>
+  </div>  
+
+  <!-- CONTENIDO PRINCIPAL: EXCUSAS RECIBIDAS -->
+  <main class="container py-5" style="max-width: 1200px;">
+    <!-- Título -->
+    <div class="text-center mb-4">
+      <h1 class="titulo-principal">EXCUSAS RECIBIDAS</h1>
+      <p class="descripcion mb-0">Revise, apruebe o rechace las justificaciones enviadas por los acudientes.</p>
+    </div>
+
+    <!-- Tabla de excusas -->
+    <section class="bg-light rounded-3 shadow-sm p-4">
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th scope="col">Fecha de la Falta</th>
+              <th scope="col">Estudiante</th>
+              <th scope="col">Materia / Período</th>
+              <th scope="col">Motivo</th>
+              <th scope="col">Estado</th>
+              <th scope="col" class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Ejemplos de filas; luego se pueden reemplazar por datos reales -->
+            <tr>
+              <td>15/11/2025</td>
+              <td>Juan Pérez</td>
+              <td>Matemáticas (Toda la Jornada)</td>
+              <td>Cita Médica</td>
+              <td><span class="badge bg-warning text-dark">Pendiente</span></td>
+              <td class="text-center">
+                <button type="button" class="btn btn-primary btn-sm" style="background-color: #050733ff;" 
+                        data-bs-toggle="modal" data-bs-target="#modalExcusa"
+                        data-fecha="15/11/2025"
+                        data-estudiante="Juan Pérez"
+                        data-materia="Matemáticas (Toda la Jornada)"
+                        data-motivo="Cita Médica"
+                        data-detalles="Control médico programado">
+                  Ver detalle
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>18/11/2025</td>
+              <td>María Gómez</td>
+              <td>Biología (Hora 3)</td>
+              <td>Situación Familiar</td>
+              <td><span class="badge bg-success">Aprobada</span></td>
+              <td class="text-center">
+                <button type="button" class="btn btn-primary btn-sm" style="background-color: #050733ff;" 
+                        data-bs-toggle="modal" data-bs-target="#modalExcusa"
+                        data-fecha="18/11/2025"
+                        data-estudiante="María Gómez"
+                        data-materia="Biología (Hora 3)"
+                        data-motivo="Situación Familiar"
+                        data-detalles="Situación familiar justificada por acudiente">
+                  Ver detalle
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: DETALLE DE EXCUSA -->
+  <div class="modal fade" id="modalExcusa" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Detalle de la Excusa</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="post">
+          <div class="modal-body">
+            <p class="mb-1"><strong>Fecha de la falta:</strong> <span id="excusaFecha">--/--/----</span></p>
+            <p class="mb-1"><strong>Estudiante:</strong> <span id="excusaEstudiante">---</span></p>
+            <p class="mb-3"><strong>Materia / Período:</strong> <span id="excusaMateria">---</span></p>
+
+            <div class="mb-3">
+              <label class="form-label"><strong>Motivo reportado:</strong></label>
+              <p id="excusaMotivo" class="mb-0">---</p>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label"><strong>Detalles enviados por el acudiente:</strong></label>
+              <p id="excusaDetalles" class="mb-0">---</p>
+            </div>
+
+            <hr>
+
+            <!-- Estado que define el docente -->
+            <div class="mb-3">
+              <label for="estadoExcusa" class="form-label">Estado de la excusa:</label>
+              <select id="estadoExcusa" name="estado" class="form-select" required>
+                <option value="Pendiente">Pendiente</option>
+                <option value="Aprobada">Aprobada</option>
+                <option value="Rechazada">Rechazada</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="observacionesDocente" class="form-label">Observaciones del docente:</label>
+              <textarea id="observacionesDocente" name="observaciones" class="form-control" rows="3" placeholder="Ej: Se acepta la excusa con base en el certificado enviado."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn" style="background-color: #050733ff; color: #ffffff;">Actualizar Estado</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Rellena el modal con los datos de la excusa seleccionada
+    const modalExcusa = document.getElementById('modalExcusa');
+    if (modalExcusa) {
+      modalExcusa.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        if (!button) return;
+
+        const fecha = button.getAttribute('data-fecha') || '';
+        const estudiante = button.getAttribute('data-estudiante') || '';
+        const materia = button.getAttribute('data-materia') || '';
+        const motivo = button.getAttribute('data-motivo') || '';
+        const detalles = button.getAttribute('data-detalles') || '';
+
+        const fechaSpan = modalExcusa.querySelector('#excusaFecha');
+        const estSpan = modalExcusa.querySelector('#excusaEstudiante');
+        const materiaSpan = modalExcusa.querySelector('#excusaMateria');
+        const motivoP = modalExcusa.querySelector('#excusaMotivo');
+        const detallesP = modalExcusa.querySelector('#excusaDetalles');
+
+        if (fechaSpan) fechaSpan.textContent = fecha;
+        if (estSpan) estSpan.textContent = estudiante;
+        if (materiaSpan) materiaSpan.textContent = materia;
+        if (motivoP) motivoP.textContent = motivo;
+        if (detallesP) detallesP.textContent = detalles;
+      });
+    }
+  </script>
+
+</body>
+</html>

@@ -83,15 +83,21 @@
 
         <div class="d-flex justify-content-between mt-4">
 
-            <button id="btnGuardarNotas" type="submit" name="action" value="guardar" class="btn btn-primary">
-                <i class="fas fa-save"></i> Guardar Todas las Notas
+            <button id="btnGuardarNotas" type="submit" name="action" value="guardar" class="btn btn-primary" style="background-color: #050733ff;">
+                <i class="fas fa-save"><i class="bi bi-arrow-down-square"></i></i> Guardar Notas
             </button>
 
-            <button type="submit" name="action" value="reporte" class="btn btn-success">
-                <i class="fas fa-file-pdf"></i> Reporte de Notas (PDF)
+            <button type="submit" name="action" value="reporte" class="btn btn-success" style="background-color: #ff0000ff;">
+                <i class="fas fa-file-pdf"></i> Reporte (PDF)
             </button>
             
-            <div style="width: 150px;"></div> </div>
+            <a href="{{ url_for('Docente.asistencia') }}" 
+   class="btn btn-success" 
+   style="background-color: #050733ff;">
+  <i class="fas fa-file-pdf"></i> Asistencias
+</a>
+            
+            <div style="width: 900px;"></div> </div>
 
         <div class="row mb-4 g-3 justify-content-center mt-3">
 
@@ -112,8 +118,10 @@
                 <select class="form-select" id="asignatura_select" name="asignatura" required onchange="this.form.submit()">
                     <option value="" disabled {% if not asignatura_id or asignatura_id == 0 %}selected{% endif %}>Seleccione Asignatura</option>
                     {% for asignatura in asignaturas %}
+                        {% set partes = asignatura.nombre.split(' ') %}
+                        {% set nombre_base = partes[0] if partes else asignatura.nombre %}
                         <option value="{{ asignatura.id }}" {% if asignatura.id|string == asignatura_id|string %}selected{% endif %}>
-                            {{ asignatura.nombre }}
+                            {{ nombre_base }}
                         </option>
                     {% endfor %}
                 </select>

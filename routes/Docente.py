@@ -4,7 +4,7 @@ from flask_mail import Message
 from werkzeug.utils import secure_filename
 import io
 from xhtml2pdf import pisa
-from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Curso, Notificacion, Programacion, Observacion, Nota_Calificaciones, Docente_Asignatura, ResumenSemanal, Tutorias, Acudiente )
+from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Curso, Notificacion, Programacion, Observacion, Nota_Calificaciones, Docente_Asignatura, ResumenSemanal, Tutorias, Acudiente, MaterialDidactico )
 from sqlalchemy import text
 
 from reportlab.pdfgen import canvas
@@ -41,9 +41,7 @@ def paginainicio():
 def manual():
     return render_template('Docentes/ManualUsuario.html')
 
-@Docente_bp.route('/materialapoyo')
-def materialapoyo():
-    return render_template('Docentes/MaterialApoyo.html')
+
 
 @Docente_bp.route('/resumensemanal')
 def resumensemanal():
@@ -330,8 +328,8 @@ def crear_actividad(curso_id):
             nueva_actividad = Actividad(
                 Titulo=titulo,
                 Tipo=tipo,
-                Fecha=datetime.datetime.strptime(fecha, "%Y-%m-%d").date(),
-                Hora=datetime.datetime.strptime(hora, "%H:%M").time(),
+                Fecha=datetime.strptime(fecha, "%Y-%m-%d").date(),
+                Hora=datetime.strptime(hora, "%H:%M").time(),
                 Descripcion=descripcion,
                 ArchivoPDF=nombre_pdf,  # 👈 solo guardamos el nombre
                 Estado=estado,
@@ -444,6 +442,61 @@ def ver_pdf(filename):
     except FileNotFoundError:
         flash("❌ El archivo PDF no fue encontrado.", "danger")
         return redirect(url_for('Docente.tareas_actividades1'))
+    
+
+
+@Docente_bp.route('/ver_entregas')
+@login_required
+def ver_entregas_lista():
+    try:
+        # obtener asignaturas del docente
+        asignaturas_docente = Docente_Asignatura.query.filter_by(
+            ID_Docente=current_user.ID_Usuario
+        ).all()
+
+        id_asignaturas = [a.ID_Asignatura for a in asignaturas_docente]
+
+        # obtener cronogramas ligados a esas asignaturas
+        cronogramas = Cronograma_Actividades.query.filter(
+            Cronograma_Actividades.ID_Asignatura.in_(id_asignaturas)
+        ).all()
+
+        id_cronogramas = [c.ID_Cronograma_Actividades for c in cronogramas]
+
+        # obtener actividades de esos cronogramas
+        actividades = Actividad.query.filter(
+            Actividad.ID_Cronograma_Actividades.in_(id_cronogramas)
+        ).all()
+
+        return render_template(
+            "Docentes/VerEntregasLista.html",
+            actividades=actividades
+        )
+
+    except Exception as e:
+        print("ERROR en ver_entregas_lista:", e)
+        return render_template("Docentes/VerEntregasLista.html", actividades=[])
+
+
+@Docente_bp.route('/entregas/<int:id_actividad>')
+@login_required
+def ver_entregas(id_actividad):
+
+    if current_user.Rol != 'Docente':
+        flash("Acceso no autorizado", "warning")
+        return redirect(url_for('Docente.paginainicio'))
+
+    actividad = Actividad.query.get(id_actividad)
+
+    entregas = Actividad_Estudiante.query.filter_by(
+        ID_Actividad=id_actividad
+    ).all()
+
+    return render_template(
+        "Docentes/VerEntregas.html",
+        actividad=actividad,
+        entregas=entregas
+    )
 #----------------------------------------------------------------------------------------------------------------------------
 
 @Docente_bp.route('/aprobacion_academica')
@@ -972,9 +1025,96 @@ def horarios():
 
 
 # ----------------- SUB-PÁGINAS -----------------
-@Docente_bp.route('/materialapoyo2')
-def materialapoyo2():
-    return render_template('Docentes/MaterialApoyo2.html')
+
+#--------------------------material de apoyo----------------------------
+@Docente_bp.route('/materialapoyo')
+@login_required
+def materialapoyo():
+    cursos = db.session.query(Curso)\
+                .join(Docente_Asignatura, Docente_Asignatura.ID_Curso == Curso.ID_Curso)\
+                .filter(Docente_Asignatura.ID_Docente == current_user.ID_Usuario)\
+                .all()
+
+    return render_template('Docentes/MaterialApoyo.html', cursos=cursos)
+
+@Docente_bp.route('/materialapoyo/<int:curso_id>', methods=['GET', 'POST'])
+@login_required
+def materialapoyo2(curso_id):
+
+    # Cargar las materias dictadas por este docente en este curso
+    materias = (
+        db.session.query(Asignatura)
+        .join(Docente_Asignatura)
+        .filter(
+            Docente_Asignatura.ID_Docente == current_user.ID_Usuario,
+            Docente_Asignatura.ID_Curso == curso_id
+        )
+        .all()
+    )
+
+    if request.method == 'POST':
+
+        tipo = request.form.get('tipo')
+        asignatura_nombre = request.form.get('nombre')
+        archivo = request.files.get('archivo')
+        link = request.form.get('link')
+
+        # --- Buscar materia ---
+        asignatura = Asignatura.query.filter_by(Nombre=asignatura_nombre).first()
+
+        if not asignatura:
+            flash("La materia seleccionada no es válida.", "danger")
+            return redirect(url_for('Docente.materialapoyo2', curso_id=curso_id))
+
+        ruta_archivo = None
+        enlace_final = None
+
+        # === 1. Crear carpeta material si no existe ===
+        carpeta_material = os.path.join(current_app.static_folder, "material")
+        os.makedirs(carpeta_material, exist_ok=True)
+
+        # === 2. Guardar archivo según tipo ===
+        if archivo and archivo.filename != "" and tipo not in ["Enlace", "Video"]:
+            filename = secure_filename(archivo.filename)
+            ruta_archivo = f"material/{filename}"
+            archivo.save(os.path.join(current_app.static_folder, ruta_archivo))
+
+        # === 3. Guardar enlace si aplica ===
+        if tipo in ["Enlace", "Video"]:
+            enlace_final = link
+
+        # === 4. Guardar registro en la BD ===
+        material = MaterialDidactico(
+            ID_Docente=current_user.ID_Usuario,
+            ID_Curso=curso_id,
+            Titulo=asignatura_nombre,
+            Tipo=tipo,
+            RutaArchivo=ruta_archivo,
+            Enlace=enlace_final
+        )
+
+        db.session.add(material)
+        db.session.commit()
+
+        flash('Material subido correctamente.', 'success')
+        return redirect(url_for('Docente.materialapoyo2', curso_id=curso_id))
+
+    # Cargar material existente
+    materiales = MaterialDidactico.query.filter_by(
+        ID_Docente=current_user.ID_Usuario,
+        ID_Curso=curso_id
+    ).all()
+
+    return render_template(
+        'Docentes/MaterialApoyo2.html',
+        materiales=materiales,
+        curso_id=curso_id,
+        materias=materias
+    )
+
+
+
+#----------------------------------------------------
 
 @Docente_bp.route('/registrotutorias2')
 def registrotutorias2():

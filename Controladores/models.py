@@ -210,6 +210,7 @@ class Cronograma_Actividades(db.Model):
     ID_Periodo = db.Column(db.Integer, db.ForeignKey("Periodo.ID_Periodo", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
     FechaInicial = db.Column(db.Date)
     FechaFinal = db.Column(db.Date)
+    ID_Asignatura = db.Column(db.Integer, db.ForeignKey("Asignatura.ID_Asignatura", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
 
     curso = relationship("Curso", back_populates="cronogramas")
     periodo = relationship("Periodo", back_populates="cronogramas")
@@ -243,6 +244,7 @@ class Actividad_Estudiante(db.Model):
     ID_Actividad_Estudiante = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ID_Actividad = db.Column(db.Integer, db.ForeignKey("Actividad.ID_Actividad", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
     ID_Matricula = db.Column(db.Integer, db.ForeignKey("Matricula.ID_Matricula", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
+    Archivo = db.Column(db.String(255))
     Observaciones = db.Column(db.Text)
     Calificacion = db.Column(db.Numeric(5,2))
 
@@ -462,3 +464,26 @@ class Nota_Calificaciones(db.Model):
     __table_args__ = (
         db.UniqueConstraint('ID_Estudiante', 'ID_Asignatura', 'Periodo', name='uq_calificacion_periodo'),
     )
+    
+
+
+class MaterialDidactico(db.Model):
+    __tablename__ = 'MaterialDidactico'
+
+    ID_Material = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ID_Curso = db.Column(db.Integer, db.ForeignKey('Curso.ID_Curso'), nullable=False)
+    ID_Docente = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
+
+    Titulo = db.Column(db.String(200), nullable=False)
+    Descripcion = db.Column(db.Text)
+    Tipo = db.Column(db.Enum('PDF', 'Video', 'Enlace', 'Documento', 'Imagen', name='tipo_material'), nullable=False)
+
+    RutaArchivo = db.Column(db.String(255))  # Solo si es archivo (PDF, imagen, doc)
+    Enlace = db.Column(db.String(500))       # Solo si es un link externo (YouTube, Drive, etc.)
+
+    FechaCreacion = db.Column(db.DateTime, default=db.func.now())
+    Estado = db.Column(db.Enum('Activo', 'Inactivo', name='estado_material'), default='Activo')
+
+    # Relaciones opcionales (no necesarias pero útiles)
+    curso = db.relationship('Curso', backref='materiales', lazy=True)
+    docente = db.relationship('Usuario', backref='materiales_creados', lazy=True)

@@ -26,7 +26,7 @@
         id="dropdownMenuButton"
         data-bs-toggle="dropdown"
         aria-expanded="false"
-        style="border: none; background: transparent; padding: 0; margin-left: 860px;"
+        style="border: none; background: transparent; padding: 0; margin-left: 940px;"
       >
         <i class="bi bi-bell-fill" style="font-size: 1.25rem;"></i>
         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none ">0</span>
@@ -85,34 +85,59 @@
   </div>
 </section>
 
-    <main class="container">
-    <section class="card form-card" aria-labelledby="form-title">
-      <h2 id="form-title">Registrar justificación</h2>
-      <form id="justificacionForm" novalidate>
-        <label for="studentName">Nombre del estudiante</label>
-        <input id="studentName" name="studentName" type="text" placeholder="Ej. Juan Pérez" required>
+    <main class="table">
+        <h2>FALTAS POR JUSTIFICAR</h2>
+        <table id="attendance-table">
+            <thead class="cuadro">
+                <tr>
+                    <th>Fecha de la Falta</th>
+                    <th>Materia / Periodo</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-falta-id="101">
+                    <td>15/11/2025</td>
+                    <td>Matemáticas (Toda la Jornada)</td>
+                    <td><button class="justify-btn" data-id="101">Justificar</button></td>
+                </tr>
+                <tr data-falta-id="102">
+                    <td>18/11/2025</td>
+                    <td>Biología (Hora 3)</td>
+                    <td><button class="justify-btn" data-id="102">Justificar</button></td>
+                </tr>
+            </tbody>
+        </table>
 
-        <label for="relation">Relación (acudiente)</label>
-        <input id="relation" name="relation" type="text" placeholder="Ej. Madre, Padre, Tutor" required>
+        </main>
 
-        <label for="date">Fecha de ausencia</label>
-        <input id="date" name="date" type="date" required>
+    <div id="justification-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>Registrar Justificación</h3>
+            <form id="justification-form">
+                <input type="hidden" id="falta-id-input" name="faltaId">
 
-        <label for="reason">Motivo</label>
-        <textarea id="reason" name="reason" rows="4" placeholder="Describe brevemente el motivo" required></textarea>
+                <label for="reason">Motivo:</label>
+                <select id="reason" name="reason" required>
+                    <option value="">Seleccione un motivo</option>
+                    <option value="enfermedad">Enfermedad</option>
+                    <option value="cita">Cita Médica</option>
+                    <option value="viaje">Viaje Familiar</option>
+                    <option value="otro">Otro</option>
+                </select>
 
-        <label for="evidence">Adjuntar evidencia (opcional)</label>
-        <input id="evidence" name="evidence" type="file" accept="image/*,.pdf">
+                <label for="details">Detalles:</label>
+                <textarea id="details" name="details" rows="4" required></textarea>
 
-        <div class="actions">
-          <button type="submit" class="btn">Enviar justificación</button>
-          <button type="button" id="clearBtn" class="btn btn-ghost">Limpiar</button>
+                <label for="document">Adjuntar Soporte (Certificado, etc.):</label>
+                <input type="file" id="document" name="document" accept=".pdf,.jpg,.png">
+
+                <button type="submit">Enviar Justificación</button>
+            </form>
         </div>
-      </form>
-      <div id="formMessage" role="status" aria-live="polite" class="form-message"></div>
-    </section>
+    </div>
 
-  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <!-- JavaScript externo -->

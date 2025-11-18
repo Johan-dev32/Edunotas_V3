@@ -1,11 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, abort
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, abort, current_app
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from datetime import datetime
+from datetime import datetime, date
 from sqlalchemy import or_, text, func
 from sqlalchemy.exc import IntegrityError
-from Controladores.models import db, Matricula, Actividad, Curso, Periodo, Asignatura, Programacion, Actividad_Estudiante, Notificacion, Bloques, Usuario, Encuesta, Encuesta_Respuesta, Tutorias, Citaciones, Nota_Calificaciones, Observacion
-
+from Controladores.models import db, Matricula, Actividad, Curso, Periodo, Asignatura, Programacion, Actividad_Estudiante, Notificacion, Bloques, Usuario, Encuesta, Encuesta_Respuesta, Tutorias, Citaciones, Nota_Calificaciones, Observacion, Cronograma_Actividades, Docente_Asignatura, MaterialDidactico
+import json
 import os
 
 from decimal import Decimal
@@ -176,22 +176,51 @@ def horario_estudiante(curso_id):
 def vernotas():
     return render_template('Estudiante/VerNotas.html')
 
+
 @Estudiante_bp.route('/MaterialDidactico')
-def MaterialDidactico():
-    return render_template('Estudiante/MaterialDidactico.html')
+@login_required
+def verMaterialDidactico():
 
-@Estudiante_bp.route('/entregatareas')
-def entregatareas():
-    return render_template('Estudiante/EntregaTareas.html')
+    matricula = Matricula.query.filter_by(ID_Estudiante=current_user.ID_Usuario).first()
 
-@Estudiante_bp.route('/entregatareas2')
-def entregatareas2():
-    return render_template('Estudiante/EntregaTareas2.html')
+    print("\n============== DEBUG ==============")
+    print("Usuario logueado:", current_user.ID_Usuario)
+    print("Matricula encontrada:", matricula)
+    if matricula:
+        print("Curso ID obtenido:", matricula.ID_Curso)
 
-@Estudiante_bp.route('/entregatareas3')
-def entregatareas3():
-    return render_template('Estudiante/EntregaTareas3.html')
+    # Buscar materiales del curso
+    materiales = MaterialDidactico.query.filter_by(ID_Curso=matricula.ID_Curso, Estado='Activo').all()
 
+    print("Materiales encontrados:", len(materiales))
+    for m in materiales:
+        print(" ->", m.ID_Material, m.Titulo, "Curso:", m.ID_Curso)
+
+    print("====================================\n")
+
+    materiales_json = json.dumps([
+    {
+        "id": m.ID_Material,
+        "titulo": m.Titulo,
+        "descripcion": m.Descripcion,
+        "tipo": m.Tipo,
+        "archivo": m.RutaArchivo,
+        "enlace": m.Enlace,
+        "fecha": m.FechaCreacion.strftime('%Y-%m-%d'),
+        "url": m.Enlace if m.Enlace else (
+        url_for('static', filename=f"material/{m.RutaArchivo.split('/')[-1]}") 
+        if m.RutaArchivo else "#"
+        )
+        }
+    for m in materiales
+    ])
+
+    return render_template(
+        'Estudiante/MaterialDidactico.html',
+        materiales_json=materiales_json
+    )
+    
+    
 @Estudiante_bp.route('/evaluaciones')
 def evaluaciones():
     return render_template('Estudiante/Evaluaciones.html')
@@ -261,6 +290,8 @@ def circulares_estudiantes():
 def materias():
     return render_template('Estudiante/Materias.html')
 
+
+# ----------------------- parte de actividades---------------------------
 @Estudiante_bp.route('/tareas_actividades')
 @login_required
 def tareas_actividades():
@@ -269,40 +300,66 @@ def tareas_actividades():
         matriculas = Matricula.query.filter_by(ID_Estudiante=current_user.ID_Usuario).all()
         cursos_ids = [m.ID_Curso for m in matriculas]
 
-        # Buscar actividades relacionadas con sus cursos
         actividades = []
         if cursos_ids:
-            actividades = Actividad.query.filter(Actividad.ID_Curso.in_(cursos_ids)).all()
+            actividades = (
+                db.session.query(Actividad)
+                .join(Cronograma_Actividades, Actividad.ID_Cronograma_Actividades == Cronograma_Actividades.ID_Cronograma_Actividades)
+                .filter(Cronograma_Actividades.ID_Curso.in_(cursos_ids))
+                .all()
+            )
 
         return render_template('Estudiante/TareasActividades.html', actividades=[(a, None) for a in actividades])
     except Exception as e:
         flash(f"Error al cargar actividades: {e}", "danger")
         return redirect(url_for('Estudiante.paginainicio'))
     
-@Estudiante_bp.route('/subida_evidencias/<int:id_actividad>')
+        
+@Estudiante_bp.route('/subir_entrega/<int:id_actividad>', methods=['POST'])
 @login_required
-def subida_evidencias(id_actividad):
-    try:
-        actividad = Actividad.query.get(id_actividad)
-        if not actividad:
-            flash("Actividad no encontrada.", "warning")
-            return redirect(url_for('Estudiante.tareas_actividades'))
+def subir_entrega(id_actividad):
 
-        return render_template('Estudiante/SubidaEvidencias.html',
-                               actividad_id=actividad.ID_Actividad,
-                               titulo_actividad=actividad.Titulo,
-                               descripcion_actividad=actividad.Tipo,  # puedes reemplazar por otra descripción si la agregas
-                               fecha_entrega=actividad.Fecha,
-                               hora_entrega=None,
-                               pdf_nombre=None)
-    except Exception as e:
-        flash(f"Error: {e}", "danger")
-        return redirect(url_for('Estudiante.tareas_actividades'))
-    
+    archivo = request.files.get('archivo_entrega')
+    if not archivo:
+        flash('Debes seleccionar un archivo.', 'warning')
+        return redirect(url_for('Estudiante.entregatareas3', id_actividad=id_actividad))
+
+    filename = secure_filename(archivo.filename)
+
+    folder = os.path.join(current_app.root_path, 'static', 'entregas', str(id_actividad))
+    os.makedirs(folder, exist_ok=True)
+
+    archivo_path = os.path.join(folder, filename)
+    archivo.save(archivo_path)
+
+    # matrícula del estudiante
+    matricula = Matricula.query.filter_by(ID_Estudiante=current_user.ID_Usuario).first()
+
+    # buscar si ya había entrega
+    entrega = Actividad_Estudiante.query.filter_by(
+        ID_Actividad=id_actividad,
+        ID_Matricula=matricula.ID_Matricula
+    ).first()
+
+    if entrega:
+        entrega.Archivo = f'entregas/{id_actividad}/{filename}'
+    else:
+        entrega = Actividad_Estudiante(
+            ID_Actividad=id_actividad,
+            ID_Matricula=matricula.ID_Matricula,
+            Archivo=f'entregas/{id_actividad}/{filename}'
+        )
+        db.session.add(entrega)
+
+    db.session.commit()
+
+    flash("Evidencia subida correctamente", "success")
+    return redirect(url_for('Estudiante.entregatareas3', id_actividad=id_actividad)) 
+       
 @Estudiante_bp.route('/enviar_evidencia/<int:id_actividad>', methods=['POST'])
 @login_required
 def enviar_evidencia(id_actividad):
-    archivo = request.files.get('archivo')
+    archivo = request.files.get('archivo_entrega')
     if not archivo:
         flash('Debes seleccionar un archivo.', 'warning')
         return redirect(url_for('Estudiante.subida_evidencias', id_actividad=id_actividad))
@@ -315,6 +372,153 @@ def enviar_evidencia(id_actividad):
     return redirect(url_for('Estudiante.tareas_actividades'))
 
 
+@Estudiante_bp.route('/actividades')
+@login_required
+def actividades_estudiante():
+    try:
+        # 1. Verificar que es estudiante
+        if current_user.Rol != "Estudiante":
+            return "Acceso no autorizado", 403
+
+        # 2. Obtener matrícula activa del estudiante
+        matricula = (
+            Matricula.query
+            .filter_by(ID_Estudiante=current_user.ID_Usuario)
+            .order_by(Matricula.AnioLectivo.desc())
+            .first()
+        )
+
+        if not matricula:
+            return render_template("Estudiante/Actividades.html", actividades=[], error="No tienes matrícula registrada")
+
+        # 3. Obtener el curso al que pertenece
+        curso_id = matricula.ID_Curso
+
+        # 4. Buscar cronogramas del curso
+        cronogramas = Cronograma_Actividades.query.filter_by(ID_Curso=curso_id).all()
+        cronograma_ids = [c.ID_Cronograma_Actividades for c in cronogramas]
+
+        # 5. Buscar actividades asociadas a esos cronogramas
+        actividades = []
+        if cronograma_ids:
+            actividades = Actividad.query.filter(
+                Actividad.ID_Cronograma_Actividades.in_(cronograma_ids)
+            ).order_by(Actividad.Fecha.asc()).all()
+
+        # 6. Ver si el estudiante ya entregó algo
+        entregas = {
+            e.ID_Actividad: e
+            for e in Actividad_Estudiante.query.filter_by(ID_Matricula=matricula.ID_Matricula).all()
+        }
+
+        return render_template(
+            "Estudiante/Actividades.html",
+            actividades=actividades,
+            entregas=entregas,
+            matricula=matricula
+        )
+
+    except Exception as e:
+        print("ERROR ACTIVIDADES ESTUDIANTE:", e)
+        return render_template("Estudiante/Actividades.html", actividades=[], error="Error interno")
+    
+
+@Estudiante_bp.route('/entregatareas')
+@login_required
+def entregatareas():
+    try:
+        # 1. Verificar que es estudiante
+        if current_user.Rol != "Estudiante":
+            return "Acceso no autorizado", 403
+
+        # 2. Obtener matrícula activa
+        matricula = (
+            Matricula.query
+            .filter_by(ID_Estudiante=current_user.ID_Usuario)
+            .order_by(Matricula.AnioLectivo.desc())
+            .first()
+        )
+
+        if not matricula:
+            return render_template("Estudiante/EntregaTareas.html", materias=[], error="No tienes matrícula activa")
+
+        # 3. Buscar las asignaturas del curso
+        materias = (
+            db.session.query(Asignatura)
+            .join(Docente_Asignatura, Docente_Asignatura.ID_Asignatura == Asignatura.ID_Asignatura)
+            .filter(Docente_Asignatura.ID_Curso == matricula.ID_Curso)
+            .all()
+        )
+
+        return render_template("Estudiante/EntregaTareas.html", materias=materias)
+
+    except Exception as e:
+        print("ERROR ENTREGATAREAS:", e)
+        return render_template("Estudiante/EntregaTareas.html", materias=[], error="Error interno")
+
+
+@Estudiante_bp.route('/entregatareas2/<int:id_asignatura>')
+@login_required
+def entregatareas2(id_asignatura):
+    try:
+        # verificar estudiante
+        if current_user.Rol != 'Estudiante':
+            flash("Acceso no autorizado", "warning")
+            return redirect(url_for('Estudiante.paginainicio'))
+
+        # obtener cursos del estudiante
+        matriculas = Matricula.query.filter_by(ID_Estudiante=current_user.ID_Usuario).all()
+        curso_ids = [m.ID_Curso for m in matriculas]
+
+        # buscar cronogramas del curso Y de la asignatura
+        cronogramas = Cronograma_Actividades.query.filter(
+            Cronograma_Actividades.ID_Curso.in_(curso_ids),
+            Cronograma_Actividades.ID_Asignatura == id_asignatura
+        ).all()
+
+        cronograma_ids = [c.ID_Cronograma_Actividades for c in cronogramas]
+
+        actividades = Actividad.query.filter(
+            Actividad.ID_Cronograma_Actividades.in_(cronograma_ids)
+        ).order_by(Actividad.Fecha.asc()).all()
+
+        return render_template(
+            "Estudiante/EntregaTareas2.html",
+            actividades=actividades,
+            today=date.today()
+        )
+
+    except Exception as e:
+        print("ERROR:", e)
+        return render_template("Estudiante/EntregaTareas2.html", actividades=[], today=date.today())
+
+
+
+@Estudiante_bp.route('/entregatareas3/<int:id_actividad>')
+@login_required
+def entregatareas3(id_actividad):
+
+    actividad = Actividad.query.get(id_actividad)
+    if not actividad:
+        flash("Actividad no encontrada.", "danger")
+        return redirect(url_for('Estudiante.tareas_actividades'))
+
+    # matrícula del estudiante
+    matricula = Matricula.query.filter_by(ID_Estudiante=current_user.ID_Usuario).first()
+
+    # buscar si ya entregó algo
+    entrega = Actividad_Estudiante.query.filter_by(
+        ID_Actividad=id_actividad,
+        ID_Matricula=matricula.ID_Matricula
+    ).first()
+
+    return render_template(
+        'Estudiante/EntregaTareas3.html',
+        actividad=actividad,
+        entrega=entrega    
+    )
+
+#---------------------------------------------------------------------------------------------------------------------
 
 @Estudiante_bp.route('/calculo_promedio')
 def calculo_promedio():

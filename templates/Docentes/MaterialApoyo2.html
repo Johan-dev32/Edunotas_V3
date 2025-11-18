@@ -13,31 +13,30 @@
 </head>
 <body>
   <header class="d-flex align-items-center p-3 border-bottom w-100">
-<button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
-  <i class="bi bi-list"></i>
-</button>
-<h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
 
-<div class="dropdown">
-  <button 
-    class="btn btn-edunotas position-relative dropdown-toggle" 
-    type="button" 
-    id="dropdownMenuButton" 
-    data-bs-toggle="dropdown" 
-    aria-expanded="false">
-    <span class="bi bi-envelope-fill"></span>
-  </button>
+    <div class="dropdown ms-auto">
+      <button 
+        class="btn btn-edunotas position-relative dropdown-toggle" 
+        type="button" 
+        id="dropdownMenuButton1" 
+        data-bs-toggle="dropdown" 
+        aria-expanded="false">
+        <span class="bi bi-envelope-fill"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li><a class="dropdown-item" href="#">Ajustes</a></li>
+        <li><a class="dropdown-item" href="#">Opción 2</a></li>
+        <li><a class="dropdown-item" href="#">Opción 3</a></li>
+      </ul>
+    </div>
 
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <li><a class="dropdown-item" href="#">Ajustes</a></li>
-    <li><a class="dropdown-item" href="#">Opción 2</a></li>
-    <li><a class="dropdown-item" href="#">Opción 3</a></li>
-  </ul>
-</div>
 
-
-<div class="dropdown">
+    <div class="dropdown">
     <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
       <span class="bi bi-person-circle"></span>
     </button>
@@ -49,7 +48,7 @@
     <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
     </ul>
   </div>
-
+  </header>
 
 
 
@@ -80,74 +79,138 @@
             <li class="nav-item"><a href="{{ url_for('Docente.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Aprobación Académica </a></li>
 
             <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones </a></li>
+
         </ul>
       </div>
     </div>
   </div>
 
+
   </header>
-<div class="containerimg">
-  <p class="titulo">MATERIAL DE APOYO</p>
-  <p class="texto1">Visualiza todo el material que has subido </p>
-  
-<class="bg-light">
+<div class="container py-4">
 
-<div class="container py-2">
-  <div class="card shadow-lg rounded-3 custom-card">
-    <div class="card-header  text-white">
-      <h5 class="mb-0 text-center fw-bold">Subir Material de Apoyo</h5>
+  <h2 class="fw-bold text-center mb-4">Material de Apoyo</h2>
+  <p class="text-center text-muted">Aquí puedes subir el material para tus estudiantes.</p>
+
+  <div class="card mx-auto shadow-lg custom-card p-3">
+
+    <div class="card-header text-white text-center">
+      <h5 class="fw-bold mb-0">Subir Material de Apoyo</h5>
     </div>
+
     <div class="card-body">
-      <form>
-        <div class="dropdown">
+      <form method="POST" enctype="multipart/form-data">
 
+        <div class="row g-3">
 
+          <!-- Materia -->
+          <div class="col-md-6">
+            <label class="form-label">MATERIA</label>
+            <select class="form-select" name="nombre" required>
+              <option disabled selected>Seleccione la materia</option>
+              {% for m in materias %}
+              <option value="{{ m.Nombre }}">{{ m.Nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
 
-</div>
-        <div class="mb-3">
-          <label for="nombre" class="form-label">MATERIA ELEGIDA</label>
-          <input type="text" class="form-control" id="nombre" name="nombre" required>
+          <!-- Tipo -->
+          <div class="col-md-6">
+            <label class="form-label">TIPO DE MATERIAL</label>
+            <select class="form-select" name="tipo" id="tipo" required>
+              <option disabled selected>Seleccione el tipo</option>
+              <option value="PDF">PDF</option>
+              <option value="Video">Video</option>
+              <option value="Enlace">Enlace</option>
+              <option value="Documento">Documento</option>
+              <option value="Imagen">Imagen</option>
+            </select>
+          </div>
+
+          <!-- Archivo -->
+          <div class="col-12" id="archivoDiv">
+            <label class="form-label">ARCHIVO</label>
+            <input type="file" class="form-control" name="archivo">
+          </div>
+
+          <!-- Link -->
+          <div class="col-12" id="enlaceDiv">
+            <label class="form-label">ENLACE</label>
+            <input type="url" class="form-control" name="link" placeholder="https://ejemplo.com">
+          </div>
+
         </div>
 
-        <!-- Subir documento -->
-        <div class="mb-3">
-          <label for="archivo" class="form-label">SELECCIONA UN DOCUMENTO</label>
-          <input class="form-control" type="file" id="archivo" name="archivo" multiple>
-        </div>
-
-        <!-- Subir link -->
-        <div class="mb-3">
-          <label for="link" class="form-label">AGREGUE EL ENLACE</label>
-          <input type="url" class="form-control" id="link" name="link" placeholder="https://ejemplo.com">
-        </div>
-
-        <!-- Botones -->
-        <div class="d-flex justify-content-end gap-2">
+        <div class="text-end mt-4">
           <button type="reset" class="btn btn-outline-secondary">Cancelar</button>
-          <button type="submit" class="btn btn-subir"><i class="bi bi-send-fill"></i> Subir</button>
+          <button type="submit" class="btn btn-subir"><i class="bi bi-cloud-upload"></i> Subir</button>
         </div>
+
       </form>
     </div>
   </div>
+
+  <!-- Tabla -->
+  <h4 class="mt-5 fw-bold">Materiales Subidos</h4>
+
+  {% if materiales %}
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered mt-3">
+      <thead class="table-dark">
+        <tr>
+          <th>Materia</th>
+          <th>Tipo</th>
+          <th>Archivo / Enlace</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for mat in materiales %}
+        <tr>
+          <td>{{ mat.Titulo }}</td>
+          <td>{{ mat.Tipo }}</td>
+          <td>
+            {% if mat.RutaArchivo %}
+              <a href="{{ url_for('static', filename=mat.RutaArchivo) }}" target="_blank" class="btn btn-sm btn-primary">Ver archivo</a>
+            {% else %}
+              <a href="{{ mat.Enlace }}" target="_blank" class="btn btn-sm btn-success">Abrir enlace</a>
+            {% endif %}
+          </td>
+          <td>{{ mat.FechaCreacion.strftime('%d/%m/%Y') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-muted mt-3">Aún no has subido material para este curso.</p>
+  {% endif %}
+
 </div>
 
-<select class="form-select" aria-label="Materias">
-  <option selected>MATERIAS</option>
-  <option value="1">ESPAÑOL</option>
-  <option value="2">MATEMÁTICAS</option>
-  <option value="3">INGLÉS</option>
-  <option value="4">SOCIALES</option> 
-  <option value="5">ÉTICA</option>
-  <option value="6">FILOSOFÍA</option>
-  <option value="7">EDUCACIÓN FÍSICA</option>
-  <option value="8">ARTÍSTICA</option>
-  <option value="9">BIOLÓGICA - FÍSICA - QUÍMICA</option>
-  <option value="10">RELIGIÓN</option>
-  <option value="11">TECNOLOGÍA - INFORMÁTICA</option>
-  <option value="12">P.T.I</option>
-  <option value="13">RUTA</option>
-</select>
 
-<p class="palo">|</p>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const tipo = document.getElementById("tipo");
+  const archivoDiv = document.getElementById("archivoDiv");
+  const enlaceDiv = document.getElementById("enlaceDiv");
+
+  enlaceDiv.style.display = "none";
+
+  tipo.addEventListener("change", () => {
+    if (tipo.value === "Enlace" || tipo.value === "Video") {
+      enlaceDiv.style.display = "block";
+      archivoDiv.style.display = "none";
+    } else {
+      enlaceDiv.style.display = "none";
+      archivoDiv.style.display = "block";
+    }
+  });
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </body>
 </html>

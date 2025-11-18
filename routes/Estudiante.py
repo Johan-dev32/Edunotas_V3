@@ -207,8 +207,11 @@ def verMaterialDidactico():
         "archivo": m.RutaArchivo,
         "enlace": m.Enlace,
         "fecha": m.FechaCreacion.strftime('%Y-%m-%d'),
-        "url": m.Enlace if m.Enlace else url_for('static', filename=f"material/{m.RutaArchivo}")
-    }
+        "url": m.Enlace if m.Enlace else (
+        url_for('static', filename=f"material/{m.RutaArchivo.split('/')[-1]}") 
+        if m.RutaArchivo else "#"
+        )
+        }
     for m in materiales
     ])
 

@@ -196,14 +196,51 @@ class Asistencia(db.Model):
 
 class Detalle_Asistencia(db.Model):
     __tablename__ = "Detalle_Asistencia"
+    
     ID_Detalle_Asistencia = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    ID_Asistencia = db.Column(db.Integer, db.ForeignKey("Asistencia.ID_Asistencia", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
-    ID_Estudiante = db.Column(db.Integer, db.ForeignKey("Usuario.ID_Usuario", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
-    Estado_Asistencia = db.Column(db.Enum('Presente','Ausente','Justificado', name="estado_asistencia_enum"))
+
+    ID_Asistencia = db.Column(
+        db.Integer,
+        db.ForeignKey("Asistencia.ID_Asistencia", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False
+    )
+    ID_Estudiante = db.Column(
+        db.Integer,
+        db.ForeignKey("Usuario.ID_Usuario", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False
+    )
+
+    Estado_Asistencia = db.Column(
+        db.Enum('Presente', 'Ausente', 'Justificado', name="estado_asistencia_enum")
+    )
+
     Observaciones = db.Column(db.Text)
+
+    ID_Acudiente = db.Column(
+        db.Integer,
+        db.ForeignKey("Acudiente.ID_Acudiente", ondelete="SET NULL", onupdate="CASCADE"),
+        nullable=True
+    )
+
+    ArchivoExcusa = db.Column(db.String(255), nullable=True)
+    TextoExcusa = db.Column(db.Text, nullable=True)
+    FechaExcusa = db.Column(db.DateTime, nullable=True)
+
+    EstadoExcusa = db.Column(
+        db.Enum('pendiente', 'aceptada', 'rechazada', name="estado_excusa_enum"),
+        default='pendiente'
+    )
 
     asistencia = relationship("Asistencia", back_populates="detalles")
     estudiante = relationship("Usuario")
+
+    acudiente = relationship(
+        "Acudiente",
+        backref="excusas_asistencia",
+        lazy=True
+    )
+
+
 
 class Cronograma_Actividades(db.Model):
     __tablename__ = "Cronograma_Actividades"
@@ -247,6 +284,7 @@ class Actividad_Estudiante(db.Model):
     ID_Actividad_Estudiante = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ID_Actividad = db.Column(db.Integer, db.ForeignKey("Actividad.ID_Actividad", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
     ID_Matricula = db.Column(db.Integer, db.ForeignKey("Matricula.ID_Matricula", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
+    Archivo = db.Column(db.String(255))
     Observaciones = db.Column(db.Text)
     Calificacion = db.Column(db.Numeric(5,2))
     Archivo = db.Column(db.String(255))
@@ -432,6 +470,9 @@ class Citaciones(db.Model):
 
     destinatario = relationship("Usuario", back_populates="recibidos_citaciones", foreign_keys=[ID_Usuario])
     enviado_por = relationship("Usuario", back_populates="enviados_citaciones", foreign_keys=[EnviadoPor])
+    
+    def __repr__(self):
+        return f"<Citacion {self.ID_Citacion} - Para: {self.ID_Usuario}>"
 
 class ResumenSemanal(db.Model):
     __tablename__ = 'Resumen_Semanal'

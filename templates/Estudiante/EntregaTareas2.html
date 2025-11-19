@@ -82,108 +82,69 @@
     <h1 class="titulo">TAREAS PENDIENTES DE </h1>
     <br><br>
 
-    <div class="row">
-            <div class="col-lg-3 mb-4">
-                <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
-                    <div class="card-body">
-                        <h5 class="fw-bold text-dark">Próximas entregas</h5>
-                        <hr>
-                        
+<div class="row">
+
+    <!-- Barra lateral de próximas entregas -->
+    <div class="col-lg-3 mb-4">
+        <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+            <div class="card-body">
+                <h5 class="fw-bold text-dark">Próximas entregas</h5>
+                <hr>
+
+                {% set proximas = actividades | selectattr('Fecha', 'defined') | selectattr('Fecha', '>=', today) | list %}
+                {% if proximas | length == 0 %}
+                    <p class="text-muted fst-italic">No tienes nada por entregar pronto 🎉</p>
+                {% else %}
+                    {% for p in proximas %}
                         <div class="mb-3">
-                            <p class="mb-0 fw-semibold text-truncate">Tarea: Reporte de lectura</p>
-                            <small class="text-danger fw-bold">Fecha límite: Vie, 08 Nov</small>
+                            <p class="mb-0 fw-semibold text-truncate">{{ p.Titulo }}</p>
+                            <small class="text-danger fw-bold">Fecha límite: {{ p.Fecha }}</small>
                         </div>
-                        
-                         <div class="mb-3">
-                            <p class="mb-0 fw-semibold text-truncate">Actividad: Exposición cultural</p>
-                            <small class="text-danger fw-bold">Fecha límite: Lun, 11 Nov</small>
-                        </div>
-                        
-                        <p class="text-muted fst-italic">¡No tienes nada por entregar pronto! 🎉</p>
-                        
-                        <a href="#" class="btn btn-sm btn-link p-0 ver-todo-btn">Ver todas las tareas</a>
+                    {% endfor %}
+                {% endif %}
+
+                <a href="#" class="btn btn-sm btn-link p-0 ver-todo-btn">Ver todas las tareas</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido principal (actividades reales) -->
+    <div class="col-lg-9">
+
+        {% if actividades | length == 0 %}
+            <div class="alert alert-info text-center">No hay actividades asignadas.</div>
+        {% endif %}
+
+        {% for a in actividades %}
+        <div class="card post-card mb-3 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="icon-circle me-3">
+                        <i class="bi bi-journal-text fs-4"></i>
                     </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold">
+                            {{ a.Titulo }}
+                        </h6>
+                        <small class="text-muted">Fecha entrega: {{ a.Fecha if a.Fecha else 'Sin fecha' }}</small>
+                        <div><small class="text-muted">Estado: {{ a.Estado if a.Estado else 'Pendiente' }}</small></div>
+                    </div>
+
+                    <button class="btn btn-sm btn-link text-dark ms-auto" type="button">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                </div>
+
+                <div class="text-end mt-3">
+                    <a href="{{ url_for('Estudiante.entregatareas3', id_actividad=a.ID_Actividad) }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-upload"></i> Ver / Entregar Tarea
+                    </a>
                 </div>
             </div>
-
-<div class="col-lg-9">
-  <div class="card post-card mb-3 shadow-sm post-tarea">
-    <div class="card-body">
-      <div class="d-flex align-items-center">
-        <div class="icon-circle me-3"><i class="bi bi-journal-text fs-4"></i></div>
-        <div>
-          <h6 class="mb-0 fw-bold">
-            Jonathan David Espitia Rivera ha publicado una nueva tarea:
-            <span class="text-main-color">TAREA: ENSAYO DE UN ESCRITOR CLÁSICO</span>
-          </h6>
-          <small class="text-muted">Publicado: 25 Octubre (Última modificación: 25 Octubre)</small>
         </div>
+        {% endfor %}
 
-        <button class="btn btn-sm btn-link text-dark ms-auto" type="button">
-          <i class="bi bi-three-dots-vertical"></i>
-        </button>
-      </div>
-
-      <!-- 🔹 Botón de redirección -->
-      <div class="text-end mt-3">
-        <a href="{{ url_for('Estudiante.entregatareas3') }}" class="btn btn-primary btn-sm">
-          <i class="bi bi-upload"></i> Ver / Entregar Tarea
-        </a>
-      </div>
     </div>
-  </div>
-
-
-               <div class="card post-card mb-3 shadow-sm post-material">
-  <div class="card-body">
-    <div class="d-flex align-items-center">
-      <div class="icon-circle me-3"><i class="bi bi-book fs-4"></i></div>
-      <div>
-        <h6 class="mb-0 fw-bold">
-          Jonathan David Espitia Rivera ha publicado nuevo material:
-          <span class="text-main-color">GUÍA DE REFERENCIAS APA V.7</span>
-        </h6>
-        <small class="text-muted">Publicado: 23 Octubre (Última modificación: 23 Octubre)</small>
-      </div>
-
-      <button class="btn btn-sm btn-link text-dark ms-auto" type="button">
-        <i class="bi bi-three-dots-vertical"></i>
-      </button>
-    </div>
-
-    <!-- 🔹 Botón de redirección -->
-    <div class="text-end mt-3">
-      <a href="{{ url_for('Estudiante.entregatareas3') }}" class="btn btn-success btn-sm">
-        <i class="bi bi-eye"></i> Ver / Descargar Material
-      </a>
-    </div>
-  </div>
-</div>
-
-              <div class="card post-card mb-3 shadow-sm post-material">
-  <div class="card-body">
-    <div class="d-flex align-items-center">
-      <div class="icon-circle me-3"><i class="bi bi-book fs-4"></i></div>
-      <div>
-        <h6 class="mb-0 fw-bold">
-          Jonathan David Espitia Rivera ha publicado nuevo material:
-          <span class="text-main-color">GUÍA DE REFERENCIAS APA V.7</span>
-        </h6>
-        <small class="text-muted">Publicado: 23 Octubre (Última modificación: 23 Octubre)</small>
-      </div>
-
-      <button class="btn btn-sm btn-link text-dark ms-auto" type="button">
-        <i class="bi bi-three-dots-vertical"></i>
-      </button>
-    </div>
-
-    <!-- 🔹 Botón de redirección -->
-    <div class="text-end mt-3">
-      <a href="{{ url_for('Estudiante.entregatareas3') }}" class="btn btn-success btn-sm">
-        <i class="bi bi-eye"></i> Ver / Descargar Material
-      </a>
-    </div>
-  </div>
 </div>
     </main>
 

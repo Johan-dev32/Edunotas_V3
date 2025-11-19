@@ -20,16 +20,26 @@
     </button>
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
-    <div class="dropdown ms-auto">
-      <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" data-bs-toggle="dropdown">
-        <span class="bi bi-envelope-fill"></span>
+       <div class="dropdown">
+      <button
+        class="position-relative"
+        type="button"
+        id="dropdownMenuButton"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        style="border: none; background: transparent; padding: 0; margin-left: 850px;"
+      >
+        <i class="bi bi-bell-fill" style="font-size: 1.25rem;"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none ">0</span>
       </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Ajustes</a></li>
-        <li><a class="dropdown-item" href="#">Opción 2</a></li>
-        <li><a class="dropdown-item" href="#">Opción 3</a></li>
+      <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="dropdownMenuButton" style="min-width: 300px;">
+        <li class="text-center text-muted small">Últimas notificaciones</li>
+        <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+          <p class="text-center small text-secondary mb-0">No tienes mensajes nuevos.</p>
+        </div>
       </ul>
     </div>
+<script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
 
      <div class="dropdown">
     <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -60,133 +70,82 @@
           <ul class="nav flex-column ms-3">
            
             <li><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Registrar Notas</a></li>
-            <li><a href="{{ url_for('Docente.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-calculator"></i> Cálculo de Promedios</a></li>
           </ul>
         </div>
         
         <li class="nav-item"><a href="{{ url_for('Docente.tareas_actividades1') }}" class="nav-link text-white"><i class="bi bi-book-half"></i> Registro de Tareas y Actividades</a></li>
         <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-        <li class="nav-item"><a href="{{ url_for('Docente.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Aprobación Académica</a></li>
         <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones</a></li>
       </ul>
     </div>
   </div>  
 
-  <!-- CONTENIDO PRINCIPAL: EXCUSAS RECIBIDAS -->
+  <!-- CONTENIDO PRINCIPAL: REGISTRO DE ASISTENCIA -->
   <main class="container py-5" style="max-width: 1200px;">
     <!-- Título -->
     <div class="text-center mb-4">
-      <h1 class="titulo-principal">EXCUSAS RECIBIDAS</h1>
-      <p class="descripcion mb-0">Revise, apruebe o rechace las justificaciones enviadas por los acudientes.</p>
+      <h1 class="titulo-principal">REGISTRO DE ASISTENCIA</h1>
+      <p class="descripcion mb-0">Seleccione el curso y marque Presente o Ausente para cada estudiante.</p>
     </div>
 
-    <!-- Tabla de excusas -->
+    <!-- Selector de curso y acceso a excusas -->
+    <form method="get" class="mb-4 d-flex align-items-center gap-3" action="{{ url_for('Docente.asistencia') }}">
+      <label for="curso_id" class="form-label mb-0"><strong>Curso:</strong></label>
+      <select id="curso_id" name="curso_id" class="form-select" style="max-width: 250px;" onchange="this.form.submit()">
+        {% for c in cursos %}
+          <option value="{{ c.ID_Curso }}" {% if curso_seleccionado and c.ID_Curso == curso_seleccionado.ID_Curso %}selected{% endif %}>
+            {{ c.Grado }}{{ c.Grupo }}
+          </option>
+        {% endfor %}
+      </select>
+
+      <a href="{{ url_for('Docente.excusas_inasistencias') }}" class="btn btn-outline-primary ms-auto">
+        Ver excusas de inasistencia
+      </a>
+    </form>
+
+    <!-- Formulario de asistencia -->
     <section class="bg-light rounded-3 shadow-sm p-4">
-      <div class="table-responsive">
-        <table class="table align-middle mb-0">
-          <thead>
-            <tr>
-              <th scope="col">Fecha de la Falta</th>
-              <th scope="col">Estudiante</th>
-              <th scope="col">Materia / Período</th>
-              <th scope="col">Motivo</th>
-              <th scope="col">Estado</th>
-              <th scope="col" class="text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Ejemplos de filas; luego se pueden reemplazar por datos reales -->
-            <tr>
-              <td>15/11/2025</td>
-              <td>Juan Pérez</td>
-              <td>Matemáticas (Toda la Jornada)</td>
-              <td>Cita Médica</td>
-              <td><span class="badge bg-warning text-dark">Pendiente</span></td>
-              <td class="text-center">
-                <button type="button" class="btn btn-primary btn-sm" style="background-color: #050733ff;" 
-                        data-bs-toggle="modal" data-bs-target="#modalExcusa"
-                        data-fecha="15/11/2025"
-                        data-estudiante="Juan Pérez"
-                        data-materia="Matemáticas (Toda la Jornada)"
-                        data-motivo="Cita Médica"
-                        data-detalles="Control médico programado">
-                  Ver detalle
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td>18/11/2025</td>
-              <td>María Gómez</td>
-              <td>Biología (Hora 3)</td>
-              <td>Situación Familiar</td>
-              <td><span class="badge bg-success">Aprobada</span></td>
-              <td class="text-center">
-                <button type="button" class="btn btn-primary btn-sm" style="background-color: #050733ff;" 
-                        data-bs-toggle="modal" data-bs-target="#modalExcusa"
-                        data-fecha="18/11/2025"
-                        data-estudiante="María Gómez"
-                        data-materia="Biología (Hora 3)"
-                        data-motivo="Situación Familiar"
-                        data-detalles="Situación familiar justificada por acudiente">
-                  Ver detalle
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-  </main>
-
-  <!-- MODAL: DETALLE DE EXCUSA -->
-  <div class="modal fade" id="modalExcusa" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Detalle de la Excusa</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <form method="post">
-          <div class="modal-body">
-            <p class="mb-1"><strong>Fecha de la falta:</strong> <span id="excusaFecha">--/--/----</span></p>
-            <p class="mb-1"><strong>Estudiante:</strong> <span id="excusaEstudiante">---</span></p>
-            <p class="mb-3"><strong>Materia / Período:</strong> <span id="excusaMateria">---</span></p>
-
-            <div class="mb-3">
-              <label class="form-label"><strong>Motivo reportado:</strong></label>
-              <p id="excusaMotivo" class="mb-0">---</p>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label"><strong>Detalles enviados por el acudiente:</strong></label>
-              <p id="excusaDetalles" class="mb-0">---</p>
-            </div>
-
-            <hr>
-
-            <!-- Estado que define el docente -->
-            <div class="mb-3">
-              <label for="estadoExcusa" class="form-label">Estado de la excusa:</label>
-              <select id="estadoExcusa" name="estado" class="form-select" required>
-                <option value="Pendiente">Pendiente</option>
-                <option value="Aprobada">Aprobada</option>
-                <option value="Rechazada">Rechazada</option>
-              </select>
-            </div>
-
-            <div class="mb-3">
-              <label for="observacionesDocente" class="form-label">Observaciones del docente:</label>
-              <textarea id="observacionesDocente" name="observaciones" class="form-control" rows="3" placeholder="Ej: Se acepta la excusa con base en el certificado enviado."></textarea>
-            </div>
+      {% if estudiantes %}
+        <form method="post" action="{{ url_for('Docente.asistencia') }}">
+          <input type="hidden" name="curso_id" value="{{ curso_seleccionado.ID_Curso if curso_seleccionado else '' }}">
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Estudiante</th>
+                  <th scope="col" class="text-center">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for est in estudiantes %}
+                  <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ est.Apellido }} {{ est.Nombre }}</td>
+                    <td class="text-center">
+                      {% set estado = estados_previos.get(est.ID_Usuario, 'Presente') %}
+                      <select name="estado_{{ est.ID_Usuario }}" class="form-select" style="max-width: 180px; margin: 0 auto;">
+                        <option value="Presente" {% if estado == 'Presente' %}selected{% endif %}>Presente</option>
+                        <option value="Ausente" {% if estado == 'Ausente' %}selected{% endif %}>Ausente</option>
+                      </select>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            <button type="submit" class="btn" style="background-color: #050733ff; color: #ffffff;">Actualizar Estado</button>
+          <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-primary" style="background-color: #050733ff;">
+              Guardar asistencia de hoy
+            </button>
           </div>
         </form>
-      </div>
-    </div>
-  </div>
+      {% else %}
+        <p class="text-muted mb-0">No se encontraron estudiantes para este curso.</p>
+      {% endif %}
+    </section>
+  </main>
 
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

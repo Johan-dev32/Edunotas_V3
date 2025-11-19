@@ -14,7 +14,6 @@ from routes.notificaciones_routes import notificaciones_bp
 from flask_mail import Mail, Message
 from Controladores.models import db
 
-
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired,BadSignature
 
 import os
@@ -31,7 +30,7 @@ app = Flask(__name__)
 
 
 # Carpeta donde se guardarán los archivos subidos
-UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
 
 # Crear la carpeta si no existe
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)

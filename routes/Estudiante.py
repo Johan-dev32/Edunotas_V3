@@ -149,7 +149,7 @@ def verhorario():
 
     # Obtener el curso y las programaciones
     curso = matricula.curso
-    programaciones = curso.programaciones.all() if curso else []
+    programaciones = curso.programaciones if curso else []
 
     return render_template(
         'Estudiante/VerHorario.html',

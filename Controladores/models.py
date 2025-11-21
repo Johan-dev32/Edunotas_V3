@@ -52,6 +52,7 @@ class Usuario(UserMixin, db.Model):
     enviados_citaciones = relationship("Citaciones", back_populates="enviado_por", foreign_keys="Citaciones.EnviadoPor")
     recibidos_citaciones = relationship("Citaciones", back_populates="destinatario", foreign_keys="Citaciones.ID_Usuario")
     reportes_docente = relationship("Reporte_Notas", back_populates="docente", foreign_keys="Reporte_Notas.ID_Docente")
+    materiales_didacticos = relationship("MaterialDidactico", back_populates="docente")
 
     # 🔑 Método requerido por Flask-Login
     def get_id(self):
@@ -101,7 +102,8 @@ class Curso(db.Model):
     matriculas = relationship("Matricula", back_populates="curso", cascade="all, delete-orphan")
     programaciones = relationship("Programacion", back_populates="curso", cascade="all, delete-orphan")
     cronogramas = relationship("Cronograma_Actividades", back_populates="curso", cascade="all, delete-orphan")
-   
+    reuniones = relationship("Reuniones", back_populates="curso")
+    materiales_didacticos = relationship("MaterialDidactico", back_populates="curso")
 
 class Matricula(db.Model):
     __tablename__ = "Matricula"
@@ -119,7 +121,6 @@ class Matricula(db.Model):
     curso = relationship("Curso", back_populates="matriculas")
     actividades_estudiante = relationship("Actividad_Estudiante", back_populates="matricula", cascade="all, delete-orphan")
     reportes = relationship("Reporte_Notas", back_populates="matricula", foreign_keys="Reporte_Notas.ID_Matricula")
-    
 
 class Periodo(db.Model):
     __tablename__ = "Periodo"
@@ -144,6 +145,7 @@ class Asignatura(db.Model):
 
     docentes_asignaturas = relationship("Docente_Asignatura", back_populates="asignatura", cascade="all, delete-orphan")
     reportes_detalle = relationship("Reporte_Notas_Detalle", back_populates="asignatura")
+    cronogramas = relationship("Cronograma_Actividades", back_populates="asignatura")
 
 class Docente_Asignatura(db.Model):
     __tablename__ = "Docente_Asignatura"
@@ -192,14 +194,51 @@ class Asistencia(db.Model):
 
 class Detalle_Asistencia(db.Model):
     __tablename__ = "Detalle_Asistencia"
+    
     ID_Detalle_Asistencia = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    ID_Asistencia = db.Column(db.Integer, db.ForeignKey("Asistencia.ID_Asistencia", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
-    ID_Estudiante = db.Column(db.Integer, db.ForeignKey("Usuario.ID_Usuario", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
-    Estado_Asistencia = db.Column(db.Enum('Presente','Ausente','Justificado', name="estado_asistencia_enum"))
+
+    ID_Asistencia = db.Column(
+        db.Integer,
+        db.ForeignKey("Asistencia.ID_Asistencia", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False
+    )
+    ID_Estudiante = db.Column(
+        db.Integer,
+        db.ForeignKey("Usuario.ID_Usuario", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=False
+    )
+
+    Estado_Asistencia = db.Column(
+        db.Enum('Presente', 'Ausente', 'Justificado', name="estado_asistencia_enum")
+    )
+
     Observaciones = db.Column(db.Text)
+
+    ID_Acudiente = db.Column(
+        db.Integer,
+        db.ForeignKey("Acudiente.ID_Acudiente", ondelete="SET NULL", onupdate="CASCADE"),
+        nullable=True
+    )
+
+    ArchivoExcusa = db.Column(db.String(255), nullable=True)
+    TextoExcusa = db.Column(db.Text, nullable=True)
+    FechaExcusa = db.Column(db.DateTime, nullable=True)
+
+    EstadoExcusa = db.Column(
+        db.Enum('pendiente', 'aceptada', 'rechazada', name="estado_excusa_enum"),
+        default='pendiente'
+    )
 
     asistencia = relationship("Asistencia", back_populates="detalles")
     estudiante = relationship("Usuario")
+
+    acudiente = relationship(
+        "Acudiente",
+        backref="excusas_asistencia",
+        lazy=True
+    )
+
+
 
 class Cronograma_Actividades(db.Model):
     __tablename__ = "Cronograma_Actividades"
@@ -208,10 +247,11 @@ class Cronograma_Actividades(db.Model):
     ID_Periodo = db.Column(db.Integer, db.ForeignKey("Periodo.ID_Periodo", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
     FechaInicial = db.Column(db.Date)
     FechaFinal = db.Column(db.Date)
-    ID_Asignatura = db.Column(db.Integer, db.ForeignKey("Asignatura.ID_Asignatura", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
+    ID_Asignatura = db.Column(db.Integer, db.ForeignKey("Asignatura.ID_Asignatura", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
 
     curso = relationship("Curso", back_populates="cronogramas")
     periodo = relationship("Periodo", back_populates="cronogramas")
+    asignatura = relationship("Asignatura", back_populates="cronogramas")
     actividades = relationship("Actividad", back_populates="cronograma", cascade="all, delete-orphan")
 
 class Actividad(db.Model):
@@ -245,6 +285,7 @@ class Actividad_Estudiante(db.Model):
     Archivo = db.Column(db.String(255))
     Observaciones = db.Column(db.Text)
     Calificacion = db.Column(db.Numeric(5,2))
+    Archivo = db.Column(db.String(255))
 
     actividad = relationship("Actividad", back_populates="participaciones")
     matricula = relationship("Matricula", back_populates="actividades_estudiante")
@@ -278,24 +319,27 @@ class Tutorias(db.Model):
     Rol = db.Column(db.String(50))
     Tema = db.Column(db.String(255))
     FechaRealizacion = db.Column(db.DateTime)
-    Curso = db.Column(db.String(50))
-    NombreEstudiante = db.Column(db.String(200))
+    ID_Curso = db.Column(db.Integer, db.ForeignKey("Curso.ID_Curso", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
+    ID_Estudiante = db.Column(db.Integer, db.ForeignKey("Usuario.ID_Usuario", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
     Correo = db.Column(db.String(150))
     Motivo = db.Column(db.Text)
     Observaciones = db.Column(db.Text)
 
+    curso = relationship("Curso")
+    estudiante = relationship("Usuario")
+
 class Reuniones(db.Model):
-    __tablename__ = 'reuniones'
-    ID_Reunion = db.Column(db.Integer, primary_key=True)
-    FechaReunion = db.Column(db.Date, nullable=False)
-    TemaATratar = db.Column(db.String(100), nullable=False)
-    NombreOrganizador = db.Column(db.String(100), nullable=False)
-    CargoOrganizador = db.Column(db.String(100), nullable=False)
-    NombresInvitados = db.Column(db.String(255), nullable=False)
-    LinkReunion = db.Column(db.String(255), nullable=False)
+    __tablename__ = "Reuniones"
+    ID_Reunion = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FechaReunion = db.Column(db.DateTime, nullable=False)
+    TemaATratar = db.Column(db.String(255))
+    NombreOrganizador = db.Column(db.String(200))
+    CargoOrganizador = db.Column(db.String(100))
+    NombresInvitados = db.Column(db.Text)
+    ID_Curso = db.Column(db.Integer, db.ForeignKey("Curso.ID_Curso", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
+    LinkReunion = db.Column(db.String(300))
 
-
-    
+    curso = relationship("Curso", back_populates="reuniones")
 
 class Encuesta(db.Model):
     __tablename__ = "Encuesta"
@@ -425,6 +469,8 @@ class Citaciones(db.Model):
     destinatario = relationship("Usuario", back_populates="recibidos_citaciones", foreign_keys=[ID_Usuario])
     enviado_por = relationship("Usuario", back_populates="enviados_citaciones", foreign_keys=[EnviadoPor])
     
+    def __repr__(self):
+        return f"<Citacion {self.ID_Citacion} - Para: {self.ID_Usuario}>"
 
 class ResumenSemanal(db.Model):
     __tablename__ = 'Resumen_Semanal'
@@ -442,15 +488,14 @@ class ResumenSemanal(db.Model):
         foreign_keys=[CreadoPor])
     def __repr__(self):
         return f"ResumenSemanal(ID={self.ID_Resumen_Semanal}, Título='{self.Titulo}')"
-    
 
 class Nota_Calificaciones(db.Model):
     __tablename__ = 'Nota_Calificaciones'
     
     ID_Calificacion = db.Column(db.Integer, primary_key=True, autoincrement=True) 
-    ID_Estudiante = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
-    ID_Asignatura = db.Column(db.Integer, db.ForeignKey('Asignatura.ID_Asignatura'), nullable=False)
-    ID_Historial = db.Column(db.Integer, db.ForeignKey('Historial.ID_Historial'), nullable=False)
+    ID_Estudiante = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario', ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
+    ID_Asignatura = db.Column(db.Integer, db.ForeignKey('Asignatura.ID_Asignatura', ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
+    ID_Historial = db.Column(db.Integer, db.ForeignKey('Historial_Academico.ID_Historial', ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
     Periodo = db.Column(db.Integer, nullable=False) 
     Nota_1 = db.Column(db.Float, nullable=True) 
     Nota_2 = db.Column(db.Float, nullable=True)
@@ -459,29 +504,26 @@ class Nota_Calificaciones(db.Model):
     Nota_5 = db.Column(db.Float, nullable=True)
     Promedio_Final = db.Column(db.Float, nullable=True)
 
+    estudiante = relationship('Usuario')
+    asignatura = relationship('Asignatura')
+    historial = relationship('Historial_Academico')
+
     __table_args__ = (
         db.UniqueConstraint('ID_Estudiante', 'ID_Asignatura', 'Periodo', name='uq_calificacion_periodo'),
     )
-    
-
 
 class MaterialDidactico(db.Model):
-    __tablename__ = 'MaterialDidactico'
-
+    __tablename__ = "MaterialDidactico"
     ID_Material = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    ID_Curso = db.Column(db.Integer, db.ForeignKey('Curso.ID_Curso'), nullable=False)
-    ID_Docente = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
-
+    ID_Curso = db.Column(db.Integer, db.ForeignKey("Curso.ID_Curso", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
+    ID_Docente = db.Column(db.Integer, db.ForeignKey("Usuario.ID_Usuario", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
     Titulo = db.Column(db.String(200), nullable=False)
     Descripcion = db.Column(db.Text)
-    Tipo = db.Column(db.Enum('PDF', 'Video', 'Enlace', 'Documento', 'Imagen', name='tipo_material'), nullable=False)
+    Tipo = db.Column(db.Enum('PDF','Video','Enlace','Documento','Imagen', name="tipo_material_enum"), nullable=False)
+    RutaArchivo = db.Column(db.String(255))
+    Enlace = db.Column(db.String(500))
+    FechaCreacion = db.Column(db.DateTime, default=datetime.utcnow)
+    Estado = db.Column(db.Enum('Activo','Inactivo', name="estado_material_enum"), default='Activo')
 
-    RutaArchivo = db.Column(db.String(255))  # Solo si es archivo (PDF, imagen, doc)
-    Enlace = db.Column(db.String(500))       # Solo si es un link externo (YouTube, Drive, etc.)
-
-    FechaCreacion = db.Column(db.DateTime, default=db.func.now())
-    Estado = db.Column(db.Enum('Activo', 'Inactivo', name='estado_material'), default='Activo')
-
-    # Relaciones opcionales (no necesarias pero útiles)
-    curso = db.relationship('Curso', backref='materiales', lazy=True)
-    docente = db.relationship('Usuario', backref='materiales_creados', lazy=True)
+    curso = relationship("Curso", back_populates="materiales_didacticos")
+    docente = relationship("Usuario", back_populates="materiales_didacticos")

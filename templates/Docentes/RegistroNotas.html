@@ -20,16 +20,26 @@
     </button>
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
-    <div class="dropdown ms-auto">
-      <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" data-bs-toggle="dropdown">
-        <span class="bi bi-envelope-fill"></span>
+     <div class="dropdown">
+      <button
+        class="position-relative"
+        type="button"
+        id="dropdownMenuButton"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        style="border: none; background: transparent; padding: 0; margin-left: 850px;"
+      >
+        <i class="bi bi-bell-fill" style="font-size: 1.25rem;"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none ">0</span>
       </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Ajustes</a></li>
-        <li><a class="dropdown-item" href="#">Opción 2</a></li>
-        <li><a class="dropdown-item" href="#">Opción 3</a></li>
+      <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="dropdownMenuButton" style="min-width: 300px;">
+        <li class="text-center text-muted small">Últimas notificaciones</li>
+        <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+          <p class="text-center small text-secondary mb-0">No tienes mensajes nuevos.</p>
+        </div>
       </ul>
     </div>
+<script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
 
      <div class="dropdown">
     <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -58,15 +68,12 @@
         <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
         <div class="collapse" id="submenuNotas">
           <ul class="nav flex-column ms-3">
-           
             <li><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Registrar Notas</a></li>
-            <li><a href="{{ url_for('Docente.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-calculator"></i> Cálculo de Promedios</a></li>
           </ul>
         </div>
         
         <li class="nav-item"><a href="{{ url_for('Docente.tareas_actividades1') }}" class="nav-link text-white"><i class="bi bi-book-half"></i> Registro de Tareas y Actividades</a></li>
         <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-        <li class="nav-item"><a href="{{ url_for('Docente.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Aprobación Académica</a></li>
         <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones</a></li>
       </ul>
     </div>
@@ -83,15 +90,21 @@
 
         <div class="d-flex justify-content-between mt-4">
 
-            <button id="btnGuardarNotas" type="submit" name="action" value="guardar" class="btn btn-primary">
-                <i class="fas fa-save"></i> Guardar Todas las Notas
+            <button id="btnGuardarNotas" type="submit" name="action" value="guardar" class="btn btn-primary" style="background-color: #050733ff;">
+                <i class="fas fa-save"><i class="bi bi-arrow-down-square"></i></i> Guardar Notas
             </button>
 
-            <button type="submit" name="action" value="reporte" class="btn btn-success">
-                <i class="fas fa-file-pdf"></i> Reporte de Notas (PDF)
+            <button type="submit" name="action" value="reporte" class="btn btn-success" style="background-color: #ff0000ff;">
+                <i class="fas fa-file-pdf"></i> Reporte (PDF)
             </button>
             
-            <div style="width: 150px;"></div> </div>
+            <a href="{{ url_for('Docente.asistencia') }}" 
+   class="btn btn-success" 
+   style="background-color: #050733ff;">
+  <i class="fas fa-file-pdf"></i> Asistencias
+</a>
+            
+            <div style="width: 900px;"></div> </div>
 
         <div class="row mb-4 g-3 justify-content-center mt-3">
 
@@ -112,8 +125,10 @@
                 <select class="form-select" id="asignatura_select" name="asignatura" required onchange="this.form.submit()">
                     <option value="" disabled {% if not asignatura_id or asignatura_id == 0 %}selected{% endif %}>Seleccione Asignatura</option>
                     {% for asignatura in asignaturas %}
+                        {% set partes = asignatura.nombre.split(' ') %}
+                        {% set nombre_base = partes[0] if partes else asignatura.nombre %}
                         <option value="{{ asignatura.id }}" {% if asignatura.id|string == asignatura_id|string %}selected{% endif %}>
-                            {{ asignatura.nombre }}
+                            {{ nombre_base }}
                         </option>
                     {% endfor %}
                 </select>

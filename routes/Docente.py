@@ -4,9 +4,9 @@ from flask_mail import Message
 from werkzeug.utils import secure_filename
 import io
 from xhtml2pdf import pisa
-from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Curso, Notificacion, Programacion, Observacion, Nota_Calificaciones, Docente_Asignatura, ResumenSemanal, Tutorias, Acudiente, MaterialDidactico )
+from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Curso, Notificacion, Programacion, Observacion, Nota_Calificaciones, Docente_Asignatura, ResumenSemanal, Tutorias, Acudiente, MaterialDidactico, Asistencia, Detalle_Asistencia )
 from sqlalchemy import text
-
+from sqlalchemy.orm import aliased
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
@@ -31,6 +31,8 @@ ID_DOCENTE_FIJO = 2
 @Docente_bp.route('/paginainicio')
 def paginainicio():
     return render_template('Docentes/Paginainicio_Docentes.html')
+
+
 
 # ---------------- NOTIFICACIONES DOCENTE----------------
 
@@ -499,6 +501,148 @@ def ver_entregas(id_actividad):
     )
 #----------------------------------------------------------------------------------------------------------------------------
 
+@Docente_bp.route('/asistencia', methods=['GET', 'POST'])
+@login_required
+def asistencia():
+    docente_id = current_user.ID_Usuario
+
+    # Cursos donde el docente tiene asignaturas asociadas
+    cursos = (
+        db.session.query(Curso)
+        .join(Docente_Asignatura, Docente_Asignatura.ID_Curso == Curso.ID_Curso)
+        .filter(Docente_Asignatura.ID_Docente == docente_id)
+        .filter(Curso.Estado == 'Activo')
+        .distinct()
+        .all()
+    )
+
+    if not cursos:
+        flash("No tiene cursos asignados para pasar asistencia.", "warning")
+        return render_template('Docentes/Asistencia.html', cursos=[], curso_seleccionado=None, estudiantes=[])
+
+    # Curso seleccionado (por querystring o por POST)
+    if request.method == 'POST':
+        curso_id = request.form.get('curso_id', type=int)
+    else:
+        curso_id = request.args.get('curso_id', type=int)
+
+    if not curso_id:
+        curso_id = cursos[0].ID_Curso
+
+    curso_seleccionado = Curso.query.get(curso_id)
+
+    # Estudiantes matriculados en el curso
+    estudiantes = (
+        db.session.query(Usuario)
+        .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+        .filter(Matricula.ID_Curso == curso_id, Usuario.Rol == 'Estudiante')
+        .order_by(Usuario.Apellido, Usuario.Nombre)
+        .all()
+    )
+
+    # Estados previos de asistencia (último registro por estudiante en este curso)
+    from sqlalchemy import desc
+    estados_previos = {}
+    if estudiantes:
+        detalles = (
+            db.session.query(Detalle_Asistencia)
+            .join(Asistencia, Detalle_Asistencia.ID_Asistencia == Asistencia.ID_Asistencia)
+            .join(Programacion, Asistencia.ID_Programacion == Programacion.ID_Programacion)
+            .filter(Programacion.ID_Curso == curso_id)
+            .order_by(Asistencia.Fecha.desc(), Detalle_Asistencia.ID_Detalle_Asistencia.desc())
+            .all()
+        )
+
+        for det in detalles:
+            if det.ID_Estudiante not in estados_previos:
+                estados_previos[det.ID_Estudiante] = det.Estado_Asistencia
+
+    if request.method == 'POST':
+        try:
+            from datetime import date
+
+            print("[DEBUG asistencia] POST recibido - docente_id=", docente_id, "curso_id=", curso_id)
+
+            # Buscar relación Docente_Asignatura para este curso y docente
+            da = Docente_Asignatura.query.filter_by(ID_Docente=docente_id, ID_Curso=curso_id).first()
+            print("[DEBUG asistencia] Docente_Asignatura encontrado:", bool(da))
+            if not da:
+                flash("No se encontró una asignatura asociada a este curso para el docente.", "warning")
+                return redirect(url_for('Docente.asistencia', curso_id=curso_id))
+
+            # Buscar o crear una programación básica para este curso
+            programacion = Programacion.query.filter_by(ID_Curso=curso_id, ID_Docente_Asignatura=da.ID_Docente_Asignatura).first()
+            print("[DEBUG asistencia] Programacion existente:", bool(programacion))
+            if not programacion:
+                programacion = Programacion(
+                    ID_Curso=curso_id,
+                    ID_Docente_Asignatura=da.ID_Docente_Asignatura,
+                    ID_Docente=docente_id,
+                    Dia='N/A'
+                )
+                db.session.add(programacion)
+                db.session.flush()
+                print("[DEBUG asistencia] Programacion creada con ID=", programacion.ID_Programacion)
+
+            asistencia_reg = Asistencia(
+                Fecha=date.today(),
+                ID_Programacion=programacion.ID_Programacion,
+            )
+            db.session.add(asistencia_reg)
+            db.session.flush()  # para obtener ID_Asistencia
+            print("[DEBUG asistencia] Asistencia creada con ID=", asistencia_reg.ID_Asistencia)
+
+            # Recorrer estudiantes y guardar detalle de asistencia
+            for est in estudiantes:
+                estado = request.form.get(f"estado_{est.ID_Usuario}", 'Presente')
+                print(f"[DEBUG asistencia] Estudiante {est.ID_Usuario} estado=", estado)
+
+                detalle = Detalle_Asistencia(
+                    ID_Asistencia=asistencia_reg.ID_Asistencia,
+                    ID_Estudiante=est.ID_Usuario,
+                    Estado_Asistencia=estado,
+                )
+                db.session.add(detalle)
+
+                # Si es ausente, notificar al acudiente asociado
+                if estado == 'Ausente':
+                    relaciones = Acudiente.query.filter_by(ID_Estudiante=est.ID_Usuario, Estado='Activo').all()
+                    materia_nombre = None
+                    if programacion and programacion.docente_asignatura and programacion.docente_asignatura.asignatura:
+                        materia_nombre = programacion.docente_asignatura.asignatura.Nombre
+
+                    for rel in relaciones:
+                        mensaje = f"El estudiante {est.Nombre} {est.Apellido} estuvo ausente el {asistencia_reg.Fecha.strftime('%d/%m/%Y')}"
+                        if materia_nombre:
+                            mensaje += f" en la asignatura {materia_nombre}."
+
+                        notif = Notificacion(
+                            Titulo="Registro de inasistencia",
+                            Mensaje=mensaje,
+                            Enlace=url_for('Acudiente.inasistencias_justificadas'),
+                            ID_Usuario=rel.ID_Usuario,
+                        )
+                        db.session.add(notif)
+
+            db.session.commit()
+            print("[DEBUG asistencia] Commit realizado correctamente")
+            flash("Asistencia registrada correctamente.", "success")
+            return redirect(url_for('Docente.asistencia', curso_id=curso_id))
+
+        except Exception as e:
+            db.session.rollback()
+            print("Error al registrar asistencia:", e)
+            flash("Ocurrió un error al registrar la asistencia.", "danger")
+            return redirect(url_for('Docente.asistencia', curso_id=curso_id))
+
+    return render_template(
+        'Docentes/Asistencia.html',
+        cursos=cursos,
+        curso_seleccionado=curso_seleccionado,
+        estudiantes=estudiantes,
+        estados_previos=estados_previos,
+    )
+
 @Docente_bp.route('/aprobacion_academica')
 def aprobacion_academica():
     return render_template('Docentes/AprobacionAcademica.html')
@@ -526,6 +670,62 @@ def noticias():
 @Docente_bp.route('/noticias_vistas')
 def noticias_vistas():
     return render_template('Docentes/NoticiasVistas.html')
+
+
+@Docente_bp.route('/excusas_inasistencias')
+@login_required
+def excusas_inasistencias():
+    """Lista de excusas de inasistencia enviadas por acudientes."""
+
+    q = request.args.get('q', type=str, default='').strip()
+    estado = request.args.get('estado', type=str, default='').strip() or None
+
+    # Alias para estudiante y usuario acudiente
+    Estudiante = aliased(Usuario)
+    AcudienteUser = aliased(Usuario)
+
+    # Base: detalles con excusa
+    query = (
+        db.session.query(
+            Detalle_Asistencia,
+            Asistencia,
+            Estudiante,
+            Acudiente,
+            AcudienteUser,
+        )
+        .join(Asistencia, Detalle_Asistencia.ID_Asistencia == Asistencia.ID_Asistencia)
+        .join(Estudiante, Detalle_Asistencia.ID_Estudiante == Estudiante.ID_Usuario)
+        .join(Acudiente, Detalle_Asistencia.ID_Acudiente == Acudiente.ID_Acudiente)
+        .join(AcudienteUser, Acudiente.ID_Usuario == AcudienteUser.ID_Usuario)
+        .filter(Detalle_Asistencia.TextoExcusa.isnot(None))
+    )
+
+    # Filtro por nombre de acudiente
+    if q:
+        like = f"%{q}%"
+        query = query.filter(
+            (AcudienteUser.Nombre.ilike(like)) |
+            (AcudienteUser.Apellido.ilike(like))
+        )
+
+    # Filtro por estado de excusa
+    if estado:
+        query = query.filter(Detalle_Asistencia.EstadoExcusa == estado)
+
+    resultados = query.order_by(Asistencia.Fecha.desc(), Detalle_Asistencia.ID_Detalle_Asistencia.desc()).all()
+
+    excusas = []
+    for det, asis, est, rel, u_acu in resultados:
+        excusas.append({
+            'fecha_falta': asis.Fecha.strftime('%d/%m/%Y') if asis and asis.Fecha else '—',
+            'estudiante_nombre': f"{est.Apellido} {est.Nombre}",
+            'acudiente_nombre': f"{u_acu.Apellido} {u_acu.Nombre}",
+            'texto_excusa': det.TextoExcusa,
+            'archivo_excusa': det.ArchivoExcusa,
+            'estado_excusa': det.EstadoExcusa,
+        })
+
+    return render_template('Docentes/ExcusasInasistencias.html', excusas=excusas, q=q, estado=estado)
 
 @Docente_bp.route('/notas_curso/<int:curso_id>')
 def notas_curso(curso_id):
@@ -563,20 +763,48 @@ def _calcular_promedio_local(registro_nota):
 @Docente_bp.route('/registro_notas_curso/<int:curso_id>', methods=['GET', 'POST'])
 @login_required
 def registro_notas_curso(curso_id):
-    
-    # 🛑 Asegúrate de que Docente_Asignatura esté importado al inicio del archivo
-    # 🛑 Y que ID_DOCENTE_ACTUAL se obtenga de la sesión de Flask, no un valor fijo (ej: current_user.ID_Usuario si usas Flask-Login)
+    """Pantalla de registro de notas.
+
+    Admite dos tipos de identificador en la URL:
+    - ID_Curso real (clave primaria de la tabla Curso)
+    - Código "visible" como 601, 701, 1001, 1103, etc. (grado*100 + grupo)
+
+    Si recibe un código (>=100), se decodifica a grado y grupo y se
+    busca el Curso correspondiente. A partir de ahí se trabaja siempre
+    con el ID_Curso real para consultas y formularios.
+    """
+
     ID_DOCENTE_ACTUAL = current_user.ID_Usuario
-    
-    # --- 1. PROCESAR FILTROS Y OBTENER DATOS BASE ---
-    
-    # 1.1. Obtener la información del curso
+
+    # --- 1. Resolver el curso real (ID_Curso) a partir del parámetro ---
     curso_obj = Curso.query.get(curso_id)
+    curso_pk = None
+
+    if not curso_obj and curso_id >= 100:
+        # Interpretar como código grado*100 + grupo
+        grado_calc = curso_id // 100
+        grupo_calc = curso_id % 100
+
+        # Aceptar grupo "1" y "01", "2" y "02", etc.
+        grupo_candidatos = {str(grupo_calc), f"{grupo_calc:02d}"}
+
+        curso_obj = Curso.query.filter(
+            (Curso.Grado == str(grado_calc)) | (Curso.Grado == grado_calc),
+            (Curso.Grupo.in_(list(grupo_candidatos)))
+        ).first()
+
+    if curso_obj:
+        curso_pk = curso_obj.ID_Curso
+    else:
+        # Fallback: usamos el ID tal cual para que al menos no rompa,
+        # pero el nombre mostrará "Curso Desconocido".
+        curso_pk = curso_id
+
     curso_nombre = f"{curso_obj.Grado}-{curso_obj.Grupo}" if curso_obj and hasattr(curso_obj, 'Grado') else "Curso Desconocido"
-    
-    # 1.2. Claves de sesión para este curso específico
-    session_key_asignatura = f'last_asignatura_{curso_id}'
-    session_key_periodo = f'last_periodo_{curso_id}'
+
+    # 1.2. Claves de sesión para este curso específico (usando el ID real)
+    session_key_asignatura = f'last_asignatura_{curso_pk}'
+    session_key_periodo = f'last_periodo_{curso_pk}'
     
     # 1.3. Obtener filtros, priorizando: 1. URL/GET, 2. Sesión
     
@@ -608,7 +836,7 @@ def registro_notas_curso(curso_id):
     estudiantes_db = db.session.query(Usuario, Matricula). \
         join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario). \
         filter(
-            Matricula.ID_Curso == curso_id,
+            Matricula.ID_Curso == curso_pk,
             Usuario.Rol == 'Estudiante'
         ).order_by(Usuario.Apellido, Usuario.Nombre).all()
 
@@ -620,6 +848,16 @@ def registro_notas_curso(curso_id):
                              .filter(Docente_Asignatura.ID_Docente == ID_DOCENTE_ACTUAL)\
                              .distinct()\
                              .all()
+
+    # 1.6.1. Agrupar por nombre base (primera palabra) para no repetir materias por grado
+    asignaturas_unicas_dict = {}
+    for asig in asignaturas_db:
+        partes = (asig.nombre or '').split()
+        nombre_base = partes[0] if partes else asig.nombre
+        if nombre_base not in asignaturas_unicas_dict:
+            asignaturas_unicas_dict[nombre_base] = asig
+
+    asignaturas_unicas = list(asignaturas_unicas_dict.values())
     
     # --- 2. OBTENER NOTAS EXISTENTES (PERSISTENCIA) ---
     notas_por_estudiante = {}
@@ -659,10 +897,10 @@ def registro_notas_curso(curso_id):
                            curso_obj=curso_obj,
                            curso_nombre=curso_nombre, 
                            estudiantes=lista_estudiantes, 
-                           curso_id=curso_id, 
+                           curso_id=curso_pk, 
                            asignatura_id=asignatura_id,
                            periodo_seleccionado=periodo_seleccionado, # Pasar el filtro seleccionado
-                           asignaturas=asignaturas_db
+                           asignaturas=asignaturas_unicas
                            )
     
 @Docente_bp.route('/generar_reporte_pdf/<int:curso_id>', methods=['GET'])
@@ -897,22 +1135,18 @@ def guardar_notas_curso(curso_id):
                 print(f"[guardar_notas_curso] Error creando notificaciones: {e}")
             except Exception:
                 pass
-        
+
         # ✅ CLAVE DE PERSISTENCIA: Guardar los filtros en la sesión
         session[session_key_asignatura] = asignatura_id
         session[session_key_periodo] = periodo
-        
+
         flash("Notas guardadas exitosamente.", "success")
-        
-        # Redirigir conservando filtros para repoblar la vista
-        return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id, asignatura=asignatura_id, periodo=periodo))
         
     except Exception as e:
         db.session.rollback()
         flash(f"Error al guardar los cambios en la base de datos: {e}", "error")
-        return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id, asignatura=asignatura_id, periodo=periodo))
-        
-    # 3. REDIRECCIONAMIENTO FINAL
+
+    # 3. REDIRECCIONAMIENTO FINAL (según la acción solicitada)
     if accion == 'reporte':
         # Redirigir a la generación de PDF (usa GET)
         return redirect(url_for(
@@ -921,8 +1155,8 @@ def guardar_notas_curso(curso_id):
             asignatura=asignatura_id, 
             periodo=periodo
         ))
-    
-    # Si la acción es 'guardar' o si falla el reporte, redirigir a la vista,
+
+    # Si la acción es 'guardar' o cualquier otra, redirigir de nuevo a la vista
     # manteniendo los filtros en la URL para recargar la tabla actualizada.
     return redirect(url_for(
         'Docente.registro_notas_curso', 
@@ -1120,6 +1354,9 @@ def materialapoyo2(curso_id):
 def registrotutorias2():
     return render_template('Docentes/RegistroTutorías2.html')
 
+@Docente_bp.route('/inasistencias')
+def inasistencias():
+    return render_template('Docentes/inasistencias.html')
 
 
 #--------------------------------LO DE NOTAS-----------------------

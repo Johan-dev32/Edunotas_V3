@@ -6,8 +6,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.mysql import YEAR
 from datetime import datetime
 from flask_login import UserMixin
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
 
 db = SQLAlchemy()
 

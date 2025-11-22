@@ -1357,12 +1357,21 @@ def guardar_asignatura():
     descripcion = request.form.get('descripcion')
     ciclo = request.form.get('ciclo')
     id_docente = request.form.get('id_docente')
+    id_curso = request.form.get('id_curso')
+    
+    print("=== DATOS RECIBIDOS ===")
+    print(f"Nombre: {nombre}")
+    print(f"Descripción: {descripcion}")
+    print(f"Ciclo: {ciclo}")
+    print(f"ID Docente: {id_docente}")
+    print("=======================")
 
-    if not all([nombre, id_docente]):
+    if not all([nombre, id_docente, id_curso]):
         return jsonify({"error": "Faltan datos obligatorios"}), 400
 
     try:
         id_docente = int(id_docente)
+        id_curso = int(id_curso)
         docente = Usuario.query.get(id_docente)
         if not docente:
             return jsonify({"error": "Docente no encontrado"}), 404
@@ -1382,7 +1391,7 @@ def guardar_asignatura():
             Estado="Activa"
         )
 
-        relacion = Docente_Asignatura(docente=docente, asignatura=asignatura)
+        relacion = Docente_Asignatura(docente=docente, asignatura=asignatura, ID_Curso=id_curso)
         db.session.add(asignatura)
         db.session.add(relacion)
         db.session.commit()
@@ -1475,6 +1484,7 @@ def crear_asignatura():
     area = data.get('area', '')
     codigo = data.get('codigo')
     id_docente = data.get('id_docente')
+    id_curso = data.get('id_curso')
 
     # Crear la asignatura
     nueva = Asignatura(
@@ -1489,10 +1499,11 @@ def crear_asignatura():
     db.session.flush()  # Para obtener ID antes del commit
 
     # Crear relación docente-asignatura
-    if id_docente:
+    if id_docente and id_curso:
         relacion = Docente_Asignatura(
             ID_Docente=id_docente,
-            ID_Asignatura=nueva.ID_Asignatura
+            ID_Asignatura=nueva.ID_Asignatura,
+            ID_Curso=id_curso
         )
         db.session.add(relacion)
 

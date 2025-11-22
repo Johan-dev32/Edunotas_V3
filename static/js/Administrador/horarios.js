@@ -124,7 +124,23 @@ function activarBloque(bloque) {
 // ------------------- Inicializar tabla -------------------
 async function initTabla() {
   const tbody = document.querySelector('#horario-table tbody');
-  tbody.innerHTML = '';
+  if (!tbody.hasChildNodes()) {
+    horas.forEach(h => {
+      if (h.descanso) {
+        tbody.innerHTML += `<tr><td colspan="6" class="bg-warning fw-bold">DESCANSO</td></tr>`;
+      } else {
+        tbody.innerHTML += `
+          <tr data-inicio="${h.inicio}" data-fin="${h.fin}">
+            <td>${h.inicio} - ${h.fin}</td>
+            <td data-dia="Lunes" data-hora="${h.inicio.trim()}"></td>
+            <td data-dia="Martes" data-hora="${h.inicio.trim()}"></td>
+            <td data-dia="Miércoles" data-hora="${h.inicio.trim()}"></td>
+            <td data-dia="Jueves" data-hora="${h.inicio.trim()}"></td>
+            <td data-dia="Viernes" data-hora="${h.inicio.trim()}"></td>
+          </tr>`;
+      }
+    });
+  }
 
   horas.forEach(h => {
     if (h.descanso) {
@@ -215,11 +231,14 @@ async function cargarBloques() {
       return;
     }
 
+
+    if (!celda.querySelector('.bloque')) {
     crearBloque(celda, {
       id_bloque: b.id_bloque || b.ID_Bloque || b.id || '',
       materia: b.materia || b.Materia || (b.asignatura ? b.asignatura.Nombre : ''),
       docente: b.docente || b.Docente || (b.docente_nombre ? b.docente_nombre : '')
     });
+  }
   });
 }
 // ------------------- Guardar bloques en DB -------------------
@@ -254,7 +273,7 @@ async function guardarBloques() {
       };
 
       // 🔹 Convertimos la hora actual a ID_Bloque válido
-      const id_bloque = horaIndexMap[hora.trim()] || null;
+      const id_bloque = null;
 
       bloques.push({
         id_bloque,   // 👈 ahora sí manda un ID real que existe

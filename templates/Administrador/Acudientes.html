@@ -59,46 +59,55 @@
 
    <!-- MENU -->
      <section class="bg-light">
-     <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
-     <div class="offcanvas-header">
-       <h5 class="offcanvas-title">MENÚ</h5>
-     </div>
-     <div class="offcanvas1-body">
-       <ul class="nav flex-column">
-             <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
-             
-             <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
-             <div class="collapse" id="submenuNotas">
-               <ul class="nav flex-column ms-3">
-                 <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-                 <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
-                <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
-               </ul>
-             </div>
+      <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">MENÚ</h5>
+  </div>
+  <div class="offcanvas1-body">
+    <ul class="nav flex-column">
+          <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+          
+          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
+          <div class="collapse" id="submenuNotas">
+            <ul class="nav flex-column ms-3">
+              <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+              
+             <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
 
-             <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-             <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
+             <li><a href="{{ url_for('Administrador.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-check-circle-fill"></i> Aprobación Académica</a></li>
 
-             <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
-               <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
-             </a>
-             <div class="collapse" id="submenuUsuarios">
-               <ul class="nav flex-column ms-3">
-                 <li><a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
-                 <li><a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
-                 <li><a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
-                 <li><a href="{{ url_for('Administrador.repitentes') }}" class="nav-link text-white"><i class="bi bi-person-dash"></i> Lista Estudiantes Repitentes</a></li>
-                 <li><a href="{{ url_for('Administrador.registro') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Registro Usuarios</a></li>
-               </ul>
-             </div>
 
-             <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
-             <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
-             
-           </ul>
-         </div>
-       </div>
-     </div>
+
+            </ul>
+          </div>
+
+          <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+          <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
+
+          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
+            <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
+          </a>
+          <div class="collapse" id="submenuUsuarios">
+            <ul class="nav flex-column ms-3">
+              <li><a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
+              <li><a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
+              <li><a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
+              <li><a href="{{ url_for('Administrador.repitentes') }}" class="nav-link text-white"><i class="bi bi-person-dash"></i> Lista Estudiantes Repitentes</a></li>
+              <li><a href="{{ url_for('Administrador.registro') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Registro Usuarios</a></li>
+            </ul>
+          </div>
+
+
+
+
+
+          <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+          <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+          
+        </ul>
+      </div>
+    </div>
+  </div>
    </section>
 
    <!-- Contenido principal -->

@@ -41,22 +41,25 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
+<div class="dropdown">
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      
+      <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
+      <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
 
-    <div class="dropdown">
-      <button class="btn btn-usuario dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
-        <i class="bi bi-person-lines-fill"></i>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="userDropdown">
-        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuración Académica</a></li>
-        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-      </ul>
-    </div>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
   </header>
 
 <!-- Offcanvas menú lateral -->
-<section class="bg-light py-5 mt-5">
-  <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
+<section class="">
+   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
   </div>
@@ -68,8 +71,10 @@
           <div class="collapse" id="submenuNotas">
             <ul class="nav flex-column ms-3">
               <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
+              
              <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+
+             <li><a href="{{ url_for('Administrador.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-check-circle-fill"></i> Aprobación Académica</a></li>
 
 
 
@@ -78,7 +83,6 @@
 
           <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
           <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.reporte') }}" class="nav-link text-white"><i class="bi bi-calendar2"></i></i> Generar reporte</a></li>
 
           <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
             <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
@@ -177,7 +181,7 @@
           <select id="cicloAsignatura" class="form-select">
             <option value="">-- Seleccione --</option>
             {% for curso in cursos %}
-              <option value="{{ curso.Grado }}">{{ curso.Grado }} {{ curso.Grupo or '' }}</option>
+              <option value="{{ curso.Grado }}">{{ curso.Grupo }}</option>
             {% endfor %}
           </select>
         </label>

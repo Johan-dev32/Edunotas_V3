@@ -94,7 +94,7 @@
       <select id="curso_id" name="curso_id" class="form-select" style="max-width: 250px;" onchange="this.form.submit()">
         {% for c in cursos %}
           <option value="{{ c.ID_Curso }}" {% if curso_seleccionado and c.ID_Curso == curso_seleccionado.ID_Curso %}selected{% endif %}>
-            {{ c.Grado }}{{ c.Grupo }}
+            {{ c.Grupo }}
           </option>
         {% endfor %}
       </select>

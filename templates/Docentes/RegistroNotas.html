@@ -205,17 +205,25 @@
 
         // Forzar que el botón Guardar siempre envíe POST al endpoint correcto
         const btnGuardar = document.getElementById('btnGuardarNotas');
-        btnGuardar.addEventListener('click', function(e) {
-            const form = document.getElementById('formRegistroNotas');
-            form.method = 'POST';
-            form.action = "{{ url_for('Docente.guardar_notas_curso', curso_id=curso_id) }}";
-            // Asegurar que asignatura y periodo actuales viajen en el POST
-            // (ya viajan porque los <select> tienen name, pero reforzamos)
-            const selAsig = document.getElementById('asignatura_select');
-            const selPer = document.getElementById('periodo_select');
-            if (!selAsig.name) selAsig.name = 'asignatura';
-            if (!selPer.name) selPer.name = 'periodo';
-        });
+        if (btnGuardar) {
+            btnGuardar.addEventListener('click', function(e) {
+                // Nos aseguramos de que el envío sea siempre un POST al endpoint correcto
+                const form = document.getElementById('formRegistroNotas');
+                if (!form) return;
+
+                form.method = 'POST';
+                form.action = "{{ url_for('Docente.guardar_notas_curso', curso_id=curso_id) }}";
+
+                // Asegurar que asignatura y período actuales viajen en el POST
+                const selAsig = document.getElementById('asignatura_select');
+                const selPer = document.getElementById('periodo_select');
+                if (selAsig && !selAsig.name) selAsig.name = 'asignatura';
+                if (selPer && !selPer.name) selPer.name = 'periodo';
+
+                // Forzar el envío del formulario (por si algún otro JS cancela el submit)
+                form.submit();
+            });
+        }
     });
     // Tus otras variables JS
     const ASIGNATURA_ID = {{ asignatura_id | default(0) }};

@@ -113,35 +113,39 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderGraficaAsistencia = (asis) => {
     const labels = ['Presente', 'Ausente', 'Justificado'];
     const dataVals = [asis.Presente || 0, asis.Ausente || 0, asis.Justificado || 0];
-    const total = Math.max(1, dataVals.reduce((a,b)=>a+b,0));
+    const total = Math.max(1, dataVals.reduce((a, b) => a + b, 0));
 
     if (chartAsis) chartAsis.destroy();
     chartAsis = new Chart(ctxAsis, {
-      type: 'doughnut',
+      type: 'bar',
       data: {
         labels,
         datasets: [{
+          label: 'Asistencia',
           data: dataVals,
           backgroundColor: ['#28a745', '#dc3545', '#ffc107'],
-          borderColor: '#ffffff',
-          borderWidth: 2
+          borderColor: '#1b2068',
+          borderWidth: 1
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '60%',
+        scales: {
+          y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+          x: { grid: { display: false } }
+        },
         plugins: {
           tooltip: {
             callbacks: {
               label: (ctx) => {
                 const val = Number(ctx.raw || 0);
-                const pct = (val/total)*100;
+                const pct = (val / total) * 100;
                 return ` ${ctx.label}: ${val} (${pct.toFixed(0)}%)`;
               }
             }
           },
-          legend: { position: 'bottom' }
+          legend: { display: false }
         }
       }
     });
@@ -150,21 +154,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderGraficaDisciplina = (serie) => {
     const labels = serie.map(s => `Ciclo ${s.periodo}`);
     const dataVals = serie.map(s => Number(s.observaciones || 0));
-    const total = Math.max(1, dataVals.reduce((a,b)=>a+b,0));
+    const total = Math.max(1, dataVals.reduce((a, b) => a + b, 0));
 
     if (chartDisc) chartDisc.destroy();
     chartDisc = new Chart(ctxDisc, {
-      type: 'line',
+      type: 'bar',
       data: {
         labels,
         datasets: [{
           label: 'Conducta',
           data: dataVals,
-          borderColor: '#050733ff',
-          backgroundColor: 'rgba(5,7,51,0.08)',
-          pointBackgroundColor: '#050733ff',
-          fill: true,
-          tension: 0.25
+          backgroundColor: '#050733ff',
+          borderColor: '#1b2068',
+          borderWidth: 1
         }]
       },
       options: {
@@ -174,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
             callbacks: {
               label: (ctx) => {
                 const val = Number(ctx.raw || 0);
-                const pct = (val/total)*100;
+                const pct = (val / total) * 100;
                 return ` ${val} reportes (${pct.toFixed(0)}%)`;
               }
             }

@@ -101,6 +101,12 @@
   <h1 class="text-center mb-4 titulo-principal">APROBACIÓN ACADÉMICA</h1>
   <p class="text-center descripcion">Consulta el estado de aprobación de los estudiantes por curso y asignatura.</p>
 
+  <div class="text-center mb-4 reporte">
+    <a href="{{ url_for('Administrador.reporte_asistencia') }}" class="btn btn-outline-primary">
+      <i class="bi bi-clipboard-check"></i> Ver reporte de asistencia
+    </a>
+  </div>
+
   <div class="card mb-4">
     <div class="card-body row g-3 align-items-end">
       <div class="col-md-3">

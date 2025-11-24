@@ -119,6 +119,156 @@ def aprobacion_academica():
         return render_template('Administrador/AprobacionAcademica.html', cursos=[])
 
 
+@Administrador_bp.route('/reporte_asistencia')
+@login_required
+def reporte_asistencia():
+    """Vista inicial de reporte de asistencia (administrador).
+
+    Por ahora solo muestra una página base donde luego se podrán agregar
+    filtros por curso, asignatura y periodo, y tablas/resúmenes de
+    asistencia.
+    """
+    return render_template('Administrador/ReporteAsistencia.html')
+
+
+@Administrador_bp.route('/reporte_asistencia/datos', methods=['GET'])
+@login_required
+def reporte_asistencia_datos():
+    """Devuelve un resumen de asistencia por estudiante para un curso.
+
+    Parámetros (querystring):
+      - curso_id (obligatorio)
+      - asignatura_id (opcional)
+      - fecha_inicio, fecha_fin (opcional, YYYY-MM-DD)
+    """
+    try:
+        from datetime import datetime as dt
+
+        curso_id = request.args.get('curso_id', type=int)
+        asignatura_id = request.args.get('asignatura_id', type=int)
+        fecha_inicio_str = request.args.get('fecha_inicio')
+        fecha_fin_str = request.args.get('fecha_fin')
+
+        if not curso_id:
+            return jsonify({"success": False, "error": "Parámetro requerido: curso_id"}), 400
+
+        fecha_inicio = None
+        fecha_fin = None
+        try:
+            if fecha_inicio_str:
+                fecha_inicio = dt.strptime(fecha_inicio_str, '%Y-%m-%d').date()
+            if fecha_fin_str:
+                fecha_fin = dt.strptime(fecha_fin_str, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({"success": False, "error": "Formato de fecha inválido"}), 400
+
+        # 1) Traer todos los estudiantes matriculados en el curso
+        estudiantes = (
+            db.session.query(Usuario.ID_Usuario, Usuario.Nombre, Usuario.Apellido)
+            .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+            .filter(Matricula.ID_Curso == curso_id, Usuario.Rol == 'Estudiante')
+            .order_by(Usuario.Apellido, Usuario.Nombre)
+            .all()
+        )
+
+        # Inicializar resumen con todos los estudiantes (aunque no tengan asistencias)
+        resumen = {
+            est.ID_Usuario: {
+                "id_estudiante": est.ID_Usuario,
+                "nombre_completo": f"{est.Nombre} {est.Apellido}",
+                "presentes": 0,
+                "ausentes_injustificados": 0,
+                "ausentes_justificados": 0,
+                "total_sesiones": 0,
+                "observaciones": []
+            }
+            for est in estudiantes
+        }
+
+        # 2) Consultar registros de asistencia del curso (y filtros)
+        q = (
+            db.session.query(
+                Usuario.ID_Usuario.label('id_estudiante'),
+                Detalle_Asistencia.Estado_Asistencia,
+                Detalle_Asistencia.EstadoExcusa,
+                Detalle_Asistencia.Observaciones,
+                Asistencia.Fecha
+            )
+            .join(Detalle_Asistencia, Detalle_Asistencia.ID_Asistencia == Asistencia.ID_Asistencia)
+            .join(Usuario, Usuario.ID_Usuario == Detalle_Asistencia.ID_Estudiante)
+            .join(Programacion, Programacion.ID_Programacion == Asistencia.ID_Programacion)
+            .filter(Programacion.ID_Curso == curso_id)
+        )
+
+        # Filtrar por asignatura si se solicita (vía Docente_Asignatura)
+        if asignatura_id:
+            q = (
+                q.join(Docente_Asignatura, Docente_Asignatura.ID_Docente_Asignatura == Programacion.ID_Docente_Asignatura)
+                 .filter(Docente_Asignatura.ID_Asignatura == asignatura_id)
+            )
+
+        # Rango de fechas
+        if fecha_inicio:
+            q = q.filter(Asistencia.Fecha >= fecha_inicio)
+        if fecha_fin:
+            q = q.filter(Asistencia.Fecha <= fecha_fin)
+
+        registros = q.all()
+
+        # 3) Acumular sobre el resumen (solo afectará a quienes tengan registros)
+        for row in registros:
+            rid = row.id_estudiante
+            if rid not in resumen:
+                # Por seguridad, crear entrada si el estudiante no estaba en Matricula
+                resumen[rid] = {
+                    "id_estudiante": rid,
+                    "nombre_completo": "",
+                    "presentes": 0,
+                    "ausentes_injustificados": 0,
+                    "ausentes_justificados": 0,
+                    "total_sesiones": 0,
+                    "observaciones": []
+                }
+
+            r = resumen[rid]
+            r["total_sesiones"] += 1
+
+            estado = (row.Estado_Asistencia or '').strip()
+            estado_excusa = (row.EstadoExcusa or '').strip() if row.EstadoExcusa is not None else None
+
+            if estado == 'Presente':
+                r["presentes"] += 1
+            elif estado == 'Justificado':
+                r["ausentes_justificados"] += 1
+            elif estado == 'Ausente':
+                # Si hay excusa aceptada, contar como justificada
+                if estado_excusa == 'aceptada':
+                    r["ausentes_justificados"] += 1
+                else:
+                    r["ausentes_injustificados"] += 1
+
+            if row.Observaciones:
+                r["observaciones"].append(row.Observaciones)
+
+        # 4) Construir salida ordenada por nombre
+        salida = []
+        for rid, r in resumen.items():
+            salida.append({
+                "id_estudiante": rid,
+                "nombre_completo": r["nombre_completo"],
+                "presentes": r["presentes"],
+                "ausentes_injustificados": r["ausentes_injustificados"],
+                "ausentes_justificados": r["ausentes_justificados"],
+                "total_sesiones": r["total_sesiones"],
+                "observaciones": " | ".join(r["observaciones"])
+            })
+
+        return jsonify({"success": True, "registros": salida})
+    except Exception as e:
+        print('Error en /reporte_asistencia/datos:', e)
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 @Administrador_bp.route('/aprobacion_academica/datos', methods=['GET'])
 def aprobacion_academica_datos():
     try:
@@ -2390,26 +2540,31 @@ def api_historial_academico_notas(id_historial):
         curso = Curso.query.get(matricula.ID_Curso)
         
         # --- 3. Búsqueda de Notas (Solo Nota_Calificaciones) ---
-        
-        # Realiza un JOIN entre Nota_Calificaciones y Asignatura para obtener el nombre.
-        # CRUCIAL: Se corrigió la referencia a Notas_Calificaciones a Nota_Calificaciones.
-        notas_query = db.session.query(Nota_Calificaciones, Asignatura)\
-                            .join(Asignatura)\
-                            .filter(Nota_Calificaciones.ID_Historial == id_historial)\
-                            .all()
-        
+
+        # JOIN entre Nota_Calificaciones y Asignatura para obtener el nombre de la materia.
+        # Se usan los campos reales definidos en el modelo Nota_Calificaciones
+        # (ID_Calificacion, Nota_1..Nota_4, Promedio_Final).
+        notas_query = (
+            db.session.query(Nota_Calificaciones, Asignatura)
+            .join(Asignatura)
+            .filter(Nota_Calificaciones.ID_Historial == id_historial)
+            .all()
+        )
+
         notas_data = []
         for nota_obj, asignatura_obj in notas_query:
             notas_data.append({
-                "ID_Nota": nota_obj.ID_Nota,
-                "Materia": asignatura_obj.Nombre, 
-                "N1": f"{nota_obj.N1:.1f}" if nota_obj.N1 is not None else "N/A", # Formato con un decimal
-                "N2": f"{nota_obj.N2:.1f}" if nota_obj.N2 is not None else "N/A",
-                "N3": f"{nota_obj.N3:.1f}" if nota_obj.N3 is not None else "N/A",
-                "N4": f"{nota_obj.N4:.1f}" if nota_obj.N4 is not None else "N/A",
-                # Asumo que estos campos están en tu tabla Nota_Calificaciones
-                "PromedioCortes": f"{nota_obj.PromedioCortes:.1f}" if nota_obj.PromedioCortes is not None else "N/A",
-                "NotaFinal": f"{nota_obj.NotaFinal:.1f}" if nota_obj.NotaFinal is not None else "N/A",
+                # ID interno de la calificación
+                "ID_Nota": nota_obj.ID_Calificacion,
+                "Materia": asignatura_obj.Nombre,
+                # Nombres de claves alineados con el JS HistorialAcademico3.js
+                "Nota1": nota_obj.Nota_1 if nota_obj.Nota_1 is not None else 0.0,
+                "Nota2": nota_obj.Nota_2 if nota_obj.Nota_2 is not None else 0.0,
+                "Nota3": nota_obj.Nota_3 if nota_obj.Nota_3 is not None else 0.0,
+                "Nota4": nota_obj.Nota_4 if nota_obj.Nota_4 is not None else 0.0,
+                # Promedio final del historial (puedes ajustarlo si tienes otra lógica)
+                "Promedio": nota_obj.Promedio_Final if nota_obj.Promedio_Final is not None else 0.0,
+                "NotaFinal": nota_obj.Promedio_Final if nota_obj.Promedio_Final is not None else 0.0,
             })
 
         # --- 4. Búsqueda de Recuperaciones (ELIMINADO y reemplazado con lista vacía) ---
@@ -2419,7 +2574,8 @@ def api_historial_academico_notas(id_historial):
         # --- 5. Construcción de la Respuesta Final ---
         response_data = {
             "EstudianteNombre": f"{estudiante.Nombre} {estudiante.Apellido}" if estudiante else "Estudiante Desconocido",
-            "Curso": f"{curso.Grado}-{curso.Nombre}" if curso else "Curso Desconocido",
+            # En el modelo Curso los campos son Grado y Grupo (no Nombre)
+            "Curso": f"{curso.Grado}-{curso.Grupo}" if curso else "Curso Desconocido",
             "Anio": historial.Anio,
             "Periodo": historial.Periodo,
             "Notas": notas_data,

@@ -99,7 +99,7 @@
         {% endfor %}
       </select>
 
-      <a href="{{ url_for('Docente.excusas_inasistencias') }}" class="btn btn-outline-primary ms-auto">
+      <a href="{{ url_for('Docente.excusas_inasistencias') }}" class="btn ms-auto" style="background-color: #050733ff; color: #fff; border-color: #050733ff;">
         Ver excusas de inasistencia
       </a>
     </form>
@@ -135,7 +135,10 @@
               </tbody>
             </table>
           </div>
-          <div class="mt-4 text-end">
+          <div class="mt-4 d-flex justify-content-end gap-2">
+            <button type="button" id="btnExportarAsistenciaPdf" class="btn btn-danger">
+              Exportar como PDF
+            </button>
             <button type="submit" class="btn btn-primary" style="background-color: #050733ff;">
               Guardar asistencia de hoy
             </button>
@@ -149,6 +152,9 @@
 
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jsPDF y autoTable para exportar asistencia a PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
   <script>
     // Rellena el modal con los datos de la excusa seleccionada
@@ -177,6 +183,63 @@
         if (detallesP) detallesP.textContent = detalles;
       });
     }
+
+    // Exportar asistencia a PDF
+    document.addEventListener('DOMContentLoaded', function () {
+      const btnPdf = document.getElementById('btnExportarAsistenciaPdf');
+      if (!btnPdf) return;
+
+      btnPdf.addEventListener('click', function () {
+        const tabla = document.querySelector('table.table');
+        if (!tabla) return;
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const titulo = 'Registro de Asistencia';
+        const cursoSelect = document.getElementById('curso_id');
+        const cursoTexto = cursoSelect ? cursoSelect.options[cursoSelect.selectedIndex].text : '';
+        const fechaHoy = new Date().toLocaleDateString();
+
+        doc.setFontSize(14);
+        doc.setTextColor(5, 7, 51); // #050733 aproximado
+        doc.text(titulo, 14, 15);
+
+        doc.setFontSize(10);
+        let subtitulo = '';
+        if (cursoTexto) {
+          subtitulo += 'Curso: ' + cursoTexto + '   ';
+        }
+        subtitulo += 'Fecha: ' + fechaHoy;
+        doc.text(subtitulo, 14, 22);
+
+        const body = [];
+        const rows = tabla.querySelectorAll('tbody tr');
+        rows.forEach((tr) => {
+          const cols = tr.querySelectorAll('td');
+          if (cols.length >= 3) {
+            const numero = cols[0].innerText.trim();
+            const estudiante = cols[1].innerText.trim();
+            const estadoSelect = cols[2].querySelector('select');
+            const estado = estadoSelect ? estadoSelect.value : cols[2].innerText.trim();
+            body.push([numero, estudiante, estado]);
+          }
+        });
+
+        doc.autoTable({
+          head: [['#', 'Estudiante', 'Estado']],
+          body: body,
+          startY: 28,
+          styles: { fontSize: 9 },
+          headStyles: {
+            fillColor: [5, 7, 51],
+            textColor: 255,
+          },
+        });
+
+        doc.save('asistencia.pdf');
+      });
+    });
   </script>
 
 </body>

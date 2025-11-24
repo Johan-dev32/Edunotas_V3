@@ -29,6 +29,7 @@ header .btn-dark {
   background-color: #050733ff;
   color: #fff;
 }
+
 .btn-usuario {
   background-color: transparent; /* sin recuadro */
   color: #050733ff;               /* color institucional para el icono */
@@ -75,7 +76,6 @@ header .btn-dark {
   margin-left: 40px;
   font-weight: bold;
   font-size: 30px;
-  color: #ffffff;
 }
 
 .offcanvas1-body {
@@ -108,51 +108,73 @@ header .btn-dark {
   height: auto;
 }
 
-.logo-container img {
-  max-width: 250px; 
-  height: auto;
-}
-
 
 /* titulos */
 
 .titulo-principal {
   font-size: 3rem;      
   font-weight: 900;      
-  color: #050733ff;   
-  margin-top: -70px;   
+  color: #050733ff; 
+  margin-top: -40px;
 }
+
 
 .descripcion {
   font-size: 1.3rem;     
-  color: #555;           
+  color: #555;  
+  margin-bottom:50px !important;         
 }
 
-.card-header {
+.card-filtros {
+  border: 1px solid #05073333;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+}
+
+#btnAplicar {
   background-color: #050733ff;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-}
-
-.table th {
-  background-color: #e8eaf6;
-  color: #050733ff;
-  font-weight: bold;
-}
-
-.table td {
-  vertical-align: middle;
-}
-
-input.form-control {
-  border-radius: 20px;
-}
-
-h5, label {
-  color: #050733ff;
-}
-
-select.form-select {
   border-color: #050733ff;
-  color: #050733ff;
+}
+
+#btnAplicar:hover {
+  background-color: #02041f;
+  border-color: #02041f;
+}
+
+#btnExportPdf {
+  border-color: #c0392b;
+  color: #c0392b;
+}
+
+#btnExportPdf:hover {
+  background-color: #c0392b;
+  color: #ffffff;
+}
+
+#btnExportCsv {
+  border-color: #27ae60;
+  color: #27ae60;
+}
+
+#btnExportCsv:hover {
+  background-color: #27ae60;
+  color: #ffffff;
+}
+
+#tablaAsistencia thead {
+  background-color: #050733ff !important;
+}
+
+#tablaAsistencia thead th {
+  background-color: #050733ff !important;
+  border-color: #050733ff !important;
+  color: #ffffff !important;
+}
+
+#tablaAsistencia tbody tr:nth-child(even) {
+  background-color: #f8f9ff;
+}
+
+#tablaAsistencia tbody tr:hover {
+  background-color: #e6ebff;
 }

@@ -108,6 +108,15 @@ header .btn-dark {
   margin-top: -150px;      
 }
 
+/* Contenedor de botones de acciones sobre el curso (Informe, Citaciones, etc.) */
+.botones {
+  justify-content: flex-start !important; /* alinear a la izquierda dentro del d-flex */
+}
+
+.botones a {
+  font-weight: bolder;
+}
+
 .subtitulo {
   font-size: 2rem;       
   font-weight: 700;

@@ -4,12 +4,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const API_URL_NOTAS = `/administrador/api/historialacademico/notas/${historialId}`; 
     
-    // Elementos del DOM a rellenar
-    const nombreEstudianteElement = document.querySelector('.d-flex h5');
-    const cursoElement = document.querySelector('.d-flex span');
-    const tituloPeriodoElement = document.querySelector('.descripcion');
-    const tbodyNotas = document.querySelector('.card:nth-child(2) table tbody');
-    const tbodyRecuperaciones = document.querySelector('.card:nth-child(3) table tbody');
+    // Elementos del DOM a rellenar (coinciden con el HTML HistorialAcademico3.html)
+    const nombreEstudianteElement = document.getElementById('info-estudiante');
+    const cursoElement = document.getElementById('info-curso');
+    const anioElement = document.getElementById('info-anio');
+    const periodoElement = document.getElementById('info-periodo');
+    const tbodyNotas = document.getElementById('tbody-notas');
+    const tbodyRecuperaciones = document.getElementById('tbody-recuperaciones');
     
     const COLUMNS_COUNT = 7; // Nueva cuenta de columnas para la tabla de Notas
 
@@ -67,9 +68,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             // 1. Actualizar el encabezado y títulos
-            nombreEstudianteElement.textContent = data.EstudianteNombre;
-            cursoElement.textContent = data.Curso;
-            tituloPeriodoElement.textContent = `Historial Académico - Periodo ${data.Periodo} (${data.Anio})`;
+            if (nombreEstudianteElement) nombreEstudianteElement.textContent = data.EstudianteNombre || '---';
+            if (cursoElement) cursoElement.textContent = data.Curso || '---';
+            if (anioElement) anioElement.textContent = data.Anio || '---';
+            if (periodoElement) periodoElement.textContent = data.Periodo || '---';
             
             // 2. Rellenar las tablas
             rellenarTablaNotas(data.Notas);

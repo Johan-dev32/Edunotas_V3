@@ -211,6 +211,7 @@ class Cronograma_Actividades(db.Model):
     FechaInicial = db.Column(db.Date)
     FechaFinal = db.Column(db.Date)
     ID_Asignatura = db.Column(db.Integer, db.ForeignKey("Asignatura.ID_Asignatura", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
+    ID_Asignatura = db.Column(db.Integer, db.ForeignKey("Asignatura.ID_Asignatura", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
 
     curso = relationship("Curso", back_populates="cronogramas")
     periodo = relationship("Periodo", back_populates="cronogramas")
@@ -245,6 +246,7 @@ class Actividad_Estudiante(db.Model):
     ID_Actividad_Estudiante = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ID_Actividad = db.Column(db.Integer, db.ForeignKey("Actividad.ID_Actividad", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
     ID_Matricula = db.Column(db.Integer, db.ForeignKey("Matricula.ID_Matricula", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
+    Archivo = db.Column(db.String(255))
     Observaciones = db.Column(db.Text)
     Calificacion = db.Column(db.Numeric(5,2))
     Archivo = db.Column(db.String(255))
@@ -486,3 +488,4 @@ class MaterialDidactico(db.Model):
 
     curso = relationship("Curso", back_populates="materiales_didacticos")
     docente = relationship("Usuario", back_populates="materiales_didacticos")
+    

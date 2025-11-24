@@ -1,58 +1,34 @@
 body {
+  background-color: #f8f9fa; 
   font-family: 'Trebuchet MS', sans-serif;
-  /* Hace que la imagen cubra toda la pantalla */
-  background-repeat: no-repeat; /* Evita que se repita */
-   /* Hace que se quede fija al hacer scroll */
-  background-position: center;  /* Centra la imagen */
-  background-attachment: scroll;
-  height: 600px;
+  color: #212529;
 }
 
-#sidebar {
-  width: 220px;
-  min-height: 100vh;
-  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
-}
-
-#sidebar .nav-link:hover {
-  background: linear-gradient(180deg, #11064e, #ffffff);
-  border-radius: 8px;
-}
+/* navbar */
 header {
-  background-color: rgb(255, 255, 255); /* azul */
-  color: rgb(207, 0, 0); 
+  background-color: white;
+  color: #050733ff;
+  font-family: 'Trebuchet MS', sans-serif;
 }
 
-/* Cambiar color del título */
 .titulo-header {
- 
   color: #050733ff;
   font-size: 40px;
   font-weight: bolder;
   font-family: 'Trebuchet MS', sans-serif;
   margin: 0;
-  margin-left: 60px;  /* lo acercas/separas de la izquierda */
+  margin-left: 60px;
 }
 
-/* Botón hamburguesa con color claro */
 header .btn-dark {
   background-color: #050733ff;
   border: none;
 }
 
-
-/* Botón de iniciar sesión */
-header .btn-outline-primary {
-  color: #050733ff;
-  border-color: #050733ff;
-  margin-left: 900px;
-
-}
 .btn-edunotas {
-    background-color: #050733ff; 
-    color: rgb(255, 255, 255);        
-    margin-left: 800px;
-
+  background-color: #050733ff;
+  color: #fff;
+  margin-left: 800px;
 }
 .btn-usuario {
   background-color: transparent; /* sin recuadro */
@@ -80,17 +56,31 @@ header .btn-outline-primary {
   font-size: 1.6rem;
 }
 
-
-header .btn-outline-primary:hover {
-  background-color: white;
-  color: #ffffff;
+/*  menu_des  */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
 }
-.offcanvas-title{
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+.offcanvas {
+  font-size: 25px;
+
+
+}
+
+
+.offcanvas-title {
   margin-left: 40px;
   font-weight: bold;
-  font-size: 30px ;
+  font-size: 30px;
+  
 }
-
 
 .offcanvas1-body {
   flex-grow: 1;
@@ -98,15 +88,14 @@ header .btn-outline-primary:hover {
   max-height: 100vh;  
 }
 
-.nav-item{
+.nav-item {
   font-weight: bold;
   font-size: 22px;
-
 }
 #sidebar .nav-link {
   font-size: 18px;   /* tamaño menú hamburguesa */
   font-weight: bold;
-  margin-bottom: 10px;
+   margin-bottom: 10px;
 }
 
 /* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
@@ -117,75 +106,48 @@ header .btn-outline-primary:hover {
 
 }
 
-.titulo{
-  margin-left:600px;
-  font-size: 40px;
-  margin-top: 30px;
-  font-weight: bold;
+
+.logo-container {
+  width: auto;
+  height: auto;
 }
-.texto1{
-  margin-left: 550px;
-  font-size: 25px;
-  font-weight: bold;
-  margin-bottom: 80px;
+
+.logo-container img {
+  max-width: 250px; 
+  height: auto;
 }
-.card {
-  max-width: 800px;   /* ancho máximo */
-  max-height: 4000px;
-  /* centrar horizontalmente */
-  font-size: 11 px;  /* letras un poco más pequeñas */
-}
+
+/* Card centrada */
 .custom-card {
-  margin-left: 450px;  /* lo mueve a la derecha */
-}
-.card-header{
-  background-color: #050733ff;
-}
-.btn-menu{
-  margin-left: 100px;
-  background-color: #050733ff; 
-  color: #ffffff;
-  margin-bottom: 20px;
-  
-}
-.btn-subir{
-  background-color: rgb(34, 208, 14);
-  color: #ffffff;
-}
-.btn-outline-secondary{
-  background-color: #ffffff;
-}
-.form-select {
-  width: 300px;    
-  min-height: 70px;         
-  margin-top: -250px;   
-  margin-left: 50px;     
-  font-size: 1.1rem;   
-  text-align: center;    /* texto más grande */
-  font-weight: bold;          /* un poco más grueso */
-  border: 2px solid #050733ff; /* azul Bootstrap */
-  border-radius: 8px;        
-  box-shadow: 0 4px 8px #050733ff; /* sombra sutil */
-  transition: all 0.3s ease;
+  max-width: 850px;
 }
 
-/* Efecto al pasar el mouse */
-.form-select:hover {
-  border-color: #ff4e4e;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+/* Botones */
+.btn-edunotas {
+  background-color: #050733;
+  color: white;
 }
 
-/* Efecto al hacer clic o enfocar */
-.form-select:focus {
-  outline: none;
-  border-color: #ff4e4e;       /* morado */
-  box-shadow: 0 0 8px #ff4e4e;
+.btn-usuario {
+  border: none;
+  background: none;
+  color: #050733;
+  font-size: 1.7rem;
 }
-.form-label{
+
+.btn-subir {
+  background-color: #22d00e;
+  color: white;
+}
+
+/* Inputs */
+.form-select, .form-control {
+  border: 2px solid #050733;
   font-weight: bold;
 }
-.palo{
-  font-size: 200px;
-  margin-left: 400px;
-  margin-top: -200px;
+
+/* Tabla */
+table {
+  border-radius: 10px;
+  overflow: hidden;
 }

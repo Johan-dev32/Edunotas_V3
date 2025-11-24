@@ -161,8 +161,6 @@ def login():
         login_user(usuario)
         flash('Inicio de sesión exitoso')
         
-        session['nombre_usuario'] = usuario.Nombre
-        session['sexo_usuario'] = usuario.Sexo
 
         if rol == 'Administrador':
             return redirect(url_for('loading', destino='indexadministrador'))

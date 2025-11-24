@@ -281,6 +281,17 @@ def tareas_actividades(curso_id):
 @login_required
 def crear_actividad(curso_id):
 
+    relacion = Docente_Asignatura.query.filter_by(
+        ID_Docente=current_user.ID_Usuario,
+        ID_Curso=curso_id
+    ).first()
+
+    if not relacion:
+        flash("No tienes una asignatura asociada a este curso.", "warning")
+        return redirect(url_for('Docente.tareas_actividades1'))
+
+    id_asignatura = relacion.ID_Asignatura
+
     if request.method == 'POST':
         try:
             titulo = request.form.get('titulo')
@@ -291,41 +302,38 @@ def crear_actividad(curso_id):
             fecha = request.form.get('fecha')
             hora = request.form.get('hora')
             pdf = request.files.get('pdfUpload')
-            print("========== DEBUG PDF ==========")
-            print("pdf recibido:", pdf)
-            print("filename:", pdf.filename if pdf else None)
-            print("UPLOAD_FOLDER:", current_app.config['UPLOAD_FOLDER'])
-            print("ruta absoluta:", os.path.abspath(current_app.config['UPLOAD_FOLDER']))
-            print("================================")
 
-            # Debugging
+            print("ASIGNATURA RECIBIDA FORM:", request.form.get('id_asignatura'))
+
             if not all([titulo, descripcion, tipo, fecha, hora, porcentaje]):
                 flash("Por favor completa todos los campos obligatorios.", "warning")
                 return redirect(request.url)
 
-            # Buscar o crear cronograma
-            cronograma = Cronograma_Actividades.query.filter_by(ID_Curso=curso_id).first()
+            # Buscar o crear cronograma por curso **y asignatura**
+            cronograma = Cronograma_Actividades.query.filter_by(
+                ID_Curso=curso_id,
+                ID_Asignatura=id_asignatura
+            ).first()
+
             if not cronograma:
                 cronograma = Cronograma_Actividades(
                     ID_Curso=curso_id,
                     ID_Periodo=1,
                     FechaInicial=datetime.now().date(),
-                    FechaFinal=datetime.now().date()
+                    FechaFinal=datetime.now().date(),
+                    ID_Asignatura=id_asignatura
                 )
                 db.session.add(cronograma)
                 db.session.commit()
 
-            # Guardar PDF en carpeta
+            # Guardar PDF
             nombre_pdf = None
             if pdf and pdf.filename:
                 nombre_seguro = secure_filename(pdf.filename)
                 nombre_pdf = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{nombre_seguro}"
                 ruta_pdf = os.path.join(current_app.config['UPLOAD_FOLDER'], nombre_pdf)
-                print("Archivo recibido:", pdf)
-                print("Nombre del archivo:", pdf.filename)
-                print("Ruta donde se guardará:", ruta_pdf)
                 pdf.save(ruta_pdf)
-                print(f"✅ PDF guardado en: {ruta_pdf}")
+
             # Crear actividad
             nueva_actividad = Actividad(
                 Titulo=titulo,
@@ -333,7 +341,7 @@ def crear_actividad(curso_id):
                 Fecha=datetime.strptime(fecha, "%Y-%m-%d").date(),
                 Hora=datetime.strptime(hora, "%H:%M").time(),
                 Descripcion=descripcion,
-                ArchivoPDF=nombre_pdf,  # 👈 solo guardamos el nombre
+                ArchivoPDF=nombre_pdf,
                 Estado=estado,
                 Porcentaje=porcentaje,
                 ID_Cronograma_Actividades=cronograma.ID_Cronograma_Actividades
@@ -351,8 +359,12 @@ def crear_actividad(curso_id):
             flash("Ocurrió un error al crear la actividad.", "danger")
             return redirect(request.url)
 
-    return render_template("Docentes/Crear_Actividad.html", curso_id=curso_id)
-
+    # ========== SI ES GET → Renderizar HTML ==========
+    return render_template(
+        "Docentes/Crear_Actividad.html",
+        curso_id=curso_id,
+        id_asignatura=id_asignatura
+    )
     
 @Docente_bp.route('/editar_actividad/<int:id_actividad>', methods=['POST', 'GET'])
 @login_required

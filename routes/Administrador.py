@@ -2117,6 +2117,7 @@ def cursos():
     return render_template('Administrador/Cursos.html', cursos=cursos)
 
 
+
 # ---------------------- Historial Académico ----------------------
 
 @Administrador_bp.route('/historialacademico')
@@ -2339,7 +2340,8 @@ def gestion_cursos(): # <--- NOMBRE DE LA FUNCIÓN CAMBIADO
     # Mostrar la vista general de cursos existente
     return render_template('Administrador/Cursos.html', cursos=cursos, directores=directores)
 
-@Administrador_bp.route('/cursos/<int:curso_id>/estudiantes') 
+@Administrador_bp.route('/estudiantes/curso/<int:curso_id>')
+@login_required
 def _estudiantes_curso(curso_id):
     try:
         # 1. Decodificar el ID del curso (Ej: 901 -> Grado 9, Grupo 01)

@@ -5,7 +5,7 @@ from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
 from sqlalchemy import func, and_, or_, extract
-from sqlalchemy import or_, text
+from sqlalchemy import or_, text, cast, Integer
 from datetime import datetime
 from Controladores.models import db, Usuario, Matricula, Nota_Calificaciones, Reporte_Notas, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes, Detalle_Asistencia, Asistencia, Encuesta, Encuesta_Pregunta, Encuesta_Respuesta, Historial_Academico
 from flask_mail import Message
@@ -1861,14 +1861,21 @@ def registro_notas(curso_id):
 
 
 @Administrador_bp.route('/notas_registro')
-def notas_registro():
-    return render_template('Administrador/Notas_Registro.html')
 
 @Administrador_bp.route('/notas_consultar')
 def notas_consultar():
-    cursos = Curso.query.filter_by(Estado='Activo').order_by(Curso.Grado, Curso.Grupo).all()
-    return render_template('Administrador/Notas_Consultar.html', cursos=cursos)
+    """Vista de consulta de notas.
 
+    Los cursos se ordenan numéricamente por grupo para que aparezcan
+    en pantalla en el orden 601, 602, ..., 1103.
+    """
+    cursos = (
+        Curso.query
+        .filter_by(Estado='Activo')
+        .order_by(cast(Curso.Grupo, Integer))
+        .all()
+    )
+    return render_template('Administrador/Notas_Consultar.html', cursos=cursos)
 
 # GESTIÓN DE LA OBSERVACIÓN #
 

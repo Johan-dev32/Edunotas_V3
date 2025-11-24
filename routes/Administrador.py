@@ -1,11 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app
 from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import func
-from sqlalchemy import func, and_, or_, extract
-from sqlalchemy import or_, text
+from sqlalchemy import func, and_, or_, extract, text, cast, Integer
 from datetime import datetime
 from Controladores.models import db, Usuario, Matricula, Nota_Calificaciones, Reporte_Notas, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes, Detalle_Asistencia, Asistencia, Encuesta, Encuesta_Pregunta, Encuesta_Respuesta, Historial_Academico
 from flask_mail import Message
@@ -2058,6 +2055,17 @@ def configuracion_academica2():
 def configuracion_academica3():
     return render_template('Administrador/ConfiguracionAcademica3.html')
 
+@Administrador_bp.route('/niveles-superacion')
+@Administrador_bp.route('/niveles-superacion/<int:curso_id>')
+@login_required
+def niveles_superacion(curso_id=None):
+    # Si no se proporciona curso_id, redirigir a la página de selección de curso
+    if curso_id is None:
+        # Aquí deberías obtener la lista de cursos disponibles
+        # Por ahora, redirigimos al inicio
+        return redirect(url_for('Administrador.paginainicio'))
+    # Lógica para obtener los datos del curso y estudiantes
+    return render_template('Administrador/niveles_superacion.html', curso_id=curso_id)
 
 @Administrador_bp.route('/repitentes')
 def repitentes():
@@ -2115,7 +2123,6 @@ def agregar_repitente():
 def cursos():
     cursos = Curso.query.all()
     return render_template('Administrador/Cursos.html', cursos=cursos)
-
 
 
 # ---------------------- Historial Académico ----------------------
@@ -2340,8 +2347,7 @@ def gestion_cursos(): # <--- NOMBRE DE LA FUNCIÓN CAMBIADO
     # Mostrar la vista general de cursos existente
     return render_template('Administrador/Cursos.html', cursos=cursos, directores=directores)
 
-@Administrador_bp.route('/estudiantes/curso/<int:curso_id>')
-@login_required
+@Administrador_bp.route('/cursos/<int:curso_id>/estudiantes') 
 def _estudiantes_curso(curso_id):
     try:
         # 1. Decodificar el ID del curso (Ej: 901 -> Grado 9, Grupo 01)

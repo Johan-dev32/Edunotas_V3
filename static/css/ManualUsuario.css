@@ -54,7 +54,9 @@ header .btn-dark {
 .descripcion {
   font-size: 1.3rem;     
   color: #555;   
-  margin-left:60px;
+  margin-left:560px;
+  font-family: 'Trebuchet MS', sans-serif; 
+
 }
 /* Botón de iniciar sesión */
 header .btn-outline-primary {

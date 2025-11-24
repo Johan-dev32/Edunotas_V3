@@ -1,9 +1,9 @@
 import os
 import re
+from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
 from routes.Administrador import Administrador_bp
@@ -13,14 +13,17 @@ from routes.Estudiante import Estudiante_bp
 from routes.notificaciones_routes import notificaciones_bp
 from flask_mail import Mail, Message
 from Controladores.models import db
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired,BadSignature
+# Cargar variables de entorno
+load_dotenv()
 
-import os
 
+# Inicialización de Flask-Mail
 mail = Mail()
 
-s = URLSafeTimedSerializer("clave_super_secreta")
+# Configuración del serializador con la clave secreta de las variables de entorno
+s = URLSafeTimedSerializer(os.getenv('SECRET_KEY', 'clave_por_defecto_segura'))
 
 # Importa el objeto 'db' y los modelos desde tu archivo de modelos
 from Controladores.models import db, Usuario, Notificacion
@@ -36,20 +39,21 @@ UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Configuración de la base de datos
-DB_URL = 'mysql+pymysql://root:@127.0.0.1:3306/edunotas'
+DB_URL = os.getenv('DATABASE_URL', 'mysql+pymysql://root:@127.0.0.1:3306/edunotas')
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'clave_super_secreta'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'clave_por_defecto_segura')
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_pre_ping': True}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Configuración de correo electrónico
 app.config.update(
     MAIL_SERVER="smtp.gmail.com",
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
     MAIL_USE_SSL=False,
-    MAIL_USERNAME=os.getenv("MAIL_USERNAME", "edunotas2025@gmail.com"),
-    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD", "keerxgqfufoynmhm"),
+    MAIL_USERNAME=os.getenv('MAIL_USERNAME'),
+    MAIL_PASSWORD=os.getenv('MAIL_PASSWORD'),
     MAIL_DEFAULT_SENDER=(
         "Edunotas",
         os.getenv("MAIL_USERNAME", "edunotas2025@gmail.com"),
@@ -161,6 +165,7 @@ def login():
         login_user(usuario)
         flash('Inicio de sesión exitoso')
         
+
 
         if rol == 'Administrador':
             return redirect(url_for('loading', destino='indexadministrador'))

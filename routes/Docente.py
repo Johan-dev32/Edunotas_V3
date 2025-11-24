@@ -4,7 +4,7 @@ from flask_mail import Message
 from werkzeug.utils import secure_filename
 import io
 from xhtml2pdf import pisa
-from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Curso, Notificacion, Programacion, Observacion, Nota_Calificaciones, Docente_Asignatura, ResumenSemanal, Tutorias, Acudiente, MaterialDidactico, Asistencia, Detalle_Asistencia )
+from Controladores.models import ( db, Usuario, Matricula, Asignatura, Cronograma_Actividades, Actividad, Actividad_Estudiante, Periodo, Curso, Notificacion, Programacion, Observacion, Nota_Calificaciones, Docente_Asignatura, ResumenSemanal, Tutorias, Acudiente, MaterialDidactico, Asistencia, Detalle_Asistencia, Historial_Academico )
 from sqlalchemy import text
 from sqlalchemy.orm import aliased
 from reportlab.pdfgen import canvas
@@ -518,13 +518,13 @@ def ver_entregas(id_actividad):
 def asistencia():
     docente_id = current_user.ID_Usuario
 
-    # Cursos donde el docente tiene asignaturas asociadas
+    # Cursos disponibles para pasar asistencia
+    # Por ahora cargamos todos los cursos activos, sin filtrar por Docente_Asignatura,
+    # para que el combo siempre tenga opciones aunque aún no se haya configurado esa tabla.
     cursos = (
-        db.session.query(Curso)
-        .join(Docente_Asignatura, Docente_Asignatura.ID_Curso == Curso.ID_Curso)
-        .filter(Docente_Asignatura.ID_Docente == docente_id)
-        .filter(Curso.Estado == 'Activo')
-        .distinct()
+        Curso.query
+        .filter_by(Estado='Activo')
+        .order_by(Curso.Grado, Curso.Grupo)
         .all()
     )
 
@@ -575,14 +575,24 @@ def asistencia():
 
             print("[DEBUG asistencia] POST recibido - docente_id=", docente_id, "curso_id=", curso_id)
 
-            # Buscar relación Docente_Asignatura para este curso y docente
+            # Asegurar que exista una relación Docente_Asignatura para este curso y docente
             da = Docente_Asignatura.query.filter_by(ID_Docente=docente_id, ID_Curso=curso_id).first()
-            print("[DEBUG asistencia] Docente_Asignatura encontrado:", bool(da))
             if not da:
-                flash("No se encontró una asignatura asociada a este curso para el docente.", "warning")
-                return redirect(url_for('Docente.asistencia', curso_id=curso_id))
+                # Tomar alguna asignatura existente (por ejemplo la primera activa)
+                asig_ref = Asignatura.query.filter_by(Estado='Activa').order_by(Asignatura.ID_Asignatura).first()
+                if not asig_ref:
+                    raise Exception("No hay asignaturas activas para asociar a la asistencia.")
 
-            # Buscar o crear una programación básica para este curso
+                da = Docente_Asignatura(
+                    ID_Docente=docente_id,
+                    ID_Asignatura=asig_ref.ID_Asignatura,
+                    ID_Curso=curso_id
+                )
+                db.session.add(da)
+                db.session.flush()
+                print("[DEBUG asistencia] Docente_Asignatura creado con ID=", da.ID_Docente_Asignatura)
+
+            # Buscar o crear una programación básica para este curso y docente/asignatura
             programacion = Programacion.query.filter_by(ID_Curso=curso_id, ID_Docente_Asignatura=da.ID_Docente_Asignatura).first()
             print("[DEBUG asistencia] Programacion existente:", bool(programacion))
             if not programacion:
@@ -812,7 +822,14 @@ def registro_notas_curso(curso_id):
         # pero el nombre mostrará "Curso Desconocido".
         curso_pk = curso_id
 
-    curso_nombre = f"{curso_obj.Grado}-{curso_obj.Grupo}" if curso_obj and hasattr(curso_obj, 'Grado') else "Curso Desconocido"
+    # Mostrar preferiblemente el código visible del curso (por ejemplo 601)
+    if curso_obj and hasattr(curso_obj, 'Grupo'):
+        # Si el grupo ya contiene el código completo (601, 701, etc.), úsalo tal cual
+        curso_nombre = f"{curso_obj.Grupo}"
+    elif curso_obj and hasattr(curso_obj, 'Grado'):
+        curso_nombre = f"{curso_obj.Grado}-{getattr(curso_obj, 'Grupo', '')}"
+    else:
+        curso_nombre = "Curso Desconocido"
 
     # 1.2. Claves de sesión para este curso específico (usando el ID real)
     session_key_asignatura = f'last_asignatura_{curso_pk}'
@@ -852,14 +869,17 @@ def registro_notas_curso(curso_id):
             Usuario.Rol == 'Estudiante'
         ).order_by(Usuario.Apellido, Usuario.Nombre).all()
 
-    # 1.6. Obtener las asignaturas del docente
-    # Asumo que Docente_Asignatura es una tabla de unión
-    asignaturas_db = db.session.query(Asignatura.ID_Asignatura.label('id'), 
-                                     Asignatura.Nombre.label('nombre'))\
-                             .join(Docente_Asignatura, Docente_Asignatura.ID_Asignatura == Asignatura.ID_Asignatura)\
-                             .filter(Docente_Asignatura.ID_Docente == ID_DOCENTE_ACTUAL)\
-                             .distinct()\
-                             .all()
+    # 1.6. Obtener las asignaturas disponibles
+    # Por ahora cargamos todas las asignaturas registradas, sin filtrar por docente,
+    # para que siempre aparezcan en el combo aunque aún no exista Docente_Asignatura.
+    asignaturas_db = (
+        db.session.query(
+            Asignatura.ID_Asignatura.label('id'),
+            Asignatura.Nombre.label('nombre')
+        )
+        .order_by(Asignatura.Nombre)
+        .all()
+    )
 
     # 1.6.1. Agrupar por nombre base (primera palabra) para no repetir materias por grado
     asignaturas_unicas_dict = {}
@@ -1050,7 +1070,7 @@ def guardar_notas_curso(curso_id):
         print(f"[guardar_notas_curso] Campos de notas recibidos: {len(nota_items)}")
         print(f"[guardar_notas_curso] Muestra notas: {nota_items[:5]}")
 
-        # Agrupar notas por estudiante para calcular promedio y actualizar por SQL crudo
+        # Agrupar notas por estudiante para calcular promedio
         por_estudiante = {}
         for key, value in nota_items:
             partes = key.split('_')  # ['nota', 'n', 'id']
@@ -1068,44 +1088,67 @@ def guardar_notas_curso(curso_id):
 
         updated_estudiante_ids = set()
         for est_id, notas_dict in por_estudiante.items():
-            # Asegurar fila existente
-            db.session.execute(
-                text("""
-                    INSERT INTO Nota_Calificaciones (ID_Estudiante, ID_Asignatura, Periodo)
-                    SELECT :est, :asig, :per
-                    WHERE NOT EXISTS (
-                        SELECT 1 FROM Nota_Calificaciones 
-                        WHERE ID_Estudiante=:est AND ID_Asignatura=:asig AND Periodo=:per
-                    )
-                """), {"est": est_id, "asig": asignatura_id, "per": periodo}
-            )
-            # Construir SET dinámico para UPDATE
-            sets = []
-            params = {"est": est_id, "asig": asignatura_id, "per": periodo}
-            for campo, val in notas_dict.items():
-                sets.append(f"{campo} = :{campo}")
-                params[campo] = val
+            # Buscar o crear el registro de Nota_Calificaciones para este estudiante/asignatura/período
+            nota_obj = Nota_Calificaciones.query.filter_by(
+                ID_Estudiante=est_id,
+                ID_Asignatura=asignatura_id,
+                Periodo=periodo
+            ).first()
 
-            # Calcular promedio localmente con las notas presentes en BD sería lo ideal;
-            # como simplificación, usamos el promedio de las notas_dict ingresadas ahora
+            if not nota_obj:
+                # Asegurar que exista un Historial_Academico asociado a la matrícula del estudiante
+                curso_obj = Curso.query.get(curso_id)
+                matricula = Matricula.query.filter_by(ID_Estudiante=est_id, ID_Curso=curso_id).first()
+
+                historial = None
+                if matricula and curso_obj:
+                    historial = Historial_Academico.query.filter_by(
+                        ID_Matricula=matricula.ID_Matricula,
+                        Anio=curso_obj.Anio,
+                        Periodo=str(periodo)
+                    ).first()
+
+                    if not historial:
+                        historial = Historial_Academico(
+                            ID_Matricula=matricula.ID_Matricula,
+                            Anio=curso_obj.Anio,
+                            Periodo=str(periodo),
+                            Descripcion=f"Notas período {periodo}",
+                            Observaciones=""
+                        )
+                        db.session.add(historial)
+                        # No hacemos commit aún; se hará al final del bloque
+
+                # Si por alguna razón no hay historial, no podemos crear la nota (rompería la FK)
+                if not historial:
+                    continue
+
+                # Crear la nota y enlazarla al historial usando la relación ORM
+                nota_obj = Nota_Calificaciones(
+                    ID_Estudiante=est_id,
+                    ID_Asignatura=asignatura_id,
+                    Periodo=periodo
+                )
+                nota_obj.historial = historial
+                db.session.add(nota_obj)
+
+            # Asignar campos Nota_1..Nota_5 según lo recibido
+            for campo, val in notas_dict.items():
+                if hasattr(nota_obj, campo):
+                    setattr(nota_obj, campo, val)
+
+            # Calcular y guardar promedio
             if notas_dict:
                 prom = round(sum(notas_dict.values()) / len(notas_dict), 2)
-                sets.append("Promedio_Final = :prom")
-                params["prom"] = prom
+                nota_obj.Promedio_Final = prom
 
-            if sets:
-                sql = f"UPDATE Nota_Calificaciones SET {', '.join(sets)} WHERE ID_Estudiante=:est AND ID_Asignatura=:asig AND Periodo=:per"
-                db.session.execute(text(sql), params)
-                updated_estudiante_ids.add(est_id)
+            updated_estudiante_ids.add(est_id)
 
         db.session.commit()
 
         # DEBUG: verificar cuántos registros hay ahora
         try:
-            cnt = db.session.execute(
-                text("SELECT COUNT(*) AS c FROM Nota_Calificaciones WHERE ID_Asignatura=:asig AND Periodo=:per"),
-                {"asig": asignatura_id, "per": periodo}
-            ).scalar()
+            cnt = Nota_Calificaciones.query.filter_by(ID_Asignatura=asignatura_id, Periodo=periodo).count()
             print(f"[guardar_notas_curso] Registros ahora para asig={asignatura_id}, periodo={periodo}: {cnt}")
         except Exception as _:
             pass

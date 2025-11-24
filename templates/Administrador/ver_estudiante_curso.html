@@ -73,8 +73,10 @@
           <div class="collapse" id="submenuNotas">
             <ul class="nav flex-column ms-3">
               <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
+              
              <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+
+             <li><a href="{{ url_for('Administrador.configuracion_academica') }}" class="nav-link text-white"><i class="bi bi-gear-fill"></i> Configuración Académica</a></li>
 
 
 
@@ -114,7 +116,7 @@
 
   <section class="container py-5 mt-5">
     <h1 class="text-center mb-4 titulo-principal">
-        LISTA DEL CURSO {{ curso_obj.Grado }}{{ curso_obj.Grupo }}
+        LISTA DEL CURSO {{ curso_obj.Grupo }}
     </h1>
 
   <!-- 🔹 Botones de redirección arriba del formulario -->
@@ -149,48 +151,25 @@
         <table class="table table-bordered text-center align-middle" id="tablaEstudiantes">
             <thead>
                 <tr style="background-color: #050733ff; color: white;">
-                    <th>#</th>
-                    <th>Nombre Completo</th>
-                    <th colspan="3">Estado de Asistencia</th>
-                </tr>
-                <tr style="background-color: #c4c4c4; color: black;">
                     <th>ID</th>
-                    <th></th>
-                    <th>Presente</th>
-                    <th>Ausente</th>
-                    <th>Justificado</th>
+                    <th>Nombre Completo</th>
                 </tr>
             </thead>
             <tbody>
             {% for estudiante in estudiantes %}
                 <tr>
-                    <td>{{ estudiante.ID_Usuario }}</td>
+                    <td>{{ loop.index }}</td>
                     <td class="text-start">{{ estudiante.Nombre }} {{ estudiante.Apellido }}</td>
-                    
-                    <td>
-                        <input type="radio" name="asistencia_{{ estudiante.ID_Usuario }}" value="Presente" required>
-                    </td>
-                    <td>
-                        <input type="radio" name="asistencia_{{ estudiante.ID_Usuario }}" value="Ausente" required>
-                    </td>
-                    <td>
-                        <input type="radio" name="asistencia_{{ estudiante.ID_Usuario }}" value="Justificado" required>
-                    </td>
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="5">No hay estudiantes matriculados en este curso.</td>
+                    <td colspan="2">No hay estudiantes matriculados en este curso.</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <div class="d-flex justify-content-center mt-4">
-        <button type="submit" class="btn btn-success btn-lg">
-            <i class="bi bi-save-fill"></i> Guardar Asistencia
-        </button>
-    </div>
 </form>
 <script>
     // URL que apunta a @Administrador_bp.route('/tomar_asistencia/<int:curso_id>')

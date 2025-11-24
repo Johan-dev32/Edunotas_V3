@@ -43,25 +43,54 @@ header .btn-dark {
   color: #fff;        
   margin-left: 770px;
 }
-
 .btn-usuario {
-  background-color: #050733ff; 
-  color: #fff;        
+  background-color: transparent; /* sin recuadro */
+  color: #050733ff;               /* color institucional para el icono */
+  border: none;                    /* sin borde */
+  box-shadow: none;                /* sin sombra */
+  padding: 6px 8px;                /* compacto */
   margin-left: 10px;
+}
+
+.btn-usuario:hover,
+.btn-usuario:focus {
+  background-color: transparent;   /* mantener sin recuadro en hover/focus */
+  color: #050733ff;
+  box-shadow: none;
+}
+
+/* Oculta el caret del dropdown en el botón de usuario */
+.btn-usuario.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Tamaño del icono circular */
+.btn-usuario .bi-person-circle {
+  font-size: 1.6rem;
 }
 
 /* Título principal */
 .titulo-pagina {
-  font-weight: bold;
-  color: #050733;
+  font-size: 3rem;      
+  font-weight: 900;      
+  color: #050733ff; 
+  font-family: 'Trebuchet MS', sans-serif;
+  margin-top: 30px; 
+}
+.descripcion {
+  font-size: 1.3rem;     
+  color: #555; 
+  margin-left: 410px;          
+  font-family: 'Trebuchet MS', sans-serif;
+  margin-bottom: 40px;
+}
+/* Tabla repitentes (aplicar por id, coincide con el HTML) */
+#tabla-repitentes thead th {
+  background-color: #050733ff !important;
+  color: #ffffff !important;
 }
 
-/* Tabla */
-.tabla-repitentes th {
-  background-color: #050733;
-  color: white;
-}
-
+#tabla-repitentes td,
 .tabla-repitentes td {
   vertical-align: middle;
 }

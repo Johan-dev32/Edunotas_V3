@@ -76,8 +76,10 @@
           <div class="collapse" id="submenuNotas">
             <ul class="nav flex-column ms-3">
               <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
+              
              <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+
+             <li><a href="{{ url_for('Administrador.configuracion_academica') }}" class="nav-link text-white"><i class="bi bi-check-circle-fill"></i> Aprobación Académica</a></li>
 
 
 
@@ -125,7 +127,7 @@
         <div class="col-sm-6 col-md-4 col-lg-3">
           <div class="card text-center curso-card">
             <div class="card-body">
-              <h4 class="card-title">{{ c.Grado }}{{ c.Grupo }}</h4>
+              <h4 class="card-title">{{ c.Grupo }}</h4>
               <a href="{{ url_for('Administrador.notas_curso', curso_id=c.ID_Curso) }}" class="btn btn-primary">Ver Notas</a>
             </div>
           </div>

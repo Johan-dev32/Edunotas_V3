@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aprobación Académica</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Administrador/AprobacionAcademica.css') }}">
+</head>
+<body>
+
+<header class="d-flex align-items-center p-3 border-bottom w-100">
+  <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+    <i class="bi bi-list"></i>
+  </button>
+  <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+
+  <div class="dropdown ms-auto me-3">
+    <button class="position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="border: none; background: transparent; padding: 0;">
+      <i class="bi bi-bell-fill" style="font-size: 1.25rem;"></i>
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none">0</span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
+      <li class="text-center text-muted small">Últimas notificaciones</li>
+      <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+        <p class="text-center small text-secondary mb-0">Sin notificaciones recientes</p>
+      </div>
+    </ul>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
+
+  <div class="dropdown">
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownUser" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
+      <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
+</header>
+
+<section class="bg-light py-5 mt-5">
+  <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">MENÚ</h5>
+  </div>
+  <div class="offcanvas1-body">
+    <ul class="nav flex-column">
+          <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+          
+          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
+          <div class="collapse" id="submenuNotas">
+            <ul class="nav flex-column ms-3">
+              <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+              
+             <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+
+             <li><a href="{{ url_for('Administrador.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-check-circle-fill"></i> Aprobación Académica</a></li>
+
+
+
+            </ul>
+          </div>
+
+          <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+          <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
+
+          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
+            <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
+          </a>
+          <div class="collapse" id="submenuUsuarios">
+            <ul class="nav flex-column ms-3">
+              <li><a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
+              <li><a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
+              <li><a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
+              <li><a href="{{ url_for('Administrador.repitentes') }}" class="nav-link text-white"><i class="bi bi-person-dash"></i> Lista Estudiantes Repitentes</a></li>
+              <li><a href="{{ url_for('Administrador.registro') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Registro Usuarios</a></li>
+            </ul>
+          </div>
+
+
+
+
+
+          <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+          <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+          
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container mt-4">
+  <h1 class="text-center mb-4 titulo-principal">APROBACIÓN ACADÉMICA</h1>
+  <p class="text-center descripcion">Consulta el estado de aprobación de los estudiantes por curso y asignatura.</p>
+
+  <div class="card mb-4">
+    <div class="card-body row g-3 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label">Curso</label>
+        <select id="filtroCurso" class="form-select">
+          <option value="">Selecciona un curso</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Asignatura</label>
+        <select id="filtroAsignatura" class="form-select">
+          <option value="">Selecciona una asignatura</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Periodo</label>
+        <select id="filtroPeriodo" class="form-select">
+          <option value="">Periodo</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Buscar estudiante</label>
+        <input type="text" id="buscarNombre" class="form-control" placeholder="Escribe el nombre del estudiante">
+      </div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle" id="tablaAprobacion">
+      <thead class="table-dark">
+        <tr>
+          <th>Número de Documento</th>
+          <th>Nombre del estudiante</th>
+          <th>Nota final</th>
+          <th>Estado</th>
+          <th>Nivel de desempeño</th>
+          <th>Observación</th>
+          <th>Profesor encargado</th>
+          <th>Periodo académico</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="modal fade" id="modalObservacion" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Observación Académica</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="obsEstudianteId">
+        <input type="hidden" id="obsCursoId">
+        <input type="hidden" id="obsAsignaturaId">
+        <input type="hidden" id="obsPeriodo">
+        <div class="mb-3">
+          <label class="form-label">Detalle</label>
+          <textarea id="textoObservacion" class="form-control" rows="6"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" id="btnGuardarObservacion">Guardar observación</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  let datosActuales = [];
+
+  function calcularEstado(nota) {
+    if (nota === null || nota === undefined || nota === "") return { texto: "Sin nota", clase: "badge bg-secondary" };
+    const n = parseFloat(nota);
+    if (isNaN(n)) return { texto: "Sin nota", clase: "badge bg-secondary" };
+    if (n < 3.0) return { texto: "Reprobado", clase: "badge bg-danger" };
+    return { texto: "Aprobado", clase: "badge bg-success" };
+  }
+
+  function calcularNivel(nota) {
+    if (nota === null || nota === undefined || nota === "") return "Sin nivel";
+    const n = parseFloat(nota);
+    if (isNaN(n)) return "Sin nivel";
+    if (n >= 4.5) return "Alto";
+    if (n >= 3.0) return "Medio";
+    return "Bajo";
+  }
+
+  function aplicarFiltroNombre() {
+    const filtro = document.getElementById('buscarNombre').value.toLowerCase();
+    const cuerpo = document.querySelector('#tablaAprobacion tbody');
+    cuerpo.querySelectorAll('tr').forEach(tr => {
+      const nombre = tr.getAttribute('data-nombre') || '';
+      tr.style.display = nombre.includes(filtro) ? '' : 'none';
+    });
+  }
+
+  async function cargarCursos() {
+    const sel = document.getElementById('filtroCurso');
+    sel.innerHTML = '<option value="">Selecciona un curso</option>';
+    const res = await fetch('/administrador/cursos/lista');
+    const data = await res.json();
+    if (!data.success) return;
+    data.cursos.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.nombre;
+      sel.appendChild(opt);
+    });
+  }
+
+  async function cargarAsignaturas() {
+    const selCurso = document.getElementById('filtroCurso');
+    const cursoId = selCurso.value || '';
+    const sel = document.getElementById('filtroAsignatura');
+    sel.innerHTML = '<option value="">Selecciona una asignatura</option>';
+    const url = cursoId ? `/administrador/asignaturas/lista?curso_id=${cursoId}` : '/administrador/asignaturas/lista';
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.success) return;
+    const vistos = new Set();
+    data.asignaturas.forEach(a => {
+      let nombre = a.nombre || '';
+      nombre = nombre.replace(/\s+\d+°$/, '');
+      const clave = nombre.toLowerCase();
+      if (vistos.has(clave)) return; // ya agregamos esta materia
+      vistos.add(clave);
+      const opt = document.createElement('option');
+      opt.value = a.id; // usamos el id de la primera coincidencia
+      opt.textContent = nombre;
+      sel.appendChild(opt);
+    });
+  }
+
+  async function cargarTabla() {
+    const cursoId = document.getElementById('filtroCurso').value;
+    const asigId = document.getElementById('filtroAsignatura').value;
+    const periodo = document.getElementById('filtroPeriodo').value;
+    const cuerpo = document.querySelector('#tablaAprobacion tbody');
+    cuerpo.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Cargando...</td></tr>';
+
+    if (!cursoId || !asigId || !periodo) {
+      cuerpo.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Selecciona curso, asignatura y periodo.</td></tr>';
+      return;
+    }
+
+    const res = await fetch(`/administrador/aprobacion_academica/datos?curso_id=${cursoId}&asignatura_id=${asigId}&periodo=${periodo}`);
+    const data = await res.json();
+    if (!data.success) {
+      cuerpo.innerHTML = `<tr><td colspan="8" class="text-center text-danger">${data.error || 'Error al cargar datos'}</td></tr>`;
+      return;
+    }
+
+    datosActuales = data.registros || [];
+    cuerpo.innerHTML = '';
+
+    if (datosActuales.length === 0) {
+      cuerpo.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No hay registros para los filtros seleccionados.</td></tr>';
+      return;
+    }
+
+    datosActuales.forEach(r => {
+      const estado = calcularEstado(r.nota_final);
+      const nivel = calcularNivel(r.nota_final);
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-nombre', (r.nombre_completo || '').toLowerCase());
+      tr.innerHTML = `
+        <td>${r.numero_documento || ''}</td>
+        <td>${r.nombre_completo || ''}</td>
+        <td>${r.nota_final !== null && r.nota_final !== undefined ? r.nota_final.toFixed(2) : ''}</td>
+        <td><span class="${estado.clase}">${estado.texto}</span></td>
+        <td>${nivel}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-primary" onclick="abrirModalObservacion(${r.id_estudiante}, ${cursoId}, ${asigId}, ${periodo}, '${r.nombre_completo || ''}', '${r.nombre_curso || ''}')">
+            <i class="bi bi-pencil-square"></i> Observación
+          </button>
+        </td>
+        <td>${r.docente || ''}</td>
+        <td>${r.periodo_academico || ''}</td>
+      `;
+      cuerpo.appendChild(tr);
+    });
+
+    aplicarFiltroNombre();
+  }
+
+  function abrirModalObservacion(idEst, idCurso, idAsig, periodo, nombre, cursoTexto) {
+    const txt = document.getElementById('textoObservacion');
+    const hoy = new Date().toISOString().slice(0,10);
+    document.getElementById('obsEstudianteId').value = idEst;
+    document.getElementById('obsCursoId').value = idCurso;
+    document.getElementById('obsAsignaturaId').value = idAsig;
+    document.getElementById('obsPeriodo').value = periodo;
+    txt.value = `Nombre: ${nombre}\nCurso: ${cursoTexto}\nFecha: ${hoy}\n\n`; 
+    const modal = new bootstrap.Modal(document.getElementById('modalObservacion'));
+    modal.show();
+  }
+
+  async function guardarObservacion() {
+    const payload = {
+      id_estudiante: document.getElementById('obsEstudianteId').value,
+      id_curso: document.getElementById('obsCursoId').value,
+      id_asignatura: document.getElementById('obsAsignaturaId').value,
+      periodo: document.getElementById('obsPeriodo').value,
+      texto: document.getElementById('textoObservacion').value
+    };
+
+    const res = await fetch('/administrador/aprobacion_academica/observacion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('Observación guardada correctamente');
+      const modalEl = document.getElementById('modalObservacion');
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      modal.hide();
+    } else {
+      alert(data.error || 'Error al guardar la observación');
+    }
+  }
+
+  function guardarFiltros() {
+    const filtros = {
+      cursoId: document.getElementById('filtroCurso').value || '',
+      asignaturaId: document.getElementById('filtroAsignatura').value || '',
+      periodo: document.getElementById('filtroPeriodo').value || ''
+    };
+    try {
+      localStorage.setItem('aprobacion_academica_filtros', JSON.stringify(filtros));
+    } catch (e) {
+      console.warn('No se pudieron guardar los filtros:', e);
+    }
+  }
+
+  function leerFiltrosGuardados() {
+    try {
+      const raw = localStorage.getItem('aprobacion_academica_filtros');
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      console.warn('No se pudieron leer los filtros guardados:', e);
+      return null;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const filtrosGuardados = leerFiltrosGuardados();
+
+    await cargarCursos();
+    await cargarAsignaturas();
+
+    if (filtrosGuardados) {
+      if (filtrosGuardados.cursoId) {
+        document.getElementById('filtroCurso').value = filtrosGuardados.cursoId;
+        await cargarAsignaturas();
+      }
+      if (filtrosGuardados.asignaturaId) {
+        document.getElementById('filtroAsignatura').value = filtrosGuardados.asignaturaId;
+      }
+      if (filtrosGuardados.periodo) {
+        document.getElementById('filtroPeriodo').value = filtrosGuardados.periodo;
+      }
+      if (filtrosGuardados.cursoId && filtrosGuardados.asignaturaId && filtrosGuardados.periodo) {
+        await cargarTabla();
+      }
+    }
+
+    document.getElementById('filtroCurso').addEventListener('change', async () => {
+      await cargarAsignaturas();
+      guardarFiltros();
+      cargarTabla();
+    });
+    document.getElementById('filtroAsignatura').addEventListener('change', () => {
+      guardarFiltros();
+      cargarTabla();
+    });
+    document.getElementById('filtroPeriodo').addEventListener('change', () => {
+      guardarFiltros();
+      cargarTabla();
+    });
+    document.getElementById('buscarNombre').addEventListener('input', aplicarFiltroNombre);
+    document.getElementById('btnGuardarObservacion').addEventListener('click', guardarObservacion);
+  });
+</script>
+</body>
+</html>

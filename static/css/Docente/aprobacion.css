@@ -23,12 +23,7 @@ header {
 header .btn-dark {
     background-color: #050733ff;
     border: none;
-}
 
-.btn-edunotas {
-    background-color: #050733ff;
-    color: #fff;
-    margin-left: 800px;
 }
 .btn-usuario {
   background-color: transparent; /* sin recuadro */

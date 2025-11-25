@@ -65,7 +65,7 @@
 
 <!--  MENU  -->
 
-  <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
+   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
   </div>
@@ -77,8 +77,10 @@
           <div class="collapse" id="submenuNotas">
             <ul class="nav flex-column ms-3">
               <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
+              
              <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+
+             <li><a href="{{ url_for('Administrador.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-check-circle-fill"></i> Aprobación Académica</a></li>
 
 
 
@@ -112,7 +114,6 @@
       </div>
     </div>
   </div>
-</section>
 
   <!-- titulos -->
   <section class="bg-light py-5 mt-5">

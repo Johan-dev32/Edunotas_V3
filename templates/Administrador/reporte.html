@@ -53,20 +53,25 @@
 
   <!--  MENU  -->
   <section class="bg-light py-5 mt-5">
-    <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title">MENÚ</h5>
-      </div>
-      <div class="offcanvas1-body">
-        <ul class="nav flex-column">
+   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">MENÚ</h5>
+  </div>
+  <div class="offcanvas1-body">
+    <ul class="nav flex-column">
           <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
           
           <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
           <div class="collapse" id="submenuNotas">
             <ul class="nav flex-column ms-3">
               <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
-              <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+              
+             <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+
+             <li><a href="{{ url_for('Administrador.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-check-circle-fill"></i> Aprobación Académica</a></li>
+
+
+
             </ul>
           </div>
 
@@ -86,11 +91,17 @@
             </ul>
           </div>
 
+
+
+
+
           <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
           <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+          
         </ul>
       </div>
     </div>
+  </div>
   </section>
 
   <!-- ENCABEZADO NUEVO -->

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aprobación Académica</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Administrador/ReporteAsistencia.css') }}">
+</head>
+<body>
+
+<header class="d-flex align-items-center p-3 border-bottom w-100">
+  <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+    <i class="bi bi-list"></i>
+  </button>
+  <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+
+  <div class="dropdown ms-auto me-3">
+    <button class="position-relative" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="border: none; background: transparent; padding: 0;">
+      <i class="bi bi-bell-fill" style="font-size: 1.25rem;"></i>
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none">0</span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
+      <li class="text-center text-muted small">Últimas notificaciones</li>
+      <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+        <p class="text-center small text-secondary mb-0">Sin notificaciones recientes</p>
+      </div>
+    </ul>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
+
+  <div class="dropdown">
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownUser" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
+      <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
+</header>
+
+<section class="bg-light py-5">
+  <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">MENÚ</h5>
+  </div>
+  <div class="offcanvas1-body">
+    <ul class="nav flex-column">
+          <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+          
+          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
+          <div class="collapse" id="submenuNotas">
+            <ul class="nav flex-column ms-3">
+              <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
+              
+             <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+
+             <li><a href="{{ url_for('Administrador.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-check-circle-fill"></i> Aprobación Académica</a></li>
+
+
+
+            </ul>
+          </div>
+
+          <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+          <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
+
+          <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
+            <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
+          </a>
+          <div class="collapse" id="submenuUsuarios">
+            <ul class="nav flex-column ms-3">
+              <li><a href="{{ url_for('Administrador.profesores') }}" class="nav-link text-white"><i class="bi bi-person-fill-gear"></i> Profesores</a></li>
+              <li><a href="{{ url_for('Administrador.acudientes') }}" class="nav-link text-white"><i class="bi bi-person-fill"></i> Acudientes</a></li>
+              <li><a href="{{ url_for('Administrador.estudiantes') }}" class="nav-link text-white"><i class="bi bi-mortarboard-fill"></i> Estudiantes</a></li>
+              <li><a href="{{ url_for('Administrador.repitentes') }}" class="nav-link text-white"><i class="bi bi-person-dash"></i> Lista Estudiantes Repitentes</a></li>
+              <li><a href="{{ url_for('Administrador.registro') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Registro Usuarios</a></li>
+            </ul>
+          </div>
+
+
+
+
+
+          <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+          <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+          
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <section class="container mt-4">
+    <h1 class="text-center mb-2 titulo-principal">REPORTE DE ASISTENCIA</h1>
+    <p class="text-center text-muted mb-4 descripcion">Reporte de asistencia por curso, asignatura y rango de fechas.</p>
+
+    <!-- Filtros -->
+    <div class="card mb-4 card-filtros">
+      <div class="card-body row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">Curso</label>
+          <select id="filtroCurso" class="form-select">
+            <option value="">Selecciona un curso</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Asignatura</label>
+          <select id="filtroAsignatura" class="form-select">
+            <option value="">Todas las asignaturas</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Desde</label>
+          <input type="date" id="fechaInicio" class="form-control">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Hasta</label>
+          <input type="date" id="fechaFin" class="form-control">
+        </div>
+        <div class="col-md-2 text-end">
+          <button id="btnAplicar" class="btn btn-primary w-100">
+            <i class="bi bi-search"></i> Aplicar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de exportación -->
+    <div class="d-flex justify-content-end mb-3 gap-2">
+      <button id="btnExportPdf" class="btn btn-outline-danger">
+        <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+      </button>
+      <button id="btnExportCsv" class="btn btn-outline-success">
+        <i class="bi bi-file-earmark-spreadsheet"></i> Exportar Excel
+      </button>
+    </div>
+
+    <!-- Tabla resumen -->
+    <div class="table-responsive">
+      <table class="table table-striped table-hover align-middle" id="tablaAsistencia">
+        <thead>
+          <tr>
+            <th>N°</th>
+            <th>Estudiante</th>
+            <th>Asistencias</th>
+            <th>Faltas injustificadas</th>
+            <th>Faltas justificadas</th>
+            <th>Asistencia</th>
+            <th>Observaciones</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.21/jspdf.plugin.autotable.min.js"></script>
+
+  <script>
+    async function cargarCursosRA() {
+      const sel = document.getElementById('filtroCurso');
+      sel.innerHTML = '<option value="">Selecciona un curso</option>';
+      try {
+        const res = await fetch('/administrador/cursos/lista');
+        const data = await res.json();
+        if (!data.success) return;
+        data.cursos.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = c.nombre;
+          sel.appendChild(opt);
+        });
+      } catch (e) {
+        console.error('Error cargando cursos:', e);
+      }
+    }
+
+    function exportarTablaComoCSV() {
+      const tabla = document.getElementById('tablaAsistencia');
+      const filas = Array.from(tabla.querySelectorAll('tr'));
+      if (filas.length === 0) return;
+
+      const lineas = filas.map(tr => {
+        const celdas = Array.from(tr.querySelectorAll('th,td'));
+        return celdas
+          .map(td => '"' + (td.textContent || '').replace(/"/g, '""') + '"')
+          .join(',');
+      });
+
+      const blob = new Blob([lineas.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'reporte_asistencia.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function exportarTablaComoPDF() {
+      const { jsPDF } = window.jspdf || {};
+      if (!jsPDF) {
+        console.error('jsPDF no está disponible');
+        return;
+      }
+
+      const doc = new jsPDF('p', 'pt');
+      doc.setFontSize(14);
+      doc.text('Reporte de Asistencia', 40, 40);
+
+      const tabla = document.getElementById('tablaAsistencia');
+      const head = [
+        Array.from(tabla.querySelectorAll('thead th')).map(th => th.textContent || '')
+      ];
+
+      const body = Array.from(tabla.querySelectorAll('tbody tr'))
+        .map(tr => Array.from(tr.querySelectorAll('td')).map(td => td.textContent || ''));
+
+      doc.autoTable({
+        head,
+        body,
+        startY: 60,
+        styles: { fontSize: 9 }
+      });
+
+      doc.save('reporte_asistencia.pdf');
+    }
+
+    async function cargarAsignaturasRA() {
+      const selCurso = document.getElementById('filtroCurso');
+      const cursoId = selCurso.value || '';
+      const sel = document.getElementById('filtroAsignatura');
+      sel.innerHTML = '<option value="">Todas las asignaturas</option>';
+      try {
+        const url = cursoId ? `/administrador/asignaturas/lista?curso_id=${cursoId}` : '/administrador/asignaturas/lista';
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.success) return;
+        const vistos = new Set();
+        data.asignaturas.forEach(a => {
+          let nombre = a.nombre || '';
+          const clave = nombre.toLowerCase();
+          if (vistos.has(clave)) return;
+          vistos.add(clave);
+          const opt = document.createElement('option');
+          opt.value = a.id;
+          opt.textContent = nombre;
+          sel.appendChild(opt);
+        });
+      } catch (e) {
+        console.error('Error cargando asignaturas:', e);
+      }
+    }
+
+    async function cargarTablaRA() {
+      const cursoId = document.getElementById('filtroCurso').value;
+      const asigId = document.getElementById('filtroAsignatura').value;
+      const fInicio = document.getElementById('fechaInicio').value;
+      const fFin = document.getElementById('fechaFin').value;
+      const cuerpo = document.querySelector('#tablaAsistencia tbody');
+
+      cuerpo.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Cargando...</td></tr>';
+
+      if (!cursoId) {
+        cuerpo.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Selecciona al menos un curso.</td></tr>';
+        return;
+      }
+
+      const params = new URLSearchParams();
+      params.append('curso_id', cursoId);
+      if (asigId) params.append('asignatura_id', asigId);
+      if (fInicio) params.append('fecha_inicio', fInicio);
+      if (fFin) params.append('fecha_fin', fFin);
+
+      try {
+        const res = await fetch(`/administrador/reporte_asistencia/datos?${params.toString()}`);
+        const data = await res.json();
+        if (!data.success) {
+          cuerpo.innerHTML = `<tr><td colspan="7" class="text-center text-danger">${data.error || 'Error al cargar datos'}</td></tr>`;
+          return;
+        }
+
+        const registros = data.registros || [];
+        cuerpo.innerHTML = '';
+        if (registros.length === 0) {
+          cuerpo.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No hay registros para los filtros seleccionados.</td></tr>';
+          return;
+        }
+
+        registros.forEach((r, idx) => {
+          const tr = document.createElement('tr');
+          const pct = (r.total_sesiones && r.presentes != null)
+            ? ((r.presentes / r.total_sesiones) * 100).toFixed(1) + '%'
+            : '';
+          tr.innerHTML = `
+            <td>${idx + 1}</td>
+            <td>${r.nombre_completo || ''}</td>
+            <td>${r.presentes}</td>
+            <td>${r.ausentes_injustificados}</td>
+            <td>${r.ausentes_justificados}</td>
+            <td>${pct}</td>
+            <td>${r.observaciones || ''}</td>
+          `;
+          cuerpo.appendChild(tr);
+        });
+      } catch (e) {
+        console.error('Error cargando reporte de asistencia:', e);
+        cuerpo.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error de conexión con el servidor.</td></tr>';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await cargarCursosRA();
+      await cargarAsignaturasRA();
+
+      document.getElementById('filtroCurso').addEventListener('change', async () => {
+        await cargarAsignaturasRA();
+      });
+
+      document.getElementById('btnAplicar').addEventListener('click', (e) => {
+        e.preventDefault();
+        cargarTablaRA();
+      });
+
+      document.getElementById('btnExportPdf').addEventListener('click', (e) => {
+        e.preventDefault();
+        exportarTablaComoPDF();
+      });
+
+      document.getElementById('btnExportCsv').addEventListener('click', (e) => {
+        e.preventDefault();
+        exportarTablaComoCSV();
+      });
+    });
+  </script>
+</body>
+</html>

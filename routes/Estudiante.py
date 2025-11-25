@@ -296,9 +296,14 @@ def materias():
 @login_required
 def tareas_actividades():
     try:
+        
+        print("==== DEBUG tareas_actividades ====")
+        print("Usuario actual:", current_user.ID_Usuario)
         # Buscar las matrículas del estudiante actual
         matriculas = Matricula.query.filter_by(ID_Estudiante=current_user.ID_Usuario).all()
+        print("MATRICULAS ENCONTRADAS:", matriculas)
         cursos_ids = [m.ID_Curso for m in matriculas]
+        print("CURSOS DEL ESTUDIANTE:", cursos_ids)
 
         actividades = []
         if cursos_ids:
@@ -308,9 +313,11 @@ def tareas_actividades():
                 .filter(Cronograma_Actividades.ID_Curso.in_(cursos_ids))
                 .all()
             )
+        print("ACTIVIDADES ENCONTRADAS:", actividades)
 
         return render_template('Estudiante/TareasActividades.html', actividades=[(a, None) for a in actividades])
     except Exception as e:
+        print("ERROR EN tareas_actividades:", e)
         flash(f"Error al cargar actividades: {e}", "danger")
         return redirect(url_for('Estudiante.paginainicio'))
     
@@ -379,6 +386,9 @@ def actividades_estudiante():
         # 1. Verificar que es estudiante
         if current_user.Rol != "Estudiante":
             return "Acceso no autorizado", 403
+        
+        print("==== DEBUG actividades_estudiante ====")
+        print("Usuario:", current_user.ID_Usuario)
 
         # 2. Obtener matrícula activa del estudiante
         matricula = (
@@ -387,16 +397,21 @@ def actividades_estudiante():
             .order_by(Matricula.AnioLectivo.desc())
             .first()
         )
+        
+        print("MATRICULA ENCONTRADA:", matricula)
 
         if not matricula:
             return render_template("Estudiante/Actividades.html", actividades=[], error="No tienes matrícula registrada")
 
         # 3. Obtener el curso al que pertenece
         curso_id = matricula.ID_Curso
+        print("CURSO DEL ESTUDIANTE:", curso_id)
 
         # 4. Buscar cronogramas del curso
         cronogramas = Cronograma_Actividades.query.filter_by(ID_Curso=curso_id).all()
+        print("CRONOGRAMAS:", cronogramas)
         cronograma_ids = [c.ID_Cronograma_Actividades for c in cronogramas]
+        print("CRONOGRAMA IDS:", cronograma_ids)
 
         # 5. Buscar actividades asociadas a esos cronogramas
         actividades = []
@@ -404,6 +419,7 @@ def actividades_estudiante():
             actividades = Actividad.query.filter(
                 Actividad.ID_Cronograma_Actividades.in_(cronograma_ids)
             ).order_by(Actividad.Fecha.asc()).all()
+        print("ACTIVIDADES:", actividades)
 
         # 6. Ver si el estudiante ya entregó algo
         entregas = {

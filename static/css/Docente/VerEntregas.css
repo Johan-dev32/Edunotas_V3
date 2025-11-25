@@ -1,0 +1,217 @@
+/* Estilos para la página de Ver Entregas */
+
+/* Estilos generales */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+/* ========== NAVBAR SUPERIOR GENERAL ========== */
+header {
+  background-color: white;
+  color: #050733ff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  margin: 0;
+  margin-left: 60px;
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas {
+  background-color: #050733ff;
+  color: #fff;
+}
+
+.btn-usuario {
+  background-color: transparent; /* sin recuadro */
+  color: #050733ff;               /* color institucional para el icono */
+  border: none;                    /* sin borde */
+  box-shadow: none;                /* sin sombra */
+  padding: 6px 8px;                /* compacto */
+  margin-left: 10px;
+}
+
+.btn-usuario:hover,
+.btn-usuario:focus {
+  background-color: transparent;   /* mantener sin recuadro en hover/focus */
+  color: #050733ff;
+  box-shadow: none;
+}
+
+/* Oculta el caret del dropdown en el botón de usuario */
+.btn-usuario.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Tamaño del icono circular */
+.btn-usuario .bi-person-circle {
+  font-size: 1.6rem;
+}
+
+/* ========== MENU LATERAL ========== */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+.offcanvas {
+  font-size: 25px;
+}
+
+.offcanvas-title {
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+.nav-item {
+  font-weight: bold;
+  font-size: 22px;
+}
+
+#sidebar .nav-link {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+
+/* Contenedor principal */
+.container-custom {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Título de la actividad */
+.actividad-titulo {
+    color: #2c3e50;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid #3498db;
+    display: inline-block;
+}
+
+/* Estilos para la tabla */
+.tabla-entregas {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.tabla-entregas thead {
+    background-color: #2c3e50;
+    color: white;
+}
+
+.tabla-entregas th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 500;
+}
+
+.tabla-entregas tbody tr {
+    transition: background-color 0.2s;
+}
+
+.tabla-entregas tbody tr:hover {
+    background-color: #f1f8ff;
+}
+
+.tabla-entregas td {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+}
+
+/* Estilos para los enlaces de archivo */
+.archivo-enlace {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.archivo-enlace:hover {
+    color: #1a5276;
+    text-decoration: underline;
+}
+
+.archivo-enlace i {
+    font-size: 1.1rem;
+}
+
+/* Badge para calificaciones */
+.badge-calificacion {
+    padding: 0.35em 0.65em;
+    font-size: 0.85em;
+    font-weight: 600;
+    border-radius: 0.375rem;
+}
+
+/* Estilos para la paginación */
+.paginacion {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+/* Mensaje cuando no hay entregas */
+.sin-entregas {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container-custom {
+        padding: 1rem;
+    }
+    
+    .tabla-entregas {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .actividad-titulo {
+        font-size: 1.5rem;
+    }
+}

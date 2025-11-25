@@ -140,3 +140,21 @@ section.bg-light {
   background-color: #050733ff !important;
   color: #ffffff !important; /* para que el texto se vea bien */
 }
+
+/* Contenedor del botón "Ver reporte de asistencia" */
+.reporte {
+  margin-top: 10px;
+  margin-left: -1000px;
+}
+
+/* Estilo del botón dentro de .reporte usando el color institucional */
+.reporte .btn-outline-primary {
+  border-color: #050733ff;
+  color: #050733ff;
+}
+
+.reporte .btn-outline-primary:hover {
+  background-color: #050733ff;
+  border-color: #050733ff;
+  color: #ffffff;
+}

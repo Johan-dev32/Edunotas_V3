@@ -489,25 +489,52 @@ def consultar_notas():
 @Administrador_bp.route('/profesores')
 @login_required
 def profesores():
-    docentes = Usuario.query.filter_by(Rol='Docente').all()
-    return render_template('Administrador/Profesores.html', docentes=docentes)
+    # Carga la lista de Cursos para el formulario de Director de Grupo.
+    try:
+        cursos = Curso.query.all()
+    except Exception:
+        cursos = []
+        
+    return render_template(
+        'Administrador/Profesores.html', 
+        cursos=cursos 
+    )
 
-
+# ----------------------------------------------------------------------
 @Administrador_bp.route('/agregar_docente', methods=['POST'])
 @login_required
 def agregar_docente():
+    # Función auxiliar para manejar campos opcionales que pueden venir como "" (cadena vacía)
+    def clean_form_value(key):
+        value = request.form.get(key)
+        return value if value and str(value).strip() else None
+
     try:
+        # --- 1. Obtención de Datos del Formulario ---
+        # (Todos los campos de tu modelo que vienen del HTML)
         nombre = request.form['Nombre']
         apellido = request.form['Apellido']
         correo = request.form['Correo']
+        contrasena = request.form['Contrasena']
+        tipo_doc = request.form['TipoDocumento'] 
         numero_doc = request.form['NumeroDocumento']
         telefono = request.form['Telefono']
-        tipo_doc = request.form['TipoDocumento']
-        profesion = request.form['Profesion']
-        ciclo = request.form['Ciclo']
+        genero = request.form['Genero']
+        direccion = clean_form_value('Direccion')   
+        
+        # Validación: Contraseñas
+        if contrasena != request.form['ConfirmarContrasena']:
+            flash("❌ Las contraseñas no coinciden.", "danger")
+            return redirect(url_for('Administrador.profesores'))
 
-        # contraseña por defecto
-        hashed_password = generate_password_hash("123456")
+        # Validación: Unicidad (Correo y Documento)
+        if Usuario.query.filter_by(Correo=correo).first() or \
+           Usuario.query.filter_by(NumeroDocumento=numero_doc).first():
+            flash("❌ Ya existe un usuario con este correo o documento.", "danger")
+            return redirect(url_for('Administrador.profesores'))
+        
+        # --- 2. Creación del Objeto Usuario (SOLO con campos de su modelo) ---
+        hashed_password = generate_password_hash(contrasena)
 
         nuevo_docente = Usuario(
             Nombre=nombre,
@@ -516,88 +543,27 @@ def agregar_docente():
             Contrasena=hashed_password,
             TipoDocumento=tipo_doc,
             NumeroDocumento=numero_doc,
+            Direccion=direccion, 
             Telefono=telefono,
-            Rol='Docente',
+            Genero=genero,
+            Rol='Docente', 
             Estado='Activo',
-            Direccion=profesion,
-            Genero="Otro"
         )
 
-        
-        nuevo_docente.Calle = ciclo
-
         db.session.add(nuevo_docente)
+        
+        # ELIMINADA toda la lógica de DirectorGrupo
+                
         db.session.commit()
+        
         flash("✅ Docente agregado correctamente", "success")
 
-        # Notificaciones automáticas: bienvenida al docente y aviso a administradores
-        try:
-            notis = []
-            notis.append(Notificacion(
-                Titulo='Bienvenido a EduNotas',
-                Mensaje=f"Hola {nuevo_docente.Nombre}, tu cuenta de {nuevo_docente.Rol} fue creada con éxito.",
-                Enlace=None,
-                ID_Usuario=nuevo_docente.ID_Usuario
-            ))
-            admins = Usuario.query.filter_by(Rol='Administrador', Estado='Activo').all()
-            for adm in admins:
-                notis.append(Notificacion(
-                    Titulo='Nuevo registro de usuario',
-                    Mensaje=f"Se registró un {nuevo_docente.Rol}: {nuevo_docente.Nombre} {nuevo_docente.Apellido} ({nuevo_docente.Correo}).",
-                    Enlace=None,
-                    ID_Usuario=adm.ID_Usuario
-                ))
-            if notis:
-                db.session.bulk_save_objects(notis)
-                db.session.commit()
-        except Exception:
-            db.session.rollback()
-
-    except SQLAlchemyError as e:
+    except Exception as e:
         db.session.rollback()
+        # Si el error persiste (por ejemplo, 'Rol' no existe), aparecerá aquí.
+        print(f"*** ERROR DE REGISTRO DOCENTE: {str(e)}") 
         flash(f"❌ Error al agregar docente: {str(e)}", "danger")
-
-    return redirect(url_for('Administrador.profesores'))
-
-
-@Administrador_bp.route('/actualizar_docente/<int:id>', methods=['POST'])
-@login_required
-def actualizar_docente(id):
-    docente = Usuario.query.get_or_404(id)
-
-    try:
-        docente.Nombre = request.form['Nombre']
-        docente.Apellido = request.form['Apellido']
-        docente.TipoDocumento = request.form['TipoDocumento']
-        docente.NumeroDocumento = request.form['NumeroDocumento']
-        docente.Correo = request.form['Correo']
-        docente.Telefono = request.form['Telefono']
-        docente.Direccion = request.form['Profesion']  # profesión
-        docente.Calle = request.form['Ciclo']          # ciclo
-
-        db.session.commit()
-        flash("✅ Docente actualizado correctamente.", "success")
-
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        flash(f"❌ Error al actualizar docente: {str(e)}", "danger")
-
-    return redirect(url_for('Administrador.profesores'))
-
-
-@Administrador_bp.route('/eliminar_docente/<int:id>', methods=['POST'])
-@login_required
-def eliminar_docente(id):
-    docente = Usuario.query.get_or_404(id)
-
-    try:
-        db.session.delete(docente)
-        db.session.commit()
-        flash("🗑️ Docente eliminado correctamente", "danger")
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        flash(f"❌ Error al eliminar docente: {str(e)}", "danger")
-
+        
     return redirect(url_for('Administrador.profesores'))
 
 
@@ -2662,7 +2628,7 @@ def registrotutorias2():
 
 
 @Administrador_bp.route('/gestion_cursos', methods=['GET', 'POST']) 
-def gestion_cursos(): # <--- NOMBRE DE LA FUNCIÓN CAMBIADO
+def gestion_cursos():
     if request.method == 'POST':
         grado = request.form['Grado']
         grupo = request.form['Grupo']

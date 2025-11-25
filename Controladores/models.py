@@ -9,8 +9,6 @@ from flask_login import UserMixin
 
 db = SQLAlchemy()
 
-
-# Definiciones de enums en Python para reutilizar (opcional)
 EstadoEnum = ("Activo", "Inactivo")
 GeneroEnum = ("M", "F", "Otro")
 RolEnum = ("Administrador", "Docente", "Estudiante", "Acudiente")
@@ -22,7 +20,7 @@ TipoActividadEnum = ("Taller","Examen","Proyecto","Participacion","Grupo")
 EstadoActividadEnum = ("Pendiente","Calificada","Cancelada")
 TipoObservacionEnum = ("Academica","Convivencial")
 NivelImportanciaEnum = ("Bajo","Medio","Alto")
-EstadoTutoriaEnum = ("Activo","Inactivo")  # not in SQL but keep generic
+EstadoTutoriaEnum = ("Activo","Inactivo")
 
 class Usuario(UserMixin, db.Model):
     __tablename__ = "Usuario"
@@ -248,6 +246,7 @@ class Cronograma_Actividades(db.Model):
     FechaInicial = db.Column(db.Date)
     FechaFinal = db.Column(db.Date)
     ID_Asignatura = db.Column(db.Integer, db.ForeignKey("Asignatura.ID_Asignatura", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
+    ID_Asignatura = db.Column(db.Integer, db.ForeignKey("Asignatura.ID_Asignatura", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
 
     curso = relationship("Curso", back_populates="cronogramas")
     periodo = relationship("Periodo", back_populates="cronogramas")

@@ -158,19 +158,120 @@ def verhorario():
         programaciones=programaciones
     )
 
-@Estudiante_bp.route('/api/curso/<int:curso_id>/horario')
-def horario_estudiante(curso_id):
-    bloques = Bloques.query.filter_by(curso_id=curso_id).all()
-    resultado = []
-    for b in bloques:
-        resultado.append({
-            "dia": b.dia,
-            "hora_inicio": b.hora_inicio,
-            "materia": b.materia,
-            "docente": b.docente
-        })
-    return jsonify(resultado)
+@Estudiante_bp.route('/api/mi-horario')
+@login_required
+def horario_estudiante():
+    try:
+        # Obtener la matrícula más reciente del estudiante
+        matricula = (
+            Matricula.query
+            .filter_by(ID_Estudiante=current_user.ID_Usuario)
+            .order_by(Matricula.AnioLectivo.desc())
+            .first()
+        )
+        
+        if not matricula or not matricula.ID_Curso:
+            return jsonify({
+                "error": "No se encontró un curso asignado para el estudiante"
+            }), 404
+        
+        # Obtener las programaciones del curso del estudiante
+        programaciones = (
+            db.session.query(
+                Programacion,
+                Asignatura.Nombre.label('Asignatura'),
+                Usuario.Nombre,
+                Usuario.Apellido
+            )
+            .join(
+                Docente_Asignatura,
+                Programacion.ID_Docente_Asignatura == Docente_Asignatura.ID_Docente_Asignatura
+            )
+            .join(
+                Asignatura,
+                Docente_Asignatura.ID_Asignatura == Asignatura.ID_Asignatura
+            )
+            .join(
+                Usuario,
+                Docente_Asignatura.ID_Docente == Usuario.ID_Usuario
+            )
+            .filter(
+                Programacion.ID_Curso == matricula.ID_Curso
+            )
+            .order_by(
+                Programacion.Dia,
+                Programacion.HoraInicio
+            )
+            .all()
+        )
 
+        # Obtener el nombre del curso para mostrarlo en la interfaz
+        nombre_curso = 'Curso sin nombre'
+        if matricula.curso:
+            if hasattr(matricula.curso, 'Grado') and hasattr(matricula.curso, 'Grupo'):
+                nombre_curso = f"{matricula.curso.Grado} {matricula.curso.Grupo}"
+            elif hasattr(matricula.curso, 'Nombre'):
+                nombre_curso = matricula.curso.Nombre
+
+        # Inicializar el horario con los días de la semana
+        dias_semana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes']
+        horario = {dia: [] for dia in dias_semana}
+        
+        # Procesar cada programación
+        for p in programaciones:
+            programacion = p[0]  # Objeto Programacion
+            asignatura = p[1]    # Nombre de la asignatura
+            nombre_docente = p[2] or ''  # Nombre del docente
+            apellido_docente = p[3] or ''  # Apellido del docente
+            
+            # Formatear el nombre completo del docente
+            docente = f"{nombre_docente} {apellido_docente}".strip()
+            
+            # Asegurarse de que el día esté en el formato correcto
+            dia = programacion.Dia
+            if dia not in dias_semana:
+                continue  # Saltar si el día no es válido
+            
+            # Formatear las horas
+            try:
+                # Convertir a string si es un objeto time
+                if hasattr(programacion.HoraInicio, 'strftime'):
+                    hora_inicio = programacion.HoraInicio.strftime('%H:%M')
+                else:
+                    hora_inicio = str(programacion.HoraInicio) or '00:00'
+                
+                if hasattr(programacion.HoraFin, 'strftime'):
+                    hora_fin = programacion.HoraFin.strftime('%H:%M')
+                else:
+                    hora_fin = str(programacion.HoraFin) or '00:00'
+                
+                # Asegurar formato HH:MM
+                if ':' not in hora_inicio:
+                    hora_inicio = '00:00'
+                if ':' not in hora_fin:
+                    hora_fin = '00:00'
+                
+                # Agregar al horario
+                horario[dia].append({
+                    'hora_inicio': hora_inicio,
+                    'hora_fin': hora_fin,
+                    'asignatura': asignatura or 'Sin asignatura',
+                    'docente': docente or 'Sin docente asignado'
+                })
+            except Exception as e:
+                current_app.logger.error(f"Error al formatear horario: {str(e)}", exc_info=True)
+                continue
+        
+        return jsonify({
+            'curso': nombre_curso,
+            'horario': horario
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Error en horario_estudiante: {str(e)}", exc_info=True)
+        return jsonify({
+            "error": "Ocurrió un error al procesar la solicitud"
+        }), 500
 
 @Estudiante_bp.route('/vernotas')
 def vernotas():

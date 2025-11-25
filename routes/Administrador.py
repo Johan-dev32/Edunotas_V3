@@ -1814,17 +1814,44 @@ def guardar_horario(curso_id):
                 print(f"No se encontró asignación para {b.get('materia')} - {b.get('docente')} (curso {curso_id})")
                 continue
 
-            # validar ID_Bloque: si viene, comprobar que exista en la tabla Bloques
+            # Manejar ID_Bloque: si no viene, intentar determinarlo por la hora
             id_bloque = b.get('id_bloque') or b.get('ID_Bloque')
             id_bloque_valid = None
+            
+            # Si no hay ID de bloque, intentar determinarlo por la hora
+            if not id_bloque and hora_str:
+                try:
+                    # Mapa de horas a IDs de bloque
+                    hora_a_bloque = {
+                        "06:45": 1,
+                        "07:30": 2,
+                        "08:30": 3,
+                        "09:50": 4,
+                        "10:40": 5,
+                        "11:30": 6,
+                        "13:30": 7,
+                        "14:20": 8
+                    }
+                    # Buscar la hora más cercana
+                    for h, bloque_id in hora_a_bloque.items():
+                        if h.startswith(hora_str[:2]):  # Comparar solo la hora
+                            id_bloque = bloque_id
+                            break
+                except Exception as e:
+                    print(f"Error determinando ID_Bloque: {e}")
+            
+            # Si se encontró un ID de bloque, validarlo
             if id_bloque:
                 try:
-                    # intenta convertir y buscar
                     id_b = int(id_bloque)
+                    # Verificar si existe en la tabla Bloques
                     bloque_obj = Bloques.query.get(id_b)
                     if bloque_obj:
                         id_bloque_valid = id_b
-                except Exception:
+                    else:
+                        print(f"ID_Bloque {id_b} no encontrado en la tabla Bloques")
+                except (ValueError, TypeError) as e:
+                    print(f"ID_Bloque inválido: {id_bloque}")
                     id_bloque_valid = None
 
             # crear programacion
@@ -1911,19 +1938,46 @@ def api_bloques_db(id_curso):
         }
         return mapa.get(hora, None)
 
-    programaciones = Programacion.query.filter_by(ID_Curso=id_curso).all()
+    programaciones = db.session.query(
+        Programacion,
+        Asignatura.Nombre.label('nombre_asignatura'),
+        Usuario.Nombre.label('nombre_docente'),
+        Bloques.ID_Bloque
+    ).join(
+        Docente_Asignatura, 
+        Programacion.ID_Docente_Asignatura == Docente_Asignatura.ID_Docente_Asignatura
+    ).join(
+        Asignatura,
+        Docente_Asignatura.ID_Asignatura == Asignatura.ID_Asignatura
+    ).join(
+        Usuario,
+        Docente_Asignatura.ID_Docente == Usuario.ID_Usuario
+    ).outerjoin(
+        Bloques,
+        Programacion.ID_Bloque == Bloques.ID_Bloque
+    ).filter(
+        Programacion.ID_Curso == id_curso
+    ).all()
+
     data = []
-
-    for p in programaciones:
+    for p, materia, docente, id_bloque in programaciones:
         inicio = p.HoraInicio.strftime('%H:%M') if p.HoraInicio else None
-
-        data.append({
+        
+        bloque_data = {
             "id": p.ID_Programacion,
-            "materia": p.docente_asignatura.asignatura.Nombre,
-            "docente": p.docente_asignatura.docente.Nombre,
+            "id_bloque": id_bloque,
+            "materia": materia,
+            "docente": docente,
             "dia": dia_to_short(p.Dia),
-            "hora": hora_to_bloque(inicio),
-        })
+            "hora_inicio": inicio,
+            "hora_fin": p.HoraFin.strftime('%H:%M') if p.HoraFin else None
+        }
+        
+        # Añadir ID de bloque basado en la hora si no hay ID_Bloque
+        if not bloque_data["id_bloque"] and inicio:
+            bloque_data["id_bloque"] = hora_to_bloque(inicio)
+            
+        data.append(bloque_data)
 
     return jsonify(data), 200
 

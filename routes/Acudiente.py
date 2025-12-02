@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, abort
 from flask_login import login_required, current_user
-from Controladores.models import db, Usuario, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Notificacion, Acudiente, Nota_Calificaciones, Citaciones, Detalle_Asistencia, Asistencia, Observacion, Matricula
+from Controladores.models import db, Usuario, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Notificacion, Acudiente, Nota_Calificaciones, Citaciones, Observacion, Matricula, Detalle_Asistencia
 from sqlalchemy import or_, func
 from datetime import datetime
 import os
@@ -69,7 +69,7 @@ def enviar_excusa(id_detalle):
     db.session.commit()
 
     flash("Excusa enviada correctamente.", "success")
-    return redirect(url_for('Acudiente.ver_inasistencias'))
+    return redirect(url_for('Acudiente.inasistencias_justificadas'))
 
 @Acudiente_bp.route('/mis_excusas')
 @login_required
@@ -101,23 +101,39 @@ def ver_notas():
 @Acudiente_bp.route('/ver_notas2')
 @login_required
 def ver_notas2():
+    # 1. Intentar recibir directamente el ID de la asignatura
+    asignatura_id = request.args.get('asignatura_id', type=int)
     materia_nombre = request.args.get('materia')
-    if not materia_nombre:
-        flash('Debe seleccionar una materia.', 'warning')
-        return redirect(url_for('Acudiente.ver_notas'))
 
-    # Resolver asignatura por nombre (insensible a acentos y mayúsculas)
-    def _normalize(s):
-        if not s:
-            return ''
-        return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn').strip().upper()
+    if asignatura_id:
+        asignatura = Asignatura.query.get(asignatura_id)
+        if not asignatura:
+            flash('La materia seleccionada no existe.', 'danger')
+            return redirect(url_for('Acudiente.ver_notas'))
+        # Si el nombre no viene, usar el de la asignatura
+        if not materia_nombre:
+            materia_nombre = asignatura.Nombre
+    else:
+        # Compatibilidad: resolver por nombre (insensible a acentos y mayúsculas)
+        if not materia_nombre:
+            flash('Debe seleccionar una materia.', 'warning')
+            return redirect(url_for('Acudiente.ver_notas'))
 
-    materia_norm = _normalize(materia_nombre)
-    asignatura = None
-    for asig in Asignatura.query.all():
-        if _normalize(asig.Nombre) == materia_norm:
-            asignatura = asig
-            break
+        def _normalize(s):
+            if not s:
+                return ''
+            return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn').strip().upper()
+
+        materia_norm = _normalize(materia_nombre)
+        materia_root = materia_norm.split()[0] if materia_norm else ''
+
+        asignatura = None
+        for asig in Asignatura.query.all():
+            nombre_norm = _normalize(asig.Nombre)
+            if nombre_norm.startswith(materia_norm) or nombre_norm.startswith(materia_root):
+                asignatura = asig
+                break
+
     if not asignatura:
         flash('La materia seleccionada no existe.', 'danger')
         return redirect(url_for('Acudiente.ver_notas'))
@@ -235,8 +251,31 @@ def ver_citaciones2():
     return render_template('Acudiente/ver_citaciones2.html', estudiante=estudiante, citacion=citacion)
 
 @Acudiente_bp.route('/inasistencias_justificadas')
+@login_required
 def inasistencias_justificadas():
-    return render_template('Acudiente/InasistenciasJustificadas.html')
+    print("[DEBUG inasistencias_justificadas] ID_Usuario actual=", current_user.ID_Usuario)
+
+    # Buscar estudiantes asociados al acudiente actual
+    relaciones = Acudiente.query.filter_by(ID_Usuario=current_user.ID_Usuario, Estado='Activo').all()
+    print("[DEBUG inasistencias_justificadas] relaciones encontradas=", len(relaciones))
+
+    if not relaciones:
+        flash("No tiene estudiantes asociados.", "warning")
+        return render_template('Acudiente/InasistenciasJustificadas.html', faltas=[])
+
+    estudiante_id = relaciones[0].ID_Estudiante
+    print("[DEBUG inasistencias_justificadas] usando ID_Estudiante=", estudiante_id)
+
+    # Faltas del estudiante marcadas como Ausente y sin excusa registrada aún
+    faltas = Detalle_Asistencia.query.filter(
+        Detalle_Asistencia.ID_Estudiante == estudiante_id,
+        Detalle_Asistencia.Estado_Asistencia == 'Ausente',
+        Detalle_Asistencia.TextoExcusa.is_(None)
+    ).order_by(Detalle_Asistencia.ID_Detalle_Asistencia.desc()).all()
+
+    print("[DEBUG inasistencias_justificadas] faltas encontradas=", len(faltas))
+
+    return render_template('Acudiente/InasistenciasJustificadas.html', faltas=faltas)
 
 @Acudiente_bp.route('/informes_academicos')
 def informes_academicos():
@@ -246,6 +285,21 @@ def informes_academicos():
 def comunicados():
     return render_template('Acudiente/Comunicados.html')
 
+@Acudiente_bp.route('/manual')
+def manual():
+    return render_template('Acudiente/ManualUsuario.html')
+
+@Acudiente_bp.route('/comunicacion')
+def comunicacion():
+    return render_template('Acudiente/Comunicacion.html')
+
+@Acudiente_bp.route('/horarios')
+def horarios():
+    return render_template('Acudiente/Horarios.html')
+
+@Acudiente_bp.route('/circulares')
+def circulares():
+    return render_template('Acudiente/Circulares.html')
 
 @Acudiente_bp.route('/observador')
 def ver_observador_estudiante():
@@ -311,19 +365,3 @@ def historial_academico():
 @Acudiente_bp.route('/historial_academico2')
 def historial_academico2():
     return render_template('Acudiente/historial_academico2.html')
-
-@Acudiente_bp.route('/manual')
-def manual():
-    return render_template('Acudiente/ManualUsuario.html')
-
-@Acudiente_bp.route('/comunicacion')
-def comunicacion():
-    return render_template('Acudiente/Comunicacion.html')
-
-@Acudiente_bp.route('/horarios')
-def horarios():
-    return render_template('Acudiente/Horarios.html')
-
-@Acudiente_bp.route('/circulares')
-def circulares():
-    return render_template('Acudiente/Circulares.html')

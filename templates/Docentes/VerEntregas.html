@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Colegio Fe y Alegría</title>
+  <title>Ver Entregas - Colegio Fe y Alegría</title>
   
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Iconos -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <!-- CSS propio -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/Docente/Crear_Actividad.css') }}">
-</head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- CSS personalizado -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Docente/VerEntregas.css') }}">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <body>
 
@@ -22,27 +23,38 @@
     </button>
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
-    <div class="dropdown ms-auto">
-      <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-        <span class="bi bi-envelope-fill"></span>
+      <div class="dropdown">
+      <button
+        class="position-relative"
+        type="button"
+        id="dropdownMenuButton"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        style="border: none; background: transparent; padding: 0; margin-left: 850px;"
+      >
+        <i class="bi bi-bell-fill" style="font-size: 1.25rem;"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none ">0</span>
       </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-        <li><a class="dropdown-item" href="#">Ajustes</a></li>
-        <li><a class="dropdown-item" href="#">Opción 2</a></li>
-        <li><a class="dropdown-item" href="#">Opción 3</a></li>
+      <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="dropdownMenuButton" style="min-width: 300px;">
+        <li class="text-center text-muted small">Últimas notificaciones</li>
+        <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+          <p class="text-center small text-secondary mb-0">No tienes mensajes nuevos.</p>
+        </div>
       </ul>
     </div>
-
+<script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
     <div class="dropdown">
-      <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
-        <span class="bi bi-person-lines-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      
       <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
-      </ul>
-    </div>
+      <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
   </header>
 
   <!-- Menú lateral -->
@@ -58,56 +70,114 @@
           <ul class="nav flex-column ms-3">
             
             <li><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Registrar Notas</a></li>
-            <li><a href="{{ url_for('Docente.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-calculator"></i> Cálculo de Promedios</a></li>
           </ul>
         </div>
         <li class="nav-item"><a href="{{ url_for('Docente.tareas_actividades1') }}" class="nav-link text-white"><i class="bi bi-book-half"></i> Registro de Tareas y Actividades</a></li>
         <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
-        <li class="nav-item"><a href="{{ url_for('Docente.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Aprobación Académica</a></li>
         <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones</a></li>
       </ul>
     </div>
   </div>
 
   <!-- Contenido principal -->
+  <div class="container-fluid py-4">
+    <div class="container-custom">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="actividad-titulo">
+          <i class="bi bi-collection-play-fill me-2"></i>
+          Entregas: {{ actividad.Titulo }}
+        </h2>
+        <a href="{{ url_for('Docente.tareas_actividades1') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-2"></i>Volver
+        </a>
+      </div>
 
-  <h2>Entregas de {{ actividad.Titulo }}</h2>
-
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Estudiante</th>
-            <th>Archivo</th>
-        </tr>
-    </thead>
-
-    <tbody>
-    {% for entrega in entregas %}
-        <tr>
-            <td>{{ entrega.matricula.estudiante_usuario.Nombre }} {{ entrega.matricula.estudiante_usuario.Apellido }}</td>
-
-            <td>
-                {% if entrega.Archivo %}
-                    <a href="{{ url_for('static', filename=entrega.Archivo) }}" target="_blank">
-                        Ver archivo
-                    </a>
-                {% else %}
-                    Sin archivo
-                {% endif %}
-            </td>
-
-            <td>{{ entrega.Observaciones or '-' }}</td>
-            <td>{{ entrega.Calificacion if entrega.Calificacion else '-' }}</td>
-
-
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+      {% if entregas %}
+        <div class="table-responsive">
+          <table class="tabla-entregas">
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Archivo</th>
+                <th>Observaciones</th>
+                <th>Calificación</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entrega in entregas %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="avatar bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        {{ entrega.matricula.estudiante_usuario.Nombre[0] }}{{ entrega.matricula.estudiante_usuario.Apellido[0] }}
+                      </div>
+                      <div>
+                        <div class="fw-semibold">{{ entrega.matricula.estudiante_usuario.Nombre }} {{ entrega.matricula.estudiante_usuario.Apellido }}</div>
+                        <small class="text-muted">{{ entrega.matricula.estudiante_usuario.Documento }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    {% if entrega.Archivo %}
+                      <a href="{{ url_for('static', filename=entrega.Archivo) }}" target="_blank" class="archivo-enlace">
+                        <i class="bi bi-file-earmark-arrow-down"></i>
+                        <span>Ver entrega</span>
+                      </a>
+                    {% else %}
+                      <span class="text-muted">
+                        <i class="bi bi-file-earmark-x"></i> Sin archivo
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <span class="{% if not entrega.Observaciones %}text-muted{% endif %}">
+                      {{ entrega.Observaciones or 'Sin observaciones' }}
+                    </span>
+                  </td>
+                  <td>
+                    {% if entrega.Calificacion is not none %}
+                      <span class="badge rounded-pill bg-{{ 'success' if entrega.Calificacion >= 3.0 else 'warning' }}">
+                        {{ '%.1f'|format(entrega.Calificacion) }}
+                      </span>
+                    {% else %}
+                      <span class="badge bg-secondary">Pendiente</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="sin-entregas">
+          <i class="bi bi-inbox" style="font-size: 3rem; opacity: 0.3;"></i>
+          <h4 class="mt-3">No hay entregas aún</h4>
+          <p class="text-muted">Los estudiantes aún no han enviado sus trabajos para esta actividad.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- JavaScript externo -->
-
+  <script>
+    // Agregar clase activa al menú de navegación
+    document.addEventListener('DOMContentLoaded', function() {
+      // Resaltar el ítem de menú activo
+      const currentPage = window.location.pathname;
+      document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
+          link.classList.add('active');
+          link.setAttribute('aria-current', 'page');
+        }
+      });
+      
+      // Inicializar tooltips
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    });
+  </script>
 </body>
 </html>

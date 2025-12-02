@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colegio Fe y Alegría</title>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Iconos -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- CSS propio -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Docente/Asistencia.css') }}">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="d-flex align-items-center p-3 border-bottom w-100">
+    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+      <i class="bi bi-list"></i>
+    </button>
+    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
+
+       <div class="dropdown">
+      <button
+        class="position-relative"
+        type="button"
+        id="dropdownMenuButton"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        style="border: none; background: transparent; padding: 0; margin-left: 850px;"
+      >
+        <i class="bi bi-bell-fill" style="font-size: 1.25rem;"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none ">0</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="dropdownMenuButton" style="min-width: 300px;">
+        <li class="text-center text-muted small">Últimas notificaciones</li>
+        <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+          <p class="text-center small text-secondary mb-0">No tienes mensajes nuevos.</p>
+        </div>
+      </ul>
+    </div>
+<script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
+
+     <div class="dropdown">
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      
+      <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
+      <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
+  </header>
+
+  <!-- MENU -->
+  <div class="offcanvas offcanvas-start text-white" tabindex="-1" id="sidebar">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">MENÚ</h5>
+    </div>
+    <div class="offcanvas1-body">
+      <ul class="nav flex-column">
+        <li class="nav-item"><a href="{{ url_for('Docente.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
+
+        <!-- Submenú Notas -->
+        <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
+        <div class="collapse" id="submenuNotas">
+          <ul class="nav flex-column ms-3">
+           
+            <li><a href="{{ url_for('Docente.notas_registro') }}" class="nav-link text-white"><i class="bi bi-pencil-square"></i> Registrar Notas</a></li>
+          </ul>
+        </div>
+        
+        <li class="nav-item"><a href="{{ url_for('Docente.tareas_actividades1') }}" class="nav-link text-white"><i class="bi bi-book-half"></i> Registro de Tareas y Actividades</a></li>
+        <li class="nav-item"><a href="{{ url_for('Docente.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
+        <li class="nav-item"><a href="{{ url_for('Docente.citaciones') }}" class="nav-link text-white"><i class="bi bi-clipboard-check"></i> Citaciones</a></li>
+      </ul>
+    </div>
+  </div>  
+
+  <!-- CONTENIDO PRINCIPAL: REGISTRO DE ASISTENCIA -->
+  <main class="container py-5" style="max-width: 1200px;">
+    <!-- Título -->
+    <div class="text-center mb-4">
+      <h1 class="titulo-principal">REGISTRO DE ASISTENCIA</h1>
+      <p class="descripcion mb-0">Seleccione el curso y marque Presente o Ausente para cada estudiante.</p>
+    </div>
+
+    <!-- Selector de curso y acceso a excusas -->
+    <form method="get" class="mb-4 d-flex align-items-center gap-3" action="{{ url_for('Docente.asistencia') }}">
+      <label for="curso_id" class="form-label mb-0"><strong>Curso:</strong></label>
+      <select id="curso_id" name="curso_id" class="form-select" style="max-width: 250px;" onchange="this.form.submit()">
+        {% for c in cursos %}
+          <option value="{{ c.ID_Curso }}" {% if curso_seleccionado and c.ID_Curso == curso_seleccionado.ID_Curso %}selected{% endif %}>
+            {{ c.Grupo }}
+          </option>
+        {% endfor %}
+      </select>
+
+      <a href="{{ url_for('Docente.excusas_inasistencias') }}" class="btn ms-auto" style="background-color: #050733ff; color: #fff; border-color: #050733ff;">
+        Ver excusas de inasistencia
+      </a>
+    </form>
+
+    <!-- Formulario de asistencia -->
+    <section class="bg-light rounded-3 shadow-sm p-4">
+      {% if estudiantes %}
+        <form method="post" action="{{ url_for('Docente.asistencia') }}">
+          <input type="hidden" name="curso_id" value="{{ curso_seleccionado.ID_Curso if curso_seleccionado else '' }}">
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Estudiante</th>
+                  <th scope="col" class="text-center">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for est in estudiantes %}
+                  <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ est.Apellido }} {{ est.Nombre }}</td>
+                    <td class="text-center">
+                      {% set estado = estados_previos.get(est.ID_Usuario, 'Presente') %}
+                      <select name="estado_{{ est.ID_Usuario }}" class="form-select" style="max-width: 180px; margin: 0 auto;">
+                        <option value="Presente" {% if estado == 'Presente' %}selected{% endif %}>Presente</option>
+                        <option value="Ausente" {% if estado == 'Ausente' %}selected{% endif %}>Ausente</option>
+                      </select>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-4 d-flex justify-content-end gap-2">
+            <button type="button" id="btnExportarAsistenciaPdf" class="btn btn-danger">
+              Exportar como PDF
+            </button>
+            <button type="submit" class="btn btn-primary" style="background-color: #050733ff;">
+              Guardar asistencia de hoy
+            </button>
+          </div>
+        </form>
+      {% else %}
+        <p class="text-muted mb-0">No se encontraron estudiantes para este curso.</p>
+      {% endif %}
+    </section>
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jsPDF y autoTable para exportar asistencia a PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <script>
+    // Rellena el modal con los datos de la excusa seleccionada
+    const modalExcusa = document.getElementById('modalExcusa');
+    if (modalExcusa) {
+      modalExcusa.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        if (!button) return;
+
+        const fecha = button.getAttribute('data-fecha') || '';
+        const estudiante = button.getAttribute('data-estudiante') || '';
+        const materia = button.getAttribute('data-materia') || '';
+        const motivo = button.getAttribute('data-motivo') || '';
+        const detalles = button.getAttribute('data-detalles') || '';
+
+        const fechaSpan = modalExcusa.querySelector('#excusaFecha');
+        const estSpan = modalExcusa.querySelector('#excusaEstudiante');
+        const materiaSpan = modalExcusa.querySelector('#excusaMateria');
+        const motivoP = modalExcusa.querySelector('#excusaMotivo');
+        const detallesP = modalExcusa.querySelector('#excusaDetalles');
+
+        if (fechaSpan) fechaSpan.textContent = fecha;
+        if (estSpan) estSpan.textContent = estudiante;
+        if (materiaSpan) materiaSpan.textContent = materia;
+        if (motivoP) motivoP.textContent = motivo;
+        if (detallesP) detallesP.textContent = detalles;
+      });
+    }
+
+    // Exportar asistencia a PDF
+    document.addEventListener('DOMContentLoaded', function () {
+      const btnPdf = document.getElementById('btnExportarAsistenciaPdf');
+      if (!btnPdf) return;
+
+      btnPdf.addEventListener('click', function () {
+        const tabla = document.querySelector('table.table');
+        if (!tabla) return;
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const titulo = 'Registro de Asistencia';
+        const cursoSelect = document.getElementById('curso_id');
+        const cursoTexto = cursoSelect ? cursoSelect.options[cursoSelect.selectedIndex].text : '';
+        const fechaHoy = new Date().toLocaleDateString();
+
+        doc.setFontSize(14);
+        doc.setTextColor(5, 7, 51); // #050733 aproximado
+        doc.text(titulo, 14, 15);
+
+        doc.setFontSize(10);
+        let subtitulo = '';
+        if (cursoTexto) {
+          subtitulo += 'Curso: ' + cursoTexto + '   ';
+        }
+        subtitulo += 'Fecha: ' + fechaHoy;
+        doc.text(subtitulo, 14, 22);
+
+        const body = [];
+        const rows = tabla.querySelectorAll('tbody tr');
+        rows.forEach((tr) => {
+          const cols = tr.querySelectorAll('td');
+          if (cols.length >= 3) {
+            const numero = cols[0].innerText.trim();
+            const estudiante = cols[1].innerText.trim();
+            const estadoSelect = cols[2].querySelector('select');
+            const estado = estadoSelect ? estadoSelect.value : cols[2].innerText.trim();
+            body.push([numero, estudiante, estado]);
+          }
+        });
+
+        doc.autoTable({
+          head: [['#', 'Estudiante', 'Estado']],
+          body: body,
+          startY: 28,
+          styles: { fontSize: 9 },
+          headStyles: {
+            fillColor: [5, 7, 51],
+            textColor: 255,
+          },
+        });
+
+        doc.save('asistencia.pdf');
+      });
+    });
+  </script>
+
+</body>
+</html>

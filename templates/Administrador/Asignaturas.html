@@ -41,22 +41,25 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
+<div class="dropdown">
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      
+      <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
+      <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
 
-    <div class="dropdown">
-      <button class="btn btn-usuario dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
-        <i class="bi bi-person-lines-fill"></i>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="userDropdown">
-        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuración Académica</a></li>
-        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-      </ul>
-    </div>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
   </header>
 
 <!-- Offcanvas menú lateral -->
-<section class="bg-light py-5 mt-5">
-  <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
+<section class="">
+   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
   </div>
@@ -68,8 +71,10 @@
           <div class="collapse" id="submenuNotas">
             <ul class="nav flex-column ms-3">
               <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
+              
              <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+
+             <li><a href="{{ url_for('Administrador.configuracion_academica') }}" class="nav-link text-white"><i class="bi bi-check-circle-fill"></i> Aprobación Académica</a></li>
 
 
 
@@ -78,7 +83,6 @@
 
           <li class="nav-item"><a href="{{ url_for('Administrador.observador') }}" class="nav-link text-white"><i class="bi bi-eye-fill"></i> Observador</a></li>
           <li class="nav-item"><a href="{{ url_for('Administrador.cursos') }}" class="nav-link text-white"><i class="bi bi-inboxes"></i> Cursos</a></li>
-          <li class="nav-item"><a href="{{ url_for('Administrador.reporte') }}" class="nav-link text-white"><i class="bi bi-calendar2"></i></i> Generar reporte</a></li>
 
           <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuUsuarios">
             <i class="bi bi-caret-down-fill"></i> Gestión de Usuarios
@@ -156,67 +160,71 @@
     </div>
   </main>
 
-  <!-- MODAL -->
-  <div id="modal" class="modal" style="display:none;">
-    <div class="modal-dialog">
-      <div class="modal-content p-4">
-        <h4 id="tituloForm" class="text-center mb-3 text-primary fw-bold">Registrar Asignatura</h4>
 
-        <div class="mb-3">
-          <label for="nombreAsignatura" class="form-label">Nombre</label>
-          <input type="text" id="nombreAsignatura" class="form-control">
-        </div>
-
-        <div class="mb-3">
-          <label for="descripcionAsignatura" class="form-label">Descripción</label>
-          <textarea id="descripcionAsignatura" class="form-control"></textarea>
-        </div>
+<!-- MODAL -->
+<div id="modal" class="modal" style="display:none;">
+  <div class="modal-dialog">
+    <div class="modal-content p-4">
+      <h4 id="tituloForm" class="text-center mb-3 text-primary fw-bold">Registrar Asignatura</h4>
 
       <div class="mb-3">
+
         <label>Ciclo:
           <select id="cicloAsignatura" class="form-select">
             <option value="">-- Seleccione --</option>
             {% for curso in cursos %}
-              <option value="{{ curso.Grado }}">{{ curso.Grado }} {{ curso.Grupo or '' }}</option>
+              <option value="{{ curso.Grado }}">{{ curso.Grupo }}</option>
             {% endfor %}
           </select>
         </label>
+
+        <label for="nombreAsignatura" class="form-label">Nombre</label>
+        <input type="text" id="nombreAsignatura" name="nombre" class="form-control">
+
       </div>
 
-        <div class="mb-3">
-          <label for="profesorAsignatura" class="form-label">Docente Encargado</label>
-          <select id="profesorAsignatura" class="form-select">
-            <option value="">-- Seleccione --</option>
-            {% for docente in docentes %}
-              <option value="{{ docente.ID_Usuario }}">{{ docente.Nombre }} {{ docente.Apellido }}</option>
-            {% endfor %}
-          </select>
-        </div>
+      <div class="mb-3">
+        <label for="descripcionAsignatura" class="form-label">Descripción</label>
+        <textarea id="descripcionAsignatura" name="descripcion" class="form-control"></textarea>
+      </div>
 
-
-      <label>Ciclo:
+      <div class="mb-3">
+        <label for="cicloAsignatura" class="form-label">Ciclo</label>
         <select id="cicloAsignatura" class="form-select">
           <option value="">-- Seleccione --</option>
-          <option value="1">Ciclo 1 (601-603, 701-703)</option>
-          <option value="2">Ciclo 2 (801-803, 901-903)</option>
-          <option value="3">Ciclo 3 (1001-1003, 1101-1103)</option>
+          <option value="1">Ciclo 1</option>
+          <option value="2">Ciclo 2</option>
+          <option value="3">Ciclo 3</option>
         </select>
-      </label>
+      </div>
 
-      <label>Profesor Encargado:
-        <select id="profesorAsignatura" class="form-select">
+      <div class="mb-3">
+        <label for="cursoAsignatura" class="form-label">Curso</label>
+        <select id="cursoAsignatura" class="form-select">
           <option value="">-- Seleccione --</option>
+          {% for curso in cursos %}
+            <option value="{{ curso.ID_Curso }}">{{ curso.Grado }} {{ curso.Grupo or '' }}</option>
+          {% endfor %}
         </select>
-      </label>
+      </div>
+
+      <div class="mb-3">
+        <label for="profesorAsignatura" class="form-label">Docente Encargado</label>
+        <select id="profesorAsignatura" name="id_docente" class="form-select">
+          <option value="">-- Seleccione --</option>
+          {% for docente in docentes %}
+            <option value="{{ docente.ID_Usuario }}">{{ docente.Nombre }} {{ docente.Apellido }}</option>
+          {% endfor %}
+        </select>
+      </div>
 
       <div class="d-flex justify-content-end mt-4">
         <button class="btn btn-success me-2" onclick="guardarAsignatura()">Guardar</button>
         <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
-
       </div>
     </div>
   </div>
-
+</div>
   <!-- SCRIPTS -->
   <script>
   const guardarURL = "{{ url_for('Administrador.guardar_asignatura') }}";
@@ -240,13 +248,14 @@
     document.getElementById("profesorAsignatura").value = '';
   }
 
-  function guardarAsignatura() {
+function guardarAsignatura() {
     const nombre = document.getElementById("nombreAsignatura").value.trim();
     const descripcion = document.getElementById("descripcionAsignatura").value.trim();
     const ciclo = document.getElementById("cicloAsignatura").value;
     const id_docente = document.getElementById("profesorAsignatura").value;
+    const id_curso = document.getElementById("cursoAsignatura").value; // <-- nuevo
 
-    if (!nombre || !id_docente || !ciclo) {
+    if (!nombre || !id_docente || !id_curso) {
       alert("Por favor complete todos los campos obligatorios.");
       return;
     }
@@ -254,7 +263,7 @@
     fetch(guardarURL, {
       method: "POST",
       headers: {"Content-Type": "application/x-www-form-urlencoded"},
-      body: `nombre=${encodeURIComponent(nombre)}&descripcion=${encodeURIComponent(descripcion)}&ciclo=${ciclo}&id_docente=${id_docente}`
+      body: `nombre=${encodeURIComponent(nombre)}&descripcion=${encodeURIComponent(descripcion)}&ciclo=${ciclo}&id_docente=${id_docente}&id_curso=${id_curso}`
     })
     .then(res => res.json())
     .then(data => {
@@ -266,7 +275,7 @@
       }
     })
     .catch(err => console.error(err));
-  }
+}
 
   function editarAsignatura(id) {
     const nombre = prompt("Nuevo nombre:");

@@ -18,7 +18,9 @@ header {
   margin: 0;
   margin-left: 60px;
 }
-
+.botones{
+  font-weight: bolder;
+}
 header .btn-dark {
   background-color: #050733ff;
   border: none;

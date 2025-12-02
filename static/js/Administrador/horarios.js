@@ -103,38 +103,109 @@ function crearBloque(celda, data = null) {
 }
 // ------------------- Activar drag & drop -------------------
 function activarBloque(bloque) {
-  const bloqueTexto = bloque.querySelector('.bloque-texto');
-  if (!bloqueTexto) return;
+  // Asegurarse de que el bloque tenga la clase correcta
+  bloque.classList.add('bloque');
+  
+  // Crear o actualizar el contenido del bloque si es necesario
+  let bloqueTexto = bloque.querySelector('.bloque-texto');
+  if (!bloqueTexto) {
+    // Si no existe el bloque de texto, crearlo
+    const materia = bloque.dataset.materia || '';
+    const docente = bloque.dataset.docente || '';
+    const id_bloque = bloque.dataset.id_bloque || '';
+    
+    bloque.innerHTML = `
+      <div class="bloque-texto" 
+           draggable="${editMode}" 
+           data-id-bloque="${id_bloque}" 
+           data-materia="${materia}" 
+           data-docente="${docente}">
+        <strong>${materia}</strong><br>${docente}
+        <span class="bloque-close">&times;</span>
+      </div>`;
+    
+    bloqueTexto = bloque.querySelector('.bloque-texto');
+  } else {
+    // Si ya existe, asegurarse de que tenga el botón de cierre
+    if (!bloqueTexto.querySelector('.bloque-close')) {
+      bloqueTexto.innerHTML += '<span class="bloque-close">&times;</span>';
+    }
+  }
 
+  // Configurar arrastrable
   bloqueTexto.setAttribute('draggable', editMode);
-
-  bloqueTexto.addEventListener('dragstart', e => dragged = bloque);
-  bloqueTexto.addEventListener('dragend', e => {
-    dragged = null;
-    guardarBloques(); // 💾 guarda automáticamente al soltar
+  
+  // Configurar eventos de arrastre
+  bloqueTexto.addEventListener('dragstart', e => {
+    dragged = bloque;
+    setTimeout(() => {
+      bloque.style.opacity = '0.4';
+    }, 0);
   });
 
-  const closeBtn = bloqueTexto.querySelector('.bloque-close');
-  if (closeBtn) closeBtn.addEventListener('click', () => {
-    bloque.remove();
+  bloqueTexto.addEventListener('dragend', e => {
+    bloque.style.opacity = '1';
+    dragged = null;
     guardarBloques();
   });
+
+  // Configurar botón de cierre
+  const closeBtn = bloqueTexto.querySelector('.bloque-close');
+  if (closeBtn) {
+    // Eliminar cualquier evento anterior
+    const newCloseBtn = closeBtn.cloneNode(true);
+    closeBtn.replaceWith(newCloseBtn);
+    
+    // Hacer que el botón de cierre sea siempre visible
+    newCloseBtn.style.opacity = '0.8';
+    newCloseBtn.style.cursor = 'pointer';
+    newCloseBtn.style.pointerEvents = 'auto';
+    newCloseBtn.style.zIndex = '100';
+    
+    // Agregar evento de clic
+    newCloseBtn.onclick = function(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (confirm('¿Estás seguro de que deseas eliminar este bloque?')) {
+        bloque.remove();
+        guardarBloques();
+      }
+      return false;
+    };
+    
+    // Efectos hover
+    bloque.onmouseenter = function() {
+      if (newCloseBtn) {
+        newCloseBtn.style.opacity = '1';
+        newCloseBtn.style.transform = 'scale(1.2)';
+      }
+    };
+    
+    bloque.onmouseleave = function() {
+      if (newCloseBtn) {
+        newCloseBtn.style.opacity = '0.8';
+        newCloseBtn.style.transform = 'scale(1)';
+      }
+    };
+  }
 }
 
 // ------------------- Inicializar tabla -------------------
 async function initTabla() {
   const tbody = document.querySelector('#horario-table tbody');
+  // Limpiar el tbody antes de agregar nuevas filas
   tbody.innerHTML = '';
-
+  
+  // Agregar las filas del horario una sola vez
   horas.forEach(h => {
     if (h.descanso) {
-      tbody.innerHTML += `
-        <tr>
+      tbody.innerHTML +=
+        `<tr>
           <td colspan="6" class="bg-warning fw-bold">DESCANSO</td>
         </tr>`;
     } else {
-      tbody.innerHTML += `
-        <tr data-inicio="${h.inicio}" data-fin="${h.fin}">
+      tbody.innerHTML +=
+        `<tr data-inicio="${h.inicio}" data-fin="${h.fin}">
           <td>${h.inicio} - ${h.fin}</td>
           <td data-dia="Lunes" data-hora="${h.inicio.trim()}"></td>
           <td data-dia="Martes" data-hora="${h.inicio.trim()}"></td>
@@ -145,82 +216,124 @@ async function initTabla() {
     }
   });
 
-  // Drag & drop en celdas
-  document.querySelectorAll('#horario-table td, #fuera-tabla').forEach(td => {
-    td.addEventListener('dragover', e => e.preventDefault());
-    td.addEventListener('drop', e => {
-      e.preventDefault();
-      if (!editMode || !dragged) return;
-      if (td.querySelector('.bloque') && td.id !== 'fuera-tabla') return;
-      td.appendChild(dragged);
-      guardarBloques(); // 💾 guarda cada vez que sueltas
-    });
+  // Configurar eventos de arrastrar y soltar
+  function configurarEventos() {
+    document.querySelectorAll('#horario-table td, #fuera-tabla').forEach(td => {
+      // Remover eventos anteriores para evitar duplicados
+      const newTd = td.cloneNode(true);
+      td.parentNode.replaceChild(newTd, td);
+      
+      newTd.addEventListener('dragover', e => e.preventDefault());
+      newTd.addEventListener('drop', e => {
+        e.preventDefault();
+        if (!editMode || !dragged) return;
+        if (newTd.querySelector('.bloque') && newTd.id !== 'fuera-tabla') return;
+        newTd.appendChild(dragged);
+        guardarBloques();
+      });
 
-    td.addEventListener('dblclick', () => {
-      if (!editMode) return;
-      if (!td.dataset.dia) return;
-      crearBloque(td);
+      newTd.addEventListener('dblclick', () => {
+        if (!editMode) return;
+        if (!newTd.dataset.dia) return;
+        crearBloque(newTd);
+      });
     });
-  });
-
+  }
+  
+  configurarEventos();
+  
+  // Cargar bloques solo si no se han cargado antes
   if (!window._bloquesCargados) {
-  window._bloquesCargados = true;
-  cargarBloques();
-}
+    window._bloquesCargados = true;
+    await cargarBloques();
+    // Volver a configurar eventos después de cargar bloques
+    configurarEventos();
+  }
 }
 
 // ------------------- Cargar bloques desde DB -------------------
 async function cargarBloques() {
-  const resp = await fetch(`/administrador/api/curso/${curso_id}/bloques_db`);
-  const data = await resp.json();
-  console.log("DATA:", data);
+  try {
+    const resp = await fetch(`/administrador/api/curso/${curso_id}/bloques_db`);
+    const data = await resp.json();
+    console.log("Datos recibidos del servidor:", data);
 
-  // Limpia bloques viejos
-  document.querySelectorAll('#horario-table td .bloque').forEach(n => n.remove());
-
-  const diasMap = { 
-    lun: "Lunes", mar: "Martes", mie: "Miércoles", 
-    jue: "Jueves", vie: "Viernes" 
-  };
-  
-  // 🔹 Asegúrate de incluir las 9 horas (coinciden con tu tabla)
-  const horaIndexMap = { 
-    1: "06:45", 2: "07:30", 3: "08:30", 4: "09:50", 
-    5: "10:40", 6: "11:30", 7: "13:30", 8: "14:20"
-  };
-
-  data.forEach(b => {
-    const dia = diasMap[b.dia] || b.dia || b.Dia;
-    
-    // 🔹 Prioriza `b.hora_inicio`, luego `b.id_bloque`, luego `b.hora`
-    let hora = null;
-    if (b.hora_inicio) {
-      hora = b.hora_inicio;
-    } else if (b.id_bloque) {
-      hora = horaIndexMap[b.id_bloque] || null;
-    } else if (typeof b.hora === 'number') {
-      hora = horaIndexMap[b.hora] || null;
-    } else {
-      hora = b.hora || b.HoraInicio;
-    }
-
-    if (!dia || !hora) {
-      console.warn("Bloque sin dia/hora válido:", b);
-      return;
-    }
-
-    const celda = document.querySelector(`td[data-dia="${dia}"][data-hora="${hora.trim()}"]`);
-    if (!celda) {
-      console.warn(`No existe celda para ${dia} ${hora} (id_bloque=${b.id_bloque})`);
-      return;
-    }
-
-    crearBloque(celda, {
-      id_bloque: b.id_bloque || b.ID_Bloque || b.id || '',
-      materia: b.materia || b.Materia || (b.asignatura ? b.asignatura.Nombre : ''),
-      docente: b.docente || b.Docente || (b.docente_nombre ? b.docente_nombre : '')
+    // Primero, limpiar todos los bloques existentes
+    document.querySelectorAll('#horario-table .bloque').forEach(bloque => {
+      bloque.remove();
     });
-  });
+
+    const diasMap = { 
+      lun: "Lunes", mar: "Martes", mie: "Miércoles", 
+      jue: "Jueves", vie: "Viernes" 
+    };
+    
+    // Mapa de horas
+    const horaIndexMap = { 
+      1: "06:45", 2: "07:30", 3: "08:30", 4: "09:50", 
+      5: "10:40", 6: "11:30", 7: "13:30", 8: "14:20"
+    };
+
+    // Crear un array para almacenar promesas de creación de bloques
+    const promesas = [];
+
+    data.forEach(b => {
+      try {
+        const dia = diasMap[b.dia] || b.dia || b.Dia;
+        
+        // Determinar la hora del bloque
+        let hora = null;
+        if (b.hora_inicio) {
+          hora = b.hora_inicio;
+        } else if (b.id_bloque) {
+          hora = horaIndexMap[b.id_bloque] || null;
+        } else if (typeof b.hora === 'number') {
+          hora = horaIndexMap[b.hora] || null;
+        } else {
+          hora = b.hora || b.HoraInicio;
+        }
+
+        if (!dia || !hora) {
+          console.warn("Bloque sin dia/hora válido:", b);
+          return;
+        }
+
+        const celda = document.querySelector(`td[data-dia="${dia}"][data-hora="${hora.trim()}"]`);
+        if (!celda) {
+          console.warn(`No existe celda para ${dia} ${hora} (id_bloque=${b.id_bloque})`);
+          return;
+        }
+
+        // Crear el bloque directamente en lugar de usar crearBloque
+        const bloque = document.createElement('div');
+        bloque.className = 'bloque';
+        
+        const materia = b.materia || b.Materia || (b.asignatura ? b.asignatura.Nombre : '');
+        const docente = b.docente || b.Docente || (b.docente_nombre ? b.docente_nombre : '');
+        const id_bloque = b.id_bloque || b.ID_Bloque || b.id || '';
+        
+        bloque.innerHTML = `
+          <div class="bloque-texto" 
+               draggable="${editMode}" 
+               data-id-bloque="${id_bloque}" 
+               data-materia="${materia}" 
+               data-docente="${docente}">
+            <strong>${materia}</strong><br>${docente}
+            <span class="bloque-close">&times;</span>
+          </div>`;
+        
+        celda.appendChild(bloque);
+        
+        // Activar el bloque recién creado
+        activarBloque(bloque);
+        
+      } catch (error) {
+        console.error('Error al procesar bloque:', b, error);
+      }
+    });
+  } catch (error) {
+    console.error('Error al cargar bloques:', error);
+  }
 }
 // ------------------- Guardar bloques en DB -------------------
 
@@ -254,7 +367,7 @@ async function guardarBloques() {
       };
 
       // 🔹 Convertimos la hora actual a ID_Bloque válido
-      const id_bloque = horaIndexMap[hora.trim()] || null;
+      const id_bloque = Object.entries(horaIndexMap).find(([_, h]) => h === hora)?.[0] || null;
 
       bloques.push({
         id_bloque,   // 👈 ahora sí manda un ID real que existe

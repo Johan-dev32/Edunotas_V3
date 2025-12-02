@@ -1,0 +1,344 @@
+/* Estilos generales */
+body {
+  background-color: #f8f9fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* navbar */
+header {
+  background-color: white;
+  color: #050733ff;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.titulo-header {
+  color: #050733ff;
+  font-size: 40px;
+  font-weight: bolder;
+  font-family: 'Trebuchet MS', sans-serif;
+  margin: 0;
+  margin-left: 60px;
+}
+
+header .btn-dark {
+  background-color: #050733ff;
+  border: none;
+}
+
+.btn-edunotas {
+  background-color: #050733ff;
+  color: #fff;
+}
+
+.btn-usuario {
+  background-color: transparent; /* sin recuadro */
+  color: #050733ff;               /* color institucional para el icono */
+  border: none;                    /* sin borde */
+  box-shadow: none;                /* sin sombra */
+  padding: 6px 8px;                /* compacto */
+  margin-left: 10px;
+}
+
+.btn-usuario:hover,
+.btn-usuario:focus {
+  background-color: transparent;   /* mantener sin recuadro en hover/focus */
+  color: #050733ff;
+  box-shadow: none;
+}
+
+/* Oculta el caret del dropdown en el botón de usuario */
+.btn-usuario.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Tamaño del icono circular */
+.btn-usuario .bi-person-circle {
+  font-size: 1.6rem;
+}
+
+/*  menu_des  */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgb(9, 5, 80), #050733ff);
+}
+
+#sidebar .nav-link:hover {
+  background: linear-gradient(180deg, #11064e, #ffffff);
+  border-radius: 8px;
+}
+
+.offcanvas {
+  font-size: 25px;
+}
+
+.offcanvas-title {
+  margin-left: 40px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.offcanvas1-body {
+  flex-grow: 1;
+  overflow-y: auto;   
+  max-height: 100vh;  
+}
+
+.nav-item {
+  font-weight: bold;
+  font-size: 22px;
+}
+#sidebar .nav-link {
+  font-size: 18px;   /* tamaño menú hamburguesa */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* SOLO botones nav-pills (Resumen, Registro, Comunicación, etc.) */
+.nav-pills .nav-link {
+  font-size: 25px;   /* tamaño botones nav */
+  color: #050733ff !important; 
+  font-weight: bold;
+
+}
+
+/* Contenido principal */
+.bg-light {
+  background-color: #f8f9fa !important;
+  min-height: calc(100vh - 60px);
+  margin-top: 60px;
+  padding: 20px 0;
+}
+
+/* Tarjetas de resumen */
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Tablas */
+.table {
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.table thead {
+  background-color: #2c3e50;
+  color: white;
+}
+
+.table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+/* Botones */
+.btn {
+  border-radius: 5px;
+  padding: 8px 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #3498db;
+  border-color: #3498db;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+  border-color: #2980b9;
+}
+
+/* Badges */
+.badge {
+  padding: 6px 10px;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .offcanvas {
+    width: 250px;
+  }
+  
+  .titulo-header {
+    font-size: 1.2rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+/* Estilos específicos para la tabla de niveles */
+.table-niveles tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.table-niveles tbody tr:hover {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+/* Estilos para los estados */
+.estado-aprobado {
+  color: #27ae60;
+  font-weight: 600;
+}
+
+.estado-proceso {
+  color: #f39c12;
+  font-weight: 600;
+}
+
+.estado-pendiente {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+/* Barra de progreso personalizada */
+.progress {
+  height: 8px;
+  border-radius: 4px;
+  background-color: #ecf0f1;
+}
+
+.progress-bar {
+  background-color: #3498db;
+}
+
+/* Filtros */
+.filtros-container {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Ajustes para el menú desplegable */
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-radius: 8px;
+  padding: 10px 0;
+}
+
+.dropdown-item {
+  padding: 8px 20px;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #2c3e50;
+}
+
+/* Ajustes para el botón de usuario */
+.btn-usuario {
+  color: #2c3e50;
+  font-size: 1.2rem;
+  padding: 5px 10px;
+  margin-left: 10px;
+}
+
+.btn-usuario:hover {
+  color: #3498db;
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+/* Ajustes para el botón de notificaciones */
+.btn-edunotas {
+  color: #2c3e50;
+  font-size: 1.2rem;
+  padding: 5px 10px;
+  margin-left: 10px;
+  position: relative;
+}
+
+.btn-edunotas .badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 0.6rem;
+  padding: 3px 6px;
+  background-color: #e74c3c;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Estilos para el modal */
+.modal-content {
+  border: none;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.modal-header {
+  background-color: #2c3e50;
+  color: white;
+  border-bottom: none;
+  padding: 15px 20px;
+}
+
+.modal-title {
+  font-weight: 600;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+/* Estilos para los tooltips */
+.tooltip-inner {
+  background-color: #2c3e50;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before, 
+.bs-tooltip-top .tooltip-arrow::before {
+  border-top-color: #2c3e50;
+}
+
+/* Personalización del scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #95a5a6;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7f8c8d;
+}

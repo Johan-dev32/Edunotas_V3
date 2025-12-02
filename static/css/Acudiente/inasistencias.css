@@ -117,9 +117,11 @@ table { width: 100%; border-collapse: collapse; margin-top: 20px; }
 th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
 .justify-btn { background-color: #11064e; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; }
 
-/* Estilos para el Modal */
+/* Estilos antiguos de un modal personalizado (YA NO SE USAN)
+   Se comentan para no interferir con el modal de Bootstrap. */
+/*
 .modal {
-    display: none; /* Oculto por defecto */
+    display: none;
     position: fixed;
     z-index: 1; 
     left: 0;
@@ -154,7 +156,6 @@ th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
     cursor: pointer;
 }
 
-/* Estilos de Formulario */
 #justification-form label, #justification-form input, #justification-form select, #justification-form textarea {
     display: block;
     width: 100%;
@@ -168,6 +169,7 @@ th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
     cursor: pointer;
     margin-top: 15px;
 }
+*/
 
 table {
   width: 80%; 

@@ -61,7 +61,7 @@
 
 <!--  MENU  -->
 <section class="bg-light">
-  <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
+ <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title">MENÚ</h5>
   </div>
@@ -73,8 +73,10 @@
           <div class="collapse" id="submenuNotas">
             <ul class="nav flex-column ms-3">
               <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.notas_registro') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Registrar Notas</a></li>    
+              
              <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+
+             <li><a href="{{ url_for('Administrador.configuracion_academica') }}" class="nav-link text-white"><i class="bi bi-check-circle-fill"></i> Aprobación Académica</a></li>
 
 
 
@@ -110,113 +112,290 @@
   </div>
 </section>
 
-  <!-- Capa oscura cuando el menú está abierto -->
-  <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+<div id="overlay" class="overlay" onclick="toggleMenu()"></div>
 
-  <!-- Contenido principal -->
-  <main class="container">
-    </a>
-    <h2 class="fw-bold fs-1">GESTIÓN DE DOCENTES</h2>
+  <main class="container mt-4">
+    <h2 class="fw-bold fs-1 text-center mb-4" style="color: #050733;">GESTIÓN DE DOCENTES</h2>
 
-    <div class="actions">
-      <button class="add"> Agregar Docente</button>
-    </div>
-
-    <div class="search-bar">
-      <input type="text" id="search" placeholder="Buscar docente..." onkeyup="buscarDocente()">
-    </div>
-
-    <table id="tabla-docentes">
-      <thead>
-        <tr>
-          <th>Nombre Completo</th>
-          <th>Tipo Documento</th>
-          <th>N° Documento</th>
-          <th>Correo Institucional</th>
-          <th>Número de Celular</th>
-          <th>Direccion</th>
-          <th>Ciclo</th>
-        </tr>
-      </thead>
-    <tbody>
-  {% for docente in docentes %}
-  <tr>
-    <td>{{ docente.Nombre }} {{ docente.Apellido }}</td>
-    <td>{{ docente.TipoDocumento }}</td>
-    <td>{{ docente.NumeroDocumento }}</td>
-    <td>{{ docente.Correo }}</td>
-    <td>{{ docente.Telefono }}</td>
-    <td>{{ docente.Direccion or 'Sin registrar' }}</td> <!-- profesión -->
-    <td>{{ docente.Calle or 'N/A' }}</td> <!-- ciclo -->
-    <td>
-      <!-- Botón Editar -->
-      <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editarModal{{ docente.ID_Usuario }}">Editar</button>
-
-      <!-- Botón Eliminar -->
-      <form action="{{ url_for('Administrador.eliminar_docente', id=docente.ID_Usuario) }}" method="POST" style="display:inline;">
-        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-      </form>
-    </td>
-  </tr>
-
-  <!-- Modal Editar -->
-  
-  <div class="modal fade" id="editarModal{{ docente.ID_Usuario }}" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content"> <!-- Aquí va modal-content, no en el form -->
-      <form action="{{ url_for('Administrador.actualizar_docente', id=docente.ID_Usuario) }}" method="POST">
-        <div class="modal-header">
-          <h5>Editar Docente</h5>
-        </div>
-        <div class="modal-body">
-          <input type="text" name="Nombre" value="{{ docente.Nombre }}" class="form-control mb-2">
-          <input type="text" name="Apellido" value="{{ docente.Apellido }}" class="form-control mb-2">
-          <input type="text" name="TipoDocumento" value="{{ docente.TipoDocumento }}" class="form-control mb-2">
-          <input type="text" name="NumeroDocumento" value="{{ docente.NumeroDocumento }}" class="form-control mb-2">
-          <input type="email" name="Correo" value="{{ docente.Correo }}" class="form-control mb-2">
-          <input type="text" name="Telefono" value="{{ docente.Telefono }}" class="form-control mb-2">
-          <input type="text" name="Profesion" value="{{ docente.Direccion }}" class="form-control mb-2">
-          <input type="text" name="Ciclo" value="{{ docente.Calle }}" class="form-control mb-2">
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Guardar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-    {% endfor %}
-  </tbody>
-    </table>
-
-    <div class="modal fade" id="agregarModal" tabindex="-1">
-  <div class="modal-dialog">
-    <form action="{{ url_for('Administrador.agregar_docente') }}" method="POST" class="modal-content">
-      <div class="modal-header"><h5>Agregar Docente</h5></div>
-      <div class="modal-body">
-        <input type="text" name="Nombre" placeholder="Nombre" class="form-control mb-2">
-        <input type="text" name="Apellido" placeholder="Apellido" class="form-control mb-2">
-        <input type="text" name="TipoDocumento" placeholder="Tipo Documento" class="form-control mb-2">
-        <input type="text" name="NumeroDocumento" placeholder="Número Documento" class="form-control mb-2">
-        <input type="email" name="Correo" placeholder="Correo Institucional" class="form-control mb-2">
-        <input type="text" name="Telefono" placeholder="Teléfono" class="form-control mb-2">
-        <input type="text" name="Profesion" placeholder="Profesión" class="form-control mb-2">
-        <input type="text" name="Ciclo" placeholder="Ciclo" class="form-control mb-2">
+    <div class="card shadow-lg mb-5">
+      <div class="card-header" style="background-color: #050733; color: white;">
+        <h4 class="mb-0"><i class="bi bi-person-plus me-2"></i>Registrar Nuevo Docente</h4>
       </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-success">Guardar</button>
-      </div>
-    </form>
-  </div>
-</div>
+      <div class="card-body">
+        <form id="formDocente" method="POST" action="{{ url_for('Administrador.agregar_docente') }}" class="needs-validation" novalidate>
+          
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="fw-bold border-bottom pb-2" style="color: #050733;">
+                <i class="bi bi-person-lines-fill me-2"></i>Datos de Identidad
+              </h5>
+            </div>
+          </div>
+          
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Nombres <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control" name="Nombre" required>
+                <div class="invalid-feedback">
+                  Por favor ingrese el nombre del docente.
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Apellidos <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control" name="Apellido" required>
+                <div class="invalid-feedback">
+                  Por favor ingrese los apellidos del docente.
+                </div>
+              </div>
+            </div>
+          </div>
 
-<script>
-  document.querySelector(".add").addEventListener("click", () => {
-    new bootstrap.Modal(document.getElementById("agregarModal")).show();
-  });
-</script>
+          <div class="row g-3 mb-4 border-bottom pb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Tipo de Documento <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                <select class="form-select" name="TipoDocumento" required>
+                  <option value="" selected disabled>Seleccione...</option>
+                  <option value="CC">Cédula de Ciudadanía</option>
+                  <option value="CE">Cédula de Extranjería</option>
+                  <option value="TI">Tarjeta de Identidad</option>
+                  <option value="PAS">Pasaporte</option>
+                </select>
+                <div class="invalid-feedback">
+                  Por favor seleccione el tipo de documento.
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Número de Documento <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-123"></i></span>
+                <input type="text" class="form-control" name="NumeroDocumento" required 
+                  pattern="[0-9]{6,12}" title="Ingrese un número de documento válido">
+                <div class="invalid-feedback">
+                  Por favor ingrese un número de documento válido.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="fw-bold border-bottom pb-2" style="color: #050733;">
+                <i class="bi bi-info-circle-fill me-2"></i>Datos de Contacto y Personales
+              </h5>
+            </div>
+          </div>
+        
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Correo Institucional <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                <input type="email" class="form-control" name="Correo" required 
+                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+                <div class="invalid-feedback">
+                  Por favor ingrese un correo institucional válido.
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Teléfono <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                <input type="tel" class="form-control" name="Telefono" required
+                  pattern="[0-9]{10,15}" title="Ingrese un número de teléfono válido">
+                <div class="invalid-feedback">
+                  Por favor ingrese un número de teléfono válido.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-4 border-bottom pb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Género <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-gender-ambiguous"></i></span>
+                <select class="form-select" name="Genero" required>
+                  <option value="" selected disabled>Seleccione...</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                  <option value="O">Otro</option>
+                </select>
+                <div class="invalid-feedback">
+                  Por favor seleccione el género.
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Dirección</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                <input type="text" class="form-control" name="Direccion">
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="fw-bold border-bottom pb-2" style="color: #050733;">
+                <i class="bi bi-shield-lock-fill me-2"></i>Seguridad y Rol
+              </h5>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Contraseña <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-key"></i></span>
+                <input type="password" id="ContrasenaDocente" name="Contrasena" 
+                  class="form-control" required minlength="8"
+                  pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                  title="Debe contener al menos un número, una letra mayúscula y minúscula, y al menos 8 caracteres">
+                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="ContrasenaDocente">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <div class="invalid-feedback">
+                  La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas y números.
+                </div>
+              </div>
+              <div class="form-text">Mínimo 8 caracteres, con mayúsculas, minúsculas y números.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Confirmar Contraseña <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+                <input type="password" id="ConfirmarContrasenaDocente" name="ConfirmarContrasena" 
+                  class="form-control" required>
+                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="ConfirmarContrasenaDocente">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <div class="invalid-feedback">
+                  Las contraseñas no coinciden.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Curso a Dirigir</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-journal-bookmark"></i></span>
+                <select name="Curso" id="CursoDocente" class="form-select">
+                  <option value="" selected>No asignar como director</option>
+                  {% for curso in cursos %}
+                    {% set curso_tiene_director = curso.DirectorGrupo is not none %}
+                    {% set director_nombre = (curso.director.Nombre|default('') + ' ' + curso.director.Apellido|default(''))|trim if curso.director else '' %}
+                    <option value="{{ curso.ID_Curso }}" 
+                            data-tiene-director="{{ 'true' if curso_tiene_director else 'false' }}"
+                            {% if curso_tiene_director %}data-director-actual="{{ director_nombre }}"{% endif %}>
+                      {{ curso.Grado }}° {{ curso.Grupo }}
+                      {% if curso_tiene_director %}(Director actual: {{ director_nombre }}){% endif %}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6"></div> 
+          </div>
+
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary px-4" style="background-color: #050733; border-color: #050733;">
+              <i class="bi bi-person-plus me-2"></i> Registrar Docente
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </main>
 
-  <script src="/static/js/Administrador/profesores.js"></script>
+  <script>
+    // Validación del formulario
+    (function () {
+      'use strict'
+
+      // Obtener todos los formularios a los que queremos aplicar estilos de validación de Bootstrap
+      var forms = document.querySelectorAll('.needs-validation')
+
+      // Bucle sobre ellos y evitar el envío
+      Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+          form.addEventListener('submit', function (event) {
+            // Validar contraseñas coincidentes
+            const contrasena = document.getElementById('ContrasenaDocente');
+            const confirmarContrasena = document.getElementById('ConfirmarContrasenaDocente');
+            
+            if (contrasena.value !== confirmarContrasena.value) {
+              event.preventDefault();
+              event.stopPropagation();
+              confirmarContrasena.setCustomValidity('Las contraseñas no coinciden');
+              confirmarContrasena.reportValidity();
+            } else {
+              confirmarContrasena.setCustomValidity('');
+            }
+
+            // Validar el formulario
+            if (!form.checkValidity()) {
+              event.preventDefault()
+              event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+          }, false)
+        })
+    })()
+
+    // Función para mostrar/ocultar contraseña
+    document.addEventListener('DOMContentLoaded', function() {
+      // Manejar el clic en los botones de mostrar/ocultar contraseña
+      document.querySelectorAll('.toggle-password').forEach(function(button) {
+        button.addEventListener('click', function() {
+          const targetId = this.getAttribute('data-target');
+          const input = document.getElementById(targetId);
+          const icon = this.querySelector('i');
+          
+          // Cambiar el tipo de input y el ícono
+          if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+          } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+          }
+        });
+      });
+
+      // Mostrar advertencia si se selecciona un curso con director
+      const selectCurso = document.getElementById('CursoDocente');
+      if (selectCurso) {
+        selectCurso.addEventListener('change', function() {
+          const selectedOption = this.options[this.selectedIndex];
+          const tieneDirector = selectedOption.getAttribute('data-tiene-director') === 'true';
+          
+          if (tieneDirector && this.value !== '') {
+            const directorActual = selectedOption.getAttribute('data-director-actual');
+            const confirmar = confirm(`¡Atención! Este curso ya tiene un director asignado: ${directorActual}. ¿Desea reemplazarlo?`);
+            
+            if (!confirmar) {
+              this.value = '';
+            }
+          }
+        });
+      }
+    });
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </body>
 </html>

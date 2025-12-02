@@ -1,3 +1,16 @@
+:root {
+  --bg: #f6f8fb;
+  --card: #ffffff;
+  --accent: #28527a;
+  --muted: #6b7280;
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box
+}
+
+
 body {
   background-color: #f8f9fa; 
   font-family: 'Trebuchet MS', sans-serif;
@@ -25,14 +38,34 @@ header .btn-dark {
 }
 
 .btn-edunotas {
-  background-color: #050733ff;
-  color: #fff;
+
+  color: #050733ff;
 }
 
 .btn-usuario {
-  background-color: #050733ff;
-  color: #fff;
+  background-color: transparent; /* sin recuadro */
+  color: #050733ff;               /* color institucional para el icono */
+  border: none;                    /* sin borde */
+  box-shadow: none;                /* sin sombra */
+  padding: 6px 8px;                /* compacto */
   margin-left: 10px;
+}
+
+.btn-usuario:hover,
+.btn-usuario:focus {
+  background-color: transparent;   /* mantener sin recuadro en hover/focus */
+  color: #050733ff;
+  box-shadow: none;
+}
+
+/* Oculta el caret del dropdown en el botón de usuario */
+.btn-usuario.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Tamaño del icono circular */
+.btn-usuario .bi-person-circle {
+  font-size: 1.6rem;
 }
 
 /* ========== MENU LATERAL ========== */
@@ -80,19 +113,13 @@ header .btn-dark {
   color: #050733ff !important; 
   font-weight: bold;
 }
-
-
-
-/* titulos */
-
 .titulo-principal {
   font-size: 3rem;      
   font-weight: 900;      
   color: #050733ff;    
   margin-left: 50px;  
-  margin-top: 40px;
+  margin-top: 20px;
 }
-
 
 .descripcion {
   font-size: 1.3rem;     

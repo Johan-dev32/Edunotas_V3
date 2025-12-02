@@ -1,11 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, current_app
 from flask_login import login_required, current_user
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import func
-from sqlalchemy import func, and_, or_, extract
-from sqlalchemy import or_, text
+from sqlalchemy import func, and_, or_, extract, text, cast, Integer
 from datetime import datetime
 from Controladores.models import db, Usuario, Matricula, Nota_Calificaciones, Reporte_Notas, Curso, Periodo, Asignatura, Docente_Asignatura, Programacion, Cronograma_Actividades, Observacion, Bloques, Reuniones, Tutorias, Noticias, ResumenSemanal, Citaciones, Acudiente, Notificacion, Estudiantes_Repitentes, Detalle_Asistencia, Asistencia, Encuesta, Encuesta_Pregunta, Encuesta_Respuesta, Historial_Academico
 from flask_mail import Message
@@ -106,6 +103,293 @@ def lista_asignaturas():
         print('Error en /asignaturas/lista:', e)
         return jsonify({"success": False, "error": str(e)}), 500
 
+
+
+@Administrador_bp.route('/aprobacion_academica')
+@login_required
+def aprobacion_academica():
+    try:
+        cursos = Curso.query.filter_by(Estado='Activo').order_by(Curso.Grado, Curso.Grupo).all()
+        return render_template('Administrador/AprobacionAcademica.html', cursos=cursos)
+    except Exception as e:
+        print('Error en aprobacion_academica:', e)
+        return render_template('Administrador/AprobacionAcademica.html', cursos=[])
+
+
+@Administrador_bp.route('/reporte_asistencia')
+@login_required
+def reporte_asistencia():
+    """Vista inicial de reporte de asistencia (administrador).
+
+    Por ahora solo muestra una página base donde luego se podrán agregar
+    filtros por curso, asignatura y periodo, y tablas/resúmenes de
+    asistencia.
+    """
+    return render_template('Administrador/ReporteAsistencia.html')
+
+
+@Administrador_bp.route('/reporte_asistencia/datos', methods=['GET'])
+@login_required
+def reporte_asistencia_datos():
+    """Devuelve un resumen de asistencia por estudiante para un curso.
+
+    Parámetros (querystring):
+      - curso_id (obligatorio)
+      - asignatura_id (opcional)
+      - fecha_inicio, fecha_fin (opcional, YYYY-MM-DD)
+    """
+    try:
+        from datetime import datetime as dt
+
+        curso_id = request.args.get('curso_id', type=int)
+        asignatura_id = request.args.get('asignatura_id', type=int)
+        fecha_inicio_str = request.args.get('fecha_inicio')
+        fecha_fin_str = request.args.get('fecha_fin')
+
+        if not curso_id:
+            return jsonify({"success": False, "error": "Parámetro requerido: curso_id"}), 400
+
+        fecha_inicio = None
+        fecha_fin = None
+        try:
+            if fecha_inicio_str:
+                fecha_inicio = dt.strptime(fecha_inicio_str, '%Y-%m-%d').date()
+            if fecha_fin_str:
+                fecha_fin = dt.strptime(fecha_fin_str, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({"success": False, "error": "Formato de fecha inválido"}), 400
+
+        # 1) Traer todos los estudiantes matriculados en el curso
+        estudiantes = (
+            db.session.query(Usuario.ID_Usuario, Usuario.Nombre, Usuario.Apellido)
+            .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+            .filter(Matricula.ID_Curso == curso_id, Usuario.Rol == 'Estudiante')
+            .order_by(Usuario.Apellido, Usuario.Nombre)
+            .all()
+        )
+
+        # Inicializar resumen con todos los estudiantes (aunque no tengan asistencias)
+        resumen = {
+            est.ID_Usuario: {
+                "id_estudiante": est.ID_Usuario,
+                "nombre_completo": f"{est.Nombre} {est.Apellido}",
+                "presentes": 0,
+                "ausentes_injustificados": 0,
+                "ausentes_justificados": 0,
+                "total_sesiones": 0,
+                "observaciones": []
+            }
+            for est in estudiantes
+        }
+
+        # 2) Consultar registros de asistencia del curso (y filtros)
+        q = (
+            db.session.query(
+                Usuario.ID_Usuario.label('id_estudiante'),
+                Detalle_Asistencia.Estado_Asistencia,
+                Detalle_Asistencia.EstadoExcusa,
+                Detalle_Asistencia.Observaciones,
+                Asistencia.Fecha
+            )
+            .join(Detalle_Asistencia, Detalle_Asistencia.ID_Asistencia == Asistencia.ID_Asistencia)
+            .join(Usuario, Usuario.ID_Usuario == Detalle_Asistencia.ID_Estudiante)
+            .join(Programacion, Programacion.ID_Programacion == Asistencia.ID_Programacion)
+            .filter(Programacion.ID_Curso == curso_id)
+        )
+
+        # Filtrar por asignatura si se solicita (vía Docente_Asignatura)
+        if asignatura_id:
+            q = (
+                q.join(Docente_Asignatura, Docente_Asignatura.ID_Docente_Asignatura == Programacion.ID_Docente_Asignatura)
+                 .filter(Docente_Asignatura.ID_Asignatura == asignatura_id)
+            )
+
+        # Rango de fechas
+        if fecha_inicio:
+            q = q.filter(Asistencia.Fecha >= fecha_inicio)
+        if fecha_fin:
+            q = q.filter(Asistencia.Fecha <= fecha_fin)
+
+        registros = q.all()
+
+        # 3) Acumular sobre el resumen (solo afectará a quienes tengan registros)
+        for row in registros:
+            rid = row.id_estudiante
+            if rid not in resumen:
+                # Por seguridad, crear entrada si el estudiante no estaba en Matricula
+                resumen[rid] = {
+                    "id_estudiante": rid,
+                    "nombre_completo": "",
+                    "presentes": 0,
+                    "ausentes_injustificados": 0,
+                    "ausentes_justificados": 0,
+                    "total_sesiones": 0,
+                    "observaciones": []
+                }
+
+            r = resumen[rid]
+            r["total_sesiones"] += 1
+
+            estado = (row.Estado_Asistencia or '').strip()
+            estado_excusa = (row.EstadoExcusa or '').strip() if row.EstadoExcusa is not None else None
+
+            if estado == 'Presente':
+                r["presentes"] += 1
+            elif estado == 'Justificado':
+                r["ausentes_justificados"] += 1
+            elif estado == 'Ausente':
+                # Si hay excusa aceptada, contar como justificada
+                if estado_excusa == 'aceptada':
+                    r["ausentes_justificados"] += 1
+                else:
+                    r["ausentes_injustificados"] += 1
+
+            if row.Observaciones:
+                r["observaciones"].append(row.Observaciones)
+
+        # 4) Construir salida ordenada por nombre
+        salida = []
+        for rid, r in resumen.items():
+            salida.append({
+                "id_estudiante": rid,
+                "nombre_completo": r["nombre_completo"],
+                "presentes": r["presentes"],
+                "ausentes_injustificados": r["ausentes_injustificados"],
+                "ausentes_justificados": r["ausentes_justificados"],
+                "total_sesiones": r["total_sesiones"],
+                "observaciones": " | ".join(r["observaciones"])
+            })
+
+        return jsonify({"success": True, "registros": salida})
+    except Exception as e:
+        print('Error en /reporte_asistencia/datos:', e)
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@Administrador_bp.route('/aprobacion_academica/datos', methods=['GET'])
+def aprobacion_academica_datos():
+    try:
+        curso_id = request.args.get('curso_id', type=int)
+        asignatura_id = request.args.get('asignatura_id', type=int)
+        periodo = request.args.get('periodo', type=int)
+
+        if not curso_id or not asignatura_id or not periodo:
+            return jsonify({"success": False, "error": "Parámetros requeridos: curso_id, asignatura_id, periodo"}), 400
+
+        estudiantes_q = (
+            db.session.query(Usuario, Matricula)
+            .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+            .filter(Matricula.ID_Curso == curso_id, Usuario.Rol == 'Estudiante')
+            .order_by(Usuario.Apellido, Usuario.Nombre)
+        )
+        estudiantes = estudiantes_q.all()
+
+        notas_db = Nota_Calificaciones.query.filter_by(
+            ID_Asignatura=asignatura_id,
+            Periodo=periodo
+        ).all()
+        notas_por_est = {n.ID_Estudiante: n for n in notas_db}
+
+        docente_nombre = None
+        try:
+            da = Docente_Asignatura.query.filter_by(ID_Asignatura=asignatura_id, ID_Curso=curso_id).first()
+            if da and da.docente:
+                docente_nombre = f"{da.docente.Nombre} {da.docente.Apellido}"
+        except Exception:
+            docente_nombre = None
+
+        curso = Curso.query.filter_by(ID_Curso=curso_id).first()
+        anio = curso.Anio if curso else ''
+        periodo_texto = None
+        if anio and periodo:
+            periodo_texto = f"{anio} - P{periodo}"
+
+        registros = []
+        for usuario, matricula in estudiantes:
+            reg = notas_por_est.get(usuario.ID_Usuario)
+            nota_final = getattr(reg, 'Promedio_Final', None) if reg else None
+            try:
+                nota_float = float(nota_final) if nota_final is not None else None
+            except (TypeError, ValueError):
+                nota_float = None
+
+            registros.append({
+                "id_estudiante": usuario.ID_Usuario,
+                "numero_documento": usuario.NumeroDocumento,
+                "nombre_completo": f"{usuario.Nombre} {usuario.Apellido}",
+                "nota_final": nota_float,
+                "docente": docente_nombre,
+                "periodo_academico": periodo_texto,
+                "nombre_curso": f"{curso.Grado}{curso.Grupo}" if curso else ''
+            })
+
+        return jsonify({"success": True, "registros": registros})
+    except Exception as e:
+        print('Error en /aprobacion_academica/datos:', e)
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@Administrador_bp.route('/aprobacion_academica/observacion', methods=['POST'])
+@login_required
+def aprobacion_academica_observacion():
+    try:
+        data = request.get_json() or {}
+
+        # Extraer datos desde el JSON enviado por la vista
+        id_est = data.get('id_estudiante')
+        id_curso = data.get('id_curso')
+        id_asig = data.get('id_asignatura')
+        periodo = data.get('periodo')
+        texto = data.get('texto')
+
+        # Convertir a enteros cuando sea posible
+        try:
+            id_est = int(id_est) if id_est is not None else None
+        except (TypeError, ValueError):
+            id_est = None
+
+        try:
+            id_curso = int(id_curso) if id_curso not in (None, "") else None
+        except (TypeError, ValueError):
+            id_curso = None
+
+        try:
+            id_asig = int(id_asig) if id_asig not in (None, "") else None
+        except (TypeError, ValueError):
+            id_asig = None
+
+        try:
+            periodo = int(periodo) if periodo not in (None, "") else None
+        except (TypeError, ValueError):
+            periodo = None
+
+        if not id_est or not texto:
+            return jsonify({"success": False, "error": "Faltan datos requeridos"}), 400
+
+        matricula = Matricula.query.filter_by(ID_Estudiante=id_est, ID_Curso=id_curso).first() if id_curso else None
+
+        # Nota: en algunas bases existentes la columna Estado de Observacion
+        # puede estar definida como enum('Activo','Inactivo'). Para evitar
+        # errores de truncamiento, usamos 'Activo' como valor por defecto.
+        obs = Observacion(
+            Fecha=datetime.utcnow().date(),
+            Descripcion=texto,
+            Tipo='Academica',
+            NivelImportancia='Medio',
+            Estado='Activo',
+            ID_Matricula=matricula.ID_Matricula if matricula else None,
+            ID_Estudiante=id_est
+        )
+        db.session.add(obs)
+        db.session.commit()
+
+        return jsonify({"success": True})
+    except Exception as e:
+        db.session.rollback()
+        print('Error en /aprobacion_academica/observacion:', e)
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 @Administrador_bp.route('/notas', methods=['GET'])
 def consultar_notas():
     try:
@@ -205,25 +489,52 @@ def consultar_notas():
 @Administrador_bp.route('/profesores')
 @login_required
 def profesores():
-    docentes = Usuario.query.filter_by(Rol='Docente').all()
-    return render_template('Administrador/Profesores.html', docentes=docentes)
+    # Carga la lista de Cursos para el formulario de Director de Grupo.
+    try:
+        cursos = Curso.query.all()
+    except Exception:
+        cursos = []
+        
+    return render_template(
+        'Administrador/Profesores.html', 
+        cursos=cursos 
+    )
 
-
+# ----------------------------------------------------------------------
 @Administrador_bp.route('/agregar_docente', methods=['POST'])
 @login_required
 def agregar_docente():
+    # Función auxiliar para manejar campos opcionales que pueden venir como "" (cadena vacía)
+    def clean_form_value(key):
+        value = request.form.get(key)
+        return value if value and str(value).strip() else None
+
     try:
+        # --- 1. Obtención de Datos del Formulario ---
+        # (Todos los campos de tu modelo que vienen del HTML)
         nombre = request.form['Nombre']
         apellido = request.form['Apellido']
         correo = request.form['Correo']
+        contrasena = request.form['Contrasena']
+        tipo_doc = request.form['TipoDocumento'] 
         numero_doc = request.form['NumeroDocumento']
         telefono = request.form['Telefono']
-        tipo_doc = request.form['TipoDocumento']
-        profesion = request.form['Profesion']
-        ciclo = request.form['Ciclo']
+        genero = request.form['Genero']
+        direccion = clean_form_value('Direccion')   
+        
+        # Validación: Contraseñas
+        if contrasena != request.form['ConfirmarContrasena']:
+            flash("❌ Las contraseñas no coinciden.", "danger")
+            return redirect(url_for('Administrador.profesores'))
 
-        # contraseña por defecto
-        hashed_password = generate_password_hash("123456")
+        # Validación: Unicidad (Correo y Documento)
+        if Usuario.query.filter_by(Correo=correo).first() or \
+           Usuario.query.filter_by(NumeroDocumento=numero_doc).first():
+            flash("❌ Ya existe un usuario con este correo o documento.", "danger")
+            return redirect(url_for('Administrador.profesores'))
+        
+        # --- 2. Creación del Objeto Usuario (SOLO con campos de su modelo) ---
+        hashed_password = generate_password_hash(contrasena)
 
         nuevo_docente = Usuario(
             Nombre=nombre,
@@ -232,88 +543,27 @@ def agregar_docente():
             Contrasena=hashed_password,
             TipoDocumento=tipo_doc,
             NumeroDocumento=numero_doc,
+            Direccion=direccion, 
             Telefono=telefono,
-            Rol='Docente',
+            Genero=genero,
+            Rol='Docente', 
             Estado='Activo',
-            Direccion=profesion,
-            Genero="Otro"
         )
 
-        
-        nuevo_docente.Calle = ciclo
-
         db.session.add(nuevo_docente)
+        
+        # ELIMINADA toda la lógica de DirectorGrupo
+                
         db.session.commit()
+        
         flash("✅ Docente agregado correctamente", "success")
 
-        # Notificaciones automáticas: bienvenida al docente y aviso a administradores
-        try:
-            notis = []
-            notis.append(Notificacion(
-                Titulo='Bienvenido a EduNotas',
-                Mensaje=f"Hola {nuevo_docente.Nombre}, tu cuenta de {nuevo_docente.Rol} fue creada con éxito.",
-                Enlace=None,
-                ID_Usuario=nuevo_docente.ID_Usuario
-            ))
-            admins = Usuario.query.filter_by(Rol='Administrador', Estado='Activo').all()
-            for adm in admins:
-                notis.append(Notificacion(
-                    Titulo='Nuevo registro de usuario',
-                    Mensaje=f"Se registró un {nuevo_docente.Rol}: {nuevo_docente.Nombre} {nuevo_docente.Apellido} ({nuevo_docente.Correo}).",
-                    Enlace=None,
-                    ID_Usuario=adm.ID_Usuario
-                ))
-            if notis:
-                db.session.bulk_save_objects(notis)
-                db.session.commit()
-        except Exception:
-            db.session.rollback()
-
-    except SQLAlchemyError as e:
+    except Exception as e:
         db.session.rollback()
+        # Si el error persiste (por ejemplo, 'Rol' no existe), aparecerá aquí.
+        print(f"*** ERROR DE REGISTRO DOCENTE: {str(e)}") 
         flash(f"❌ Error al agregar docente: {str(e)}", "danger")
-
-    return redirect(url_for('Administrador.profesores'))
-
-
-@Administrador_bp.route('/actualizar_docente/<int:id>', methods=['POST'])
-@login_required
-def actualizar_docente(id):
-    docente = Usuario.query.get_or_404(id)
-
-    try:
-        docente.Nombre = request.form['Nombre']
-        docente.Apellido = request.form['Apellido']
-        docente.TipoDocumento = request.form['TipoDocumento']
-        docente.NumeroDocumento = request.form['NumeroDocumento']
-        docente.Correo = request.form['Correo']
-        docente.Telefono = request.form['Telefono']
-        docente.Direccion = request.form['Profesion']  # profesión
-        docente.Calle = request.form['Ciclo']          # ciclo
-
-        db.session.commit()
-        flash("✅ Docente actualizado correctamente.", "success")
-
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        flash(f"❌ Error al actualizar docente: {str(e)}", "danger")
-
-    return redirect(url_for('Administrador.profesores'))
-
-
-@Administrador_bp.route('/eliminar_docente/<int:id>', methods=['POST'])
-@login_required
-def eliminar_docente(id):
-    docente = Usuario.query.get_or_404(id)
-
-    try:
-        db.session.delete(docente)
-        db.session.commit()
-        flash("🗑️ Docente eliminado correctamente", "danger")
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        flash(f"❌ Error al eliminar docente: {str(e)}", "danger")
-
+        
     return redirect(url_for('Administrador.profesores'))
 
 
@@ -1221,12 +1471,21 @@ def guardar_asignatura():
     descripcion = request.form.get('descripcion')
     ciclo = request.form.get('ciclo')
     id_docente = request.form.get('id_docente')
+    id_curso = request.form.get('id_curso')
+    
+    print("=== DATOS RECIBIDOS ===")
+    print(f"Nombre: {nombre}")
+    print(f"Descripción: {descripcion}")
+    print(f"Ciclo: {ciclo}")
+    print(f"ID Docente: {id_docente}")
+    print("=======================")
 
-    if not all([nombre, id_docente]):
+    if not all([nombre, id_docente, id_curso]):
         return jsonify({"error": "Faltan datos obligatorios"}), 400
 
     try:
         id_docente = int(id_docente)
+        id_curso = int(id_curso)
         docente = Usuario.query.get(id_docente)
         if not docente:
             return jsonify({"error": "Docente no encontrado"}), 404
@@ -1246,7 +1505,7 @@ def guardar_asignatura():
             Estado="Activa"
         )
 
-        relacion = Docente_Asignatura(docente=docente, asignatura=asignatura)
+        relacion = Docente_Asignatura(docente=docente, asignatura=asignatura, ID_Curso=id_curso)
         db.session.add(asignatura)
         db.session.add(relacion)
         db.session.commit()
@@ -1339,6 +1598,7 @@ def crear_asignatura():
     area = data.get('area', '')
     codigo = data.get('codigo')
     id_docente = data.get('id_docente')
+    id_curso = data.get('id_curso')
 
     # Crear la asignatura
     nueva = Asignatura(
@@ -1353,10 +1613,11 @@ def crear_asignatura():
     db.session.flush()  # Para obtener ID antes del commit
 
     # Crear relación docente-asignatura
-    if id_docente:
+    if id_docente and id_curso:
         relacion = Docente_Asignatura(
             ID_Docente=id_docente,
-            ID_Asignatura=nueva.ID_Asignatura
+            ID_Asignatura=nueva.ID_Asignatura,
+            ID_Curso=id_curso
         )
         db.session.add(relacion)
 
@@ -1519,17 +1780,44 @@ def guardar_horario(curso_id):
                 print(f"No se encontró asignación para {b.get('materia')} - {b.get('docente')} (curso {curso_id})")
                 continue
 
-            # validar ID_Bloque: si viene, comprobar que exista en la tabla Bloques
+            # Manejar ID_Bloque: si no viene, intentar determinarlo por la hora
             id_bloque = b.get('id_bloque') or b.get('ID_Bloque')
             id_bloque_valid = None
+            
+            # Si no hay ID de bloque, intentar determinarlo por la hora
+            if not id_bloque and hora_str:
+                try:
+                    # Mapa de horas a IDs de bloque
+                    hora_a_bloque = {
+                        "06:45": 1,
+                        "07:30": 2,
+                        "08:30": 3,
+                        "09:50": 4,
+                        "10:40": 5,
+                        "11:30": 6,
+                        "13:30": 7,
+                        "14:20": 8
+                    }
+                    # Buscar la hora más cercana
+                    for h, bloque_id in hora_a_bloque.items():
+                        if h.startswith(hora_str[:2]):  # Comparar solo la hora
+                            id_bloque = bloque_id
+                            break
+                except Exception as e:
+                    print(f"Error determinando ID_Bloque: {e}")
+            
+            # Si se encontró un ID de bloque, validarlo
             if id_bloque:
                 try:
-                    # intenta convertir y buscar
                     id_b = int(id_bloque)
+                    # Verificar si existe en la tabla Bloques
                     bloque_obj = Bloques.query.get(id_b)
                     if bloque_obj:
                         id_bloque_valid = id_b
-                except Exception:
+                    else:
+                        print(f"ID_Bloque {id_b} no encontrado en la tabla Bloques")
+                except (ValueError, TypeError) as e:
+                    print(f"ID_Bloque inválido: {id_bloque}")
                     id_bloque_valid = None
 
             # crear programacion
@@ -1616,19 +1904,46 @@ def api_bloques_db(id_curso):
         }
         return mapa.get(hora, None)
 
-    programaciones = Programacion.query.filter_by(ID_Curso=id_curso).all()
+    programaciones = db.session.query(
+        Programacion,
+        Asignatura.Nombre.label('nombre_asignatura'),
+        Usuario.Nombre.label('nombre_docente'),
+        Bloques.ID_Bloque
+    ).join(
+        Docente_Asignatura, 
+        Programacion.ID_Docente_Asignatura == Docente_Asignatura.ID_Docente_Asignatura
+    ).join(
+        Asignatura,
+        Docente_Asignatura.ID_Asignatura == Asignatura.ID_Asignatura
+    ).join(
+        Usuario,
+        Docente_Asignatura.ID_Docente == Usuario.ID_Usuario
+    ).outerjoin(
+        Bloques,
+        Programacion.ID_Bloque == Bloques.ID_Bloque
+    ).filter(
+        Programacion.ID_Curso == id_curso
+    ).all()
+
     data = []
-
-    for p in programaciones:
+    for p, materia, docente, id_bloque in programaciones:
         inicio = p.HoraInicio.strftime('%H:%M') if p.HoraInicio else None
-
-        data.append({
+        
+        bloque_data = {
             "id": p.ID_Programacion,
-            "materia": p.docente_asignatura.asignatura.Nombre,
-            "docente": p.docente_asignatura.docente.Nombre,
+            "id_bloque": id_bloque,
+            "materia": materia,
+            "docente": docente,
             "dia": dia_to_short(p.Dia),
-            "hora": hora_to_bloque(inicio),
-        })
+            "hora_inicio": inicio,
+            "hora_fin": p.HoraFin.strftime('%H:%M') if p.HoraFin else None
+        }
+        
+        # Añadir ID de bloque basado en la hora si no hay ID_Bloque
+        if not bloque_data["id_bloque"] and inicio:
+            bloque_data["id_bloque"] = hora_to_bloque(inicio)
+            
+        data.append(bloque_data)
 
     return jsonify(data), 200
 
@@ -2047,6 +2362,17 @@ def configuracion_academica2():
 def configuracion_academica3():
     return render_template('Administrador/ConfiguracionAcademica3.html')
 
+@Administrador_bp.route('/niveles-superacion')
+@Administrador_bp.route('/niveles-superacion/<int:curso_id>')
+@login_required
+def niveles_superacion(curso_id=None):
+    # Si no se proporciona curso_id, redirigir a la página de selección de curso
+    if curso_id is None:
+        # Aquí deberías obtener la lista de cursos disponibles
+        # Por ahora, redirigimos al inicio
+        return redirect(url_for('Administrador.paginainicio'))
+    # Lógica para obtener los datos del curso y estudiantes
+    return render_template('Administrador/niveles_superacion.html', curso_id=curso_id)
 
 @Administrador_bp.route('/repitentes')
 def repitentes():
@@ -2236,26 +2562,31 @@ def api_historial_academico_notas(id_historial):
         curso = Curso.query.get(matricula.ID_Curso)
         
         # --- 3. Búsqueda de Notas (Solo Nota_Calificaciones) ---
-        
-        # Realiza un JOIN entre Nota_Calificaciones y Asignatura para obtener el nombre.
-        # CRUCIAL: Se corrigió la referencia a Notas_Calificaciones a Nota_Calificaciones.
-        notas_query = db.session.query(Nota_Calificaciones, Asignatura)\
-                            .join(Asignatura)\
-                            .filter(Nota_Calificaciones.ID_Historial == id_historial)\
-                            .all()
-        
+
+        # JOIN entre Nota_Calificaciones y Asignatura para obtener el nombre de la materia.
+        # Se usan los campos reales definidos en el modelo Nota_Calificaciones
+        # (ID_Calificacion, Nota_1..Nota_4, Promedio_Final).
+        notas_query = (
+            db.session.query(Nota_Calificaciones, Asignatura)
+            .join(Asignatura)
+            .filter(Nota_Calificaciones.ID_Historial == id_historial)
+            .all()
+        )
+
         notas_data = []
         for nota_obj, asignatura_obj in notas_query:
             notas_data.append({
-                "ID_Nota": nota_obj.ID_Nota,
-                "Materia": asignatura_obj.Nombre, 
-                "N1": f"{nota_obj.N1:.1f}" if nota_obj.N1 is not None else "N/A", # Formato con un decimal
-                "N2": f"{nota_obj.N2:.1f}" if nota_obj.N2 is not None else "N/A",
-                "N3": f"{nota_obj.N3:.1f}" if nota_obj.N3 is not None else "N/A",
-                "N4": f"{nota_obj.N4:.1f}" if nota_obj.N4 is not None else "N/A",
-                # Asumo que estos campos están en tu tabla Nota_Calificaciones
-                "PromedioCortes": f"{nota_obj.PromedioCortes:.1f}" if nota_obj.PromedioCortes is not None else "N/A",
-                "NotaFinal": f"{nota_obj.NotaFinal:.1f}" if nota_obj.NotaFinal is not None else "N/A",
+                # ID interno de la calificación
+                "ID_Nota": nota_obj.ID_Calificacion,
+                "Materia": asignatura_obj.Nombre,
+                # Nombres de claves alineados con el JS HistorialAcademico3.js
+                "Nota1": nota_obj.Nota_1 if nota_obj.Nota_1 is not None else 0.0,
+                "Nota2": nota_obj.Nota_2 if nota_obj.Nota_2 is not None else 0.0,
+                "Nota3": nota_obj.Nota_3 if nota_obj.Nota_3 is not None else 0.0,
+                "Nota4": nota_obj.Nota_4 if nota_obj.Nota_4 is not None else 0.0,
+                # Promedio final del historial (puedes ajustarlo si tienes otra lógica)
+                "Promedio": nota_obj.Promedio_Final if nota_obj.Promedio_Final is not None else 0.0,
+                "NotaFinal": nota_obj.Promedio_Final if nota_obj.Promedio_Final is not None else 0.0,
             })
 
         # --- 4. Búsqueda de Recuperaciones (ELIMINADO y reemplazado con lista vacía) ---
@@ -2265,7 +2596,8 @@ def api_historial_academico_notas(id_historial):
         # --- 5. Construcción de la Respuesta Final ---
         response_data = {
             "EstudianteNombre": f"{estudiante.Nombre} {estudiante.Apellido}" if estudiante else "Estudiante Desconocido",
-            "Curso": f"{curso.Grado}-{curso.Nombre}" if curso else "Curso Desconocido",
+            # En el modelo Curso los campos son Grado y Grupo (no Nombre)
+            "Curso": f"{curso.Grado}-{curso.Grupo}" if curso else "Curso Desconocido",
             "Anio": historial.Anio,
             "Periodo": historial.Periodo,
             "Notas": notas_data,
@@ -2296,7 +2628,7 @@ def registrotutorias2():
 
 
 @Administrador_bp.route('/gestion_cursos', methods=['GET', 'POST']) 
-def gestion_cursos(): # <--- NOMBRE DE LA FUNCIÓN CAMBIADO
+def gestion_cursos():
     if request.method == 'POST':
         grado = request.form['Grado']
         grupo = request.form['Grupo']
@@ -2322,11 +2654,11 @@ def gestion_cursos(): # <--- NOMBRE DE LA FUNCIÓN CAMBIADO
         # Redirige a la nueva función
         return redirect(url_for('Administrador.gestion_cursos')) 
 
-    # Para GET (mostrar cursos)
+    # Para GET (mostrar gestión de cursos)
     cursos = Curso.query.all()
-    usuarios = Usuario.query.all()
-    # Tu template Cursos2.html (la tabla con el formulario) deberá ser llamado aquí.
-    return render_template('Administrador/ver_estudiante_curso.html', cursos=cursos, usuarios=usuarios)
+    directores = Usuario.query.filter_by(Rol='Docente').all()
+    # Mostrar la vista general de cursos existente
+    return render_template('Administrador/Cursos.html', cursos=cursos, directores=directores)
 
 @Administrador_bp.route('/cursos/<int:curso_id>/estudiantes') 
 def _estudiantes_curso(curso_id):

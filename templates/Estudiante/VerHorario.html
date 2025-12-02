@@ -17,28 +17,42 @@
     <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
       <i class="bi bi-list"></i>
     </button>
-    <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
-
-    <div class="dropdown ms-auto">
-      <button class="btn btn-edunotas position-relative dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-        <span class="bi bi-envelope-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-        <li><a class="dropdown-item" href="#">Ajustes</a></li>
-        <li><a class="dropdown-item" href="#">Opción 2</a></li>
-        <li><a class="dropdown-item" href="#">Opción 3</a></li>
-      </ul>
-    </div>
+    <h2 class="titulo-header mx-3 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
     <div class="dropdown">
-      <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
-        <span class="bi bi-person-lines-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-      </ul>
+  <button
+    class="position-relative"
+    type="button"
+    id="dropdownMenuButton"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    style="border: none; background: transparent; padding: 0;"
+  >
+    <i class="bi bi-bell-fill" style="font-size: 1.25rem; margin-left:880px;"></i>
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          id="contadorMensajes" style="display:none">0</span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
+    <li class="text-center text-muted small">Últimas notificaciones</li>
+    <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+      <p class="text-center small text-secondary mb-0">Sin notificaciones recientes</p>
     </div>
+  </ul>
+</div>
+
+<script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
+
+          <div class="dropdown">
+    <button class="btn btn-usuario" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-person-circle"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu" id="dropdownSTUDENT">
+        <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('Estudiante.manual') }}">Manual de Usuario</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="{{ url_for('login') }}">Cerrar sesión</a></li>
+    </ul>
+</div>
   </header>
 
 <!--  MENU  -->
@@ -69,33 +83,48 @@
   </div>
 </section>
 
-<main class="container">
-<h2 class="section-title">Mi horario académico</h2>
-<p class="info-text">Consulta tus clases de lunes a viernes. Esta vista es solo de lectura, cualquier cambio será gestionado por el administrador.</p>
+<main class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="titulo-principal mb-2">MI HORARIO ACADÉMICO</h1>
+            <p class="text-muted mb-0" id="tituloCurso">Cargando información del curso...</p>
+        </div>
+    </div>
 
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        Consulta tus clases de lunes a viernes. Esta vista es de solo lectura. Cualquier cambio debe ser gestionado por el administrador.
+    </div>
 
-<section id="horario" class="schedule">
-<div class="table-wrapper">
-<table id="scheduleTable" class="schedule-table">
-<thead>
-<tr>
-<th>Hora</th>
-<th>Lunes</th>
-<th>Martes</th>
-<th>Miércoles</th>
-<th>Jueves</th>
-<th>Viernes</th>
-</tr>
-</thead>
-<tbody id="scheduleBody"></tbody>
-</table>
-</div>
-</section>
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table id="scheduleTable" class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-center" style="width: 12%;">Hora</th>
+                            <th class="text-center">Lunes</th>
+                            <th class="text-center">Martes</th>
+                            <th class="text-center">Miércoles</th>
+                            <th class="text-center">Jueves</th>
+                            <th class="text-center">Viernes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleBody">
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                                <p class="mt-2 mb-0">Cargando horario...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </main>
-
-<script>
-  const curso_id = {{ curso.ID_Curso }};
-</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- JavaScript externo -->

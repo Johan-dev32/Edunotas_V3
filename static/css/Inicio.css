@@ -64,6 +64,7 @@ header .btn-outline-primary {
     margin-left: 820px;
 
 }
+
 .btn-usuario {
   background-color: transparent; /* sin recuadro */
   color: #050733ff;               /* color institucional para el icono */
@@ -470,4 +471,151 @@ margin-left: 900px;
 /* Responsivo */
 @media (max-width: 576px) {
   .news-hero { min-height: 180px; }
+}
+
+/* Animación del mensaje de bienvenida */
+#nombreUsuario {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: all 4s ease;
+}
+
+#nombreUsuario.subir {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+#nombreUsuario.bajar {
+  opacity: 0 !important;
+  transform: translateY(20px) !important;
+  transition: all 0.8s ease-in-out !important;
+}
+
+/* Animación del título del colegio */
+.titulo-header {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: all 4s ease;
+}
+
+.titulo-header.subir {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+/* Animación de los iconos de usuario y notificaciones */
+.icono-header {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: all 4s ease;
+}
+
+.icono-header.subir {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+/* Animación para el icono de persona */
+.icono-person {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: all 4s ease;
+}
+
+.icono-person.subir {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+/* Asegurar que el botón de usuario mantenga su estilo original */
+.icono-header .btn-usuario {
+  background-color: transparent !important; /* sin recuadro */
+  color: #050733ff !important;               /* color institucional para el icono */
+  border: none !important;                    /* sin borde */
+  box-shadow: none !important;                /* sin sombra */
+  padding: 6px 8px !important;                /* compacto */
+}
+
+.icono-header .btn-usuario:hover,
+.icono-header .btn-usuario:focus {
+  background-color: transparent !important;   /* mantener sin recuadro en hover/focus */
+  color: #050733ff !important;
+  box-shadow: none !important;
+}
+
+/* Oculta el caret del dropdown en el botón de usuario */
+.icono-header .btn-usuario.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Tamaño del icono circular */
+.icono-header .btn-usuario .bi-person-circle {
+  font-size: 1.6rem !important;
+}
+
+/* Animación del botón de menú hamburguesa */
+.btn-menu {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: all 4s ease;
+}
+
+.btn-menu.subir {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+.btn-usuario {
+  background-color: transparent; /* sin recuadro */
+  color: #050733ff;               /* color institucional para el icono */
+  border: none;                    /* sin borde */
+  box-shadow: none;                /* sin sombra */
+  padding: 6px 8px;                /* compacto */
+  margin-left: 10px;
+}
+
+.btn-usuario:hover,
+.btn-usuario:focus {
+  background-color: transparent;   /* mantener sin recuadro en hover/focus */
+  color: #050733ff;
+  box-shadow: none;
+}
+
+/* Oculta el caret del dropdown en el botón de usuario */
+.btn-usuario.dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Tamaño del icono circular */
+.btn-usuario .bi-person-circle {
+  font-size: 1.6rem;
+}
+
+/* Asegurar que el contenedor padre también tenga z-index alto */
+.position-relative.icono-header {
+  z-index: 9998 !important;
+  position: relative !important;
+}
+
+/* Animación para títulos de secciones */
+.section-title {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 4s ease;
+}
+
+.section-title.aparecer {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.section-title2 {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 4s ease 0.3s; /* Delay de 0.3s */
+}
+
+.section-title2.aparecer {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
 }

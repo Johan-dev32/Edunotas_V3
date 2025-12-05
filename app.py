@@ -122,7 +122,25 @@ def index():
 @app.route('/indexadministrador')
 @login_required
 def indexadministrador():
-    return render_template("Administrador/Paginainicio_Administrador.html", usuario=current_user)
+    # Obtener el primer nombre y primer apellido del usuario
+    if current_user and current_user.is_authenticated:
+        print(f"Usuario autenticado en indexadministrador: {current_user}")
+        print(f"Nombre: {current_user.Nombre}")
+        print(f"Apellido: {current_user.Apellido}")
+        
+        nombre_completo = current_user.Nombre.split() if current_user.Nombre else []
+        apellido_completo = current_user.Apellido.split() if current_user.Apellido else []
+        
+        primer_nombre = nombre_completo[0] if nombre_completo else ""
+        primer_apellido = apellido_completo[0] if apellido_completo else ""
+        
+        nombre_usuario = f"{primer_nombre} {primer_apellido}"
+        print(f"Nombre usuario generado en indexadministrador: {nombre_usuario}")
+    else:
+        nombre_usuario = ""
+        print("Usuario no autenticado en indexadministrador")
+    
+    return render_template("Administrador/Paginainicio_Administrador.html", nombre_usuario=nombre_usuario)
 
 @app.route('/indexestudiante')
 @login_required
@@ -132,7 +150,20 @@ def indexestudiante():
 @app.route('/indexdocente')
 @login_required
 def indexdocente():
-    return render_template("Docentes/Paginainicio_Docentes.html", usuario=current_user)
+    if current_user.is_authenticated:
+        nombre_completo = current_user.Nombre.split() if current_user.Nombre else []
+        apellido_completo = current_user.Apellido.split() if current_user.Apellido else []
+        
+        primer_nombre = nombre_completo[0] if nombre_completo else ""
+        primer_apellido = apellido_completo[0] if apellido_completo else ""
+        
+        nombre_usuario = f"{primer_nombre} {primer_apellido}"
+        print(f"Nombre usuario generado en indexdocente: {nombre_usuario}")
+    else:
+        nombre_usuario = ""
+        print("Usuario no autenticado en indexdocente")
+    
+    return render_template("Docentes/Paginainicio_Docentes.html", usuario=current_user, nombre_usuario=nombre_usuario)
 
 @app.route('/indexacudiente')
 @login_required

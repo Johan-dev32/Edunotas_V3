@@ -10,6 +10,19 @@
 
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRÍA</h2>
 
+<script>
+// Animar título del colegio
+document.addEventListener('DOMContentLoaded', function() {
+    const tituloColegio = document.querySelector('.titulo-header');
+    if (tituloColegio) {
+        setTimeout(() => {
+            tituloColegio.classList.add('subir');
+            console.log("Clase 'subir' agregada al título del acudiente:", tituloColegio.className);
+        }, 100);
+    }
+});
+</script>
+
    
 
     <!-- Notificaciones (campana) -->
@@ -100,16 +113,6 @@
         </div>
 
         <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-          <a href="{{ url_for('Acudiente.informes_academicos') }}" class="menu-card text-decoration-none">
-            <div class="card shadow-sm text-center">
-              <div class="card-body">
-                <i class="bi bi-folder2-open menu-icon"></i>
-                <p class="card-text menu-text">Informe de Tareas</p>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
           <a href="{{ url_for('Acudiente.comunicados') }}" class="menu-card text-decoration-none">
             <div class="card shadow-sm text-center">
               <div class="card-body">
@@ -131,16 +134,6 @@
         </a>
       </div>
 
-      <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-        <a href="{{ url_for('Acudiente.horarios') }}" class="menu-card text-decoration-none">
-          <div class="card shadow-sm text-center">
-            <div class="card-body">
-              <i class="bi bi-calendar4-week menu-icon"></i>
-              <p class="card-text menu-text">Horarios</p>
-            </div>
-          </div>
-        </a>
-      </div>
 
       <div class="col-6 col-sm-4 col-md-3 col-lg-2">
         <a href="{{ url_for('Acudiente.circulares') }}" class="menu-card text-decoration-none">

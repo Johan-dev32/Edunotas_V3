@@ -168,6 +168,7 @@ def login():
         session['nombre_usuario'] = usuario.Nombre
         session['genero_usuario'] = usuario.Genero
 
+
         if rol == 'Administrador':
             return redirect(url_for('loading', destino='indexadministrador'))
         elif rol == 'Docente':

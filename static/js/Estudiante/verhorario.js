@@ -67,37 +67,59 @@ function renderizarHorario(horario) {
     
     DIAS.forEach(dia => {
       const td = document.createElement('td');
-      const clasesDia = horario[dia] || [];
+      const clasesDia = horario.horario[dia] || [];
       
+      // Buscar si hay alguna clase que coincida con esta franja horaria
       const clase = clasesDia.find(c => {
-        return c.hora_inicio === franja.inicio || 
-               (c.hora_inicio <= franja.inicio && c.hora_fin > franja.inicio);
+        const inicioClase = c.hora_inicio;
+        const finClase = c.hora_fin;
+        
+        // Verificar si la franja actual está dentro del horario de la clase
+        return (franja.inicio >= inicioClase && franja.inicio < finClase) ||
+               (franja.fin > inicioClase && franja.fin <= finClase) ||
+               (franja.inicio <= inicioClase && franja.fin >= finClase);
       });
       
       if (clase) {
         const claseCSS = obtenerClaseAsignatura(clase.asignatura);
         td.className = `bloque-ocupado ${claseCSS}`;
         
-        const contenido = document.createElement('div');
-        contenido.className = 'clase-contenido';
+        // Verificar si es la primera celda de una clase que ocupa varias celdas
+        const esPrimeraCelda = clase.hora_inicio === franja.inicio;
         
-        const titulo = document.createElement('div');
-        titulo.className = 'asignatura';
-        titulo.textContent = clase.asignatura || '';
-        
-        const docente = document.createElement('div');
-        docente.className = 'docente';
-        docente.textContent = clase.docente || '';
-        
-        const horario = document.createElement('div');
-        horario.className = 'horario';
-        horario.textContent = `${clase.hora_inicio} - ${clase.hora_fin}`;
-        
-        contenido.appendChild(titulo);
-        contenido.appendChild(docente);
-        contenido.appendChild(horario);
-        
-        td.appendChild(contenido);
+        if (esPrimeraCelda) {
+          // Calcular cuántas celdas ocupa esta clase
+          const duracion = (new Date(`2000-01-01T${clase.hora_fin}`) - new Date(`2000-01-01T${clase.hora_inicio}`)) / (1000 * 60);
+          const celdas = Math.ceil(duracion / 50); // Cada celda son aproximadamente 50 minutos
+          
+          if (celdas > 1) {
+            td.rowSpan = celdas;
+          }
+          
+          const contenido = document.createElement('div');
+          contenido.className = 'clase-contenido';
+          
+          const titulo = document.createElement('div');
+          titulo.className = 'asignatura';
+          titulo.textContent = clase.asignatura || 'Sin asignatura';
+          
+          const docente = document.createElement('div');
+          docente.className = 'docente';
+          docente.textContent = clase.docente || 'Sin docente';
+          
+          const horario = document.createElement('div');
+          horario.className = 'horario';
+          horario.textContent = `${formatearHora(clase.hora_inicio)} - ${formatearHora(clase.hora_fin)}`;
+          
+          contenido.appendChild(titulo);
+          contenido.appendChild(docente);
+          contenido.appendChild(horario);
+          
+          td.appendChild(contenido);
+        } else {
+          // Si no es la primera celda, la dejamos vacía (se rellenará por el rowSpan)
+          td.style.display = 'none';
+        }
       }
       
       tr.appendChild(td);

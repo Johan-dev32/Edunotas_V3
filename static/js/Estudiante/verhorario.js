@@ -6,7 +6,7 @@ const HORAS = [
   { inicio: "09:50", fin: "10:40" },
   { inicio: "10:40", fin: "11:30" },
   { inicio: "11:30", fin: "12:30" },
-  { descanso: true, texto: "ALMUERZO" },
+  { descanso: true, texto: "DESCANSO" },
   { inicio: "13:30", fin: "14:20" },
   { inicio: "14:20", fin: "15:30" }
 ];

@@ -355,7 +355,7 @@ async function guardarBloques() {
     if (dia && hora) {
 
       // 🔹 Mapa de hora → ID_Bloque (según tu tabla Bloques)
-      const horaIndexMap = {
+      const horaToIdMap = {
         "06:45": 1,
         "07:30": 2,
         "08:30": 3,
@@ -366,8 +366,8 @@ async function guardarBloques() {
         "14:20": 8
       };
 
-      // 🔹 Convertimos la hora actual a ID_Bloque válido
-      const id_bloque = Object.entries(horaIndexMap).find(([_, h]) => h === hora)?.[0] || null;
+      // 🔹 Obtener el ID del bloque basado en la hora
+      const id_bloque = horaToIdMap[hora] || null;
 
       bloques.push({
         id_bloque,   // 👈 ahora sí manda un ID real que existe
@@ -396,6 +396,7 @@ async function guardarBloques() {
     console.error("❌ Error al guardar:", data.error);
   }
 }
+
 // ------------------- Inicializar asignaciones -------------------
 document.querySelectorAll('.bloque-asignacion').forEach(bloque => {
   bloque.classList.add('bloque');
@@ -420,7 +421,20 @@ function generarPDF(curso_id) {
   }).from(contenido).save();
 }
 
-
-
 // ------------------- Ejecutar -------------------
-document.addEventListener('DOMContentLoaded', () => initTabla());
+// Función para inicializar la tabla y cargar los bloques
+async function inicializar() {
+  await initTabla();
+  // Forzar una recarga de los bloques después de un pequeño retraso
+  // para asegurar que la tabla esté completamente renderizada
+  setTimeout(() => {
+    cargarBloques();
+  }, 300);
+}
+
+// Inicializar cuando el DOM esté listo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', inicializar);
+} else {
+  inicializar();
+}

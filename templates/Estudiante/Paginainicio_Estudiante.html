@@ -9,14 +9,13 @@
     
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRÍA</h2> 
 
-
   <!-- Dropdown mensajes -->
 
 
   <!-- Dropdown usuario -->
 
 
-    <div class="dropdown">
+    <div class="dropdown icono-header">
   <button
     class="position-relative"
     type="button"
@@ -25,7 +24,7 @@
     aria-expanded="false"
     style="border: none; background: transparent; padding: 0;"
   >
-    <i class="bi bi-bell-fill" style="font-size: 1.25rem; margin-left:880px;"></i>
+    <i class="bi bi-bell-fill" style="font-size: 1.2rem; cursor: pointer; color: #000000; margin-left: 890px" data-bs-toggle="dropdown" aria-expanded="false"></i>
     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
           id="contadorMensajes" style="display:none">0</span>
   </button>
@@ -40,9 +39,9 @@
 <script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
 
 
-  <div class="dropdown">
-    <button class="btn btn-usuario" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="bi bi-person-circle"></i>
+  <div class="dropdown icono-person">
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="bi bi-person-circle"></span>
     </button>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu" id="dropdownSTUDENT">
         <li><a class="dropdown-item" href="{{ url_for('perfil') }}">Perfil</a></li>
@@ -57,10 +56,10 @@
 
 {% block content %}
 
-<div><h3 class="text-center titulo-2">¡BIENVENIDO A TU PANEL!</h3></div>
+<div><h3 class="text-center titulo-2" id="titulo-bienvenida" style="opacity: 0; transform: translateY(30px); transition: all 4s ease;">¡BIENVENIDO A TU PANEL!</h3></div>
 
 <!-- 🔹 CONTENIDO PRINCIPAL -->
-<div class="container my-5">
+<div class="container my-5" id="contenido-principal" style="opacity: 0; transform: translateY(30px); transition: all 4s ease;">
     <div class="row g-4 justify-content-center">
         <!--  TARJETAS NUEVAS DEL ESTUDIANTE -->
         <div class="col-6 col-sm-4 col-md-3 col-lg-2">
@@ -200,4 +199,59 @@ Creado con compromiso y tecnología por el equipo del Colegio Fe y Alegría © 2
 <script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url_for('static', filename='js/Estudiante/Inicio.js') }}"></script>
+
+<script>
+// Animar todos los elementos
+document.addEventListener('DOMContentLoaded', function() {
+    // Animar título del colegio
+    const tituloColegio = document.querySelector('.titulo-header');
+    if (tituloColegio) {
+        setTimeout(() => {
+            tituloColegio.classList.add('subir');
+            console.log("Clase 'subir' agregada al título:", tituloColegio.className);
+        }, 100);
+    }
+
+    // Animar icono de notificaciones
+    const iconoHeader = document.querySelector('.icono-header');
+    if (iconoHeader) {
+        setTimeout(() => {
+            iconoHeader.classList.add('subir');
+            console.log("Clase 'subir' agregada al icono de notificaciones");
+        }, 100);
+    }
+
+    // Animar icono de usuario
+    const iconoPersona = document.querySelector('.icono-person');
+    if (iconoPersona) {
+        setTimeout(() => {
+            iconoPersona.classList.add('subir');
+            console.log("Clase 'subir' agregada al icono de usuario");
+        }, 100);
+    }
+
+    // Animar título de bienvenida
+    const tituloBienvenida = document.getElementById('titulo-bienvenida');
+    if (tituloBienvenida) {
+        setTimeout(() => {
+            tituloBienvenida.style.opacity = '1';
+            tituloBienvenida.style.transform = 'translateY(0)';
+            console.log("Animación agregada al título de bienvenida");
+        }, 300);
+    }
+
+    // Animar contenido principal
+    const contenidoPrincipal = document.getElementById('contenido-principal');
+    console.log("Buscando contenido principal:", contenidoPrincipal);
+    if (contenidoPrincipal) {
+        setTimeout(() => {
+            contenidoPrincipal.style.opacity = '1';
+            contenidoPrincipal.style.transform = 'translateY(0)';
+            console.log("Animación agregada al contenido principal");
+        }, 500);
+    } else {
+        console.log("No se encontró el contenido principal");
+    }
+});
+</script>
 {% endblock %}

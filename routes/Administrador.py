@@ -22,8 +22,27 @@ Administrador_bp = Blueprint('Administrador', __name__, url_prefix='/administrad
 
 # ----------------- RUTAS DE INICIO -----------------
 @Administrador_bp.route('/paginainicio')
+@login_required
 def paginainicio():
-    return render_template('Administrador/Paginainicio_Administrador.html')
+    # Obtener el primer nombre y primer apellido del usuario
+    if current_user and current_user.is_authenticated:
+        print(f"Usuario autenticado: {current_user}")
+        print(f"Nombre: {current_user.Nombre}")
+        print(f"Apellido: {current_user.Apellido}")
+        
+        nombre_completo = current_user.Nombre.split() if current_user.Nombre else []
+        apellido_completo = current_user.Apellido.split() if current_user.Apellido else []
+        
+        primer_nombre = nombre_completo[0] if nombre_completo else ""
+        primer_apellido = apellido_completo[0] if apellido_completo else ""
+        
+        nombre_usuario = f"{primer_nombre} {primer_apellido}"
+        print(f"Nombre usuario generado: {nombre_usuario}")
+    else:
+        nombre_usuario = ""
+        print("Usuario no autenticado")
+    
+    return render_template('Administrador/Paginainicio_Administrador.html', nombre_usuario=nombre_usuario)
 
 # ---------------- CONSULTA DE NOTAS (ADMINISTRADOR) ----------------
 @Administrador_bp.route('/notas_curso')
@@ -2366,12 +2385,9 @@ def configuracion_academica3():
 @Administrador_bp.route('/niveles-superacion/<int:curso_id>')
 @login_required
 def niveles_superacion(curso_id=None):
-    # Si no se proporciona curso_id, redirigir a la página de selección de curso
-    if curso_id is None:
-        # Aquí deberías obtener la lista de cursos disponibles
-        # Por ahora, redirigimos al inicio
-        return redirect(url_for('Administrador.paginainicio'))
-    # Lógica para obtener los datos del curso y estudiantes
+    # Si no se proporciona curso_id simplemente mostramos la vista con el modal
+    # para que el usuario seleccione un curso. Cuando venga curso_id, la
+    # plantilla se encargará de consultar los datos vía AJAX.
     return render_template('Administrador/niveles_superacion.html', curso_id=curso_id)
 
 @Administrador_bp.route('/repitentes')
@@ -2663,43 +2679,33 @@ def gestion_cursos():
 @Administrador_bp.route('/cursos/<int:curso_id>/estudiantes') 
 def _estudiantes_curso(curso_id):
     try:
-        # 1. Decodificar el ID del curso (Ej: 901 -> Grado 9, Grupo 01)
-        grado = curso_id // 100
-        # zfill(2) asegura que grupos de un dígito (ej: 1) se conviertan en '01'
-        grupo = str(curso_id % 100).zfill(2) 
-        
-        # 2. Buscar el objeto Curso en la DB
-        curso_obj = Curso.query.filter_by(Grado=grado, Grupo=grupo).first()
+        # 1. Buscar el curso por su ID primario (ID_Curso)
+        curso_obj = Curso.query.get(curso_id)
 
         if not curso_obj:
-            flash(f"❌ Curso {curso_id} no encontrado. Asegúrese de que el curso esté registrado.", "danger")
-            # Redirige a la ruta principal de gestión de cursos
-            return redirect(url_for('Administrador.gestion_cursos'))
+            flash(f"❌ Curso con ID {curso_id} no encontrado. Asegúrate de que el curso esté registrado.", "danger")
+            return redirect(url_for('Administrador.cursos'))
 
-        id_curso = curso_obj.ID_Curso
-
-        # 3. Consultar estudiantes matriculados en ese curso
-        # ✅ CORRECCIÓN CLAVE: El join usa Matricula.ID_Estudiante como el vínculo al Usuario.
+        # 2. Consultar estudiantes matriculados en ese curso (ID_Curso)
         estudiantes_data = db.session.query(Usuario).join(Matricula).filter(
-            Matricula.ID_Curso == id_curso,
+            Matricula.ID_Curso == curso_obj.ID_Curso,
             Usuario.Rol == 'Estudiante',
-            Usuario.ID_Usuario == Matricula.ID_Estudiante 
+            Usuario.ID_Usuario == Matricula.ID_Estudiante
         ).all()
-        
-        # 4. Renderizar la plantilla
+
+        # 3. Renderizar la plantilla con el curso y su lista de estudiantes
         return render_template(
-            'Administrador/ver_estudiante_curso.html', 
-            curso_id=curso_id, 
-            curso_obj=curso_obj, # Enviamos el objeto Curso
-            estudiantes=estudiantes_data # Enviamos la lista de estudiantes
+            'Administrador/ver_estudiante_curso.html',
+            curso_id=curso_id,
+            curso_obj=curso_obj,
+            estudiantes=estudiantes_data
         )
 
     except Exception as e:
-        # Esto captura cualquier error de DB o de lógica antes del renderizado
         print(f"Error al obtener estudiantes del curso {curso_id}: {e}")
         db.session.rollback()
         flash(f"❌ Error interno al cargar estudiantes: {str(e)}", "danger")
-        return redirect(url_for('Administrador.gestion_cursos'))
+        return redirect(url_for('Administrador.cursos'))
     
 
 # Función que procesa el formulario de asistencia

@@ -3,77 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Niveles de Superación - Colegio Fe y Alegría</title>
+  <title>Colegio Fe y Alegría</title>
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Estilos generales (incluye .btn-usuario sin recuadro) -->
   <!-- CSS propio -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/Administrador/Notas.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/Administrador/niveles_superacion.css') }}">
 </head>
 <body>
+
+
   <header class="d-flex align-items-center p-3 border-bottom w-100">
     <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
       <i class="bi bi-list"></i>
     </button>
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2>
 
-    <div class="dropdown ms-auto">
-      <button 
-        class="btn btn-edunotas position-relative dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton1" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
-        <span class="bi bi-envelope-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-        <li><a class="dropdown-item" href="#">Ajustes</a></li>
-        <li><a class="dropdown-item" href="#">Opción 2</a></li>
-        <li><a class="dropdown-item" href="#">Opción 3</a></li>
-      </ul>
-    </div>
 
     <div class="dropdown">
-      <button 
-        class="btn btn-usuario dropdown-toggle" 
-        type="button" 
-        id="dropdownMenuButton2" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false">
-        <span class="bi bi-person-lines-fill"></span>
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuración Académica</a></li>
-        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-        <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Académico</a></li>
-      </ul>
+  <button
+    class="position-relative"
+    type="button"
+    id="dropdownMenuButton"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    style="border: none; background: transparent; padding: 0;"
+  >
+    <i class="bi bi-bell-fill" style="font-size: 1.25rem; margin-left:850px;"></i>
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          id="contadorMensajes" style="display:none">0</span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
+    <li class="text-center text-muted small">Últimas notificaciones</li>
+    <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+      <p class="text-center small text-secondary mb-0">Sin notificaciones recientes</p>
     </div>
+  </ul>
+</div>
+
+<script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
+
+
+    <div class="dropdown">
+    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <span class="bi bi-person-circle"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+      
+      <li><a class="dropdown-item" href="{{url_for('Administrador.configuracion_academica')}}">Configuracion Academica</a></li>
+      <li><a class="dropdown-item" href="{{url_for('Administrador.historialacademico')}}">Historial Academico</a></li>
+
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+    </ul>
+  </div>
   </header>
 
-  <!-- MENU -->
-  <section class="bg-light py-5 mt-5">
-    <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title">MENÚ</h5>
-      </div>
-      <div class="offcanvas1-body">
-        <ul class="nav flex-column">
+
+
+<!--  MENU  -->
+ <section class="">
+   <div class="offcanvas offcanvas-start text-white" data-bs-backdrop="true" tabindex="-1" id="sidebar">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">MENÚ</h5>
+  </div>
+  <div class="offcanvas1-body">
+    <ul class="nav flex-column">
           <li class="nav-item"><a href="{{ url_for('Administrador.paginainicio') }}" class="nav-link text-white"><i class="bi bi-house-fill"></i> Inicio</a></li>
           
           <a class="nav-link text-white" data-bs-toggle="collapse" href="#submenuNotas"><i class="bi bi-caret-down-fill"></i> Notas</a>
           <div class="collapse" id="submenuNotas">
             <ul class="nav flex-column ms-3">
               <li><a href="{{ url_for('Administrador.notas_consultar') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Consultar Notas</a></li>
-              <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-calculator"></i> Cálculo de Promedio</a></li>
-              {% if curso_id %}
-              <li><a href="{{ url_for('Administrador.niveles_superacion', curso_id=curso_id) }}" class="nav-link text-white active"><i class="bi bi-graph-up"></i> Niveles de Superación</a></li>
-              {% else %}
-              <li><a href="#" class="nav-link text-white" data-bs-toggle="modal" data-bs-target="#seleccionarCursoModal"><i class="bi bi-graph-up"></i> Niveles de Superación</a></li>
-              {% endif %}
-              <li><a href="{{ url_for('Administrador.configuracion_academica') }}" class="nav-link text-white"><i class="bi bi-check-circle-fill"></i> Aprobación Académica</a></li>
+              
+             <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
+
+             <li><a href="{{ url_for('Administrador.configuracion_academica') }}" class="nav-link text-white"><i class="bi bi-check-circle-fill"></i> Aprobación Académica</a></li>
+
+
+
             </ul>
           </div>
 
@@ -92,23 +103,49 @@
               <li><a href="{{ url_for('Administrador.registro') }}" class="nav-link text-white"><i class="bi bi-people-fill"></i> Registro Usuarios</a></li>
             </ul>
           </div>
+
+
+
+
+
+          <li class="nav-item"><a href="{{ url_for('Administrador.asignaturas') }}" class="nav-link text-white"><i class="bi bi-journals"></i> Asignatura</a></li>
+          <li class="nav-item"><a href="{{ url_for('Administrador.ver_horarios') }}" class="nav-link text-white"><i class="bi bi-globe-americas"></i> Horarios</a></li>
+          
         </ul>
       </div>
     </div>
+  </div>
+</section>
 
     <div class="container-fluid">
       <div class="row">
         <main class="col-md-12 ms-sm-auto px-md-4 py-4">
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">Niveles de Superación y Áreas</h1>
-            <div class="btn-toolbar mb-2 mb-md-0">
-              <div class="btn-group me-2">
-                <button type="button" class="btn btn-sm btn-outline-secondary">Exportar PDF</button>
-                <button type="button" class="btn btn-sm btn-outline-secondary">Exportar Excel</button>
+          <div class="pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2 mb-0 text-center titulo-principal">NIVELES DE SUPERACCIÓN Y ÁREAS</h1>
+            <h1 class= "descripcion">En esta sección se puede visualizar los niveles de superación y áreas de cada estudiante</h1>
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center acciones-niveles">
+              <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#seleccionarCursoModal"
+                        style="background-color: #050733ff; border-color: #050733ff; color: white;">
+                  <i class="bi bi-inboxes"></i> Seleccionar curso
+                </button>
               </div>
-              <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-                <i class="bi bi-calendar"></i> Periodo Actual
-              </button>
+              <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                  <button type="button" class="btn btn-sm"
+                          style="color: #050733ff; border-color: #050733ff; background-color: white;">
+                    Exportar PDF
+                  </button>
+                  <button type="button" class="btn btn-sm"
+                          style="color: #050733ff; border-color: #050733ff; background-color: white;">
+                    Exportar Excel
+                  </button>
+                </div>
+                <button type="button" class="btn btn-sm dropdown-toggle"
+                        style="color: #050733ff; border-color: #050733ff; background-color: white;">
+                  <i class="bi bi-calendar"></i> Periodo Actual
+                </button>
+              </div>
             </div>
           </div>
 
@@ -140,7 +177,7 @@
                   </select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
-                  <button class="btn btn-primary w-100">Aplicar Filtros</button>
+                  <button class="btn w-100" style="background-color: #050733ff; border-color: #050733ff; color: white;">Aplicar Filtros</button>
                 </div>
               </div>
             </div>
@@ -152,7 +189,7 @@
               <div class="card bg-success bg-opacity-10 border-success">
                 <div class="card-body">
                   <h5 class="card-title">Aprobados</h5>
-                  <h2 class="text-success">24</h2>
+                  <h2 class="text-success" id="countAprobados">0</h2>
                   <p class="card-text">Estudiantes que superaron</p>
                 </div>
               </div>
@@ -161,7 +198,7 @@
               <div class="card bg-warning bg-opacity-10 border-warning">
                 <div class="card-body">
                   <h5 class="card-title">En Proceso</h5>
-                  <h2 class="text-warning">8</h2>
+                  <h2 class="text-warning" id="countProceso">0</h2>
                   <p class="card-text">En proceso de superación</p>
                 </div>
               </div>
@@ -170,7 +207,7 @@
               <div class="card bg-danger bg-opacity-10 border-danger">
                 <div class="card-body">
                   <h5 class="card-title">Por Superar</h5>
-                  <h2 class="text-danger">5</h2>
+                  <h2 class="text-danger" id="countPorSuperar">0</h2>
                   <p class="card-text">Aún no superan</p>
                 </div>
               </div>
@@ -185,35 +222,15 @@
                   <thead class="table-light">
                     <tr>
                       <th>Estudiante</th>
-                      <th>Área</th>
-                      <th>Materia</th>
-                      <th>Nota Inicial</th>
-                      <th>Nota Final</th>
-                      <th>Estado</th>
-                      <th>Acciones</th>
+                      <th>Documento</th>
+                      <th>Promedio</th>
+                      <th>Nivel</th>
+                      <th>Observación</th>
+                      <th>Periodo</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <!-- Fila de ejemplo - Esto se generará dinámicamente -->
-                    <tr>
-                      <td>
-                        <div class="d-flex align-items-center">
-                          <div class="avatar bg-primary text-white rounded-circle me-2">JP</div>
-                          Juan Pérez
-                        </div>
-                      </td>
-                      <td>Matemáticas</td>
-                      <td>Álgebra</td>
-                      <td>2.8</td>
-                      <td>3.5 <span class="text-success"><i class="bi bi-arrow-up"></i> +0.7</span></td>
-                      <td><span class="badge bg-success">Aprobado</span></td>
-                      <td>
-                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#detalleEstudiante">
-                          <i class="bi bi-eye"></i> Ver Detalles
-                        </button>
-                      </td>
-                    </tr>
-                    <!-- Más filas de ejemplo -->
+                  <tbody id="tablaNivelesBody">
+                    <!-- Filas generadas dinámicamente -->
                   </tbody>
                 </table>
               </div>
@@ -330,46 +347,109 @@
   <script>
   // Script para manejar la funcionalidad de la página
   document.addEventListener('DOMContentLoaded', function() {
+
     // Inicializar tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    // Filtrado de la tabla
-    const filtroEstudiante = document.getElementById('buscarEstudiante');
-    const filtroArea = document.getElementById('filtroArea');
-    const filtroEstado = document.getElementById('filtroEstado');
-    const filasTabla = document.querySelectorAll('tbody tr');
+    // 1) Cargar cursos en el selector del modal
+    const selectCurso = document.getElementById('selectCurso');
+    const btnIrACurso = document.getElementById('btnIrACurso');
+    const cursosUrl = "{{ url_for('Administrador.lista_cursos_activos') }}";
+    const nivelesBaseUrl = "{{ url_for('Administrador.niveles_superacion') }}";
 
-    function aplicarFiltros() {
-      const texto = filtroEstudiante.value.toLowerCase();
-      const area = filtroArea.value;
-      const estado = filtroEstado.value;
+    if (selectCurso) {
+      fetch(cursosUrl)
+        .then(r => r.json())
+        .then(data => {
+          selectCurso.innerHTML = '';
+          if (data.success && Array.isArray(data.cursos) && data.cursos.length) {
+            selectCurso.insertAdjacentHTML('beforeend', '<option value="">Seleccione un curso...</option>');
+            data.cursos.forEach(c => {
+              const text = c.nombre || (c.grado + '-' + (c.grupo || ''));
+              const opt = document.createElement('option');
+              opt.value = c.id;
+              opt.textContent = text;
+              selectCurso.appendChild(opt);
+            });
+          } else {
+            selectCurso.insertAdjacentHTML('beforeend', '<option value="">No hay cursos activos</option>');
+          }
+        })
+        .catch(_ => {
+          selectCurso.innerHTML = '<option value="">Error cargando cursos</option>';
+        });
+    }
 
-      filasTabla.forEach(fila => {
-        const nombre = fila.cells[0].textContent.toLowerCase();
-        const areaFila = fila.cells[1].textContent;
-        const estadoFila = fila.cells[5].textContent.trim();
-
-        const coincideTexto = nombre.includes(texto);
-        const coincideArea = area === '' || areaFila === area;
-        const coincideEstado = estado === '' || estadoFila.includes(estado);
-
-        if (coincideTexto && coincideArea && coincideEstado) {
-          fila.style.display = '';
-        } else {
-          fila.style.display = 'none';
-        }
+    if (btnIrACurso && selectCurso) {
+      btnIrACurso.addEventListener('click', function() {
+        const id = selectCurso.value;
+        if (!id) return;
+        window.location.href = nivelesBaseUrl + '/' + id;
       });
     }
 
-    // Event listeners para los filtros
-    [filtroEstudiante, filtroArea, filtroEstado].forEach(elemento => {
-      elemento.addEventListener('change', aplicarFiltros);
-    });
-    filtroEstudiante.addEventListener('keyup', aplicarFiltros);
+    // 2) Si hay curso seleccionado, cargar datos reales de niveles
+    const cursoIdActual = {{ curso_id if curso_id is not none else 'null' }};
+    const tablaBody = document.getElementById('tablaNivelesBody');
+    const datosUrlBase = "{{ url_for('Administrador.config3_datos') }}";
+
+    const spanAprob = document.getElementById('countAprobados');
+    const spanProc = document.getElementById('countProceso');
+    const spanPorSup = document.getElementById('countPorSuperar');
+
+    function clasificarNivel(nivel) {
+      if (!nivel) return 'por_superar';
+      nivel = nivel.toLowerCase();
+      if (nivel === 'superior' || nivel === 'alto') return 'aprobado';
+      if (nivel === 'básico' || nivel === 'basico') return 'proceso';
+      return 'por_superar';
+    }
+
+    if (cursoIdActual && tablaBody) {
+      fetch(datosUrlBase + '?curso_id=' + cursoIdActual)
+        .then(r => r.json())
+        .then(data => {
+          if (!data.success || !Array.isArray(data.items)) return;
+
+          tablaBody.innerHTML = '';
+          let cAprob = 0, cProc = 0, cPor = 0;
+
+          data.items.forEach(item => {
+            const nivel = item.nivel || '';
+            const cls = clasificarNivel(nivel);
+            if (cls === 'aprobado') cAprob++;
+            else if (cls === 'proceso') cProc++;
+            else cPor++;
+
+            const prom = item.promedio !== null && item.promedio !== undefined
+              ? Number(item.promedio).toFixed(2)
+              : '-';
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${item.nombre || ''}</td>
+              <td>${item.documento || ''}</td>
+              <td>${prom}</td>
+              <td>${nivel}</td>
+              <td>${item.observacion || ''}</td>
+              <td>${item.periodo || ''}</td>
+            `;
+            tablaBody.appendChild(tr);
+          });
+
+          if (spanAprob) spanAprob.textContent = cAprob;
+          if (spanProc) spanProc.textContent = cProc;
+          if (spanPorSup) spanPorSup.textContent = cPor;
+        })
+        .catch(_ => {
+          // Si falla, dejamos la tabla vacía y contadores en 0
+        });
+    }
   });
   </script>
+
 </body>
 </html>

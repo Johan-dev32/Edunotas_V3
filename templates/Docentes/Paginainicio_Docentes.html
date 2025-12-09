@@ -7,9 +7,41 @@
   <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar"> 
     <i class="bi bi-list"></i> 
   </button> 
-  <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRIA</h2> 
+  <h2 class="titulo-header mx-4 mb-0" style="white-space: nowrap;">| COLEGIO FE Y ALEGRIA</h2>
+   <span id="nombreUsuario" style="margin-left: 360px; font-weight: bold; color: #050733ff; font-size: 35px; white-space: nowrap; flex-shrink: 0;"></span>
+  <div style="margin-left: auto; display: flex; align-items: center; gap: 15px;">
+    <!-- Icono notificaciones -->
+    <div class="position-relative icono-header">
+      <i class="bi bi-bell-fill" style="font-size: 1.2rem; cursor: pointer; color: #000000;" data-bs-toggle="dropdown" aria-expanded="false"></i>
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none">0</span>
+      <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 320px;" aria-labelledby="dropdownMenuButton">
+        <li class="text-center text-muted small">Últimas notificaciones</li>
+        <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
+          <p class="text-center small text-secondary mb-0">Sin notificaciones recientes</p>
+        </div>
+      </ul>
+    </div>
 
-  <script src="{{ url_for('static', filename='js/Administrador/finisher-header.es5.min.js') }}"></script>
+    <!-- Dropdown usuario -->
+    <div class="dropdown icono-person">
+      <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="bi bi-person-circle"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
+        <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
+        
+        <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
+      </ul>
+    </div>
+  </div>
+</header>
+{% endblock %}
+
+{% block content %}
+
+<script src="{{ url_for('static', filename='js/Administrador/finisher-header.es5.min.js') }}"></script>
     <!-- Luego la inicialización de la animación -->
     <script type="text/javascript">
         new FinisherHeader({
@@ -33,48 +65,117 @@
             "shapes": ["c"]
         });
     </script>
-
-  <!-- Dropdown mensajes -->
-  <div class="dropdown">
-      <button
-        class="position-relative"
-        type="button"
-        id="dropdownMenuButton"
-        data-bs-toggle="dropdown"
-        aria-expanded="false"
-        style="border: none; background: transparent; padding: 0; margin-left: 850px;"
-      >
-        <i class="bi bi-bell-fill" style="font-size: 1.25rem;"></i>
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorMensajes" style="display:none ">0</span>
-      </button>
-      <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="dropdownMenuButton" style="min-width: 300px;">
-        <li class="text-center text-muted small">Últimas notificaciones</li>
-        <div id="notificacionesRecientes" class="mt-2" style="max-height: 200px; overflow-y: auto;">
-          <p class="text-center small text-secondary mb-0">No tienes mensajes nuevos.</p>
-        </div>
-      </ul>
-    </div>
-
-
-
-  <!-- Dropdown usuario -->
-  <div class="dropdown">
-    <button class="btn btn-usuario dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-      <span class="bi bi-person-lines-fill"></span>
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdownADMIN">
-      <li><a class="dropdown-item" href="{{url_for('perfil')}}">Perfil</a></li>
-      
-      <li><a class="dropdown-item" href="{{ url_for('Docente.manual') }}"> Manual del Usuario</a></li>
-      <li><hr class="dropdown-divider"></li>
-    <li><a class="dropdown-item" href="{{url_for('login')}}">Cerrar sesión</a></li>
-    </ul>
-  </div>
-</header>
-{% endblock %}
-
-{% block content %}
-
+    <script>
+// Mostrar mensaje de bienvenida
+document.addEventListener('DOMContentLoaded', function() {
+    const nombreUsuario = "{{ nombre_usuario }}";
+    console.log("Nombre usuario desde Flask (crudo):", nombreUsuario);
+    console.log("Tipo de dato:", typeof nombreUsuario);
+    console.log("Longitud:", nombreUsuario ? nombreUsuario.length : "N/A");
+    
+    // Animar título del colegio
+    const tituloColegio = document.querySelector('.titulo-header');
+    if (tituloColegio) {
+        setTimeout(() => {
+            tituloColegio.classList.add('subir');
+            console.log("Clase 'subir' agregada al título:", tituloColegio.className);
+        }, 100); // 0.1s como los menu-item
+    }
+    
+    // Animar botón de menú hamburguesa
+    const btnMenu = document.querySelector('.btn-dark');
+    if (btnMenu) {
+        setTimeout(() => {
+            btnMenu.classList.add('subir');
+            console.log("Clase 'subir' agregada al botón menú:", btnMenu.className);
+        }, 100); // 0.1s como los menu-item
+    }
+    
+    // Animar iconos de usuario y notificaciones
+    const iconosHeader = document.querySelectorAll('.icono-header');
+    if (iconosHeader.length > 0) {
+        setTimeout(() => {
+            iconosHeader.forEach(icono => {
+                icono.classList.add('subir');
+            });
+            console.log("Clase 'subir' agregada a los iconos:", iconosHeader.length, "iconos");
+        }, 100); // 0.1s como los menu-item
+    }
+    
+    // Animar icono de persona
+    const iconoPersona = document.querySelector('.icono-person');
+    if (iconoPersona) {
+        setTimeout(() => {
+            iconoPersona.classList.add('subir');
+            console.log("Clase 'subir' agregada al icono-person");
+        }, 100); // 0.1s como los menu-item
+    }
+    
+    // Animar títulos de secciones con efecto diferente
+    const tituloNoticias = document.querySelector('.section-title');
+    const tituloCirculares = document.querySelector('.section-title2');
+    
+    if (tituloNoticias) {
+        setTimeout(() => {
+            tituloNoticias.classList.add('aparecer');
+            console.log("Clase 'aparecer' agregada a NOTICIAS");
+        }, 800); // Delay de 0.8s
+    }
+    
+    if (tituloCirculares) {
+        setTimeout(() => {
+            tituloCirculares.classList.add('aparecer');
+            console.log("Clase 'aparecer' agregada a CIRCULARES");
+        }, 1100); // Delay de 1.1s (0.3s después de NOTICIAS)
+    }
+    
+    if (nombreUsuario && nombreUsuario.trim() !== "" && nombreUsuario !== "None") {
+        const mensaje = "!BIENVENIDO " + nombreUsuario.toUpperCase() + "!";
+        const elemento = document.getElementById('nombreUsuario');
+        elemento.textContent = mensaje;
+        
+        console.log("Condición verdadera, mostrando mensaje:", mensaje);
+        
+        // Animación: subir al inicio (misma duración que menu-item: 4s)
+        setTimeout(() => {
+            elemento.classList.add('subir');
+            console.log("Clase 'subir' agregada:", elemento.className);
+        }, 100); // 0.1s como los menu-item
+        
+        // Esperar 7 segundos y luego bajar y desaparecer
+        setTimeout(() => {
+            elemento.classList.remove('subir');
+            elemento.classList.add('bajar');
+            console.log("Clases cambiadas a 'bajar':", elemento.className);
+        }, 7100); // 100ms + 7000ms
+        
+        console.log("Mensaje establecido con animación:", mensaje);
+    } else {
+        // Para docentes, mostrar mensaje de bienvenida genérico
+        const mensaje = "!BIENVENIDO DOCENTE!";
+        const elemento = document.getElementById('nombreUsuario');
+        elemento.textContent = mensaje;
+        elemento.style.color = "#050733ff"; // Color institucional
+        
+        console.log("No hay nombre específico, mostrando mensaje genérico:", mensaje);
+        
+        // Animación: subir al inicio
+        setTimeout(() => {
+            elemento.classList.add('subir');
+            console.log("Clase 'subir' agregada:", elemento.className);
+        }, 100); // 0.1s como los menu-item
+        
+        // Esperar 7 segundos y luego bajar y desaparecer
+        setTimeout(() => {
+            elemento.classList.remove('subir');
+            elemento.classList.add('bajar');
+            console.log("Clases cambiadas a 'bajar':", elemento.className);
+        }, 7100); // 100ms + 7000ms
+        
+        console.log("Mensaje genérico establecido con animación:", mensaje);
+    }
+});
+</script>
 
 <!-- Menú superior -->
 <div class="container mt-5 ">
@@ -228,11 +329,40 @@
 </div>
 <hr class="my-5 mx-auto"style="width: 85%;">
 <h1 class="text-center txt-ultimo">Edunotas te acompaña en tu proceso educativo con herramientas simples, seguras y efectivas.
-Creado con compromiso y tecnología por el equipo del Colegio Fe y Alegría © 2025.</h1>
+Creado con compromiso y tecnología por el equipo del Colegio Fe y Alegría ©2025.</h1>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+// Animar título del colegio
+document.addEventListener('DOMContentLoaded', function() {
+    const tituloColegio = document.querySelector('.titulo-header');
+    if (tituloColegio) {
+        setTimeout(() => {
+            tituloColegio.classList.add('subir');
+            console.log("Clase 'subir' agregada al título:", tituloColegio.className);
+        }, 100); // 0.1s como los menu-item
+    }
+
+    // Animar títulos de secciones con efecto diferente
+    const tituloNoticias = document.querySelector('.section-title');
+    const tituloCirculares = document.querySelector('.section-title2');
+    
+    if (tituloNoticias) {
+        setTimeout(() => {
+            tituloNoticias.classList.add('aparecer');
+            console.log("Clase 'aparecer' agregada a NOTICIAS");
+        }, 800); // Delay de 0.8s
+    }
+    
+    if (tituloCirculares) {
+        setTimeout(() => {
+            tituloCirculares.classList.add('aparecer');
+            console.log("Clase 'aparecer' agregada a CIRCULARES");
+        }, 1100); // Delay de 1.1s (0.3s después de NOTICIAS)
+    }
+});
+
 // Cargar circulares recientes para la tarjeta de inicio (Docente)
 document.addEventListener("DOMContentLoaded", async () => {
   const cont = document.getElementById("circularesRecientes");

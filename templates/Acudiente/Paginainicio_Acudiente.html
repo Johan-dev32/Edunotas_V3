@@ -10,6 +10,19 @@
 
     <h2 class="titulo-header mx-4 mb-0">| COLEGIO FE Y ALEGRÍA</h2>
 
+<script>
+// Animar título del colegio
+document.addEventListener('DOMContentLoaded', function() {
+    const tituloColegio = document.querySelector('.titulo-header');
+    if (tituloColegio) {
+        setTimeout(() => {
+            tituloColegio.classList.add('subir');
+            console.log("Clase 'subir' agregada al título del acudiente:", tituloColegio.className);
+        }, 100);
+    }
+});
+</script>
+
    
 
     <!-- Notificaciones (campana) -->

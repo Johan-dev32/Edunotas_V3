@@ -365,3 +365,11 @@ def historial_academico():
 @Acudiente_bp.route('/historial_academico2')
 def historial_academico2():
     return render_template('Acudiente/historial_academico2.html')
+
+@Acudiente_bp.route('/noticias')
+def noticias():
+    return render_template('Acudiente/Noticias.html')
+
+@Acudiente_bp.route('/noticias_vistas')
+def noticias_vistas():
+    return render_template('Acudiente/Noticias_vistas.html')

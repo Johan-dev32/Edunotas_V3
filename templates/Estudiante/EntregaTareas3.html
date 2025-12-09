@@ -100,9 +100,18 @@
 
     <hr>
 
-    <!-- FECHAS -->
+    <!-- FECHAS Y ESTADO -->
     <p><strong>Fecha límite:</strong> {{ actividad.Fecha }}</p>
     <p><strong>Hora límite:</strong> {{ actividad.Hora }}</p>
+    <p><strong>Estado:</strong> 
+      {% if actividad.Estado == 'Calificada' %}
+        <span class="badge bg-success">{{ actividad.Estado }}</span>
+      {% elif actividad.Estado == 'Cancelada' %}
+        <span class="badge bg-danger">{{ actividad.Estado }}</span>
+      {% else %}
+        <span class="badge bg-primary">{{ actividad.Estado or 'Pendiente' }}</span>
+      {% endif %}
+    </p>
 
     <!-- PDF ADJUNTO -->
     {% if actividad.ArchivoPDF %}
@@ -123,30 +132,41 @@
     <!-- SUBIR TAREA -->
     <h4 class="fw-bold mt-4">Subir mi entrega</h4>
 
-    {% if entrega and entrega.Archivo %}
-    <div class="alert alert-info">
-        <strong>Ya enviaste un archivo:</strong><br>
-        <a href="{{ url_for('static', filename=entrega.Archivo) }}" target="_blank">
-            <i class="bi bi-file-earmark"></i> Ver archivo enviado
-        </a>
-    </div>
+    {% if actividad.Estado in ['Calificada', 'Cancelada'] %}
+      <div class="alert {% if actividad.Estado == 'Calificada' %}alert-success{% else %}alert-danger{% endif %}">
+        <i class="bi {% if actividad.Estado == 'Calificada' %}bi-check-circle-fill{% else %}bi-x-circle-fill{% endif %} me-2"></i>
+        No puedes subir evidencias porque esta actividad ha sido <strong>{{ actividad.Estado|lower }}</strong>.
+        {% if actividad.Estado == 'Calificada' %}
+          Por favor, contacta al docente si necesitas aclaraciones.
+        {% else %}
+          Por favor, contacta al docente si crees que hay un error.
+        {% endif %}
+      </div>
+    {% else %}
+      {% if entrega and entrega.Archivo %}
+      <div class="alert alert-info">
+          <strong>Ya enviaste un archivo:</strong><br>
+          <a href="{{ url_for('static', filename=entrega.Archivo) }}" target="_blank">
+              <i class="bi bi-file-earmark"></i> Ver archivo enviado
+          </a>
+      </div>
+      <p class="text-muted">(Si subes un archivo nuevo, reemplazará este)</p>
+      {% endif %}
 
-    <p class="text-muted">(Si subes un archivo nuevo, reemplazará este)</p>
-{% endif %}
+      <form action="{{ url_for('Estudiante.subir_entrega', id_actividad=actividad.ID_Actividad) }}"
+            method="POST" 
+            enctype="multipart/form-data">
 
-<form action="{{ url_for('Estudiante.subir_entrega', id_actividad=actividad.ID_Actividad) }}"
-      method="POST" 
-      enctype="multipart/form-data">
+        <div class="mb-3">
+          <label class="form-label">Adjuntar archivo</label>
+          <input type="file" class="form-control" name="archivo_entrega" required>
+        </div>
 
-  <div class="mb-3">
-    <label class="form-label">Adjuntar archivo</label>
-    <input type="file" class="form-control" name="archivo_entrega" required>
-  </div>
-
-  <button type="submit" class="btn btn-primary w-100 mt-3">
-    Enviar mi entrega
-  </button>
-</form>
+        <button type="submit" class="btn btn-primary w-100 mt-3">
+          Enviar mi entrega
+        </button>
+      </form>
+    {% endif %}
   </div>
 
 </main>

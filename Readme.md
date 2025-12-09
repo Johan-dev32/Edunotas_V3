@@ -132,3 +132,5 @@ EDUNOTAS_V3/
 ##  Creditos
 Un proyecto hecho con mucho amor y peleas internas :O, pero fue divertido
 Donar a este número a Nequi: 3203541891 porfavor
+
+No pelien mas

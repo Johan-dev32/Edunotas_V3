@@ -99,7 +99,7 @@
               <tr>
                 <th>Estudiante</th>
                 <th>Archivo</th>
-                <th>Observaciones</th>
+                <th>Curso</th>
                 <th>Calificación</th>
               </tr>
             </thead>
@@ -130,8 +130,12 @@
                     {% endif %}
                   </td>
                   <td>
-                    <span class="{% if not entrega.Observaciones %}text-muted{% endif %}">
-                      {{ entrega.Observaciones or 'Sin observaciones' }}
+                    <span class="text-primary fw-semibold">
+                      {% if entrega.matricula and entrega.matricula.curso %}
+                        {{ entrega.matricula.curso.Grado }} {{ entrega.matricula.curso.Grupo }}
+                      {% else %}
+                        Sin curso asignado
+                      {% endif %}
                     </span>
                   </td>
                   <td>

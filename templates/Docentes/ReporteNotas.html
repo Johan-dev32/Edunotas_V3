@@ -43,12 +43,12 @@
             <tr>
                 <td>{{ loop.index }}</td>
                 <td style="text-align: left;">{{ estudiante.NombreCompleto }}</td>
-                <td>{{ estudiante.registro_nota.Nota_1 | default('-') }}</td>
-                <td>{{ estudiante.registro_nota.Nota_2 | default('-') }}</td>
-                <td>{{ estudiante.registro_nota.Nota_3 | default('-') }}</td>
-                <td>{{ estudiante.registro_nota.Nota_4 | default('-') }}</td>
-                <td>{{ estudiante.registro_nota.Nota_5 | default('-') }}</td>
-                <td class="promedio">{{ estudiante.Promedio_Final | default('-') }}</td>
+                <td>{{ estudiante.registro_nota.Nota_1 | format_number | default('-') }}</td>
+                <td>{{ estudiante.registro_nota.Nota_2 | format_number | default('-') }}</td>
+                <td>{{ estudiante.registro_nota.Nota_3 | format_number | default('-') }}</td>
+                <td>{{ estudiante.registro_nota.Nota_4 | format_number | default('-') }}</td>
+                <td>{{ estudiante.registro_nota.Nota_5 | format_number | default('-') }}</td>
+                <td class="promedio">{{ estudiante.Promedio_Final | format_number | default('-') }}</td>
             </tr>
             {% else %}
             <tr>

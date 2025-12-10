@@ -124,12 +124,24 @@
                 <label for="asignatura_select" class="form-label fw-bold">Asignatura</label>
                 <select class="form-select" id="asignatura_select" name="asignatura" required onchange="this.form.submit()">
                     <option value="" disabled {% if not asignatura_id or asignatura_id == 0 %}selected{% endif %}>Seleccione Asignatura</option>
+                    {% set nombres_vistos = [] %}
+                    
                     {% for asignatura in asignaturas %}
-                        {% set partes = asignatura.nombre.split(' ') %}
-                        {% set nombre_base = partes[0] if partes else asignatura.nombre %}
-                        <option value="{{ asignatura.id }}" {% if asignatura.id|string == asignatura_id|string %}selected{% endif %}>
-                            {{ nombre_base }}
-                        </option>
+                        {# Si la asignatura es "English", saltarla completamente #}
+                        {% if asignatura.nombre == 'English' %}
+                            {# No procesar esta asignatura #}
+                        {% else %}
+                            {% set partes = asignatura.nombre.split(' ') %}
+                            {% set nombre_base = partes[0] if partes else asignatura.nombre %}
+                            
+                            {# Solo mostrar si no hemos visto este nombre antes #}
+                            {% if nombre_base not in nombres_vistos %}
+                                <option value="{{ asignatura.id }}" {% if asignatura.id|string == asignatura_id|string %}selected{% endif %}>
+                                    {{ nombre_base }}
+                                </option>
+                                {% set _ = nombres_vistos.append(nombre_base) %}
+                            {% endif %}
+                        {% endif %}
                     {% endfor %}
                 </select>
             </div>
@@ -137,17 +149,60 @@
         </div>
 
         <div class="table-responsive mt-4">
+            <!-- Información del período y asignatura seleccionados -->
+            {% if periodo_seleccionado and asignatura_id %}
+            <div class="alert d-flex align-items-center mb-3" role="alert" style="background-color: #050733ff; color: white; border: 1px solid #030525;">
+                <i class="fas fa-info-circle me-2" style="color: #ffffff;"></i>
+                <div>
+                    <strong>Período Seleccionado:</strong> {{ periodo_seleccionado }}° | 
+                    <strong>Asignatura:</strong> 
+                    {% set asignatura_seleccionada = asignaturas | selectattr('id', 'equalto', asignatura_id) | first %}
+                    {{ asignatura_seleccionada.nombre if asignatura_seleccionada else 'No seleccionada' }}
+                </div>
+            </div>
+            {% endif %}
+            
             <table class="table table-bordered table-hover align-middle" id="tablaNotas">
                 <thead>
                     <tr class="table-primary">
-                        <th class="text-center"># ID</th>
-                        <th>Nombre Completo</th>
-                        <th class="text-center">Nota 1</th>
-                        <th class="text-center">Nota 2</th>
-                        <th class="text-center">Nota 3</th>
-                        <th class="text-center">Nota 4</th>
-                        <th class="text-center">Nota 5</th>
-                        <th class="text-center">Promedio Final</th>
+                        <th class="text-center" style="width: 50px; background-color: #050733ff; color: white;">#</th>
+                        <th style="min-width: 200px; background-color: #050733ff; color: white;">Nombre Completo</th>
+                        <th class="text-center" style="width: 80px; background-color: #ffffffff; color: #333;">
+                            <div class="d-flex flex-column align-items-center">
+                                <small class="text-muted">NOTA</small>
+                                <strong>1</strong>
+                            </div>
+                        </th>
+                        <th class="text-center" style="width: 80px; background-color: #ffffffff; color: #333;">
+                            <div class="d-flex flex-column align-items-center">
+                                <small class="text-muted">NOTA</small>
+                                <strong>2</strong>
+                            </div>
+                        </th>
+                        <th class="text-center" style="width: 80px; background-color: #ffffffff; color: #333;">
+                            <div class="d-flex flex-column align-items-center">
+                                <small class="text-muted">NOTA</small>
+                                <strong>3</strong>
+                            </div>
+                        </th>
+                        <th class="text-center" style="width: 80px; background-color: #ffffffff; color: #333;">
+                            <div class="d-flex flex-column align-items-center">
+                                <small class="text-muted">NOTA</small>
+                                <strong>4</strong>
+                            </div>
+                        </th>
+                        <th class="text-center" style="width: 80px; background-color: #ffffffff; color: #333;">
+                            <div class="d-flex flex-column align-items-center">
+                                <small class="text-muted">NOTA</small>
+                                <strong>5</strong>
+                            </div>
+                        </th>
+                        <th class="text-center" style="width: 90px; background-color: #fff3cd; color: #333;">
+                            <div class="d-flex flex-column align-items-center">
+                                <small class="text-muted" style="color: #666;">PROMEDIO</small>
+                                <strong>FINAL</strong>
+                            </div>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -157,21 +212,21 @@
                         <td>{{ estudiante.Nombre }} {{ estudiante.Apellido }}</td>
                         {% set registro = estudiante.registro_nota %}
                         <td>
-                          <input type="number" step="0.01" name="nota_1_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_1 if registro and registro.Nota_1 is not none else '' }}">
+                          <input type="number" step="0.01" name="nota_1_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_1 | format_number if registro and registro.Nota_1 is not none else '' }}">
                         </td>
                         <td>
-                          <input type="number" step="0.01" name="nota_2_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_2 if registro and registro.Nota_2 is not none else '' }}">
+                          <input type="number" step="0.01" name="nota_2_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_2 | format_number if registro and registro.Nota_2 is not none else '' }}">
                         </td>
                         <td>
-                          <input type="number" step="0.01" name="nota_3_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_3 if registro and registro.Nota_3 is not none else '' }}">
+                          <input type="number" step="0.01" name="nota_3_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_3 | format_number if registro and registro.Nota_3 is not none else '' }}">
                         </td>
                         <td>
-                          <input type="number" step="0.01" name="nota_4_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_4 if registro and registro.Nota_4 is not none else '' }}">
+                          <input type="number" step="0.01" name="nota_4_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_4 | format_number if registro and registro.Nota_4 is not none else '' }}">
                         </td>
                         <td>
-                          <input type="number" step="0.01" name="nota_5_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_5 if registro and registro.Nota_5 is not none else '' }}">
+                          <input type="number" step="0.01" name="nota_5_{{ estudiante.ID_Usuario }}" class="form-control input-nota" value="{{ registro.Nota_5 | format_number if registro and registro.Nota_5 is not none else '' }}">
                         </td>
-                        <td>{{ registro.Promedio_Final if registro and registro.Promedio_Final is not none else '' }}</td>
+                        <td>{{ registro.Promedio_Final | format_number if registro and registro.Promedio_Final is not none else '' }}</td>
                     </tr>
                 {% else %}
                     <tr>
@@ -190,38 +245,102 @@
 <script>
     // Pequeño script para manejar el submit automático de los selectores
     document.addEventListener('DOMContentLoaded', function() {
-        // Evitar enviar el formulario al cambiar filtros; navegar por URL para cargar tabla
+        // Eliminar duplicado de Inglés en el select
+        const selectAsignatura = document.getElementById('asignatura_select');
+        if (selectAsignatura) {
+            const opciones = selectAsignatura.querySelectorAll('option');
+            let inglesEncontrado = false;
+            
+            opciones.forEach(opcion => {
+                if (opcion.textContent.trim() === 'Inglés') {
+                    if (inglesEncontrado) {
+                        opcion.remove(); // Eliminar el segundo Inglés
+                    } else {
+                        inglesEncontrado = true;
+                    }
+                }
+            });
+        }
+        
+        // Evitar enviar el formulario al cambiar filtros; cargar notas con AJAX
         const selPeriodo = document.getElementById('periodo_select');
         const selAsignatura = document.getElementById('asignatura_select');
-        function navegarConFiltros() {
+        
+        function cargarNotasConFiltros() {
             const asig = selAsignatura.value;
             const per = selPeriodo.value;
             if (asig && per) {
-                window.location.href = "{{ url_for('Docente.registro_notas_curso', curso_id=curso_id) }}?asignatura=" + encodeURIComponent(asig) + "&periodo=" + encodeURIComponent(per);
+                // Cargar notas con AJAX en lugar de navegar
+                cargarNotasExistentes(per, asig);
+            } else {
+                limpiarInputsDeNotas();
             }
         }
-        if (selPeriodo) selPeriodo.onchange = navegarConFiltros;
-        if (selAsignatura) selAsignatura.onchange = navegarConFiltros;
+        
+        if (selPeriodo) selPeriodo.onchange = cargarNotasConFiltros;
+        if (selAsignatura) selAsignatura.onchange = cargarNotasConFiltros;
+        
+        // Funciones para cargar notas con AJAX
+        async function cargarNotasExistentes(periodo, asignaturaId) {
+            try {
+                // Hacer POST con JSON en lugar de GET con parámetros en URL
+                const url = "{{ url_for('Docente.cargar_notas_ajax') }}";
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        curso_id: {{ curso_id }},
+                        asignatura_id: asignaturaId,
+                        periodo: periodo
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('No se pudieron cargar las notas.');
+                }
+                
+                const notasEstudiantes = await response.json();
+                
+                // Limpiar e insertar las notas en la tabla
+                limpiarInputsDeNotas(); 
+                
+                notasEstudiantes.forEach(data => {
+                    const estudianteId = data.ID_Usuario;
+                    const notas = data.notas;
+                    const promedio = data.Promedio_Final;
+                    
+                    // Insertar notas en los inputs
+                    for (let i = 1; i <= 5; i++) {
+                        const inputName = `nota_${i}_${estudianteId}`;
+                        const input = document.querySelector(`input[name="${inputName}"]`);
+                        if (input && notas[`nota_${i}`] !== undefined && notas[`nota_${i}`] !== null) {
+                            input.value = parseFloat(notas[`nota_${i}`]).toFixed(1);
+                        }
+                    }
+                    
+                    // Actualizar promedio final
+                    const promedioCell = document.getElementById(`promedio_final_${estudianteId}`);
+                    if (promedioCell) {
+                        promedioCell.textContent = promedio !== null ? parseFloat(promedio).toFixed(1) : '';
+                    }
+                });
 
-        // Forzar que el botón Guardar siempre envíe POST al endpoint correcto
-        const btnGuardar = document.getElementById('btnGuardarNotas');
-        if (btnGuardar) {
-            btnGuardar.addEventListener('click', function(e) {
-                // Nos aseguramos de que el envío sea siempre un POST al endpoint correcto
-                const form = document.getElementById('formRegistroNotas');
-                if (!form) return;
+            } catch (error) {
+                console.error('Error al cargar notas:', error);
+            }
+        }
 
-                form.method = 'POST';
-                form.action = "{{ url_for('Docente.guardar_notas_curso', curso_id=curso_id) }}";
-
-                // Asegurar que asignatura y período actuales viajen en el POST
-                const selAsig = document.getElementById('asignatura_select');
-                const selPer = document.getElementById('periodo_select');
-                if (selAsig && !selAsig.name) selAsig.name = 'asignatura';
-                if (selPer && !selPer.name) selPer.name = 'periodo';
-
-                // Forzar el envío del formulario (por si algún otro JS cancela el submit)
-                form.submit();
+        function limpiarInputsDeNotas() {
+            document.querySelectorAll('#tablaNotas input[type="number"]').forEach(input => {
+                input.value = '';
+            });
+            document.querySelectorAll('td:last-child').forEach(cell => {
+                // Limpiar celdas de promedio (última columna de cada fila)
+                if (cell.textContent && !cell.querySelector('input')) {
+                    cell.textContent = '';
+                }
             });
         }
     });

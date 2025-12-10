@@ -6,9 +6,9 @@
 <header class="finisher-header d-flex align-items-center p-3 border-bottom w-100">
   <button class="btn btn-dark btn-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar"> 
     <i class="bi bi-list"></i> 
-  </button>   <h2 class="titulo-header mx-4 mb-0" style="white-space: nowrap;">| COLEGIO FE Y ALEGRIA</h2>
+  </button>   <span class="titulo-header mx-3 mb-0" style="white-space: nowrap; font-size: 1.5rem; font-weight: bold; color: #050733ff;">| COLEGIO FE Y ALEGRIA</span>
 
-  <span id="nombreUsuario" style="margin-left: 360px; font-weight: bold; color: #050733ff; font-size: 35px; white-space: nowrap; flex-shrink: 0;"></span>
+  <span id="nombreUsuario" style="margin-left: auto; font-weight: bold; color: #050733ff; font-size: 35px; white-space: nowrap; flex-shrink: 0;"></span>
   <div style="margin-left: auto; display: flex; align-items: center; gap: 15px;">
     <!-- Icono notificaciones -->
     <div class="position-relative icono-header">
@@ -252,7 +252,8 @@ document.addEventListener('DOMContentLoaded', function() {
               
              <li><a href="{{ url_for('Administrador.calculo_promedio') }}" class="nav-link text-white"><i class="bi bi-list-stars"></i> Calculo de Promedio</a></li>
 
-             <li><a href="{{ url_for('Administrador.configuracion_academica') }}" class="nav-link text-white"><i class="bi bi-gear-fill"></i> Configuración Académica</a></li>
+             <li><a href="{{ url_for('Administrador.aprobacion_academica') }}" class="nav-link text-white"><i class="bi bi-check-circle-fill"></i> Aprobación Académica</a></li>
+
 
 
 

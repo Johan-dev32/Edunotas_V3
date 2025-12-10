@@ -765,6 +765,8 @@ def api_notas_estudiante():
         periodo = request.args.get('periodo', type=int)
         asignatura_id = request.args.get('asignatura', type=int)
 
+        print(f"[DEBUG] API Notas - Estudiante: {uid}, Periodo: {periodo}, Asignatura: {asignatura_id}")
+
         q = Nota_Calificaciones.query.filter_by(ID_Estudiante=uid)
         if periodo:
             q = q.filter(Nota_Calificaciones.Periodo == periodo)
@@ -772,6 +774,8 @@ def api_notas_estudiante():
             q = q.filter(Nota_Calificaciones.ID_Asignatura == asignatura_id)
 
         rows = q.all()
+        print(f"[DEBUG] API Notas - Registros encontrados: {len(rows)}")
+        
         data = []
         for r in rows:
             asig = Asignatura.query.get(r.ID_Asignatura)
@@ -787,6 +791,7 @@ def api_notas_estudiante():
                 'nota_5': r.Nota_5,
                 'promedio': r.Promedio_Final,
             })
+            print(f"[DEBUG] API - Nota: ID={r.ID_Calificacion}, Asignatura={asig.Nombre if asig else 'N/A'}, Promedio={r.Promedio_Final}")
 
         return jsonify({'success': True, 'user_id': current_user.ID_Usuario, 'consulted_estudiante_id': uid, 'count': len(data), 'notas': data})
     except Exception as e:

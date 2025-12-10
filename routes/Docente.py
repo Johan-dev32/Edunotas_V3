@@ -868,6 +868,29 @@ def registro_notas_curso(curso_id):
             Matricula.ID_Curso == curso_pk,
             Usuario.Rol == 'Estudiante'
         ).order_by(Usuario.Apellido, Usuario.Nombre).all()
+    
+    # DEBUG: Mostrar estudiantes que se están cargando
+    print(f"DEBUG: Estudiantes en curso {curso_pk}:")
+    for usuario, matricula in estudiantes_db:
+        print(f"  - ID: {usuario.ID_Usuario}, Nombre: {usuario.Nombre} {usuario.Apellido}, Matrícula: {matricula.ID_Matricula}")
+    
+    # DEBUG: Verificar si existen duplicados por nombre
+    nombres_estudiantes = {}
+    for usuario, matricula in estudiantes_db:
+        nombre_completo = f"{usuario.Nombre} {usuario.Apellido}"
+        if nombre_completo not in nombres_estudiantes:
+            nombres_estudiantes[nombre_completo] = []
+        nombres_estudiantes[nombre_completo].append({
+            'id': usuario.ID_Usuario,
+            'matricula': matricula.ID_Matricula
+        })
+    
+    print("DEBUG: Revisando duplicados por nombre:")
+    for nombre, estudiantes in nombres_estudiantes.items():
+        if len(estudiantes) > 1:
+            print(f"  DUPLICADO: {nombre}")
+            for est in estudiantes:
+                print(f"    - ID: {est['id']}, Matrícula: {est['matricula']}")
 
     # 1.6. Obtener las asignaturas disponibles
     # Por ahora cargamos todas las asignaturas registradas, sin filtrar por docente,
@@ -1023,13 +1046,63 @@ def generar_reporte_pdf(curso_id):
 # ✅ ESTA ES LA DEFINICIÓN CORRECTA PARA PETICIONES AJAX POST ✅
 @Docente_bp.route('/cargar_notas_ajax', methods=['POST'])
 def cargar_notas_ajax():
-    # Los datos se obtienen del cuerpo JSON, no de la URL
-    data = request.get_json()
-    curso_id = data.get('curso_id')
-    asignatura_id = data.get('asignatura_id')
-    periodo = data.get('periodo')
-    
-    # ... (El resto de tu lógica de Python) ...
+    try:
+        # Los datos se obtienen del cuerpo JSON, no de la URL
+        data = request.get_json()
+        curso_id = data.get('curso_id')
+        asignatura_id = data.get('asignatura_id')
+        periodo = data.get('periodo')
+        
+        if not all([curso_id, asignatura_id, periodo]):
+            return jsonify({'success': False, 'error': 'Faltan parámetros requeridos'}), 400
+        
+        # Obtener estudiantes del curso
+        estudiantes = (
+            db.session.query(Usuario)
+            .join(Matricula, Matricula.ID_Estudiante == Usuario.ID_Usuario)
+            .filter(Matricula.ID_Curso == curso_id, Usuario.Rol == 'Estudiante')
+            .order_by(Usuario.Apellido, Usuario.Nombre)
+            .all()
+        )
+        
+        # Obtener notas existentes para esta asignatura y período
+        notas_existentes = Nota_Calificaciones.query.filter_by(
+            ID_Asignatura=asignatura_id,
+            Periodo=periodo
+        ).all()
+        
+        # Mapear notas por estudiante para acceso rápido
+        notas_por_estudiante = {nota.ID_Estudiante: nota for nota in notas_existentes}
+        
+        # Construir respuesta
+        resultado = []
+        for estudiante in estudiantes:
+            nota_registro = notas_por_estudiante.get(estudiante.ID_Usuario)
+            
+            notas_data = {
+                'ID_Usuario': estudiante.ID_Usuario,
+                'Nombre': estudiante.Nombre,
+                'Apellido': estudiante.Apellido,
+                'notas': {},
+                'Promedio_Final': None
+            }
+            
+            if nota_registro:
+                notas_data['notas'] = {
+                    'nota_1': nota_registro.Nota_1,
+                    'nota_2': nota_registro.Nota_2,
+                    'nota_3': nota_registro.Nota_3,
+                    'nota_4': nota_registro.Nota_4,
+                    'nota_5': nota_registro.Nota_5
+                }
+                notas_data['Promedio_Final'] = nota_registro.Promedio_Final
+            
+            resultado.append(notas_data)
+        
+        return jsonify(resultado)
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 
@@ -1044,31 +1117,31 @@ def guardar_notas_curso(curso_id):
     session_key_asignatura = f'last_asignatura_{curso_id}'
     session_key_periodo = f'last_periodo_{curso_id}'
     
+    # 1. OBTENER ASIGNATURA Y PERÍODO DESDE SESIÓN O FORMULARIO
+    asignatura_id = session.get(session_key_asignatura)
+    periodo = session.get(session_key_periodo)
+    
     datos_formulario = request.form
     
-    # 1. Obtener acción y filtros
+    # 1. Obtener acción y filtros desde el formulario
     accion = datos_formulario.get('action', 'guardar') 
     asignatura_id_str = datos_formulario.get('asignatura')
     periodo_str = datos_formulario.get('periodo')
     
     # 1.1. Validar filtros
     if not asignatura_id_str or not periodo_str:
-        flash("Error: Seleccione la Asignatura y el Período antes de guardar o reportar.", "error")
         return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id))
     
     try:
         asignatura_id = int(asignatura_id_str)
         periodo = int(periodo_str)
     except ValueError:
-        flash("Error: Los filtros de Asignatura o Período no son válidos.", "error")
         return redirect(url_for('Docente.registro_notas_curso', curso_id=curso_id))
 
     # 2. PROCESAMIENTO DE NOTAS 
     try:
         # DEBUG: contar campos de notas y mostrar muestra
         nota_items = [(k, v) for k, v in datos_formulario.items() if k.startswith('nota_')]
-        print(f"[guardar_notas_curso] Campos de notas recibidos: {len(nota_items)}")
-        print(f"[guardar_notas_curso] Muestra notas: {nota_items[:5]}")
 
         # Agrupar notas por estudiante para calcular promedio
         por_estudiante = {}
@@ -1087,7 +1160,9 @@ def guardar_notas_curso(curso_id):
                     pass
 
         updated_estudiante_ids = set()
+        
         for est_id, notas_dict in por_estudiante.items():
+            
             # Buscar o crear el registro de Nota_Calificaciones para este estudiante/asignatura/período
             nota_obj = Nota_Calificaciones.query.filter_by(
                 ID_Estudiante=est_id,
@@ -1117,19 +1192,42 @@ def guardar_notas_curso(curso_id):
                             Observaciones=""
                         )
                         db.session.add(historial)
-                        # No hacemos commit aún; se hará al final del bloque
+                        db.session.flush()  # Para obtener el ID_Historial
 
-                # Si por alguna razón no hay historial, no podemos crear la nota (rompería la FK)
+                # Si por alguna razón no hay historial, lo creamos con valores por defecto
                 if not historial:
-                    continue
+                    # Crear matrícula si no existe
+                    if not matricula:
+                        matricula = Matricula(
+                            ID_Estudiante=est_id,
+                            ID_Curso=curso_id,
+                            AnioLectivo=curso_obj.Anio if curso_obj else "2025"
+                        )
+                        db.session.add(matricula)
+                        db.session.flush()  # Para obtener el ID_Matricula
+                    
+                    # Crear historial académico
+                    historial = Historial_Academico(
+                        ID_Matricula=matricula.ID_Matricula,
+                        Anio=curso_obj.Anio if curso_obj else "2025",
+                        Periodo=str(periodo),
+                        Descripcion=f"Notas período {periodo}",
+                        Observaciones=""
+                    )
+                    db.session.add(historial)
+                    db.session.flush()  # Para obtener el ID_Historial
 
+                # Verificación final: asegurar que tenemos un historial válido
+                if not historial or not historial.ID_Historial:
+                    continue  # Saltar este estudiante
+                
                 # Crear la nota y enlazarla al historial usando la relación ORM
                 nota_obj = Nota_Calificaciones(
                     ID_Estudiante=est_id,
                     ID_Asignatura=asignatura_id,
+                    ID_Historial=historial.ID_Historial,
                     Periodo=periodo
                 )
-                nota_obj.historial = historial
                 db.session.add(nota_obj)
 
             # Asignar campos Nota_1..Nota_5 según lo recibido
@@ -1145,13 +1243,6 @@ def guardar_notas_curso(curso_id):
             updated_estudiante_ids.add(est_id)
 
         db.session.commit()
-
-        # DEBUG: verificar cuántos registros hay ahora
-        try:
-            cnt = Nota_Calificaciones.query.filter_by(ID_Asignatura=asignatura_id, Periodo=periodo).count()
-            print(f"[guardar_notas_curso] Registros ahora para asig={asignatura_id}, periodo={periodo}: {cnt}")
-        except Exception as _:
-            pass
         
         # 2.1. Notificaciones automáticas a estudiantes y acudientes
         try:
@@ -1170,9 +1261,6 @@ def guardar_notas_curso(curso_id):
                 ))
                 # Notificaciones a acudientes relacionados y activos
                 relaciones = Acudiente.query.filter_by(ID_Estudiante=est_id, Estado='Activo').all()
-                print(f"[guardar_notas_curso] Estudiante {est_id}: acudientes activos encontrados = {len(relaciones)}")
-                if relaciones:
-                    print(f"[guardar_notas_curso] Acudientes IDs: {[r.ID_Usuario for r in relaciones]}")
                 for rel in relaciones:
                     notis.append(Notificacion(
                         Titulo='Nueva calificación del estudiante',
@@ -1183,13 +1271,9 @@ def guardar_notas_curso(curso_id):
             if notis:
                 db.session.bulk_save_objects(notis)
                 db.session.commit()
-                print(f"[guardar_notas_curso] Notificaciones creadas: {len(notis)}")
         except Exception as e:
             db.session.rollback()
-            try:
-                print(f"[guardar_notas_curso] Error creando notificaciones: {e}")
-            except Exception:
-                pass
+            pass
 
         # ✅ CLAVE DE PERSISTENCIA: Guardar los filtros en la sesión
         session[session_key_asignatura] = asignatura_id
@@ -1221,6 +1305,90 @@ def guardar_notas_curso(curso_id):
     ))
 
 
+
+@Docente_bp.route('/eliminar_matricula_duplicada/<int:estudiante_id>')
+@login_required
+def eliminar_matricula_duplicada(estudiante_id):
+    """Función temporal para eliminar matrícula duplicada del curso 1"""
+    try:
+        # Verificar que el estudiante exista
+        estudiante = Usuario.query.get(estudiante_id)
+        if not estudiante:
+            print(f"DEBUG: Estudiante con ID {estudiante_id} no encontrado")
+            flash(f'Estudiante con ID {estudiante_id} no encontrado.', 'error')
+            return redirect(url_for('Docente.registro_notas_curso', curso_id=1))
+        
+        print(f"DEBUG: ELIMINANDO MATRÍCULA DUPLICADA - ID Estudiante: {estudiante_id}, Nombre: {estudiante.Nombre} {estudiante.Apellido}")
+        
+        # Eliminar solo la matrícula del curso 1
+        matricula = Matricula.query.filter_by(ID_Estudiante=estudiante_id, ID_Curso=1).first()
+        if matricula:
+            print(f"DEBUG: Eliminando matrícula ID: {matricula.ID_Matricula} del curso 1")
+            db.session.delete(matricula)
+            db.session.commit()
+            print(f"DEBUG: MATRÍCULA DEL CURSO 1 ELIMINADA EXITOSAMENTE")
+            flash(f'Matrícula del curso 1 eliminada para "{estudiante.Nombre} {estudiante.Apellido}".', 'success')
+        else:
+            print(f"DEBUG: No se encontró matrícula del curso 1 para el estudiante {estudiante_id}")
+            flash(f'No se encontró matrícula del curso 1 para este estudiante.', 'warning')
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"DEBUG: ERROR ELIMINANDO MATRÍCULA: {e}")
+        flash(f'Error al eliminar matrícula: {e}', 'error')
+    
+    return redirect(url_for('Docente.registro_notas_curso', curso_id=1))
+
+@Docente_bp.route('/eliminar_estudiante_duplicado/<int:estudiante_id>')
+@login_required
+def eliminar_estudiante_duplicado(estudiante_id):
+    """Función temporal para eliminar estudiante duplicado"""
+    try:
+        # Verificar que el estudiante exista
+        estudiante = Usuario.query.get(estudiante_id)
+        if not estudiante:
+            print(f"DEBUG: Estudiante con ID {estudiante_id} no encontrado")
+            flash(f'Estudiante con ID {estudiante_id} no encontrado.', 'error')
+            return redirect(url_for('Docente.registro_notas_curso', curso_id=1))
+        
+        print(f"DEBUG: ELIMINANDO ESTUDIANTE DUPLICADO - ID: {estudiante_id}, Nombre: {estudiante.Nombre} {estudiante.Apellido}")
+        
+        # Eliminar matrículas asociadas
+        matriculas = Matricula.query.filter_by(ID_Estudiante=estudiante_id).all()
+        for matricula in matriculas:
+            print(f"DEBUG: Eliminando matrícula ID: {matricula.ID_Matricula}")
+            db.session.delete(matricula)
+        
+        # Eliminar notas asociadas
+        notas = Nota_Calificaciones.query.filter_by(ID_Estudiante=estudiante_id).all()
+        for nota in notas:
+            print(f"DEBUG: Eliminando nota ID: {nota.ID_Calificacion}")
+            db.session.delete(nota)
+        
+        # Eliminar relaciones con acudientes
+        relaciones_acudiente = Acudiente.query.filter_by(ID_Estudiante=estudiante_id).all()
+        for relacion in relaciones_acudiente:
+            print(f"DEBUG: Eliminando relación acudiente ID: {relacion.ID_Acudiente}")
+            db.session.delete(relacion)
+        
+        # Finalmente eliminar el estudiante
+        db.session.delete(estudiante)
+        db.session.commit()
+        
+        print(f"DEBUG: ESTUDIANTE {estudiante_id} ELIMINADO EXITOSAMENTE")
+        flash(f'Estudiante "{estudiante.Nombre} {estudiante.Apellido}" (ID: {estudiante_id}) eliminado correctamente.', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"DEBUG: ERROR ELIMINANDO ESTUDIANTE: {e}")
+        flash(f'Error al eliminar estudiante: {e}', 'error')
+    
+    # Forzar una pausa para ver los mensajes antes de redirigir
+    import time
+    time.sleep(2)
+    
+    print(f"DEBUG: REDIRIGIENDO A REGISTRO DE NOTAS...")
+    return redirect(url_for('Docente.registro_notas_curso', curso_id=1))
 
 @Docente_bp.route('/notas_registro')
 def notas_registro():

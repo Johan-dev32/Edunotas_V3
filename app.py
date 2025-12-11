@@ -73,6 +73,22 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+# Agregar filtro personalizado para formatear números
+@app.template_filter('format_number')
+def format_number(value):
+    """Formatea un número para mostrar siempre un decimal"""
+    if value is None:
+        return ''
+    
+    try:
+        # Convertir a float
+        num = float(value)
+        
+        # Siempre mostrar con un decimal
+        return f"{num:.1f}"
+    except (ValueError, TypeError):
+        return str(value)
+
 # Esta función es requerida por Flask-Login para cargar un usuario
 @login_manager.user_loader
 def load_user(user_id):
@@ -168,7 +184,14 @@ def indexdocente():
 @app.route('/indexacudiente')
 @login_required
 def indexacudiente():
-    return render_template("Acudiente/Paginainicio_Acudiente.html", usuario=current_user)
+    if current_user.is_authenticated:
+        nombre_usuario = current_user.Nombre
+        print(f"Nombre usuario generado en indexacudiente: {nombre_usuario}")
+    else:
+        nombre_usuario = ""
+        print("Usuario no autenticado en indexacudiente")
+    
+    return render_template("Acudiente/Paginainicio_Acudiente.html", usuario=current_user, nombre_usuario=nombre_usuario)
 
 
 
@@ -196,6 +219,8 @@ def login():
         login_user(usuario)
         flash('Inicio de sesión exitoso')
         
+        session['nombre_usuario'] = usuario.Nombre
+        session['genero_usuario'] = usuario.Genero
 
 
         if rol == 'Administrador':

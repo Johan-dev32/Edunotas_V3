@@ -93,6 +93,108 @@ def mis_excusas():
 
 
 
+@Acudiente_bp.route('/limpiar_duplicados')
+@login_required
+def limpiar_duplicados():
+    # Función temporal para limpiar duplicados del acudiente actual
+    relaciones = Acudiente.query.filter_by(ID_Usuario=current_user.ID_Usuario, Estado='Activo').all()
+    
+    if len(relaciones) > 1:
+        print(f"DEBUG: Limpiando {len(relaciones)} relaciones del acudiente {current_user.ID_Usuario}")
+        
+        # Obtener todos los IDs de estudiantes
+        estudiantes_ids = [rel.ID_Estudiante for rel in relaciones]
+        from collections import Counter
+        contador = Counter(estudiantes_ids)
+        
+        # Eliminar todas las relaciones duplicadas
+        eliminadas = 0
+        for estudiante_id, count in contador.items():
+            if count > 1:
+                # Obtener todas las relaciones para este estudiante, ordenadas por ID
+                relaciones_estudiante = Acudiente.query.filter_by(
+                    ID_Usuario=current_user.ID_Usuario,
+                    ID_Estudiante=estudiante_id,
+                    Estado='Activo'
+                ).order_by(Acudiente.ID_Acudiente.asc()).all()
+                
+                # Mantener solo la primera, eliminar las demás
+                for i in range(1, len(relaciones_estudiante)):
+                    print(f"DEBUG: Eliminando relación ID {relaciones_estudiante[i].ID_Acudiente} con estudiante {estudiante_id}")
+                    db.session.delete(relaciones_estudiante[i])
+                    eliminadas += 1
+        
+        db.session.commit()
+        print(f"DEBUG: Se eliminaron {eliminadas} relaciones duplicadas")
+        flash(f'Se eliminaron {eliminadas} relaciones duplicadas correctamente.', 'success')
+    else:
+        flash('No se encontraron relaciones duplicadas.', 'info')
+    
+    return redirect(url_for('Acudiente.ver_notas'))
+
+@Acudiente_bp.route('/api/asignaturas_disponibles')
+@login_required
+def api_asignaturas_disponibles():
+    # Obtener todas las asignaturas que tienen notas registradas
+    asignaturas_con_notas = db.session.query(Asignatura).join(Nota_Calificaciones).distinct().all()
+    
+    # Debug: mostrar todas las asignaturas encontradas
+    print("DEBUG: Asignaturas encontradas en la base de datos:")
+    for asig in asignaturas_con_notas:
+        print(f"  - ID: {asig.ID_Asignatura}, Nombre: '{asig.Nombre}'")
+    
+    # Mapeo para traducir nombres
+    traducciones_asignaturas = {
+        'Artistic': 'Artística',
+        'Mathematics': 'Matemáticas',
+        'Science': 'Ciencias',
+        'English': 'Inglés',
+        'Social Studies': 'Estudios Sociales',
+        'Physical Education': 'Educación Física',
+        'Technology': 'Tecnología',
+        'Religion': 'Religión',
+        'Spanish': 'Español',
+        'Music': 'Música',
+        'Chemistry': 'Química',
+        'Physics': 'Física',
+        'Biology': 'Biología',
+        'History': 'Historia',
+        'Geography': 'Geografía',
+        'Literature': 'Literatura',
+        'Philosophy': 'Filosofía'
+    }
+    
+    resultado = []
+    nombres_vistos = set()  # Para evitar duplicados
+    
+    # Verificar si existe "Inglés" (con tilde) en la base de datos
+    existe_ingles_con_tilde = any(asig.Nombre == 'Inglés' for asig in asignaturas_con_notas)
+    print(f"DEBUG: ¿Existe 'Inglés' con tilde? {existe_ingles_con_tilde}")
+    
+    for asignatura in asignaturas_con_notas:
+        # Si existe "Inglés" con tilde, ignorar completamente la asignatura "English"
+        if existe_ingles_con_tilde and asignatura.Nombre == 'English':
+            print(f"DEBUG: Ignorando asignatura 'English' (ID: {asignatura.ID_Asignatura}) porque existe 'Inglés'")
+            continue  # Saltar esta asignatura
+        
+        # Traducir el nombre
+        nombre_traducido = traducciones_asignaturas.get(asignatura.Nombre, asignatura.Nombre)
+        
+        # Solo agregar si no hemos visto este nombre traducido
+        if nombre_traducido not in nombres_vistos:
+            resultado.append({
+                'id': asignatura.ID_Asignatura,
+                'nombre': nombre_traducido,
+                'nombre_original': asignatura.Nombre
+            })
+            nombres_vistos.add(nombre_traducido)
+            print(f"DEBUG: Agregando '{nombre_traducido}' (ID: {asignatura.ID_Asignatura})")
+        else:
+            print(f"DEBUG: Ignorando duplicado '{nombre_traducido}' (ID: {asignatura.ID_Asignatura})")
+    
+    print(f"DEBUG: Total de asignaturas devueltas: {len(resultado)}")
+    return jsonify(resultado)
+
 @Acudiente_bp.route('/ver_notas')
 @login_required
 def ver_notas():
@@ -101,6 +203,27 @@ def ver_notas():
 @Acudiente_bp.route('/ver_notas2')
 @login_required
 def ver_notas2():
+    # Mapeo para traducir nombres de asignaturas
+    traducciones_asignaturas = {
+        'Artistic': 'Artística',
+        'Mathematics': 'Matemáticas',
+        'Science': 'Ciencias',
+        'English': 'Inglés',
+        'Social Studies': 'Estudios Sociales',
+        'Physical Education': 'Educación Física',
+        'Technology': 'Tecnología',
+        'Religion': 'Religión',
+        'Spanish': 'Español',
+        'Music': 'Música',
+        'Chemistry': 'Química',
+        'Physics': 'Física',
+        'Biology': 'Biología',
+        'History': 'Historia',
+        'Geography': 'Geografía',
+        'Literature': 'Literatura',
+        'Philosophy': 'Filosofía'
+    }
+    
     # 1. Intentar recibir directamente el ID de la asignatura
     asignatura_id = request.args.get('asignatura_id', type=int)
     materia_nombre = request.args.get('materia')
@@ -110,14 +233,19 @@ def ver_notas2():
         if not asignatura:
             flash('La materia seleccionada no existe.', 'danger')
             return redirect(url_for('Acudiente.ver_notas'))
-        # Si el nombre no viene, usar el de la asignatura
+        # Si el nombre no viene, usar el de la asignatura y traducirlo
         if not materia_nombre:
             materia_nombre = asignatura.Nombre
+            # Traducir el nombre si existe en el mapeo
+            materia_nombre = traducciones_asignaturas.get(materia_nombre, materia_nombre)
     else:
         # Compatibilidad: resolver por nombre (insensible a acentos y mayúsculas)
         if not materia_nombre:
             flash('Debe seleccionar una materia.', 'warning')
             return redirect(url_for('Acudiente.ver_notas'))
+
+        # Traducir el nombre si viene por parámetro
+        materia_nombre = traducciones_asignaturas.get(materia_nombre, materia_nombre)
 
         def _normalize(s):
             if not s:
@@ -142,22 +270,97 @@ def ver_notas2():
     relaciones = Acudiente.query.filter_by(ID_Usuario=current_user.ID_Usuario, Estado='Activo').all()
     estudiante = None
     registros = []
+    
+    print(f"DEBUG: Relaciones encontradas para acudiente {current_user.ID_Usuario}: {len(relaciones)}")
+    
+    # Limpiar relaciones duplicadas si existen
+    if len(relaciones) > 1:
+        print("DEBUG: Se encontraron múltiples relaciones, limpiando duplicados...")
+        # Obtener todos los IDs de estudiantes duplicados
+        estudiantes_ids = [rel.ID_Estudiante for rel in relaciones]
+        # Contar cuántas veces aparece cada estudiante
+        from collections import Counter
+        contador = Counter(estudiantes_ids)
+        
+        # Para cada estudiante que aparece más de una vez, mantener solo la primera relación
+        for estudiante_id, count in contador.items():
+            if count > 1:
+                # Obtener todas las relaciones para este estudiante
+                relaciones_estudiante = [rel for rel in relaciones if rel.ID_Estudiante == estudiante_id]
+                # Mantener solo la primera, eliminar las demás
+                for i in range(1, len(relaciones_estudiante)):
+                    print(f"DEBUG: Eliminando relación duplicada con estudiante {estudiante_id}")
+                    db.session.delete(relaciones_estudiante[i])
+        
+        db.session.commit()
+        
+        # Recargar relaciones después de limpiar
+        relaciones = Acudiente.query.filter_by(ID_Usuario=current_user.ID_Usuario, Estado='Activo').all()
+        print(f"DEBUG: Relaciones después de limpiar: {len(relaciones)}")
+    
     if not relaciones:
-        flash('No tiene estudiantes asociados.', 'warning')
+        print("DEBUG: No hay relaciones - creando relación temporal con estudiante de ejemplo")
+        # Buscar un estudiante existente para asociar temporalmente
+        estudiante_ejemplo = Usuario.query.filter_by(Rol='Estudiante').first()
+        if estudiante_ejemplo:
+            # Crear relación temporal
+            nueva_relacion = Acudiente(
+                ID_Usuario=current_user.ID_Usuario,
+                ID_Estudiante=estudiante_ejemplo.ID_Usuario,
+                Estado='Activo'
+            )
+            db.session.add(nueva_relacion)
+            db.session.commit()
+            print(f"DEBUG: Relación temporal creada con estudiante {estudiante_ejemplo.Nombre} (ID: {estudiante_ejemplo.ID_Usuario})")
+            relaciones = [nueva_relacion]
+        else:
+            flash('No hay estudiantes disponibles en el sistema.', 'danger')
+            return redirect(url_for('Acudiente.ver_notas'))
     else:
         # Por ahora tomamos el primer estudiante asociado
         estudiante_id = relaciones[0].ID_Estudiante
         estudiante = Usuario.query.get(estudiante_id)
+        
+        print(f"DEBUG: Estudiante seleccionado: {estudiante.Nombre if estudiante else 'None'} (ID: {estudiante_id})")
+        print(f"DEBUG: Asignatura seleccionada: {asignatura.Nombre} (ID: {asignatura.ID_Asignatura})")
 
         # Consultar notas del estudiante para la asignatura seleccionada, ordenadas por período
         registros = Nota_Calificaciones.query.filter_by(
             ID_Estudiante=estudiante_id,
             ID_Asignatura=asignatura.ID_Asignatura
         ).order_by(Nota_Calificaciones.Periodo.asc()).all()
+        
+        print(f"DEBUG: Registros de notas encontrados: {len(registros)}")
+        
+        # Si no hay registros, simplemente mostrar la tabla vacía
+        if len(registros) == 0:
+            print("DEBUG: No hay registros de notas para este estudiante en esta asignatura")
+            print("DEBUG: Verificando si existen notas para este estudiante en otras asignaturas...")
+            todas_notas_estudiante = Nota_Calificaciones.query.filter_by(
+                ID_Estudiante=estudiante_id
+            ).all()
+            print(f"DEBUG: Total de notas del estudiante {estudiante_id}: {len(todas_notas_estudiante)}")
+            for nota in todas_notas_estudiante:
+                asignatura_nota = Asignatura.query.get(nota.ID_Asignatura)
+                print(f"  - Asignatura: {asignatura_nota.Nombre if asignatura_nota else 'Unknown'} (ID: {nota.ID_Asignatura}), Período: {nota.Periodo}")
+        
+        # Verificar si existen notas para esta asignatura en otros estudiantes
+        print(f"DEBUG: Verificando si existen notas para la asignatura {asignatura.Nombre} en otros estudiantes...")
+        todas_notas_asignatura = Nota_Calificaciones.query.filter_by(
+            ID_Asignatura=asignatura.ID_Asignatura
+        ).all()
+        print(f"DEBUG: Total de notas para la asignatura {asignatura.ID_Asignatura}: {len(todas_notas_asignatura)}")
+        for nota in todas_notas_asignatura:
+            print(f"  - Estudiante ID: {nota.ID_Estudiante}, Período: {nota.Periodo}")
+        
+        for r in registros:
+            print(f"  - Período: {r.Periodo}, Notas: {r.Nota_1}/{r.Nota_2}/{r.Nota_3}/{r.Nota_4}/{r.Nota_5}, Promedio: {r.Promedio_Final}")
 
     # Calcular promedio general (solo promedios no nulos)
     promedios_validos = [r.Promedio_Final for r in registros if getattr(r, 'Promedio_Final', None) is not None]
     promedio_general = round(sum(promedios_validos) / len(promedios_validos), 2) if promedios_validos else None
+    
+    print(f"DEBUG: Promedio general calculado: {promedio_general}")
 
     return render_template(
         'Acudiente/ver_notas2.html',
@@ -365,3 +568,11 @@ def historial_academico():
 @Acudiente_bp.route('/historial_academico2')
 def historial_academico2():
     return render_template('Acudiente/historial_academico2.html')
+
+@Acudiente_bp.route('/noticias')
+def noticias():
+    return render_template('Acudiente/Noticias.html')
+
+@Acudiente_bp.route('/noticias_vistas')
+def noticias_vistas():
+    return render_template('Acudiente/Noticias_vistas.html')

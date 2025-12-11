@@ -1,0 +1,6 @@
+[build]
+# Usa 'apt-get install' o el manejador de paquetes de tu imagen base
+# para instalar las dependencias del sistema operativo (SO).
+# Las dependencias de cairo son 'libcairo2-dev' y 'pkg-config'.
+# A veces también se necesita 'libxml2-dev' y 'libxslt1-dev' para lxml/xhtml2pdf.
+aptPackages = ["libcairo2-dev", "pkg-config", "libxml2-dev", "libxslt1-dev"]

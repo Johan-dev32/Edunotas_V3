@@ -175,7 +175,7 @@ header .btn-dark {
 
 .encabezado-tabla {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   background-color: #050733ff;
   color: white;
   font-weight: bold;
@@ -187,7 +187,7 @@ header .btn-dark {
 
 .fila-nota {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   align-items: center;
   background-color: #f1f3ff;
   border: 1px solid #dce1ef;

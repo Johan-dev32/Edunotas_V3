@@ -99,6 +99,23 @@ with app.app_context():
     db.create_all()
     print("Tablas de la base de datos verificadas/creadas exitosamente.")
     
+    # Crear usuario administrador por defecto si no existe
+    admin_exists = Usuario.query.filter_by(Rol='Administrador').first()
+    if not admin_exists:
+        admin = Usuario(
+            Nombre='Juan',
+            Apellido='Rivera',
+            Correo='juancamiloriveraduquino77@gmail.com',
+            Contrasena=generate_password_hash('123456789'),
+            Rol='Administrador',
+            Genero='Masculino',
+            Direccion='',
+            Telefono=''
+        )
+        db.session.add(admin)
+        db.session.commit()
+        print("Administrador creado exitosamente")
+    
 ###nuevo    
 def send_reset_email(user_email, user_name, token):
     reset_url = url_for('reset_password', token=token, _external=True)

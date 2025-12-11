@@ -84,15 +84,19 @@ document.addEventListener('DOMContentLoaded', () => {
       tbody.innerHTML = '';
       let sumaPromedios = 0;
       let cuentaPromedios = 0;
-      const filtroMateria = (obtenerParametro('materia') || '').toLowerCase().trim();
+      const filtroMateria = asignaturaId ? '' : (obtenerParametro('materia') || '').toLowerCase().trim();
+      console.log(`[DEBUG] Filtro materia: "${filtroMateria}"`);
       const filas = [];
       porAsig.forEach(r => {
         if (asignaturaId && String(r.asignatura_id) !== String(asignaturaId)) {
+          console.log(`[DEBUG] Descartado por ID: ${r.asignatura_id} != ${asignaturaId}`);
           return;
         }
         if (filtroMateria && !(r.asignatura || '').toLowerCase().includes(filtroMateria)) {
+          console.log(`[DEBUG] Descartado por nombre: "${r.asignatura}" no incluye "${filtroMateria}"`);
           return;
         }
+        console.log(`[DEBUG] Aceptado: ${r.asignatura} (ID: ${r.asignatura_id})`);
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${r.asignatura || 'Asignatura'}</td>
@@ -145,7 +149,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      promedioGeneralSpan.textContent = cuentaPromedios > 0 ? (sumaPromedios / cuentaPromedios).toFixed(2) : '-';
+      console.log(`[DEBUG] Filas totales: ${filas.length}`);
+      console.log(`[DEBUG] porAsig size: ${porAsig.size}`);
+      
+      // Si es una sola materia, mostrar su promedio como promedio general
+      if (filas.length === 1) {
+        const primeraFila = filas[0];
+        const promedioCelda = primeraFila.cells[6]; // Celda del promedio
+        console.log(`[DEBUG] Fila encontrada: ${primeraFila.innerHTML}`);
+        console.log(`[DEBUG] Celda promedio: ${promedioCelda ? promedioCelda.textContent : 'No encontrada'}`);
+        
+        if (promedioCelda) {
+          const promedioTexto = promedioCelda.textContent.trim();
+          if (promedioTexto !== '-') {
+            promedioGeneralSpan.textContent = promedioTexto;
+            console.log(`[DEBUG] Promedio asignado: ${promedioTexto}`);
+          }
+        }
+      } else {
+        promedioGeneralSpan.textContent = cuentaPromedios > 0 ? (sumaPromedios / cuentaPromedios).toFixed(2) : '-';
+      }
+      console.log(`[DEBUG] Promedio general - Suma: ${sumaPromedios}, Cuenta: ${cuentaPromedios}, Resultado: ${cuentaPromedios > 0 ? (sumaPromedios / cuentaPromedios).toFixed(2) : '-'}`);
     } catch (e) {
       console.error('Error cargando notas:', e);
       tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error al cargar las notas.</td></tr>';

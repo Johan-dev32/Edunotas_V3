@@ -294,3 +294,43 @@ header .btn-primary-dark {
   font-size: 12px;
   color: #666464;
 }
+
+/* ---------------------------------- */
+/* 7. ANIMACIONES DE BIENVENIDA       */
+/* ---------------------------------- */
+
+/* Animación para el mensaje de bienvenida */
+#nombreUsuario.subir {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+#nombreUsuario.bajar {
+  opacity: 0 !important;
+  transform: translateY(20px) !important;
+  transition: all 0.8s ease-in-out !important;
+}
+
+/* Animación para el título del colegio */
+.titulo-header.subir {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+/* Animación de los iconos de notificaciones */
+.icono-header.subir {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+/* Animación para el icono de persona */
+.icono-person.subir {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+/* Animación para el botón de menú */
+.btn-menu.subir {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}

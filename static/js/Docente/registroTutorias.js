@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function cargarTutorias() {
         try {
             // Llama a la ruta de Flask para obtener el historial
-            const res = await fetch("/administrador/tutorias/historial"); 
+            const res = await fetch("/docente/tutorias/historial"); 
             
             if (!res.ok) {
                  throw new Error(`Error ${res.status}: Fallo al cargar el historial.`);
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         try {
-            const res = await fetch("/administrador/tutorias/registro", { 
+            const res = await fetch("/docente/tutorias/registro", { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(tutoria),

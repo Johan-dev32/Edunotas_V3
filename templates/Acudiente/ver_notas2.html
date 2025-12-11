@@ -117,12 +117,12 @@
           {% for n in notas %}
           <div class="fila-nota">
             <span>{{ n.Periodo }}</span>
-            <span>{{ n.Nota_1 if n.Nota_1 is not none else '-' }}</span>
-            <span>{{ n.Nota_2 if n.Nota_2 is not none else '-' }}</span>
-            <span>{{ n.Nota_3 if n.Nota_3 is not none else '-' }}</span>
-            <span>{{ n.Nota_4 if n.Nota_4 is not none else '-' }}</span>
-            <span>{{ n.Nota_5 if n.Nota_5 is not none else '-' }}</span>
-            <span>{{ '%.2f' % n.Promedio_Final if n.Promedio_Final is not none else '-' }}</span>
+            <span>{{ n.Nota_1 | format_number if n.Nota_1 is not none else '-' }}</span>
+            <span>{{ n.Nota_2 | format_number if n.Nota_2 is not none else '-' }}</span>
+            <span>{{ n.Nota_3 | format_number if n.Nota_3 is not none else '-' }}</span>
+            <span>{{ n.Nota_4 | format_number if n.Nota_4 is not none else '-' }}</span>
+            <span>{{ n.Nota_5 | format_number if n.Nota_5 is not none else '-' }}</span>
+            <span>{{ n.Promedio_Final | format_number if n.Promedio_Final is not none else '-' }}</span>
           </div>
           {% endfor %}
         {% else %}
@@ -137,7 +137,7 @@
           <strong>Promedio General:</strong>
           <span class="nota-final">
             {% if promedio_general is not none %}
-              {{ '%.2f' % promedio_general }}
+              {{ promedio_general | format_number }}
             {% else %}
               -
             {% endif %}

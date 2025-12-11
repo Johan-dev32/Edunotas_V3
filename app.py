@@ -108,7 +108,7 @@ with app.app_context():
             Correo='juancamiloriveraduquino77@gmail.com',
             Contrasena=generate_password_hash('123456789'),
             Rol='Administrador',
-            Genero='Masculino',
+            Genero='M',
             Direccion='',
             Telefono=''
         )

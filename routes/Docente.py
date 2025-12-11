@@ -118,8 +118,8 @@ def historial_tutorias():
                 "rol": t.Rol,
                 "tema": t.Tema,
                 "fecha": t.FechaRealizacion.strftime("%Y-%m-%d"), 
-                "curso": t.Curso, 
-                "estudiante": t.NombreEstudiante, 
+                "curso": t.curso.Grupo if t.curso else "Sin curso",  # Mostrar el código del curso
+                "estudiante": f"{t.estudiante.Nombre} {t.estudiante.Apellido}" if t.estudiante else "Sin estudiante", 
                 "correo": t.Correo,
                 "motivo": t.Motivo,
                 "observaciones": t.Observaciones
@@ -149,14 +149,33 @@ def guardar_tutoria():
         # Convertir la fecha de String ("YYYY-MM-DD") a objeto datetime
         fecha_realizacion = datetime.strptime(data["fecha"], "%Y-%m-%d")
         
+        # Convertir el código de curso (ej: 601) al ID real de la base de datos
+        curso_codigo = data["curso"]
+        curso_obj = None
+        
+        # Buscar el curso por código (grado*100 + grupo)
+        if curso_codigo and curso_codigo.isdigit():
+            codigo_num = int(curso_codigo)
+            grado_calc = codigo_num // 100
+            grupo_calc = codigo_num % 100
+            
+            # Aceptar grupo "1" y "01", "2" y "02", etc.
+            grupo_candidatos = {str(grupo_calc), f"{grupo_calc:02d}"}
+            
+            curso_obj = Curso.query.filter(
+                (Curso.Grado == str(grado_calc)) | (Curso.Grado == grado_calc),
+                (Curso.Grupo.in_(list(grupo_candidatos)))
+            ).first()
+        
+        id_curso = curso_obj.ID_Curso if curso_obj else None
+        
         # Crear el nuevo objeto Tutorias (Alineado con el modelo modificado)
         nueva_tutoria = Tutorias(
             NombreCompleto=data["nombre"],
             Rol=data["rol"],
             Tema=data["tema"],
             FechaRealizacion=fecha_realizacion,
-            Curso=data["curso"],                  
-            NombreEstudiante=data["estudiante"],  
+            ID_Curso=id_curso,                  
             Correo=data["correo"],
             Motivo=data["motivo"],
             Observaciones=data["observaciones"]
@@ -175,8 +194,8 @@ def guardar_tutoria():
                 "rol": nueva_tutoria.Rol,
                 "tema": nueva_tutoria.Tema,
                 "fecha": nueva_tutoria.FechaRealizacion.strftime("%Y-%m-%d"), 
-                "curso": nueva_tutoria.Curso,
-                "estudiante": nueva_tutoria.NombreEstudiante,
+                "curso": curso_obj.Grupo if curso_obj else data["curso"],  # Mostrar el código del curso
+                "estudiante": data["estudiante"],  # Tomar el nombre del estudiante del formulario
                 "correo": nueva_tutoria.Correo,
                 "motivo": nueva_tutoria.Motivo,
                 "observaciones": nueva_tutoria.Observaciones

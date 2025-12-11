@@ -1463,21 +1463,24 @@ def asignaturas():
         Usuario.Nombre.label('DocenteNombre'),
         Usuario.Apellido.label('DocenteApellido'),
         Usuario.ID_Usuario.label('DocenteID')
-    ).join(Docente_Asignatura, Docente_Asignatura.ID_Asignatura == Asignatura.ID_Asignatura)\
-     .join(Usuario, Usuario.ID_Usuario == Docente_Asignatura.ID_Docente)\
+    ).outerjoin(Docente_Asignatura, Docente_Asignatura.ID_Asignatura == Asignatura.ID_Asignatura)\
+     .outerjoin(Usuario, Usuario.ID_Usuario == Docente_Asignatura.ID_Docente)\
      .all()
 
+    # Inicializar el diccionario con todos los docentes
     docentes_asignados = {docente.ID_Usuario: [] for docente in docentes}
+    
+    # Llenar el diccionario con las asignaturas de cada docente
     for asig in asignaturas:
-        docentes_asignados[asig.DocenteID].append(asig.Nombre)
-
+        if asig.DocenteID and asig.DocenteID in docentes_asignados:
+            docentes_asignados[asig.DocenteID].append(asig.Nombre)
 
     return render_template(
         'Administrador/Asignaturas.html',
         asignaturas=asignaturas,
         docentes=docentes,
         cursos=cursos,
-        docentes_asignados=docentes_asignados 
+        docentes_asignados=docentes_asignados
     )
 
 

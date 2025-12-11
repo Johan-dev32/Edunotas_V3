@@ -39,7 +39,7 @@ UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Configuración de la base de datos
-DB_URL = os.getenv('DATABASE_URL', 'mysql+pymysql://root:@127.0.0.1:3306/edunotas')
+DB_URL = os.getenv('DATABASE_URL', 'sqlite:///edunotas.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'clave_por_defecto_segura')
@@ -94,14 +94,10 @@ def format_number(value):
 def load_user(user_id):
     return Usuario.query.get(int(user_id))
 
-# Crea la base de datos y las tablas si no existen
+# Crea las tablas si no existen
 with app.app_context():
-    engine = create_engine(DB_URL)
-    if not database_exists(engine.url):
-        create_database(engine.url)
-        print("Base de datos 'edunotas' creada exitosamente.")
-        db.create_all()
-        print("Tablas de la base de datos creadas exitosamente.")
+    db.create_all()
+    print("Tablas de la base de datos verificadas/creadas exitosamente.")
     
 ###nuevo    
 def send_reset_email(user_email, user_name, token):
@@ -438,6 +434,7 @@ app.register_blueprint(notificaciones_bp)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
     
 

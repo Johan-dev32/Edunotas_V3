@@ -1842,4 +1842,3 @@ def enviar_correo():
 
     return render_template("Administrador/EnviarCorreo.html")
 
-

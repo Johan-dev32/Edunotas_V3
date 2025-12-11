@@ -86,7 +86,23 @@
   <!-- Contenido principal -->
   <div class="container">
     <div class="table-container">
-      <h3><i class="bi bi-journal-text me-2"></i>Mis Actividades</h3>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+          <i class="bi bi-journal-text me-2"></i>
+          {% if curso %}
+            Actividades del Grupo {{ curso.Grado }}-{{ curso.Grupo }}
+          {% else %}
+            Mis Actividades
+          {% endif %}
+        </h2>
+      </div>
+      <p class="text-muted mb-4">
+        {% if curso %}
+          Listado de actividades publicadas y sus entregas para el grupo {{ curso.Grado }}-{{ curso.Grupo }}
+        {% else %}
+          Listado de actividades publicadas y sus entregas
+        {% endif %}
+      </p>
       
       <div class="table-responsive">
         <table class="table table-hover align-middle">

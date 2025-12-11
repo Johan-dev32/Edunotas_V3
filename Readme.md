@@ -78,6 +78,7 @@ Pasos para levantar el proyecto en tu entorno de desarrollo:
     Asegúrate de tener Python instalado.
     ```bash
     pip install -r requirements.txt
+    
     ```
 
 3.  **Configuración de la Base de Datos y Variables de Entorno:**

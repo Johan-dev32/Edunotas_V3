@@ -102,6 +102,7 @@ class Curso(db.Model):
     cronogramas = relationship("Cronograma_Actividades", back_populates="curso", cascade="all, delete-orphan")
     reuniones = relationship("Reuniones", back_populates="curso")
     materiales_didacticos = relationship("MaterialDidactico", back_populates="curso")
+    tutorias = relationship("Tutorias", back_populates="curso", cascade="all, delete-orphan")
 
 class Matricula(db.Model):
     __tablename__ = "Matricula"
@@ -291,7 +292,7 @@ class Actividad_Estudiante(db.Model):
     
 TipoObservacionEnum = ("Academica", "Convivencial")
 NivelImportanciaEnum = ("Bajo", "Medio", "Alto")
-EstadoObservacionEnum = ("Activa", "Inactiva")
+EstadoObservacionEnum = ("Activo", "Inactivo")  # Actualizado para coincidir con la base de datos
 
 
 class Observacion(db.Model):
@@ -302,7 +303,7 @@ class Observacion(db.Model):
     Tipo = db.Column(db.Enum(*TipoObservacionEnum, name="tipo_observacion_enum"))
     NivelImportancia = db.Column(db.Enum(*NivelImportanciaEnum, name="nivel_importancia_enum"))
     Recomendacion = db.Column(db.Text)
-    Estado = db.Column(db.Enum(*EstadoObservacionEnum, name="estado_observacion_enum"), default="Activa")
+    Estado = db.Column(db.Enum(*EstadoObservacionEnum, name="estado_observacion_enum"), default="Activo")
     ID_Programacion = db.Column(db.Integer, db.ForeignKey("Programacion.ID_Programacion", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
     ID_Matricula = db.Column(db.Integer, db.ForeignKey("Matricula.ID_Matricula", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
     ID_Estudiante = db.Column(db.Integer, db.ForeignKey("Usuario.ID_Usuario", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
@@ -317,15 +318,34 @@ class Tutorias(db.Model):
     NombreCompleto = db.Column(db.String(200), nullable=False)
     Rol = db.Column(db.String(50))
     Tema = db.Column(db.String(255))
-    FechaRealizacion = db.Column(db.DateTime)
+    FechaRealizacion = db.Column(db.DateTime, nullable=False)
     ID_Curso = db.Column(db.Integer, db.ForeignKey("Curso.ID_Curso", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
     ID_Estudiante = db.Column(db.Integer, db.ForeignKey("Usuario.ID_Usuario", ondelete="SET NULL", onupdate="CASCADE"), nullable=True)
     Correo = db.Column(db.String(150))
     Motivo = db.Column(db.Text)
     Observaciones = db.Column(db.Text)
-
-    curso = relationship("Curso")
-    estudiante = relationship("Usuario")
+    FechaCreacion = db.Column(db.DateTime, default=datetime.utcnow)
+    Estado = db.Column(db.Enum(*EstadoTutoriaEnum, name="estado_tutoria_enum"), default="Activo")
+    
+    # Relaciones
+    curso = relationship("Curso", back_populates="tutorias")
+    estudiante = relationship("Usuario", foreign_keys=[ID_Estudiante])
+    
+    def to_dict(self):
+        return {
+            'id': self.ID_Tutoria,
+            'nombre': self.NombreCompleto,
+            'rol': self.Rol,
+            'tema': self.Tema,
+            'fecha': self.FechaRealizacion.strftime('%Y-%m-%d') if self.FechaRealizacion else None,
+            'curso': self.curso.Grado + ' ' + (self.curso.Grupo or '') if self.curso else '',
+            'estudiante': self.estudiante.Nombre + ' ' + self.estudiante.Apellido if self.estudiante else '',
+            'correo': self.Correo,
+            'motivo': self.Motivo,
+            'observaciones': self.Observaciones,
+            'estado': self.Estado,
+            'fecha_creacion': self.FechaCreacion.strftime('%Y-%m-%d %H:%M:%S') if self.FechaCreacion else None
+        }
 
 class Reuniones(db.Model):
     __tablename__ = "Reuniones"

@@ -91,41 +91,32 @@ def registrar_resumen_semanal():
         return jsonify({'success': False, 'error': f'Error interno del servidor: {str(e)}'}), 500
 
 @Docente_bp.route('/registrotutorias')
+@login_required
 def registrotutorias():
-    return render_template('Docentes/RegistroTutorías.html')
-
-
-
-
-# ----------------------------------------------------------------------------------------
-#---------------------------------parte de actividades----------------------------
-# -------------------------------------------------------------------------------
+    """Renderiza la página principal de registro de tutorías."""
+    # Obtener la lista de cursos para el select
+    cursos = Curso.query.filter_by(Estado='Activo').all()
+    return render_template('Docentes/RegistroTutorías.html', cursos=cursos)
 
 @Docente_bp.route("/tutorias/historial", methods=["GET"])
+@login_required
 def historial_tutorias():
     """
     Ruta API para cargar todas las tutorías guardadas en la BD.
     Esta es la ruta que llama el JavaScript al cargar la página.
     """
     try:
-        # Consulta las tutorías ordenadas por fecha de realización descendente (más recientes primero)
-        tutorias = Tutorias.query.order_by(Tutorias.FechaRealizacion.desc()).all()
+        # Si es docente, solo mostrar sus tutorías
+        if current_user.Rol == 'Docente':
+            tutorias = Tutorias.query.filter(
+                (Tutorias.ID_Estudiante == current_user.ID_Usuario) | 
+                (Tutorias.Correo == current_user.Correo)
+            ).order_by(Tutorias.FechaRealizacion.desc()).all()
+        else:
+            # Administradores ven todas las tutorías
+            tutorias = Tutorias.query.order_by(Tutorias.FechaRealizacion.desc()).all()
         
-        result = [
-            {
-                "id": t.ID_Tutoria,
-                "nombre": t.NombreCompleto,
-                "rol": t.Rol,
-                "tema": t.Tema,
-                "fecha": t.FechaRealizacion.strftime("%Y-%m-%d"), 
-                "curso": t.Curso, 
-                "estudiante": t.NombreEstudiante, 
-                "correo": t.Correo,
-                "motivo": t.Motivo,
-                "observaciones": t.Observaciones
-            }
-            for t in tutorias
-        ]
+        result = [t.to_dict() for t in tutorias]
         
         # Devuelve el JSON que el frontend espera
         return jsonify({"success": True, "tutorias": result})
@@ -133,33 +124,46 @@ def historial_tutorias():
     except Exception as e:
         print(f"Error al cargar historial de tutorías: {e}")
         return jsonify({"success": False, "error": "Error de servidor al cargar datos."}), 500
-    
+
 @Docente_bp.route("/tutorias/registro", methods=["POST"])
+@login_required
 def guardar_tutoria():
     """
     Recibe los datos de la tutoría desde el modal y los guarda en la BD.
     """
     data = request.get_json()
     
-    # 🚨 Validación de datos básicos
-    if not all(key in data for key in ["nombre", "rol", "tema", "fecha", "curso", "estudiante", "correo", "motivo", "observaciones"]):
+    # Validación de datos básicos
+    required_fields = ["nombre", "rol", "tema", "fecha", "curso_id", "estudiante_id", "correo", "motivo"]
+    if not all(key in data for key in required_fields):
         return jsonify({"success": False, "error": "Faltan campos obligatorios."}), 400
 
     try:
         # Convertir la fecha de String ("YYYY-MM-DD") a objeto datetime
         fecha_realizacion = datetime.strptime(data["fecha"], "%Y-%m-%d")
         
-        # Crear el nuevo objeto Tutorias (Alineado con el modelo modificado)
+        # Obtener el objeto del curso
+        curso = Curso.query.get(data["curso_id"])
+        if not curso:
+            return jsonify({"success": False, "error": "El curso seleccionado no existe."}), 400
+            
+        # Obtener el objeto del estudiante
+        estudiante = Usuario.query.get(data["estudiante_id"])
+        if not estudiante:
+            return jsonify({"success": False, "error": "El estudiante seleccionado no existe."}), 400
+        
+        # Crear el nuevo objeto Tutorias
         nueva_tutoria = Tutorias(
             NombreCompleto=data["nombre"],
             Rol=data["rol"],
             Tema=data["tema"],
             FechaRealizacion=fecha_realizacion,
-            Curso=data["curso"],                  
-            NombreEstudiante=data["estudiante"],  
+            ID_Curso=curso.ID_Curso,
+            ID_Estudiante=estudiante.ID_Usuario,
             Correo=data["correo"],
             Motivo=data["motivo"],
-            Observaciones=data["observaciones"]
+            Observaciones=data.get("observaciones", ""),
+            Estado="Activo"
         )
         
         db.session.add(nueva_tutoria)
@@ -169,24 +173,57 @@ def guardar_tutoria():
         return jsonify({
             "success": True,
             "message": "Tutoría registrada con éxito.",
-            "tutoria": {
-                "id": nueva_tutoria.ID_Tutoria,
-                "nombre": nueva_tutoria.NombreCompleto,
-                "rol": nueva_tutoria.Rol,
-                "tema": nueva_tutoria.Tema,
-                "fecha": nueva_tutoria.FechaRealizacion.strftime("%Y-%m-%d"), 
-                "curso": nueva_tutoria.Curso,
-                "estudiante": nueva_tutoria.NombreEstudiante,
-                "correo": nueva_tutoria.Correo,
-                "motivo": nueva_tutoria.Motivo,
-                "observaciones": nueva_tutoria.Observaciones
-            }
+            "tutoria": nueva_tutoria.to_dict()
         }), 201 
         
     except Exception as e:
         db.session.rollback()
-        print(f"Error crítico al guardar tutoría en BD: {e}") 
-        return jsonify({"success": False, "error": f"Error interno del servidor: {str(e)}", "trace": str(e)}), 500
+        print(f"Error al guardar tutoría: {e}")
+        return jsonify({"success": False, "error": f"Error al guardar la tutoría: {str(e)}"}), 500
+
+@Docente_bp.route("/tutorias/eliminar/<int:tutoria_id>", methods=["DELETE"])
+@login_required
+def eliminar_tutoria(tutoria_id):
+    """Elimina una tutoría por su ID."""
+    try:
+        tutoria = Tutorias.query.get_or_404(tutoria_id)
+        
+        # Verificar permisos (solo el docente dueño o un admin puede eliminar)
+        if current_user.Rol != 'Administrador' and tutoria.ID_Estudiante != current_user.ID_Usuario:
+            return jsonify({"success": False, "error": "No tienes permiso para eliminar esta tutoría."}), 403
+        
+        db.session.delete(tutoria)
+        db.session.commit()
+        
+        return jsonify({"success": True, "message": "Tutoría eliminada correctamente."})
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error al eliminar tutoría: {e}")
+        return jsonify({"success": False, "error": "Error al eliminar la tutoría."}), 500
+
+@Docente_bp.route("/tutorias/estudiantes-por-curso/<int:curso_id>", methods=["GET"])
+@login_required
+def obtener_estudiantes_por_curso(curso_id):
+    """Obtiene la lista de estudiantes matriculados en un curso específico."""
+    try:
+        # Obtener las matrículas activas para el curso
+        matriculas = Matricula.query.filter_by(ID_Curso=curso_id).all()
+        
+        estudiantes = []
+        for matricula in matriculas:
+            estudiante = matricula.estudiante_usuario
+            estudiantes.append({
+                'id': estudiante.ID_Usuario,
+                'nombre_completo': f"{estudiante.Nombre} {estudiante.Apellido}",
+                'documento': estudiante.NumeroDocumento or ''
+            })
+        
+        return jsonify({"success": True, "estudiantes": estudiantes})
+        
+    except Exception as e:
+        print(f"Error al obtener estudiantes del curso: {e}")
+        return jsonify({"success": False, "error": "Error al obtener la lista de estudiantes."}), 500
 
 
 @Docente_bp.route('/tareas_actividades1')
@@ -454,7 +491,7 @@ def ver_pdf(filename):
     try:
         return send_from_directory(upload_folder, filename, as_attachment=False)
     except FileNotFoundError:
-        flash("❌ El archivo PDF no fue encontrado.", "danger")
+        flash(" El archivo PDF no fue encontrado.", "danger")
         return redirect(url_for('Docente.tareas_actividades1'))
     
 
@@ -463,33 +500,38 @@ def ver_pdf(filename):
 @login_required
 def ver_entregas_lista():
     try:
-        # obtener asignaturas del docente
-        asignaturas_docente = Docente_Asignatura.query.filter_by(
-            ID_Docente=current_user.ID_Usuario
-        ).all()
+        # Obtener las asignaturas del docente
+        asignaturas_docente = Docente_Asignatura.query.filter_by(ID_Docente=current_user.ID_Usuario).all()
+        
+        if not asignaturas_docente:
+            return render_template("Docentes/VerEntregasLista.html", actividades=[], curso=None)
 
+        # Obtener el primer curso de las asignaturas del docente
+        curso = Curso.query.get(asignaturas_docente[0].ID_Curso) if asignaturas_docente[0].ID_Curso else None
+        
         id_asignaturas = [a.ID_Asignatura for a in asignaturas_docente]
 
-        # obtener cronogramas ligados a esas asignaturas
+        # Obtener cronogramas ligados a esas asignaturas
         cronogramas = Cronograma_Actividades.query.filter(
             Cronograma_Actividades.ID_Asignatura.in_(id_asignaturas)
         ).all()
 
         id_cronogramas = [c.ID_Cronograma_Actividades for c in cronogramas]
 
-        # obtener actividades de esos cronogramas
+        # Obtener actividades de esos cronogramas
         actividades = Actividad.query.filter(
             Actividad.ID_Cronograma_Actividades.in_(id_cronogramas)
         ).all()
 
         return render_template(
             "Docentes/VerEntregasLista.html",
-            actividades=actividades
+            actividades=actividades,
+            curso=curso
         )
 
     except Exception as e:
         print("ERROR en ver_entregas_lista:", e)
-        return render_template("Docentes/VerEntregasLista.html", actividades=[])
+        return render_template("Docentes/VerEntregasLista.html", actividades=[], curso=None)
 
 
 @Docente_bp.route('/entregas/<int:id_actividad>')

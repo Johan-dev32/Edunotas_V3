@@ -211,41 +211,46 @@ def indexacudiente():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        correo = request.form.get('email')
-        contrasena = request.form.get('password')
-        rol = request.form.get('rol')
-        
-        usuario = Usuario.query.filter_by(Correo=correo).first()
+        try:
+            correo = request.form.get('email')
+            contrasena = request.form.get('password')
+            rol = request.form.get('rol')
+            
+            usuario = Usuario.query.filter_by(Correo=correo).first()
 
-        if not usuario:
-            flash("Correo incorrecto.")
-            return redirect(url_for('login'))
+            if not usuario:
+                flash("Correo incorrecto.")
+                return redirect(url_for('login'))
 
-        if not check_password_hash(usuario.Contrasena, contrasena):
-            flash("Contraseña incorrecta.")
-            return redirect(url_for('login'))
+            if not check_password_hash(usuario.Contrasena, contrasena):
+                flash("Contraseña incorrecta.")
+                return redirect(url_for('login'))
 
-        if usuario.Rol != rol:
-            flash("El rol seleccionado no coincide con el asignado al usuario.")
-            return redirect(url_for('login'))
+            if usuario.Rol != rol:
+                flash("El rol seleccionado no coincide con el asignado al usuario.")
+                return redirect(url_for('login'))
 
-        login_user(usuario)
-        flash('Inicio de sesión exitoso')
-        
-        session['nombre_usuario'] = usuario.Nombre
-        session['genero_usuario'] = usuario.Genero
+            login_user(usuario)
+            flash('Inicio de sesión exitoso')
+            
+            session['nombre_usuario'] = usuario.Nombre
+            session['genero_usuario'] = usuario.Genero
 
 
-        if rol == 'Administrador':
-            return redirect(url_for('loading', destino='indexadministrador'))
-        elif rol == 'Docente':
-            return redirect(url_for('loading', destino='indexdocente'))
-        elif rol == 'Estudiante':
-            return redirect(url_for('loading', destino='indexestudiante'))
-        elif rol == 'Acudiente':
-            return redirect(url_for('loading', destino='indexacudiente'))
-        else:
-            flash("Rol no reconocido en el sistema.")
+            if rol == 'Administrador':
+                return redirect(url_for('loading', destino='indexadministrador'))
+            elif rol == 'Docente':
+                return redirect(url_for('loading', destino='indexdocente'))
+            elif rol == 'Estudiante':
+                return redirect(url_for('loading', destino='indexestudiante'))
+            elif rol == 'Acudiente':
+                return redirect(url_for('loading', destino='indexacudiente'))
+            else:
+                flash("Rol no reconocido en el sistema.")
+                return redirect(url_for('login'))
+        except Exception as e:
+            print(f"Error en login: {str(e)}")
+            flash("Ocurrió un error al intentar iniciar sesión. Por favor, inténtalo de nuevo.")
             return redirect(url_for('login'))
 
     return render_template('login.html')

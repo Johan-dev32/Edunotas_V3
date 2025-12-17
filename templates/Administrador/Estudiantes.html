@@ -200,7 +200,9 @@
       <label for="Curso" class="form-label">Curso:</label>
       <select name="Curso" id="Curso" class="form-select" required>
         {% for curso in cursos %}
-          <option value="{{ curso.ID_Curso }}">{{ curso.Grupo }}</option>
+          {% if curso.ID_Curso >= 601 and curso.ID_Curso <= 1103 %}
+            <option value="{{ curso.ID_Curso }}">{{ curso.ID_Curso }}</option>
+          {% endif %}
         {% endfor %}
       </select>
     </div>
@@ -233,7 +235,9 @@
               <label class="form-label">Curso:</label>
               <select name="ID_Curso" class="form-select" required>
                 {% for curso in cursos %}
-                  <option value="{{ curso.ID_Curso }}">{{ curso.Grado }}°{{ curso.Grupo }} - {{ curso.Anio }}</option>
+                  {% if curso.ID_Curso >= 601 and curso.ID_Curso <= 1103 %}
+                    <option value="{{ curso.ID_Curso }}">{{ curso.ID_Curso }}</option>
+                  {% endif %}
                 {% endfor %}
               </select>
             </div>

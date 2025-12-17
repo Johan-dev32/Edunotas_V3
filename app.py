@@ -96,25 +96,29 @@ def load_user(user_id):
 
 # Crea las tablas si no existen
 with app.app_context():
-    db.create_all()
-    print("Tablas de la base de datos verificadas/creadas exitosamente.")
-    
-    # Crear usuario administrador por defecto si no existe
-    admin_exists = Usuario.query.filter_by(Rol='Administrador').first()
-    if not admin_exists:
-        admin = Usuario(
-            Nombre='Juan',
-            Apellido='Rivera',
-            Correo='juancamiloriveraduquino77@gmail.com',
-            Contrasena=generate_password_hash('123456789'),
-            Rol='Administrador',
-            Genero='M',
-            Direccion='',
-            Telefono=''
-        )
-        db.session.add(admin)
-        db.session.commit()
-        print("Administrador creado exitosamente")
+    try:
+        db.create_all()
+        print("Tablas de la base de datos verificadas/creadas exitosamente.")
+        
+        # Crear usuario administrador por defecto si no existe
+        admin_exists = Usuario.query.filter_by(Rol='Administrador').first()
+        if not admin_exists:
+            admin = Usuario(
+                Nombre='Juan',
+                Apellido='Rivera',
+                Correo='juancamiloriveraduquino77@gmail.com',
+                Contrasena=generate_password_hash('123456789'),
+                Rol='Administrador',
+                Genero='M',
+                Direccion='',
+                Telefono=''
+            )
+            db.session.add(admin)
+            db.session.commit()
+            print("Administrador creado exitosamente")
+    except Exception as e:
+        print(f"Error al inicializar la base de datos: {str(e)}")
+        print("Continuando con la aplicación...")
     
 ###nuevo    
 def send_reset_email(user_email, user_name, token):
@@ -141,6 +145,18 @@ def validar_password(password):
     if re.search(r"(012|123|234|345|456|567|678|789)", password):
         return "La contraseña no puede contener números consecutivos."
     return None
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    print(f"Error 500: {str(e)}")
+    flash("Ocurrió un error inesperado. Por favor, inténtalo de nuevo.")
+    return redirect(url_for('login'))
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    print(f"Excepción no manejada: {str(e)}")
+    flash("Ocurrió un error inesperado. Por favor, inténtalo de nuevo.")
+    return redirect(url_for('login'))
 
 # ---------------- RUTAS PRINCIPALES ----------------
 

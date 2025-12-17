@@ -124,6 +124,7 @@
       <h2 class="text-center mb-4 subtitulo">LISTA DE CURSOS</h2><br><br>
       <div class="row g-3">
         {% for c in cursos %}
+          {% if c.ID_Curso in [601, 602, 603, 701, 702, 703, 801, 802, 803, 901, 902, 903, 1001, 1002, 1003, 1101, 1102, 1103] %}
         <div class="col-sm-6 col-md-4 col-lg-3">
           <div class="card text-center curso-card">
             <div class="card-body">
@@ -132,6 +133,7 @@
             </div>
           </div>
         </div>
+          {% endif %}
         {% else %}
         <div class="col-12">
           <p class="text-center text-muted">No hay cursos activos.</p>

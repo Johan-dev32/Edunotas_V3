@@ -122,7 +122,7 @@
       <h3 class="mb-3 text-center">Ciclo 1</h3>
       <div class="row g-3 mb-4">
         {% for c in cursos %}
-          {% if c.ID_Curso >= 601 and c.ID_Curso <= 603 %}
+          {% if c.ID_Curso in [601, 602, 603] %}
             <div class="col-md-4">
               <div class="card text-center curso-card">
                 <div class="card-body">
@@ -139,7 +139,7 @@
       <h3 class="mb-3 text-center">Ciclo 2</h3>
       <div class="row g-3 mb-4">
         {% for c in cursos %}
-          {% if c.ID_Curso >= 701 and c.ID_Curso <= 703 %}
+          {% if c.ID_Curso in [701, 702, 703] %}
             <div class="col-md-4">
               <div class="card text-center curso-card">
                 <div class="card-body">
@@ -156,7 +156,7 @@
       <h3 class="mb-3 text-center">Ciclo 3</h3>
       <div class="row g-3 mb-4">
         {% for c in cursos %}
-          {% if c.ID_Curso >= 801 and c.ID_Curso <= 803 %}
+          {% if c.ID_Curso in [801, 802, 803] %}
             <div class="col-md-4">
               <div class="card text-center curso-card">
                 <div class="card-body">
@@ -169,11 +169,11 @@
         {% endfor %}
       </div>
 
-<!-- ciclo4 -->
+      <!-- ciclo4 -->
       <h3 class="mb-3 text-center">Ciclo 4</h3>
       <div class="row g-3 mb-4">
         {% for c in cursos %}
-          {% if c.ID_Curso >= 1001 and c.ID_Curso <= 1003 %}
+          {% if c.ID_Curso in [901, 902, 903] %}
             <div class="col-md-4">
               <div class="card text-center curso-card">
                 <div class="card-body">
@@ -190,7 +190,7 @@
       <h3 class="mb-3 text-center">Ciclo 5</h3>
       <div class="row g-3 mb-4">
         {% for c in cursos %}
-          {% if c.ID_Curso >= 1101 and c.ID_Curso <= 1103 %}
+          {% if c.ID_Curso in [1001, 1002, 1003, 1101, 1102, 1103] %}
             <div class="col-md-4">
               <div class="card text-center curso-card">
                 <div class="card-body">

@@ -1118,8 +1118,8 @@ def historial_tutorias():
                 "rol": t.Rol,
                 "tema": t.Tema,
                 "fecha": t.FechaRealizacion.strftime("%Y-%m-%d"), 
-                "curso": t.Curso, 
-                "estudiante": t.NombreEstudiante, 
+                "curso": t.ID_Curso, 
+                "estudiante": t.ID_Estudiante, 
                 "correo": t.Correo,
                 "motivo": t.Motivo,
                 "observaciones": t.Observaciones
@@ -1155,8 +1155,8 @@ def guardar_tutoria():
             Rol=data["rol"],
             Tema=data["tema"],
             FechaRealizacion=fecha_realizacion,
-            Curso=data["curso"],                  
-            NombreEstudiante=data["estudiante"],  
+            ID_Curso=data["curso"],                  
+            ID_Estudiante=data["estudiante"],  
             Correo=data["correo"],
             Motivo=data["motivo"],
             Observaciones=data["observaciones"]
@@ -1175,8 +1175,8 @@ def guardar_tutoria():
                 "rol": nueva_tutoria.Rol,
                 "tema": nueva_tutoria.Tema,
                 "fecha": nueva_tutoria.FechaRealizacion.strftime("%Y-%m-%d"), 
-                "curso": nueva_tutoria.Curso,
-                "estudiante": nueva_tutoria.NombreEstudiante,
+                "curso": nueva_tutoria.ID_Curso,
+                "estudiante": nueva_tutoria.ID_Estudiante,
                 "correo": nueva_tutoria.Correo,
                 "motivo": nueva_tutoria.Motivo,
                 "observaciones": nueva_tutoria.Observaciones

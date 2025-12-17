@@ -121,169 +121,86 @@
       <!-- ciclo1 -->
       <h3 class="mb-3 text-center">Ciclo 1</h3>
       <div class="row g-3 mb-4">
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">601</h4>
-                <a href="{{ url_for('Administrador.calculo_promedio', curso_id=601) }}" class="btn btn-success">Calcular Promedio</a>
+        {% for c in cursos %}
+          {% if c.ID_Curso >= 601 and c.ID_Curso <= 603 %}
+            <div class="col-md-4">
+              <div class="card text-center curso-card">
+                <div class="card-body">
+                  <h4 class="card-title">{{ c.ID_Curso }} - {{ c.Grado }} {{ c.Grupo }}</h4>
+                  <a href="{{ url_for('Administrador.calculo_promedio', curso_id=c.ID_Curso) }}" class="btn {% if c.ID_Curso == 601 %}btn-success{% else %}btn-primary{% endif %}">Calcular Promedio</a>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">602</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=602) }}" class="btn btn-primary">Calcular Promedio</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">603</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=603) }}" class="btn btn-primary">Calcular Promedio</a>
-            </div>
-          </div>
-        </div>
+          {% endif %}
+        {% endfor %}
       </div>
-          <div class="row g-3 mb-4">
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">701</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=701) }}" class="btn btn-primary">Calcular Promedio</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">702</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=702) }}" class="btn btn-primary">Calcular Promedio</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">703</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=703) }}" class="btn btn-primary">Calcular Promedio</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-<br><br>
-      <!-- Ciclo 2 -->
+      
+      <!-- ciclo2 -->
       <h3 class="mb-3 text-center">Ciclo 2</h3>
       <div class="row g-3 mb-4">
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">801</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=801) }}" class="btn btn-primary">Calcular Promedio</a>
+        {% for c in cursos %}
+          {% if c.ID_Curso >= 701 and c.ID_Curso <= 703 %}
+            <div class="col-md-4">
+              <div class="card text-center curso-card">
+                <div class="card-body">
+                  <h4 class="card-title">{{ c.ID_Curso }} - {{ c.Grado }} {{ c.Grupo }}</h4>
+                  <a href="{{ url_for('Administrador.calculo_promedio', curso_id=c.ID_Curso) }}" class="btn btn-primary">Calcular Promedio</a>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">802</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=802) }}" class="btn btn-primary">Calcular Promedio</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">803</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=803) }}" class="btn btn-primary">Calcular Promedio</a>
-            </div>
-          </div>
-        </div>
+          {% endif %}
+        {% endfor %}
       </div>
-          <div class="row g-3 mb-4">
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">901</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=901) }}" class="btn btn-primary">Calcular Promedio</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">902</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=902) }}" class="btn btn-primary">Calcular Promedio</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">903</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=903) }}" class="btn btn-primary">Calcular Promedio</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-<br><br>
-      <!-- Ciclo 3 -->
+      
+      <!-- ciclo3 -->
       <h3 class="mb-3 text-center">Ciclo 3</h3>
       <div class="row g-3 mb-4">
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">1001</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=1001) }}" class="btn btn-primary">Calcular Promedio</a>
+        {% for c in cursos %}
+          {% if c.ID_Curso >= 801 and c.ID_Curso <= 803 %}
+            <div class="col-md-4">
+              <div class="card text-center curso-card">
+                <div class="card-body">
+                  <h4 class="card-title">{{ c.ID_Curso }} - {{ c.Grado }} {{ c.Grupo }}</h4>
+                  <a href="{{ url_for('Administrador.calculo_promedio', curso_id=c.ID_Curso) }}" class="btn btn-primary">Calcular Promedio</a>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">1002</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=1002) }}" class="btn btn-primary">Calcular Promedio</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">1003</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=1003) }}" class="btn btn-primary">Calcular Promedio</a>
-            </div>
-          </div>
-        </div>
+          {% endif %}
+        {% endfor %}
       </div>
 
+<!-- ciclo4 -->
+      <h3 class="mb-3 text-center">Ciclo 4</h3>
       <div class="row g-3 mb-4">
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">1101</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=1101) }}" class="btn btn-primary">Calcular Promedio</a>
+        {% for c in cursos %}
+          {% if c.ID_Curso >= 1001 and c.ID_Curso <= 1003 %}
+            <div class="col-md-4">
+              <div class="card text-center curso-card">
+                <div class="card-body">
+                  <h4 class="card-title">{{ c.ID_Curso }} - {{ c.Grado }} {{ c.Grupo }}</h4>
+                  <a href="{{ url_for('Administrador.calculo_promedio', curso_id=c.ID_Curso) }}" class="btn btn-primary">Calcular Promedio</a>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">1102</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=1102) }}" class="btn btn-primary">Calcular Promedio</a>
+          {% endif %}
+        {% endfor %}
+      </div>
+      
+      <!-- ciclo5 -->
+      <h3 class="mb-3 text-center">Ciclo 5</h3>
+      <div class="row g-3 mb-4">
+        {% for c in cursos %}
+          {% if c.ID_Curso >= 1101 and c.ID_Curso <= 1103 %}
+            <div class="col-md-4">
+              <div class="card text-center curso-card">
+                <div class="card-body">
+                  <h4 class="card-title">{{ c.ID_Curso }} - {{ c.Grado }} {{ c.Grupo }}</h4>
+                  <a href="{{ url_for('Administrador.calculo_promedio', curso_id=c.ID_Curso) }}" class="btn btn-primary">Calcular Promedio</a>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card text-center curso-card">
-            <div class="card-body">
-              <h4 class="card-title">1103</h4>
-              <a href="{{ url_for('Administrador.calculo_promedio', curso_id=1103) }}" class="btn btn-primary">Calcular Promedio</a>
-            </div>
-          </div>
-        </div>
+          {% endif %}
+        {% endfor %}
       </div>
   </section>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

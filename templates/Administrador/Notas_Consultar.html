@@ -127,7 +127,7 @@
         <div class="col-sm-6 col-md-4 col-lg-3">
           <div class="card text-center curso-card">
             <div class="card-body">
-              <h4 class="card-title">{{ c.Grupo }}</h4>
+              <h4 class="card-title">{{ c.ID_Curso }} - {{ c.Grado }} {{ c.Grupo }}</h4>
               <a href="{{ url_for('Administrador.notas_curso', curso_id=c.ID_Curso) }}" class="btn btn-primary">Ver Notas</a>
             </div>
           </div>

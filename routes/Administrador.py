@@ -2123,7 +2123,8 @@ def registrar_observacion():
 
 @Administrador_bp.route('/calculo_promedio')
 def calculo_promedio():
-    return render_template('Administrador/CalculoPromedio.html')
+    cursos = Curso.query.filter_by(Estado='Activo').order_by(Curso.Grado, Curso.Grupo).all()
+    return render_template('Administrador/CalculoPromedio.html', cursos=cursos)
 
 @Administrador_bp.route('/promedios', methods=['GET'])
 def promedios_por_curso():

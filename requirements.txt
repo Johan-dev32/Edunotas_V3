@@ -11,6 +11,7 @@ Jinja2==3.1.6
 MarkupSafe==3.0.2
 psycopg2-binary==2.9.9
 packaging==25.0
+PyMySQL==1.1.2
 SQLAlchemy==2.0.43
 SQLAlchemy-Utils==0.42.0
 reportlab==3.6.12

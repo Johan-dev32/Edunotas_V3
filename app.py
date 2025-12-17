@@ -149,14 +149,50 @@ def validar_password(password):
 @app.errorhandler(500)
 def internal_server_error(e):
     print(f"Error 500: {str(e)}")
-    flash("Ocurrió un error inesperado. Por favor, inténtalo de nuevo.")
-    return redirect(url_for('login'))
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Error</title>
+        <style>
+            body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+            .error-box { max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+            .btn { background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 3px; display: inline-block; margin-top: 20px; }
+        </style>
+    </head>
+    <body>
+        <div class="error-box">
+            <h2>Ocurrió un error inesperado</h2>
+            <p>Por favor, inténtalo de nuevo más tarde.</p>
+            <a href="/login" class="btn">Volver al login</a>
+        </div>
+    </body>
+    </html>
+    """, 500
 
 @app.errorhandler(Exception)
 def handle_exception(e):
     print(f"Excepción no manejada: {str(e)}")
-    flash("Ocurrió un error inesperado. Por favor, inténtalo de nuevo.")
-    return redirect(url_for('login'))
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Error</title>
+        <style>
+            body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+            .error-box { max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+            .btn { background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 3px; display: inline-block; margin-top: 20px; }
+        </style>
+    </head>
+    <body>
+        <div class="error-box">
+            <h2>Ocurrió un error inesperado</h2>
+            <p>Por favor, inténtalo de nuevo más tarde.</p>
+            <a href="/login" class="btn">Volver al login</a>
+        </div>
+    </body>
+    </html>
+    """, 500
 
 # ---------------- RUTAS PRINCIPALES ----------------
 
